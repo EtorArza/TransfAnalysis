@@ -1,0 +1,12 @@
+/Makefile.conf
+/neat
+/experiment_*
+/G*
+/*out*
+/obj
+/bin
+/tmp/
+.#*
+/gold*/
+/src/util/std.h.gch
+.vscode
