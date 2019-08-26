@@ -10,7 +10,7 @@
 #include "Tools.h"
 #include "Parameters.h"
 #include <iomanip>      // std::setprecision
-
+#include "../permuevaluator.h"
 
 // The object storing the values of all the individuals
 // that have been created during the execution of the
@@ -23,9 +23,13 @@ CIndividual::CIndividual(int length)
 {
 	n = length;
 	genome = new int[n];
+	momentum = new int[n];
+	genome_best = new int[n];
 	GenerateRandomPermutation(this->genome, n);
+	GenerateRandomPermutation(this->momentum, n);
+	GenerateRandomPermutation(this->genome_best, n);
 	f_value=MIN_LONG_INTEGER;
-	input_info = new double[LOGIC_INPUT_LEN];
+	f_best=MIN_LONG_INTEGER;
 	id = n_indivs_created;
 	n_indivs_created++;
 }
@@ -34,7 +38,8 @@ CIndividual::CIndividual(int length)
 CIndividual::~CIndividual()
 {
 	delete[] this->genome;
-	delete[] this-> input_info;
+	delete[] this->momentum;
+	delete[] this->genome_best;
 	genome=NULL;
 }
 

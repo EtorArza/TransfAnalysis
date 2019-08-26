@@ -17,10 +17,9 @@ void set_parameters(int argc, char *argv[])
   INSTANCE_PATH = std::string(argv[2]);
 
 
-  LOGIC_INPUT_LEN = 3;
-  LOGIC_OUTPUT_LEN = 4;
+
   SEED = 2;
-  MAX_TIME = 10.0;
+  MAX_TIME = 1.0;
   POPSIZE = 40;
 }
 

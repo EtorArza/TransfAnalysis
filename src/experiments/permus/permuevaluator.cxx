@@ -8,10 +8,7 @@
 #include "resource.h"
 #include <assert.h>
 
-//#define Truncate_Seq 2
 
-#define Max_Seq_Len 3
-#define Max_Maze_Len 26
 
 using namespace std;
 

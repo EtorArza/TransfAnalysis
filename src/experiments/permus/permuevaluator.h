@@ -1,31 +1,37 @@
 #pragma once
 
 
-
 namespace NEAT {
 
+    const int SWAP = 0;
+    const int EXCH = 1;
+    const int INSERT = 2;
+
+    const int N_OPERATORS = 3;
+
     enum sensor_t {
-        sensor_relat_f = 0,
-        sensor_time = 1,
-        sensor_rand = 2,
-        sensor_relat_spars = 3,
-        sensor_is_local_optima = 4,
-        sensor_ham_dist_from_theoneabove = 5,
-        __sensor_N = 6
+        OPT_SWAP = SWAP, // 1 if local optima for swap neighborhood. 0 else.
+        OPT_EXCH = EXCH,
+        OPT_INSERT = INSERT,
+        RELATIVE_POSITION = 3,
+        RELATIVE_TIME = 4,
+        DISTANCE = 5,
+        SPARSITY = 6,
+        R_NUMBER = 7,
+        __sensor_N = 8
     };
 
+    const int N_COEF = 4;
     enum output_t {
         ls_nothing_move = 0,
-        c_momentum = 1,
-        c_pers_best = 2,
-        c_best_known = 3,
+        O_ID_SWAP = SWAP + 1,
+        O_ID_EXCH = EXCH + 1,
+        O_ID_INSERT = INSERT + 1,
         c_momentum = 4,
-        c_above = 5,
-        o_id_exch = 6,
-        o_id_swap = 7,
-        o_id_insrt = 8,
-
-        __output_N = 9
+        c_pers_best = 5,
+        c_best_known = 6,
+        c_above = 7,
+        __output_N = 8
     };
 
     class NetworkEvaluator *create_permu_evaluator();

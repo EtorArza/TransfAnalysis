@@ -388,6 +388,56 @@ T sum_slice_vec(T *v, int i, int j)
 }
 
 
+// Sum the absolute value of elements from pos i to pos j-1. The python equivalent of sum(v[i:j])
+template <class T>
+T sum_abs_val_slice_vec(T *v, int i, int j)
+{
+    T res = 0;
+    for (int k = i; k < j; k++)
+    {
+        res += abs(v[k]);
+    }
+    return res;
+}
+
+template <class T>
+int argmax(T *v, int len){
+    T max = v[0];
+    int res = 0;
+    for (int i = 1; i < len; i++)
+    {
+        if (v[i] > max)
+        {
+            max = v[i];
+            res = i;
+        }
+    }
+    return res;
+}
+
+
+template <class T>
+int argmin(T *v, int len){
+    T max = v[0];
+    int res = 0;
+    for (int i = 1; i < len; i++)
+    {
+        if (v[i] < max)
+        {
+            max = v[i];
+            res = i;
+        }
+    }
+    return res;
+}
+
+
+template <class T>
+void copy_vector(T *v_res, T*v_ref, int len){
+	memcpy(v_res, v_ref, sizeof(T)*len);
+}
+
+
 class PermuTools
 {
 public:
@@ -423,6 +473,8 @@ private:
     double tt_tic;
 
 };
+
+
 
 
 #endif /* TOOLS_H */

@@ -34,7 +34,8 @@ PBP *GetProblemInfo(string problemType, string filename)
     //     problem = new TSP();
     // else if (problemType == "QAP")
     //     problem = new QAP();
-    // else if (problemType == "LOP")
+    // else 
+    if (problemType == "lop")
     problem = new LOP();
     // else if (problemType == "API")
     //     problem = new API();
@@ -58,16 +59,15 @@ int main(int argc, char *argv[])
 
     //Read the problem instance to optimize.
     problem = GetProblemInfo(PROBLEM_TYPE, INSTANCE_PATH);
-    pop = new CPopulation(POPSIZE, problem->GetProblemSize());
+    pop = new CPopulation(problem);
 
-    pop->evaluate_population(problem);
-    pop->SortPopulation();
+
 
     std::cout << "testing move_towards";
     for (int k = 0; k < 100; k++)
     {
         std::cout << ".";
-        for (int operator_id = 1; operator_id < 4; operator_id++)
+        for (int operator_id = 1; operator_id < 3; operator_id++)
         {
             for (int i = 1; i < POPSIZE; i++)
             {
@@ -84,9 +84,8 @@ int main(int argc, char *argv[])
     }
     std::cout << "-> passed" << endl;
     delete pop;
-    pop = new CPopulation(POPSIZE, problem->GetProblemSize());
-    pop->evaluate_population(problem);
-    pop->SortPopulation();
+    pop = new CPopulation(problem);
+
 
 
 
@@ -94,7 +93,7 @@ int main(int argc, char *argv[])
     for (int k = 0; k < 100; k++)
     {
         std::cout << ".";
-        for (int operator_id = 1; operator_id < 4; operator_id++)
+        for (int operator_id = 0; operator_id < 3; operator_id++)
         {
             for (int i = 0; i < POPSIZE; i++)
             {
@@ -117,9 +116,8 @@ int main(int argc, char *argv[])
     }
     std::cout << "-> passed" << endl;
     delete pop;
-    pop = new CPopulation(POPSIZE, problem->GetProblemSize());
-    pop->evaluate_population(problem);
-    pop->SortPopulation();
+    pop = new CPopulation(problem);
+
 
 
     std::cout << "testing permu combination";
@@ -177,10 +175,7 @@ int main(int argc, char *argv[])
     std::cout << "-> passed" << endl;
 
 
-    pop->evaluate_population(problem);
-    pop->SortPopulation();
-    pop->get_population_info();
-
+    pop->end_iteration();
     pop->Print();
 
     std::cout << "--- " << timer.toc() << " ---" << endl;

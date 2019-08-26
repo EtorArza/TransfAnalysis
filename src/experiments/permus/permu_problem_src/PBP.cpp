@@ -10,6 +10,7 @@
 #include "PBP.h"
 #include "Tools.h"
 #include "Individual.h"
+#include "../permuevaluator.h"
 
 
 PBP::PBP()
@@ -45,15 +46,15 @@ void PBP::apply_operator_with_fitness_update(CIndividual *indiv, int i, int j, i
     }
     switch (operator_id)
     {
-    case SWAP_OPERATOR:
+    case NEAT::SWAP:
         indiv->f_value = this->fitness_delta_swap(indiv, i, j) + indiv->f_value;
         Swap(indiv->genome, i, j);
         break;
-    case INTERCHANGE_OPERATOR:
+    case NEAT::EXCH:
         indiv->f_value = this->fitness_delta_interchange(indiv, i, j) + indiv->f_value;
         Swap(indiv->genome, i, j);
         break;
-    case INSERT_OPERATOR:
+    case NEAT::INSERT:
         indiv->f_value = this->fitness_delta_insert(indiv, i, j) + indiv->f_value;
         InsertAt(indiv->genome, i, j, this->problem_size_PBP);
         break;
@@ -64,7 +65,15 @@ void PBP::apply_operator_with_fitness_update(CIndividual *indiv, int i, int j, i
         exit(1);
         break;
     }
-    for (int i = 0; i < 4; i++)
+
+    if (indiv->f_value > indiv->f_best)
+    {
+        indiv->f_best = indiv->f_value;
+        copy_vector(indiv->genome_best, indiv->genome, this->GetProblemSize());
+    }
+
+
+    for (int i = 0; i < 3; i++)
     {
         indiv->is_local_optimum[i] = false;
     }
@@ -78,9 +87,10 @@ void PBP::local_search_iteration(CIndividual *indiv, int operator_id)
         return;
     }
 
+
     switch (operator_id)
     {
-    case SWAP_OPERATOR:
+    case NEAT::SWAP:
         shuffle_vector(_random_permu1, problem_size_PBP);
         for (int i = 0; i < problem_size_PBP; i++)
         {
@@ -92,12 +102,11 @@ void PBP::local_search_iteration(CIndividual *indiv, int operator_id)
             if (fitness_delta_swap(indiv, r, r+1) > 0)
             {
                 apply_operator_with_fitness_update(indiv, r, r+1, operator_id);
-                return;
             }
         }
         break;
 
-    case INTERCHANGE_OPERATOR:
+    case NEAT::EXCH:
         shuffle_vector(_random_permu1, this->problem_size_PBP);
         shuffle_vector(_random_permu2, this->problem_size_PBP);
         for (int i = 0; i < this->problem_size_PBP; i++)
@@ -116,7 +125,7 @@ void PBP::local_search_iteration(CIndividual *indiv, int operator_id)
         }
         break;
 
-    case INSERT_OPERATOR:
+    case NEAT::INSERT:
         shuffle_vector(_random_permu1, this->problem_size_PBP);
         shuffle_vector(_random_permu2, this->problem_size_PBP);
         for (int i = 0; i < this->problem_size_PBP; i++)
@@ -142,6 +151,11 @@ void PBP::local_search_iteration(CIndividual *indiv, int operator_id)
     }
 
     indiv->is_local_optimum[operator_id] = true;
+    if (operator_id == NEAT::EXCH)
+    {
+        indiv->is_local_optimum[NEAT::OPT_SWAP];
+    }
+
 
 }
 
@@ -149,7 +163,7 @@ void PBP::local_search_iteration(CIndividual *indiv, int operator_id)
 int PBP::item_i_after_operator(int *permu, int idx, int operator_id, int i, int j){
     switch (operator_id)
     {
-    case SWAP_OPERATOR:
+    case NEAT::SWAP:
         if (idx != i && idx != j)
         {
             return permu[idx];
@@ -163,7 +177,7 @@ int PBP::item_i_after_operator(int *permu, int idx, int operator_id, int i, int 
         std::cout <<  "idx not valid";
         exit(1);
         break;
-    case INTERCHANGE_OPERATOR:
+    case NEAT::EXCH:
         if (idx != i && idx != j)
         {
             return permu[idx];
@@ -178,7 +192,7 @@ int PBP::item_i_after_operator(int *permu, int idx, int operator_id, int i, int 
         exit(1);
         break;
 
-    case INSERT_OPERATOR:
+    case NEAT::INSERT:
         if(i < j){
             if (idx == j)
             {
@@ -218,7 +232,7 @@ void PBP::obtain_indexes_step_towards(int *permu, int *ref_permu, int* i, int* j
 {
     switch (operator_id)
     {
-    case SWAP_OPERATOR:  // SCHIZVINOTTO 2007
+    case NEAT::SWAP:  // SCHIZVINOTTO 2007
     {
         shuffle_vector(_random_permu1, problem_size_PBP);
         for (int idx = 0; idx < problem_size_PBP; idx++)
@@ -243,7 +257,7 @@ void PBP::obtain_indexes_step_towards(int *permu, int *ref_permu, int* i, int* j
 
         break;
     }
-    case INTERCHANGE_OPERATOR:  // SCHIZVINOTTO 2007
+    case NEAT::EXCH:  // SCHIZVINOTTO 2007
     {
         for (int idx = 0; idx < problem_size_PBP; idx++) // compute ref_permu \circ permu^-1
         {   
@@ -268,7 +282,7 @@ void PBP::obtain_indexes_step_towards(int *permu, int *ref_permu, int* i, int* j
         return;
 
     }
-    case INSERT_OPERATOR:
+    case NEAT::INSERT:
         // get indices to insert considering the item that makes the biggest "jump"    
     {
         for (int idx = 0; idx < problem_size_PBP; idx++) // compute ref_permu \circ permu^-1

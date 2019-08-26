@@ -98,7 +98,7 @@ int TSP::Read2(string filename)
 			//FILL DISTANCE m_distance_matrix
 			char * coordPieces;
 			coordPieces = strtok (line," ");
-			if (coordPieces==" ")
+			if (strcmp(coordPieces, " "))
 			{
 				coordPieces = strtok (NULL," ");
 			}

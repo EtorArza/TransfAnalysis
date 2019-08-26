@@ -6,14 +6,15 @@
 //  Copyright (c) 2013 Josu Ceberio Uribe. All rights reserved.
 //
 
-#ifndef _INDIVIDUAL_
-#define _INDIVIDUAL_
+#pragma once
+
 
 #include <stdlib.h>
 #include <stdio.h>
 #include <fstream>
 #include <limits.h>
 #include <iostream>
+#include "../permuevaluator.h"
 using namespace std;
 using std::istream;
 using std::ostream;
@@ -45,8 +46,10 @@ public:
 	int *genome; //The genes of the individual, or the permutation.
 	int id;		 // a unique identifier for each individual in the pop.
 	double f_value;
-	bool is_local_optimum[4] = {false, false, false, false}; // is_local_optimum[OPERATOR_ID] contains if it is optimum or not.
-	double *input_info;
+	bool is_local_optimum[NEAT::N_OPERATORS] = {false, false, false}; // is_local_optimum[OPERATOR_ID] contains if it is optimum or not.
+	int* momentum;
+	double f_best;
+	int* genome_best;
 
 	// pop_info
 	double relative_pos = 0;
@@ -58,4 +61,3 @@ private:
 	static int n_indivs_created;
 };
 
-#endif

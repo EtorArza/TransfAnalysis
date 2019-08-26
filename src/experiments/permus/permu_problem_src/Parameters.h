@@ -1,6 +1,5 @@
 
-#ifndef PARAMETERS_H_
-#define PARAMETERS_H_
+#pragma once
 
 #include <string>
 
@@ -15,9 +14,8 @@
 
 #define N_OF_INPUT_PARAMS 3
 
+
 // CONSTANT PARAMETERS //
-EXTERN int LOGIC_INPUT_LEN;
-EXTERN int LOGIC_OUTPUT_LEN;
 EXTERN int SEED;
 EXTERN double MAX_TIME;
 EXTERN int POPSIZE;
@@ -57,4 +55,3 @@ void print_parameters(void);
 // NEAT PARAMETERS //
 # define CUTOFF_0 0.25
 //////////////////////
-#endif

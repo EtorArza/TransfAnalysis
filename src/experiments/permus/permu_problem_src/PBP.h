@@ -6,8 +6,7 @@
  *  Copyright 2013 University of the Basque Country. All rights reserved.
  *
  */
-#ifndef __PBP_H__
-#define __PBP_H__
+#pragma once
 
 #include <stdlib.h>
 #include <math.h>
@@ -19,9 +18,7 @@
 #include <stdio.h>
 #include "Individual.h"
 
-#define SWAP_OPERATOR 1
-#define INTERCHANGE_OPERATOR 2
-#define INSERT_OPERATOR 3
+
 
 
 using namespace std;
@@ -46,12 +43,15 @@ class PBP
 	 * Functions that are valid for all permutation problems. 
 	 * The use of this functions requires the fitness value of the individual to be previously computed.
 	 */
-	void apply_operator_with_fitness_update(CIndividual *indiv, int i, int j, int operator_id);
 	void local_search_iteration(CIndividual *indiv, int operator_id);
 	void move_indiv_towards_reference(CIndividual* indiv, int* ref_permu, int operator_id);
 
 
   protected:
+
+	void apply_operator_with_fitness_update(CIndividual *indiv, int i, int j, int operator_id);
+
+
 	// This function needs to be executed on problem read.
 	int item_i_after_operator(int *permu, int idx, int operator_id, int i, int j);
 	void initialize_variables_PBP(int problem_size);
@@ -70,4 +70,3 @@ class PBP
 
 	int problem_size_PBP;
 };
-#endif

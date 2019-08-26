@@ -168,7 +168,7 @@ double LOP::fitness_delta_interchange(CIndividual *indiv, int i, int j)
 	else
 	{	
 		CIndividual *indiv_cop = indiv->Clone();
-		apply_operator_with_fitness_update(indiv_cop, i, j, INSERT_OPERATOR);
+		apply_operator_with_fitness_update(indiv_cop, i, j, NEAT::OPT_INSERT);
 		int f_value_cop = indiv_cop->f_value + fitness_delta_insert(indiv_cop, j-1, i);
 		delete indiv_cop;
 		return f_value_cop - indiv->f_value;
