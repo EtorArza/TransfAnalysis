@@ -226,7 +226,6 @@ void CPopulation::comp_r_number()
     for (int i = 0; i < POPSIZE; i++)
     {
         double res =  random_0_1_float();
-        this->m_individuals[i]->relative_pos = res;
         pop_info[i][NEAT::R_NUMBER] = res;
     }
 }

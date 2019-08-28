@@ -153,7 +153,7 @@ void PBP::local_search_iteration(CIndividual *indiv, int operator_id)
     indiv->is_local_optimum[operator_id] = true;
     if (operator_id == NEAT::EXCH)
     {
-        indiv->is_local_optimum[NEAT::OPT_SWAP];
+        indiv->is_local_optimum[NEAT::OPT_SWAP] = true;
     }
 
 
