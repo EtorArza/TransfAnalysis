@@ -45,6 +45,8 @@ class PBP
 	 */
 	void local_search_iteration(CIndividual *indiv, int operator_id);
 	void move_indiv_towards_reference(CIndividual* indiv, int* ref_permu, int operator_id);
+	void move_indiv_away_reference(CIndividual* indiv, int* ref_permu, int operator_id);
+
 
 
   protected:
@@ -57,15 +59,18 @@ class PBP
 	void initialize_variables_PBP(int problem_size);
 	int *_random_permu1;
 	int *_random_permu2;
+	int *_random_permu3;
+
 
 	// The f_value of the individuals does not change in this functions.
 	virtual double fitness_delta_swap(CIndividual *indiv, int i, int j) = 0;
 	virtual double fitness_delta_interchange(CIndividual *indiv, int i, int j) = 0;
 	virtual double fitness_delta_insert(CIndividual *indiv, int i, int j) = 0;
 
-	
+
   private:
 	void obtain_indexes_step_towards(int *permu, int *ref_permu, int* i, int* j, int operator_id);
+	void obtain_indexes_step_away(int *permu, int *ref_permu, int* i, int* j, int operator_id);
 
 
 	int problem_size_PBP;

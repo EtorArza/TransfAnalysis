@@ -184,13 +184,13 @@ string toString(const T &t, bool *ok = NULL)
  * sort 2 arrays simultaneously. The values used as keys are placed in A. If reverse == false, the order is ascending.
  */
 template <class A, class B>
-void QuickSort2Desc(A a[], B b[], int l, int r, bool reverse=false)
+void QuickSort2Desc(A a[], B b[], int l, int r, bool ascending=false)
 {
     int i = l;
     int j = r;
 
     int coef = 1;
-    if (reverse==true)
+    if (ascending==true)
     {
         coef = -1;
     }
@@ -213,9 +213,9 @@ void QuickSort2Desc(A a[], B b[], int l, int r, bool reverse=false)
         };
     } while (i <= j);
     if (l < j)
-        QuickSort2Desc(a, b, l, j, reverse=reverse);
+        QuickSort2Desc(a, b, l, j, ascending);
     if (i < r)
-        QuickSort2Desc(a, b, i, r, reverse=reverse);
+        QuickSort2Desc(a, b, i, r, ascending);
 }
 
 /*
@@ -302,7 +302,7 @@ int choose_index_given_probabilities(double *probabilities_array, int max_index)
 
 
 // Choose an index given positive weights
-int choose_index_given_wheights(double *weights_array, int max_index);
+int choose_index_given_weights(double *weights_array, int max_index);
 
 // Sample from a bernouilli distribution.
 bool coin_toss(double p_of_true);
@@ -449,12 +449,14 @@ public:
     int* random_permu1;
     int* random_permu2;
     int* temp_array;
+    double* temp_array_double;
     int* identity_permu;
     double** first_marginal;
 
-    void combine_permus(int** permu_list, double* coef_list, int n_of_components, int* res);
+    void combine_permus(int** permu_list, double* coef_list, int* res);
     void compute_first_marginal(int** permu_list, int m);
     double get_distance_to_marginal(int* permu);
+    int choose_permu_index_to_move(double* coef_list);
 
 private:
     void convert_to_permu(int* res);

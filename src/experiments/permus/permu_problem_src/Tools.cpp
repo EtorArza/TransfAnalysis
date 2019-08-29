@@ -16,7 +16,9 @@
 #include <assert.h>
 #include "Parameters.h"
 #include <set>
+#include "../permuevaluator.h"
 
+#define TEMP_DOUBLE_ARRAY_SIZE 30
 
 /*
  * Returs the first position at which value appears in array. If it does not appear, then it returns -1;
@@ -765,11 +767,13 @@ void shuffle_vector(int *vec, int len)
 
 
 PermuTools::PermuTools(int n)
-{
+{   
     this->n = n;
     random_permu1 = new int[n];
     random_permu2 = new int[n];
     temp_array = new int[n];
+    temp_array_double = new double[TEMP_DOUBLE_ARRAY_SIZE];
+
     identity_permu = new int[n];
     first_marginal = new double*[n];
 
@@ -794,6 +798,7 @@ PermuTools::~PermuTools()
     delete[] this->random_permu1;
     delete[] this->random_permu2;
     delete[] this->temp_array;
+    delete[] this->temp_array_double;
     delete[] this->identity_permu;
 
     for (int i = 0; i < n; i++)
@@ -807,8 +812,8 @@ PermuTools::~PermuTools()
 
 // combines the permutations considering the coefficients simmilarly to \cite{wang_discrete_2012}. 
 // The zeroes on their paper are -1 in our implementation
-void PermuTools::combine_permus(int** permu_list, double* coef_list, int n_of_components, int* res){
-    int m = n_of_components;
+void PermuTools::combine_permus(int** permu_list, double* coef_list, int* res){
+    int m = NEAT::N_COEF;
     int non_zero = 0; // number of non-zero coef.
     int positive = 0; // number of strictly positive coef
     int zero = 0; //number of zero coef
@@ -836,9 +841,9 @@ void PermuTools::combine_permus(int** permu_list, double* coef_list, int n_of_co
 
     // normalize positive weights
     double sum_of_pos_w = sum_slice_vec(coef_list, 0, positive);
-    double *coef_list_copy = new double[n_of_components];
+    double *coef_list_copy = new double[NEAT::N_COEF];
 
-    std::copy(coef_list, coef_list+n_of_components, coef_list_copy);
+    std::copy(coef_list, coef_list+NEAT::N_COEF, coef_list_copy);
 
     //honarte ondo
     for (int i = 0; i < positive; i++)
@@ -949,91 +954,19 @@ double PermuTools::get_distance_to_marginal(int* permu){
     return res;
 }
 
+int PermuTools::choose_permu_index_to_move(double* coef_list){
 
-
-// def combine_permus(permu_list, coef_list):
+    assert(TEMP_DOUBLE_ARRAY_SIZE >= NEAT::N_COEF);
     
-//     n = len(permu_list[0]) # length of the permu
-//     m = len(permu_list)
-//     k = 0 # number of non-zero coef. 
-//     l = 0 # number of strictly positive coef
+    for (int i = 0; i < NEAT::N_COEF; i++)
+    {
+        temp_array_double[i] = abs(coef_list[i]);
+    }
 
-//     while k < len(coef_list):
-//         if coef_list[k] == 0:
-//             m -= 1
-//             coef_list.pop(k)
-//             permu_list.pop(k)
-//         else:
-//             if coef_list[k] > 0:
-//                 l += 1
-//             k += 1
+    if(sum_abs_val_slice_vec(temp_array_double, 0, NEAT::N_COEF) == 0.0){
+        return -1;
+    }
 
-//     # if no positive coefficients, return a random permutation
-//     if l == 0:
-//         res = np.array(list(range(n)))
-//         np.random.shuffle(res)
-//         return res
+    return choose_index_given_weights(temp_array_double, NEAT::N_COEF);
+}
 
-
-    
-//     sorted_touples = list(zip(permu_list, coef_list))
-//     sorted_touples.sort(key = lambda x: x[1], reverse=True)
-//     permu_list, coef_list = map(np.array,zip(*sorted_touples))
-    
-//     # normalize_pos_weights
-//     sum_of_pos_w = sum(coef_list[0:l])
-//     for i in range(0, l):
-//         coef_list[i] /= sum_of_pos_w
-    
-//     # normalize_neg_weights, considering their relative weight with respect to pos weights
-//     sum_of_neg_w = abs(sum(coef_list[l:m]))
-//     for i in range(l, m):
-//         coef_list[i] /= -(sum_of_neg_w  + sum_of_pos_w)
-
-
-//     n_pos_numbers = 0
-//     for el in coef_list:
-//         if el > 0:
-//             n_pos_numbers += 1
-
-//     res = -1*np.ones(n, dtype=np.int32)
-    
-    
-//     indexes = np.array(list(range(l)))
-//     for i in range(n):
-//         res[i] = permu_list[np.random.choice(indexes, p=coef_list[0:l])][i]
-    
-
-//     for coef, i in zip(coef_list[l:], range(l,m)):
-//         rand_values = np.random.rand(n)
-//         for r, j in zip(rand_values, range(len(rand_values))):
-//             if r < coef:
-//                 if res[j] == permu_list[i][j]:
-//                     res[j] = -1
-    
-    
-//     convert_to_permu(res)
-//     return res
-
-
-
-// def convert_to_permu(pseudo_permu):
-//     n = len(pseudo_permu)
-//     rp1 = tools.random_permu(n)
-    
-    
-//     existing = set()
-//     missing = set(range(n))
-//     empty_positions = list()
-//     for i in rp1:
-//         if pseudo_permu[i] == -1:.
-//             empty_positions.append(i).
-//         elif pseudo_permu[i] in existing:.
-//             empty_positions.append(i).
-//             pseudo_permu[i] = -1.
-//         else:
-//             missing.discard(pseudo_permu[i])
-//             existing.add(pseudo_permu[i])
-//     random.shuffle(empty_positions)
-//     for pos, el in zip(empty_positions, missing):
-//         pseudo_permu[pos] = el

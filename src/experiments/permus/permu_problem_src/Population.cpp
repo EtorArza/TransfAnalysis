@@ -98,24 +98,24 @@ void CPopulation::Print()
 
 
 
-  void CPopulation::apply_neat_output_to_individual_i(double* output_neat, int i){
-      
-      if (-CUTOFF_0 < output_neat[0] < CUTOFF_0)
-      {
-          return;
-      }else if(output_neat[0] < -CUTOFF_0){ // Local-search iteration.
-          //#TODO check if unconnected output is 0.
-          if(sum_abs_val_slice_vec(output_neat, 1, 1+NEAT::N_OPERATORS) == 0){
-              return;
-          }
-          int operator_id = argmax(output_neat + 1, NEAT::N_OPERATORS);
-          this->problem->local_search_iteration(m_individuals[i], operator_id);
-      }else if(output_neat[0] > CUTOFF_0){ // Move-towards
-
-      }
-      
-      double* coef = output_neat + (NEAT::__output_N - NEAT::N_COEF);
-  }
+void CPopulation::apply_neat_output_to_individual_i(double* output_neat, int i){
+    if 
+    (    
+        (-CUTOFF_0 < output_neat[0] && output_neat[0] < CUTOFF_0) ||
+        (sum_abs_val_slice_vec(output_neat, 1, 1+NEAT::N_OPERATORS) == 0) 
+    )
+    {
+        return;
+    }else if(output_neat[0] < -CUTOFF_0){ // Local-search iteration.
+        //#TODO check if unconnected output is 0.
+        int operator_id = argmax(output_neat + 1, NEAT::N_OPERATORS);
+        this->problem->local_search_iteration(m_individuals[i], operator_id);
+    }else if(output_neat[0] > CUTOFF_0){ // Move-with coeficients.
+        int operator_id = argmax(output_neat + 1, NEAT::N_OPERATORS);
+        double* coef = output_neat + (NEAT::__output_N - NEAT::N_COEF);
+        this->move_individual_i_based_on_coefs(coef, i, operator_id);
+    }
+}
 
 
 
@@ -215,7 +215,7 @@ void CPopulation::comp_sparsity(){
     pt->compute_first_marginal(permus, POPSIZE);
     for (int i = 0; i < POPSIZE; i++)
     {
-        m_individuals[i]->sparsity = 1.0 - (pt->get_distance_to_marginal(permus[i]) / POPSIZE);
+        m_individuals[i]->sparsity = 1.0 - (pt->get_distance_to_marginal(permus[i]) / n);
         pop_info[i][NEAT::SPARSITY] = m_individuals[i]->sparsity;
     }
 }
@@ -276,5 +276,53 @@ void CPopulation::copy_references_of_genomes_from_individuals_to_permus(){
     for (int i = 0; i < POPSIZE; i++)
     {
         permus[i] = m_individuals[i]->genome;
+    }
+}
+
+
+void CPopulation::move_individual_i_based_on_coefs(double* coef_list, int i, int operator_id){
+
+    int idx = pt->choose_permu_index_to_move(coef_list);
+    if (idx == -1){
+        return;
+    }
+
+    bool towards = coef_list[idx] > 0;
+    idx += (NEAT::__output_N - NEAT::N_COEF);
+
+    int* ref_permu;
+    
+    switch (idx)
+    {
+    case NEAT::c_momentum:
+        ref_permu = m_individuals[i]->momentum;
+        break;
+    case NEAT::c_pers_best:
+        ref_permu = m_individuals[i]->genome_best;
+        break;
+    case NEAT::c_best_known:
+        ref_permu = this->genome_best;
+        break;
+    case NEAT::c_above:
+        if (i == 0)
+        {
+            ref_permu = this->m_individuals[1]->genome;
+        }else
+        {
+            ref_permu = this->m_individuals[i-1]->genome;
+        }
+        break;
+    
+    default:
+        cout << "error: a permutation must be chosen to move towards/away from.";
+        exit(1);
+        break;
+    }
+
+    if(towards){
+        problem->move_indiv_towards_reference(m_individuals[i], ref_permu, operator_id);
+    }else
+    {
+        problem->move_indiv_away_reference(m_individuals[i], ref_permu, operator_id);
     }
 }

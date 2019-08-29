@@ -96,5 +96,14 @@ private:
 
   // copy the reference of the permutations in the individuals to a matrix of permutations for analisys in sparsity and distances.
   void copy_references_of_genomes_from_individuals_to_permus();
+
+  // move permutation based on coefs. and other permus.
+  // first choose a permu proportionally to its weight. 
+  // Then if weight is positive move towards, otherwise, move away from.
+  // to permuevaluator.h contains which permutations are considered.
+  void move_individual_i_based_on_coefs(double* coef_list, int i, int operator_id);
+
+
+
 };
 

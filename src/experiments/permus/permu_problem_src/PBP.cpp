@@ -10,6 +10,7 @@
 #include "PBP.h"
 #include "Tools.h"
 #include "Individual.h"
+#include "Parameters.h"
 #include "../permuevaluator.h"
 
 
@@ -21,8 +22,8 @@ PBP::~PBP()
 {
     delete[] _random_permu1;
     delete[] _random_permu2;
+    delete[] _random_permu3;
 }
-
 // This function needs to be called when the read procedure is called
 void PBP::initialize_variables_PBP(int problem_size)
 {   
@@ -36,6 +37,8 @@ void PBP::initialize_variables_PBP(int problem_size)
     GenerateRandomPermutation(_random_permu1, problem_size);
     _random_permu2 = new int[problem_size];
     GenerateRandomPermutation(_random_permu2, problem_size);
+    _random_permu3 = new int[problem_size];
+    GenerateRandomPermutation(_random_permu3, problem_size);
     problem_size_PBP = problem_size;
 }
 
@@ -234,21 +237,33 @@ void PBP::obtain_indexes_step_towards(int *permu, int *ref_permu, int* i, int* j
     {
     case NEAT::SWAP:  // SCHIZVINOTTO 2007
     {
-        shuffle_vector(_random_permu1, problem_size_PBP);
+
+        // compute inverse (position) of permu
+        for (int i = 0; i < problem_size_PBP; i++)
+        {
+            _random_permu2[permu[i]] = i;
+        }
+
+        for (int idx = 0; idx < problem_size_PBP; idx++) // compute permu^-1 \circ ref_permu  
+        {
+            _random_permu1[idx] = _random_permu2[ref_permu[idx]];
+        }
+
+        GenerateRandomPermutation(_random_permu2, problem_size_PBP);
+
+        // compute inverse (position) of permu^-1 \circ ref_permu  
+        for (int i = 0; i < problem_size_PBP; i++)
+        {
+            _random_permu3[_random_permu1[i]] = i;
+        }
+
         for (int idx = 0; idx < problem_size_PBP; idx++)
         {
-            int r = _random_permu1[idx];
-            if (r < problem_size_PBP)
-            {
-                if (
-                    (permu[r] < permu[r+1] && ref_permu[r] > ref_permu[r+1]) || 
-                    (permu[r] > permu[r+1] && ref_permu[r] < ref_permu[r+1])
-                    )
-                {
-                    *i = r;
-                    *j = r+1;
-                    return;
-                }
+            int r = _random_permu2[idx];
+            if ((_random_permu3[r] > _random_permu3[r+1]) && r < problem_size_PBP - 1){
+                *i = r;
+                *j = r+1;
+                return;
             }
         }
         *i = -1;
@@ -285,21 +300,35 @@ void PBP::obtain_indexes_step_towards(int *permu, int *ref_permu, int* i, int* j
     case NEAT::INSERT:
         // get indices to insert considering the item that makes the biggest "jump"    
     {
-        for (int idx = 0; idx < problem_size_PBP; idx++) // compute ref_permu \circ permu^-1
-        {   
-            _random_permu1[idx] = Find(permu, problem_size_PBP, ref_permu[idx]);
+
+        // compute inverse (position) of permu
+        for (int i = 0; i < problem_size_PBP; i++)
+        {
+            _random_permu2[permu[i]] = i;
         }
-        shuffle_vector(_random_permu2, problem_size_PBP);
-        
+
+        for (int idx = 0; idx < problem_size_PBP; idx++) // compute permu^-1 \circ ref_permu  
+        {
+            _random_permu1[idx] = _random_permu2[ref_permu[idx]];
+        }
+
+
+        // compute inverse (position) of permu^-1 \circ ref_permu  
+        for (int i = 0; i < problem_size_PBP; i++)
+        {
+            _random_permu3[_random_permu1[i]] = i;
+        }
+
+        GenerateRandomPermutation(_random_permu2, problem_size_PBP);
         int max = 0;
         int arg_max = 0;
 
         for (int idx = 0; idx < problem_size_PBP; idx++) // compute ref_permu \circ permu^-1
         {   
             int r = _random_permu2[idx];
-            if (abs(_random_permu1[r] - r) > max)
+            if (abs(_random_permu3[r] - r) > max)
             {
-                max = abs(_random_permu1[r] - r);
+                max = abs(_random_permu3[r] - r);
                 arg_max = r;
             }
         }
@@ -309,8 +338,123 @@ void PBP::obtain_indexes_step_towards(int *permu, int *ref_permu, int* i, int* j
             *j = -1;
         }else{
             *i = arg_max;
-            *j = _random_permu1[*i];
+            *j = _random_permu3[*i];
         }
+        break;
+    }
+    default:
+        std::cout << "operator_id not recognized.";
+        exit(1);
+        break;
+    }
+
+}
+
+void PBP::obtain_indexes_step_away(int *permu, int *ref_permu, int* i, int* j, int operator_id)
+{
+    switch (operator_id)
+    {
+    case NEAT::SWAP:
+    {
+        // compute inverse (position) of permu
+        for (int i = 0; i < problem_size_PBP; i++)
+        {
+            _random_permu2[permu[i]] = i;
+        }
+
+        for (int idx = 0; idx < problem_size_PBP; idx++) // compute permu^-1 \circ ref_permu  
+        {
+            _random_permu1[idx] = _random_permu2[ref_permu[idx]];
+        }
+
+        GenerateRandomPermutation(_random_permu2, problem_size_PBP);
+
+        // compute inverse (position) of permu^-1 \circ ref_permu  
+        for (int i = 0; i < problem_size_PBP; i++)
+        {
+            _random_permu3[_random_permu1[i]] = i;
+        }
+
+        for (int idx = 0; idx < problem_size_PBP; idx++)
+        {
+            int r = _random_permu2[idx];
+            if ((_random_permu3[r] < _random_permu3[r+1]) && r < problem_size_PBP - 1){ // change this line from > to <
+                *i = r;
+                *j = r+1;
+                return;
+            }
+        }
+        *i = -1;
+        *j = -1;
+        return;
+
+        break;
+    }
+    case NEAT::EXCH:
+    {
+        for (int idx = 0; idx < problem_size_PBP; idx++)
+        {   
+            _random_permu1[idx] = Find(permu, problem_size_PBP, ref_permu[idx]);
+        }
+        shuffle_vector(_random_permu2, problem_size_PBP);
+        
+        for (int idx = 0; idx < problem_size_PBP; idx++)
+        {
+            int r = _random_permu2[idx];
+            if (_random_permu1[r] == r){ // change != with ==
+                *i = r;
+                *j = _random_permu1[r];
+                return;
+            }
+        }
+        
+        // permu == ref_permu
+
+        *i = -1;
+        *j = -1;
+        return;
+
+    }
+    case NEAT::INSERT:
+    {
+        // compute inverse (position) of permu
+        for (int i = 0; i < problem_size_PBP; i++)
+        {
+            _random_permu2[permu[i]] = i;
+        }
+
+        for (int idx = 0; idx < problem_size_PBP; idx++) // compute permu^-1 \circ ref_permu  
+        {
+            _random_permu1[idx] = _random_permu2[ref_permu[idx]];
+        }
+
+
+        // compute inverse (position) of permu^-1 \circ ref_permu  
+        for (int i = 0; i < problem_size_PBP; i++)
+        {
+            _random_permu3[_random_permu1[i]] = i;
+        }
+
+        GenerateRandomPermutation(_random_permu2, problem_size_PBP);
+        int max = MAX_INTEGER;
+        int arg_max = 0;
+
+        for (int idx = 0; idx < problem_size_PBP; idx++) 
+        {
+            int r = _random_permu2[idx];
+            if (abs(_random_permu3[r] - r) < max) // change to find minimum
+            {
+                max = abs(_random_permu3[r] - r);
+                arg_max = r;
+            }
+        }
+        *i = arg_max;
+        *j = random_integer_uniform(problem_size_PBP);
+        while (*i ==*j)
+        {
+            *j = random_integer_uniform(problem_size_PBP);
+        }
+        
         break;
     }
     default:
@@ -325,6 +469,14 @@ void PBP::obtain_indexes_step_towards(int *permu, int *ref_permu, int* i, int* j
 void PBP::move_indiv_towards_reference(CIndividual* indiv, int* ref_permu, int operator_id){
     int i,j;
     obtain_indexes_step_towards(indiv->genome, ref_permu, &i, &j, operator_id);
+    // std::cout << "(" << i << "," << j << ")" << endl;
+    apply_operator_with_fitness_update(indiv, i, j, operator_id);
+}
+
+
+void PBP::move_indiv_away_reference(CIndividual* indiv, int* ref_permu, int operator_id){
+    int i,j;
+    obtain_indexes_step_away(indiv->genome, ref_permu, &i, &j, operator_id);
     // std::cout << "(" << i << "," << j << ")" << endl;
     apply_operator_with_fitness_update(indiv, i, j, operator_id);
 }

@@ -147,7 +147,7 @@ int main(int argc, char *argv[])
         double coef[4] = {0.9, 0.1, -0.01, -0.01};
         int *permus[4] = {permu0, permu1, permu2, permu3};
         
-        pt->combine_permus(permus, coef, 4, res);
+        pt->combine_permus(permus, coef, res);
 
         if (Hamming_distance(permu0, res, n) > 0.5*(double)n)
         {
@@ -156,7 +156,7 @@ int main(int argc, char *argv[])
         }
 
         double coef2[4] = {0.2, 0.2, -0.3, -0.3};
-        pt->combine_permus(permus, coef2, 4, res);
+        pt->combine_permus(permus, coef2,  res);
 
         if (Hamming_distance(permu1, res, n) > 0.7*(double)n)
         {
@@ -175,9 +175,33 @@ int main(int argc, char *argv[])
     std::cout << "-> passed" << endl;
 
 
-    pop->end_iteration();
-    pop->Print();
+    double neat_output[8] = {1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0};
+    timer.tic();
+    pop->f_best = 1000000000;
+    for (int k = 0; k < 10000000; k++)
+    {
+        pop->end_iteration();
+        if (timer.toc() > 1.0)
+        {
+            pop->Print();
+            timer.tic();
+        }
 
+        for (int i = 0; i < POPSIZE; i++)
+        {   
+            for (int z = 0; z < 8; z++)
+            {
+                neat_output[z] = (random_0_1_float()-0.5)*2;
+            }
+            neat_output[6] += 2;
+            
+            pop->apply_neat_output_to_individual_i(neat_output, i);
+
+        }
+    }
+
+
+    pop->Print();
     std::cout << "--- " << timer.toc() << " ---" << endl;
 
     return 0;
