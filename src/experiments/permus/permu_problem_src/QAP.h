@@ -70,12 +70,12 @@ public:
 	/*
 	 * This function evaluates the individuals for the QAP problem.
 	 */
-	double Evaluate(int * genes);
+	float Evaluate(int * genes);
     
     /*
      * This function evaluates the inverted solution of the given individual for the QAP problem.
      */
-    double EvaluateInv(int * genes);
+    float EvaluateInv(int * genes);
 	
     /*
      * Returns the size of the problem.

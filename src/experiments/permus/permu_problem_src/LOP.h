@@ -40,7 +40,7 @@ public:
     /*
      * Entries matrix of the LOP.
      */
-	double ** m_matrix;
+	float ** m_matrix;
     
 	/*
 	 * The size of the problem.
@@ -62,14 +62,14 @@ public:
 
 
 
-	double fitness_delta_swap(CIndividual *indiv, int i, int j);
-	double fitness_delta_interchange(CIndividual *indiv, int i, int j);
-	double fitness_delta_insert(CIndividual *indiv, int i, int j);
+	float fitness_delta_swap(CIndividual *indiv, int i, int j);
+	float fitness_delta_interchange(CIndividual *indiv, int i, int j);
+	float fitness_delta_insert(CIndividual *indiv, int i, int j);
 
 
 
 private:
-    double _Evaluate(int *permu);
+    float _Evaluate(int *permu);
 };
 #endif
 

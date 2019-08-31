@@ -63,9 +63,9 @@ class PBP
 
 
 	// The f_value of the individuals does not change in this functions.
-	virtual double fitness_delta_swap(CIndividual *indiv, int i, int j) = 0;
-	virtual double fitness_delta_interchange(CIndividual *indiv, int i, int j) = 0;
-	virtual double fitness_delta_insert(CIndividual *indiv, int i, int j) = 0;
+	virtual float fitness_delta_swap(CIndividual *indiv, int i, int j) = 0;
+	virtual float fitness_delta_interchange(CIndividual *indiv, int i, int j) = 0;
+	virtual float fitness_delta_insert(CIndividual *indiv, int i, int j) = 0;
 
 
   private:

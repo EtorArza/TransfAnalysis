@@ -17,7 +17,7 @@
 
 // CONSTANT PARAMETERS //
 EXTERN int SEED;
-EXTERN double MAX_TIME;
+EXTERN float MAX_TIME;
 EXTERN int POPSIZE;
 /////////////////////////
 

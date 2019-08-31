@@ -1,3 +1,4 @@
+#define DEFINE_GLOBALS
 #include "Parameters.h"
 #include <string>
 #include <assert.h>
@@ -19,7 +20,7 @@ void set_parameters(int argc, char *argv[])
 
 
   SEED = 2;
-  MAX_TIME = 1.0;
+  MAX_TIME = 0.25;
   POPSIZE = 40;
 }
 

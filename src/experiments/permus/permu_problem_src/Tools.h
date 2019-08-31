@@ -163,7 +163,7 @@ void tic();
 /*
  * Return time since last tic().
  */
-double toc();
+float toc();
 
 /*
  * Convert to string.
@@ -279,6 +279,12 @@ Shuffle vector given its length.
 */
 void shuffle_vector(int *vec, int len);
 
+
+/*
+Get random integer on interval [0, max - 1], faster but slightly biased
+*/
+int random_integer_fast(int max);
+
 /*
 Get random integer on interval [min, max - 1], faster but slightly biased
 */
@@ -292,53 +298,53 @@ int random_integer_uniform(int min, int max = 0);
 int random_range_integer_uniform(int range_max);
 
 // return a random uniform float on the interval [0,1]
-double random_0_1_float();
+float random_0_1_float();
 
 // apply sigmoid function
-double sigmoid(double x);
+float sigmoid(float x);
 
 // Choose an index given the probabilities
-int choose_index_given_probabilities(double *probabilities_array, int max_index);
+int choose_index_given_probabilities(float *probabilities_array, int max_index);
 
 
 // Choose an index given positive weights
-int choose_index_given_weights(double *weights_array, int max_index);
+int choose_index_given_weights(float *weights_array, int max_index);
 
 // Sample from a bernouilli distribution.
-bool coin_toss(double p_of_true);
+bool coin_toss(float p_of_true);
 
-// round a double into the nearest integer
-int tools_round(double x);
+// round a float into the nearest integer
+int tools_round(float x);
 
 // compute the average value of the elements on the array
 template <class T>
-double Average(T *array, int len)
+float Average(T *array, int len)
 {
 
-    double sum = 0;
+    float sum = 0;
 
     for (int i = 0; i < len; i++)
     {
         sum += array[i];
     }
 
-    return (double)sum / len;
+    return (float)sum / len;
 }
 
 // compute the variance of the elements on the array
 template <class T>
-double Variance(T *array, int len)
+float Variance(T *array, int len)
 {
 
-    double mean = Average(array, len);
+    float mean = Average(array, len);
 
-    double var = 0;
+    float var = 0;
     for (int i = 0; i < len; i++)
     {
         var += (array[i] - mean) * (array[i] - mean);
     }
 
-    return (double)var / len;
+    return (float)var / len;
 }
 
 // Normalize a vector so that the sum of all the elements on it is 1
@@ -449,14 +455,14 @@ public:
     int* random_permu1;
     int* random_permu2;
     int* temp_array;
-    double* temp_array_double;
+    float* temp_array_float;
     int* identity_permu;
-    double** first_marginal;
+    float** first_marginal;
 
-    void combine_permus(int** permu_list, double* coef_list, int* res);
+    void combine_permus(int** permu_list, float* coef_list, int* res);
     void compute_first_marginal(int** permu_list, int m);
-    double get_distance_to_marginal(int* permu);
-    int choose_permu_index_to_move(double* coef_list);
+    float get_distance_to_marginal(int* permu);
+    int choose_permu_index_to_move(float* coef_list);
 
 private:
     void convert_to_permu(int* res);
@@ -469,7 +475,7 @@ public:
     stopwatch(){tt_tic = getTick();}
     ~stopwatch(){}
     void tic() { tt_tic = getTick();}
-    double toc() { return (getTick() - tt_tic);}
+    float toc() { return (float) (getTick() - tt_tic);}
 private:
     double getTick();
     double tt_tic;

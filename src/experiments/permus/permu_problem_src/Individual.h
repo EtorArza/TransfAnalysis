@@ -45,17 +45,17 @@ public:
 	int n;
 	int *genome; //The genes of the individual, or the permutation.
 	int id;		 // a unique identifier for each individual in the pop.
-	double f_value;
+	float f_value;
 	bool is_local_optimum[NEAT::N_OPERATORS] = {false, false, false}; // is_local_optimum[OPERATOR_ID] contains if it is optimum or not.
 	int* momentum;
-	double f_best;
+	float f_best;
 	int* genome_best;
 
 	// pop_info
-	double relative_pos = 0;
-	double relative_time = 0;
-	double sparsity = 0;
-	double distance = 0;
+	float relative_pos = 0;
+	float relative_time = 0;
+	float sparsity = 0;
+	float distance = 0;
 
 private:
 	static int n_indivs_created;

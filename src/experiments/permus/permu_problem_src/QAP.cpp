@@ -147,9 +147,9 @@ int QAP::Read(string filename)
 /*
  * This function evaluates the individuals for the QAP problem.
  */
-double QAP::Evaluate(int * genes)
+float QAP::Evaluate(int * genes)
 {
-	double fitness=0;
+	float fitness=0;
 	int FactA, FactB;
 	int distAB, flowAB, i ,j;
 	for (i=0;i<m_size;i++)

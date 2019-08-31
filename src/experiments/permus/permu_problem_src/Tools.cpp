@@ -8,6 +8,7 @@
  */
 
 #include "Tools.h"
+#include <limits.h>
 #include <math.h>
 #include <sys/time.h>
 #include <unistd.h>
@@ -18,7 +19,7 @@
 #include <set>
 #include "../permuevaluator.h"
 
-#define TEMP_DOUBLE_ARRAY_SIZE 30
+#define TEMP_FLOAT_ARRAY_SIZE 30
 
 /*
  * Returs the first position at which value appears in array. If it does not appear, then it returns -1;
@@ -95,8 +96,9 @@ bool isPermutation(int *permutation, int size)
 void GenerateRandomPermutation(int *permutation, int n)
 {
     for (int i = 0; i < n; ++i)
-    {
-        int j = rand() % (i + 1);
+    {   
+        int j = random_integer_fast(0, i+1);
+        // int j = rand() % (i + 1);
         permutation[i] = permutation[j];
         permutation[j] = i;
     }
@@ -612,11 +614,30 @@ double stopwatch::getTick()
     return theTick;
 }
 
+static unsigned long x=123456789, y=362436069, z=521288629;
 
+int xorshf96(void) {          //period 2^96-1
+unsigned long t;
+    x ^= x << 16;
+    x ^= x >> 5;
+    x ^= x << 1;
+
+   t = x;
+   x = y;
+   y = z;
+   z = t ^ x ^ y;
+
+  return z & INT_MAX;
+}
+
+int random_integer_fast(int max)
+{
+    return xorshf96() % max;
+}
 
 int random_integer_fast(int min, int max)
 {
-    return min + (rand() % static_cast<int>(max - min + 1));
+    return min + (xorshf96() % (max - min));
 }
 
 // https://ericlippert.com/2013/12/16/how-much-bias-is-introduced-by-the-remainder-technique/
@@ -668,20 +689,20 @@ int random_range_integer_uniform(int range_max)
     return random_integer_uniform(range_max);
 }
 
-double random_0_1_float()
+float random_0_1_float()
 {   
     return drand48();
 }
 
-double sigmoid(double x)
+float sigmoid(float x)
 {
     return 1.0 / (1.0 + exp(-x));
 }
 
-int choose_index_given_probabilities(double *probabilities_array, int len)
+int choose_index_given_probabilities(float *probabilities_array, int len)
 {
-    double r = random_0_1_float();
-    double cum_prob = 0;
+    float r = random_0_1_float();
+    float cum_prob = 0;
 
     for (int i = 0; i < len; i++)
     {
@@ -699,11 +720,11 @@ int choose_index_given_probabilities(double *probabilities_array, int len)
     //assert(cum_prob > 0.99999);
 }
 
-int choose_index_given_weights(double *weights_array, int len)
+int choose_index_given_weights(float *weights_array, int len)
 {
-    double r = random_0_1_float();
-    double cum_sum = 0;
-    double total = 0;
+    float r = random_0_1_float();
+    float cum_sum = 0;
+    float total = 0;
 
     for (int i = 0; i < len; i++)
     {
@@ -728,7 +749,7 @@ int choose_index_given_weights(double *weights_array, int len)
     //assert(cum_prob > 0.99999);
 }
 
-bool coin_toss(double p_of_true)
+bool coin_toss(float p_of_true)
 {
     if (random_0_1_float() < p_of_true)
     {
@@ -740,7 +761,7 @@ bool coin_toss(double p_of_true)
     }
 }
 
-int tools_round(double x)
+int tools_round(float x)
 {
     if (x <= 0.0)
     {
@@ -772,14 +793,14 @@ PermuTools::PermuTools(int n)
     random_permu1 = new int[n];
     random_permu2 = new int[n];
     temp_array = new int[n];
-    temp_array_double = new double[TEMP_DOUBLE_ARRAY_SIZE];
+    temp_array_float = new float[TEMP_FLOAT_ARRAY_SIZE];
 
     identity_permu = new int[n];
-    first_marginal = new double*[n];
+    first_marginal = new float*[n];
 
     for (int i = 0; i < n; i++)
     {
-        first_marginal[i] = new double[n];
+        first_marginal[i] = new float[n];
     }
 
 
@@ -798,7 +819,7 @@ PermuTools::~PermuTools()
     delete[] this->random_permu1;
     delete[] this->random_permu2;
     delete[] this->temp_array;
-    delete[] this->temp_array_double;
+    delete[] this->temp_array_float;
     delete[] this->identity_permu;
 
     for (int i = 0; i < n; i++)
@@ -812,7 +833,7 @@ PermuTools::~PermuTools()
 
 // combines the permutations considering the coefficients simmilarly to \cite{wang_discrete_2012}. 
 // The zeroes on their paper are -1 in our implementation
-void PermuTools::combine_permus(int** permu_list, double* coef_list, int* res){
+void PermuTools::combine_permus(int** permu_list, float* coef_list, int* res){
     int m = NEAT::N_COEF;
     int non_zero = 0; // number of non-zero coef.
     int positive = 0; // number of strictly positive coef
@@ -840,8 +861,8 @@ void PermuTools::combine_permus(int** permu_list, double* coef_list, int* res){
     QuickSort2Desc(coef_list, permu_list, 0, m - 1, false);
 
     // normalize positive weights
-    double sum_of_pos_w = sum_slice_vec(coef_list, 0, positive);
-    double *coef_list_copy = new double[NEAT::N_COEF];
+    float sum_of_pos_w = sum_slice_vec(coef_list, 0, positive);
+    float *coef_list_copy = new float[NEAT::N_COEF];
 
     std::copy(coef_list, coef_list+NEAT::N_COEF, coef_list_copy);
 
@@ -852,7 +873,7 @@ void PermuTools::combine_permus(int** permu_list, double* coef_list, int* res){
     }
     
     // normalize_neg_weights, considering their relative weight with respect to pos weights
-    double sum_of_neg_w = -sum_slice_vec(coef_list_copy,positive,m);
+    float sum_of_neg_w = -sum_slice_vec(coef_list_copy,positive,m);
     for (int i = positive; i < m; i++)
     {
         coef_list_copy[i] /= -(sum_of_pos_w + sum_of_neg_w);
@@ -868,7 +889,7 @@ void PermuTools::combine_permus(int** permu_list, double* coef_list, int* res){
 
     for (int i = positive + zero; i < m; i++)
     {
-        double r = 0;
+        float r = 0;
         for (int j = 0; j < n; j++)
         {
             r = random_0_1_float();
@@ -882,6 +903,7 @@ void PermuTools::combine_permus(int** permu_list, double* coef_list, int* res){
         }
     }
     convert_to_permu(res);
+    delete[] coef_list_copy;
 } 
 
 // Auxiliary function for combine_permus 
@@ -933,7 +955,7 @@ void PermuTools::compute_first_marginal(int** permu_list, int m){
         }
     }
 
-    double normalized_base_freq = 1.0 / (double) m;
+    float normalized_base_freq = 1.0 / (float) m;
 
     for (int i = 0; i < m; i++)
     {
@@ -945,8 +967,8 @@ void PermuTools::compute_first_marginal(int** permu_list, int m){
 }
 
 
-double PermuTools::get_distance_to_marginal(int* permu){
-    double res = 0.0;
+float PermuTools::get_distance_to_marginal(int* permu){
+    float res = 0.0;
     for (int i = 0; i < n; i++)
     {
         res += this->first_marginal[permu[i]][i];
@@ -954,19 +976,19 @@ double PermuTools::get_distance_to_marginal(int* permu){
     return res;
 }
 
-int PermuTools::choose_permu_index_to_move(double* coef_list){
+int PermuTools::choose_permu_index_to_move(float* coef_list){
 
-    assert(TEMP_DOUBLE_ARRAY_SIZE >= NEAT::N_COEF);
+    assert(TEMP_FLOAT_ARRAY_SIZE >= NEAT::N_COEF);
     
     for (int i = 0; i < NEAT::N_COEF; i++)
     {
-        temp_array_double[i] = abs(coef_list[i]);
+        temp_array_float[i] = abs(coef_list[i]);
     }
 
-    if(sum_abs_val_slice_vec(temp_array_double, 0, NEAT::N_COEF) == 0.0){
+    if(sum_abs_val_slice_vec(temp_array_float, 0, NEAT::N_COEF) == 0.0){
         return -1;
     }
 
-    return choose_index_given_weights(temp_array_double, NEAT::N_COEF);
+    return choose_index_given_weights(temp_array_float, NEAT::N_COEF);
 }
 

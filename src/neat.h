@@ -121,6 +121,16 @@ namespace NEAT {
         return (1/(1+(exp(-(slope*activesum))))); //Compressed
     }
 
+
+    // Hyperbolic tangetnt activation function. Inlined for speed.
+    // https://en.wikipedia.org/wiki/Hyperbolic_function#Tanh
+    inline real_t ftanh(real_t x){
+        real_t exp_2x = exp(-(x*2));
+        return (exp_2x -1) / (exp_2x + 1);
+    }
+
+
+
 	// Hebbian Adaptation Function
 	// Based on equations in Floreano & Urzelai 2000
 	// Takes the current weight, the maximum weight in the containing network,

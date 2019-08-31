@@ -1,71 +1,106 @@
 #include "std.hxx"
 
-#include "parameters.h"
+#include "Parameters.h"
 #include "permuevaluator.h"
 #include "map.h"
 #include "network.h"
 #include "networkexecutor.h"
 #include "resource.h"
 #include <assert.h>
-
+#include "PBP.h"
+//#include "PFSP.h"
+#include "LOP.h"
+//#include "QAP.h"
+//#include "TSP.h"
+//#include "API.h"
+#include "Population.h"
+#include "Tools.h"
 
 
 using namespace std;
 
+
+
 namespace NEAT
 {
-
-
+// variables to print progress
+static int nnets;
+ushort net_idx;
+real_t progress_print_decider;
 
 struct Config
-{
+{   
     uchar width;
     uchar height;
-    bool wall[Max_Maze_Len * Max_Maze_Len];
     struct Trial
     {
         uchar seqlen;
-        real_t seq[Max_Seq_Len];
         ushort max_steps;
         uchar max_dist;
-        uchar dist_map[Max_Maze_Len * Max_Maze_Len];
     };
     ushort ntrials;
     Trial trials[];
 };
 
 
+
+PBP *GetProblemInfo(string problemType, string filename)
+{
+    PBP *problem;
+    // if (problemType == "PFSP")
+    //     problem = new PFSP();
+    // else if (problemType == "TSP")
+    //     problem = new TSP();
+    // else 
+    // if (problemType == "QAP")
+    //      problem = new QAP();
+    //  else if (problemType == "lop")
+    problem = new LOP();
+    // else if (problemType == "API")
+    //     problem = new API();
+    // else
+    // {
+    //     cout << "Wrong problem type was specified." << endl;
+    //     exit(1);
+    // }
+
+    //Read the instance.
+    problem->Read(filename);
+    return problem;
+}
+
+
+
+
+
 static void create_config(__out Config *&config_, __out size_t &len_)
 {
-    Map map = parse_map(find_resource("maze.map"));
+    
 
-    Config config;
-    config.width = map.width;
-    config.height = map.height;
-    assert(config.width * config.height <= sizeof(config.wall));
+//     Config config;
 
-    config.ntrials = 0;
 
-    memset(config.wall, 0, sizeof(bool) * config.width * config.height);
+//     config.ntrials = 0;
 
-    vector<Config::Trial> trials;
+
+//     vector<Config::Trial> trials;
 
 
 
-#ifdef Truncate_Seq
-                for (size_t i = Truncate_Seq; i < seq.length(); i++)
-                {
-                    trial.seq[i] = 0.5;
-                }
-#endif
+// #ifdef Truncate_Seq
+//                 for (size_t i = Truncate_Seq; i < seq.length(); i++)
+//                 {
+//                     trial.seq[i] = 0.5;
+//                 }
+// #endif
 
 
-    for (size_t i = 0; i < config.ntrials; i++)
-    {
-        Config::Trial &trial = trials[i];
-        trial.max_steps = 2 + 3 * trial.seqlen;
-    }
-    memcpy(config_->trials, trials.data(), sizeof(Config::Trial) * config.ntrials);
+//     for (size_t i = 0; i < config.ntrials; i++)
+//     {
+//         Config::Trial &trial = trials[i];
+//         trial.max_steps = 2 + 3 * trial.seqlen;
+//     }
+//     memcpy(config_->trials, trials.data(), sizeof(Config::Trial) * config.ntrials);
 }
 
 struct Evaluator
@@ -73,18 +108,38 @@ struct Evaluator
     typedef NEAT::Config Config;
     const Config *config;
     bool terminated;
-    ushort it;
-    ushort max_it;
     OrganismEvaluation eval;
+    int idx_particle;
+
+    // ushort max_it;
+
+
+//////////////////////////////////////
+
+    PBP *problem;
+    CPopulation *pop;
+
 
     // constructor
     __net_eval_decl Evaluator(const Config *config_): config(config_)
     {
-        it = 0;
-        max_it = 10;
         terminated = false;
         eval.error = 0.0;
         eval.fitness = 0.0;
+        // it = 0;
+        int idx_particle = -1;
+        // max_it = 10;
+
+//////////////////////////////////////
+
+        char* params[3] = {"binary_name", "lop", "src/experiments/permus/instances/lop/Cebe.lop.n30.1"};
+        set_parameters(3, params); // Read parameters from bash.
+        //Read the problem instance to optimize.
+        problem = GetProblemInfo(PROBLEM_TYPE, INSTANCE_PATH);
+        pop = new CPopulation(problem);
+
+
+
     }
 
     // Check if evaluation is terminated. If it is, __net_eval_decl OrganismEvaluation result() is called.
@@ -93,37 +148,53 @@ struct Evaluator
         return !terminated;
     }
 
+
+
+
+
+
+
+
+
     // Clear non-input latent variables. (for example, the states of previous iterations on a recurrent net)
     // This function is called before each iteration, so it could potentially be used to compute the necessary info.
     __net_eval_decl bool clear_noninput()
-    {
-        return false; // trial_step == 1;
+    {   idx_particle++;
+        if (idx_particle == POPSIZE)
+        {
+            pop->end_iteration();
+            terminated = pop->terminated;
+        }
+        idx_particle = idx_particle % POPSIZE;
+        return true;
     }
 
     // load the sensory input
     __net_eval_decl real_t get_sensor(node_size_t sensor_index)
     {
-        switch (sensor_t(sensor_index))
-        {
-        case sensor_relat_f:
-            return 0.0;
-        case sensor_time:
-            return 0.0;
-        case sensor_rand:
-            return 0.0;
-        case sensor_relat_spars:
-            return 0.0;
-        case sensor_is_local_optima:
-            return 0.0;
-        case sensor_ham_dist_from_theoneabove:
-            return 0.0;
-        default:
-#ifdef ENABLE_CUDA
-            return 0.0;
-#else
-            abort();
-#endif
-        }
+//         switch (sensor_t(sensor_index))
+//         {
+//         case sensor_relat_f:
+//             return 0.0;
+//         case sensor_time:
+//             return 0.0;
+//         case sensor_rand:
+//             return 0.0;
+//         case sensor_relat_spars:
+//             return 0.0;
+//         case sensor_is_local_optima:
+//             return 0.0;
+//         case sensor_ham_dist_from_theoneabove:
+//             return 0.0;
+//         default:
+// #ifdef ENABLE_CUDA
+//             return 0.0;
+// #else
+//             abort();
+// #endif
+//         }
+    return pop->pop_info[idx_particle][sensor_index];
+
     }
 
     // load the outputs, and assign fitness if it it is the last iteration.
@@ -131,19 +202,36 @@ struct Evaluator
     {
         if (!terminated)
         {
-            if (output[ls_nothing_move] < -CUTOFF_0){
-                //local search
-            }else if(output[ls_nothing_move] > CUTOFF_0){
-                //movememnt
-            }
-        }else{
-            eval.fitness = 10.0;
-            eval.error = eval.fitness;
+                pop->apply_neat_output_to_individual_i(output, idx_particle);
         }
     }
 
     __net_eval_decl OrganismEvaluation result()
-    {
+    {   
+        progress_print_decider += 10.0 / (double) nnets;
+
+        if (net_idx == 0)
+        {
+            cout << "[" << std::flush;
+        }
+        
+        while (progress_print_decider >= 1.0)
+        {
+            std::cout << "." << std::flush;
+            progress_print_decider--;
+        }
+
+        if (net_idx == nnets-1)
+        {
+            cout << "]" << endl;
+
+        }
+        
+
+        
+        net_idx++;  
+        eval.fitness = pop->f_best;
+        eval.error = 10000000.0-eval.fitness;
         return eval;
     }
 };
@@ -156,11 +244,11 @@ public:
     PermuEvaluator()
     {
         executor = NetworkExecutor<Evaluator>::create();
-        Evaluator::Config *config;
-        size_t configlen;
-        create_config(config, configlen);
-        executor->configure(config, configlen);
-        free(config);
+        // Evaluator::Config *config;
+        // size_t configlen;
+        // create_config(config, configlen);
+        // executor->configure(config, configlen);
+        // free(config);
     }
 
     ~PermuEvaluator()
@@ -172,7 +260,13 @@ public:
                          class OrganismEvaluation *results,
                          size_t nnets)
     {
+        NEAT::nnets = nnets;
+        NEAT::net_idx = 0;
+        NEAT::progress_print_decider = 0.0;
+
+
         executor->execute(nets_, results, nnets);
+        
     }
 };
 

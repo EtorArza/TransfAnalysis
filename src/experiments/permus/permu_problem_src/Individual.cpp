@@ -73,7 +73,7 @@ ostream & operator<<(ostream & os,CIndividual * & individual)
 	os << std::setprecision(0);
 	os << std::fixed;
 	os << std::setfill(' ');
-    os << (double) individual->genome[0];
+    os << (float) individual->genome[0];
 	for(int i=1;i<individual->n;i++){
 		os << std::setw(0);
 		os << ", ";
@@ -82,7 +82,7 @@ ostream & operator<<(ostream & os,CIndividual * & individual)
 		os << std::setfill(' ');
 		os << std::setw(2);
 
-        os << (double) individual->genome[i];
+        os << (float) individual->genome[i];
 	}
 	os << std::setw(0);
 	os << "]";

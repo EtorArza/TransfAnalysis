@@ -135,7 +135,7 @@ void PBP::local_search_iteration(CIndividual *indiv, int operator_id)
         {
             for (int j = 0; j < this->problem_size_PBP; j++)
             {
-                if (i != j || _random_permu1[j]==_random_permu1[(i-1)])
+                if (i != j || (i > 0 &&_random_permu1[j]==_random_permu1[i-1]))
                 {
                     if (fitness_delta_insert(indiv, _random_permu1[i], _random_permu2[j]) > 0)
                     {
@@ -260,7 +260,7 @@ void PBP::obtain_indexes_step_towards(int *permu, int *ref_permu, int* i, int* j
         for (int idx = 0; idx < problem_size_PBP; idx++)
         {
             int r = _random_permu2[idx];
-            if ((_random_permu3[r] > _random_permu3[r+1]) && r < problem_size_PBP - 1){
+            if ((r < problem_size_PBP - 1 && _random_permu3[r] > _random_permu3[r+1])){
                 *i = r;
                 *j = r+1;
                 return;
@@ -369,7 +369,7 @@ void PBP::obtain_indexes_step_away(int *permu, int *ref_permu, int* i, int* j, i
 
         GenerateRandomPermutation(_random_permu2, problem_size_PBP);
 
-        // compute inverse (position) of permu^-1 \circ ref_permu  
+        // compute inverse (position) of permu^-1 \circ ref_permu
         for (int i = 0; i < problem_size_PBP; i++)
         {
             _random_permu3[_random_permu1[i]] = i;
@@ -378,9 +378,10 @@ void PBP::obtain_indexes_step_away(int *permu, int *ref_permu, int* i, int* j, i
         for (int idx = 0; idx < problem_size_PBP; idx++)
         {
             int r = _random_permu2[idx];
-            if ((_random_permu3[r] < _random_permu3[r+1]) && r < problem_size_PBP - 1){ // change this line from > to <
+            if ((r < problem_size_PBP - 1 && _random_permu3[r] < _random_permu3[r + 1]))
+            { // change this line from > to <
                 *i = r;
-                *j = r+1;
+                *j = r + 1;
                 return;
             }
         }

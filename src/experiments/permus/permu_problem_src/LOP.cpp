@@ -63,10 +63,10 @@ int LOP::Read(string filename)
 	indata.close();
 
 	//BUILD MATRIX
-	m_matrix = new double *[n];
+	m_matrix = new float *[n];
 	for (int i = 0; i < n; i++)
 	{
-		m_matrix[i] = new double[n];
+		m_matrix[i] = new float[n];
 	}
 
 	istringstream iss(data);
@@ -98,22 +98,22 @@ int LOP::Read(string filename)
 
 	initialize_variables_PBP(n);
 
-	return (n);
+	return n;
 }
 
-double LOP::_Evaluate(int *permu)
+float LOP::_Evaluate(int *permu)
 {
-	double fitness = 0;
+	float fitness = 0;
 	int i, j;
 	for (i = 0; i < n - 1; i++)
 		for (j = i + 1; j < n; j++)
-			fitness += (double)m_matrix[permu[i]][permu[j]];
+			fitness += (float)m_matrix[permu[i]][permu[j]];
 	return fitness;
 }
 
 void LOP::Evaluate(CIndividual *indiv)
 {
-	double fitness = 0;
+	float fitness = 0;
 	fitness = _Evaluate(indiv->genome);
 	indiv->f_value = fitness;
 }
@@ -127,7 +127,7 @@ int LOP::GetProblemSize()
 }
 
 // The Linear Ordering Problem: Instances, Search Space Analysis and Algorithms (Schiavinotto 2004)
-double LOP::fitness_delta_swap(CIndividual *indiv, int i, int j)
+float LOP::fitness_delta_swap(CIndividual *indiv, int i, int j)
 {
 	if(i==j){
 		return 0;
@@ -155,7 +155,7 @@ double LOP::fitness_delta_swap(CIndividual *indiv, int i, int j)
  * offers no computational advantage over Insertn, and this dissertation will not consider
  * it further 
  */
-double LOP::fitness_delta_interchange(CIndividual *indiv, int i, int j)
+float LOP::fitness_delta_interchange(CIndividual *indiv, int i, int j)
 {
 	// the idea is to perform two insertion operations, assuming i < j. First insert item_i in position j, and then item_j in pos i
 	if (i==j){
@@ -175,9 +175,9 @@ double LOP::fitness_delta_interchange(CIndividual *indiv, int i, int j)
 	}
 }
 
-double LOP::fitness_delta_insert(CIndividual *indiv, int i, int j)
+float LOP::fitness_delta_insert(CIndividual *indiv, int i, int j)
 {
-	double delta = 0;
+	float delta = 0;
 	if (i > j)
 	{
 		for (int k = j; k < i; k++)

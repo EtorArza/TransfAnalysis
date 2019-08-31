@@ -10,3 +10,4 @@
 /gold*/
 /src/util/std.h.gch
 .vscode
+callgrind.*

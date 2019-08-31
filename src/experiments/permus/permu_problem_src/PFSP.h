@@ -69,12 +69,12 @@ public:
 	/*
 	 * Evaluates the given solution with the total flow time criterion.
 	 */
-	double Evaluate(int * genes);
+	float Evaluate(int * genes);
 
     /*
 	 * Evaluates inverted solution of the given solution with the total flow time criterion.
 	 */
-    double EvaluateInv(int * genes);
+    float EvaluateInv(int * genes);
 
     /*
      * Returns the size of the problem.

@@ -55,12 +55,12 @@ public:
     /*
      * Theta values.
      */
-    double * m_thetas;
+    float * m_thetas;
     
     /*
      * Auxiliary array of values.
      */
-    double * m_functionValues;
+    float * m_functionValues;
     
     /*
      * Auxiliary arrays for calculating Kendall distance.
@@ -101,7 +101,7 @@ public:
 	/*
 	 * This function evaluates the solution.
 	 */
-	double Evaluate(int * genes);
+	float Evaluate(int * genes);
 
 
     

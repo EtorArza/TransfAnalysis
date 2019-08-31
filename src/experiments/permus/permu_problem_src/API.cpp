@@ -46,8 +46,8 @@ int API::Read(string filename)
     
     fscanf(instance_file, "%d %d %d %d",&m_size,&m_num_mallows,&func,&m_neighborhood);
     
-    m_thetas=new double[m_num_mallows];
-    m_functionValues=new double[m_num_mallows];
+    m_thetas=new float[m_num_mallows];
+    m_functionValues=new float[m_num_mallows];
     m_matrix_ConsensusPerms=new int*[m_num_mallows];
     for (i=0; i<m_num_mallows; i++) {
         m_matrix_ConsensusPerms[i]=new int[m_size];
@@ -90,11 +90,11 @@ int API::Read(string filename)
  * This function evaluates the fitness of the solution.
  */
 
-double API::Evaluate(int * genes)
+float API::Evaluate(int * genes)
 {
     
     int dist,maxind,stop,pos;
-    double thetamax,maxf,thetapos,maxpos;
+    float thetamax,maxf,thetapos,maxpos;
     dist=CalculateDistances(genes, m_matrix_ConsensusPerms[0]);
 
     maxind=0;
