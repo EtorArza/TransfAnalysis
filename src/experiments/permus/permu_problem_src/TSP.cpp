@@ -58,180 +58,180 @@ float CalculateGEODistance(float latitudeX, float latitudeY, float longitudeX, f
 	return (int)(RRR * acos(0.5 * ((1.0+q1) * q2 - (1.0 - q1) * q3)) + 1.0);
 }
 
-/*
- * Read TSP instance file that belongs to the TSPLIB library.
- */
-int TSP::Read2(string filename)
-{
-    //declaration and initialization of variables.
-	bool readm_distance_matrix=false;
-	bool coordinatesData=false;
-	string DISTANCE_TYPE;
-	float **coordinates;
-	char line[2048]; // variable for input value
-	string data="";
-	ifstream indata;
-	indata.open(filename.c_str(),ios::in);
+// /*
+//  * Read TSP instance file that belongs to the TSPLIB library.
+//  */
+// int TSP::Read2(string filename)
+// {
+//     //declaration and initialization of variables.
+// 	bool readm_distance_matrix=false;
+// 	bool coordinatesData=false;
+// 	string DISTANCE_TYPE;
+// 	float **coordinates;
+// 	char line[2048]; // variable for input value
+// 	string data="";
+// 	ifstream indata;
+// 	indata.open(filename.c_str(),ios::in);
 	
-	while (!indata.eof())
-	{
-		//LEER LA LINEA DEL FICHERO
-		indata.getline(line, 2048);
-		stringstream ss;
-		string sline;
-		ss << line;
-		ss >> sline;
-		if (sline=="EOF")
-		{
-			break;
-		}
-		if (readm_distance_matrix && coordinatesData==false)
-		{
-			//cout << "reading distance m_distance_matrix "<<line<< endl;
-			if (data=="")
-				data = line;
-			else
-				data = data+' '+line;
-		}
-		else if (readm_distance_matrix && coordinatesData==true)
-		{
-			//FILL DISTANCE m_distance_matrix
-			char * coordPieces;
-			coordPieces = strtok (line," ");
-			if (strcmp(coordPieces, " "))
-			{
-				coordPieces = strtok (NULL," ");
-			}
-			int coordNum = atoi(coordPieces);
-			coordPieces = strtok (NULL, " ");
-			float latitud = atof(coordPieces);
-			coordPieces = strtok (NULL, " ");
-			float longitud = atof(coordPieces);
-			float *coordinate= new float[2];
-			coordinate[0]=latitud;
-			coordinate[1]=longitud;
+// 	while (!indata.eof())
+// 	{
+// 		//LEER LA LINEA DEL FICHERO
+// 		indata.getline(line, 2048);
+// 		stringstream ss;
+// 		string sline;
+// 		ss << line;
+// 		ss >> sline;
+// 		if (sline=="EOF")
+// 		{
+// 			break;
+// 		}
+// 		if (readm_distance_matrix && coordinatesData==false)
+// 		{
+// 			//cout << "reading distance m_distance_matrix "<<line<< endl;
+// 			if (data=="")
+// 				data = line;
+// 			else
+// 				data = data+' '+line;
+// 		}
+// 		else if (readm_distance_matrix && coordinatesData==true)
+// 		{
+// 			//FILL DISTANCE m_distance_matrix
+// 			char * coordPieces;
+// 			coordPieces = strtok (line," ");
+// 			if (strcmp(coordPieces, " "))
+// 			{
+// 				coordPieces = strtok (NULL," ");
+// 			}
+// 			int coordNum = atoi(coordPieces);
+// 			coordPieces = strtok (NULL, " ");
+// 			float latitud = atof(coordPieces);
+// 			coordPieces = strtok (NULL, " ");
+// 			float longitud = atof(coordPieces);
+// 			float *coordinate= new float[2];
+// 			coordinate[0]=latitud;
+// 			coordinate[1]=longitud;
 			
-			coordinates[coordNum-1]= coordinate;
-			//cout<<"coordNum "<<coordNum-1<<" latit: "<<latitud<<" long: "<<longitud<<endl;
-		}
+// 			coordinates[coordNum-1]= coordinate;
+// 			//cout<<"coordNum "<<coordNum-1<<" latit: "<<latitud<<" long: "<<longitud<<endl;
+// 		}
 		
-		if(strContains(sline,"DIMENSION"))
-		{
-			char * pch;
-			pch = strtok (line," ");
-			pch = strtok (NULL, " ");
-			if (strcmp(pch,":")==0)
-			{
-				pch = strtok (NULL, " ");
-			}
-			m_size = atoi(pch);
-		}
-		else if (strContains(sline,"EDGE_WEIGHT_TYPE"))
-		{
-			char * pch;
-			pch = strtok (line," ");
-			pch = strtok (NULL, " ");
-			if (strcmp(pch,":")==0)
-			{
-				pch = strtok (NULL, " ");
-			}
-			stringstream s;
-			string type;
-			s << pch;
-			s >> type;
-			DISTANCE_TYPE = type;
-		}
-        else if (sline =="EDGE_WEIGHT_SECTION")
-		{
-			readm_distance_matrix=true;
-			coordinatesData=false;
-		}
-		else if (sline=="NODE_COORD_SECTION"){
-			readm_distance_matrix=true;
-			coordinatesData=true;
-			coordinates= new float*[m_size];
-		}
+// 		if(strContains(sline,"DIMENSION"))
+// 		{
+// 			char * pch;
+// 			pch = strtok (line," ");
+// 			pch = strtok (NULL, " ");
+// 			if (strcmp(pch,":")==0)
+// 			{
+// 				pch = strtok (NULL, " ");
+// 			}
+// 			m_size = atoi(pch);
+// 		}
+// 		else if (strContains(sline,"EDGE_WEIGHT_TYPE"))
+// 		{
+// 			char * pch;
+// 			pch = strtok (line," ");
+// 			pch = strtok (NULL, " ");
+// 			if (strcmp(pch,":")==0)
+// 			{
+// 				pch = strtok (NULL, " ");
+// 			}
+// 			stringstream s;
+// 			string type;
+// 			s << pch;
+// 			s >> type;
+// 			DISTANCE_TYPE = type;
+// 		}
+//         else if (sline =="EDGE_WEIGHT_SECTION")
+// 		{
+// 			readm_distance_matrix=true;
+// 			coordinatesData=false;
+// 		}
+// 		else if (sline=="NODE_COORD_SECTION"){
+// 			readm_distance_matrix=true;
+// 			coordinatesData=true;
+// 			coordinates= new float*[m_size];
+// 		}
 		
-	}
-	indata.close();
+// 	}
+// 	indata.close();
 	
-	//BUILD DISTANCE m_distance_matrix
-	m_distance_matrix = new float*[m_size];
-	for (int i=0;i<m_size;i++)
-	{
-		m_distance_matrix[i]= new float[m_size];
-	}
+// 	//BUILD DISTANCE m_distance_matrix
+// 	m_distance_matrix = new float*[m_size];
+// 	for (int i=0;i<m_size;i++)
+// 	{
+// 		m_distance_matrix[i]= new float[m_size];
+// 	}
 	
-	//FILL DISTANCE m_distance_matrix
-	if (coordinatesData==true)
-	{
-		//CALCULATE EUCLIDEAN DISTANCES
-		for (int i=0;i<m_size;i++)
-		{
-			//get coordinate A
-			float *coordA=coordinates[i];
-			float coordAx = coordA[0];
-			float coordAy = coordA[1];
-			for (int j=i;j<m_size;j++)
-			{
-				//get coordinate B.
-				float *coordB=coordinates[j];
-				float coordBx=coordB[0];
-				float coordBy=coordB[1];
-				float euclidean;
-				if (DISTANCE_TYPE=="GEO")
-				{
-					//calculate geographic distance between A and B.
-					euclidean=CalculateGEODistance(coordAx, coordAy, coordBx, coordBy);
-				}
-				else
-				{
-					//calculate euclidean distance between A and B.
-					float absolute= fabs(pow((coordAx-coordBx),2) + pow((coordAy-coordBy),2));
-					euclidean= sqrt(absolute);
-                }
-				m_distance_matrix[i][j]=  euclidean;
-				m_distance_matrix[j][i]= euclidean;//<-symmetric m_distance_matrix
-			}
-		}
-	}
-	else
-	{
-		//FILL DISTANCE m_distance_matrix
-		istringstream iss(data);
-		int i=0;
-		int j=0;
-		do
-		{
-			string sub;
-		    iss >> sub;
-		    if (sub!=""){
-				//save distance in distances m_distance_matrix. Save negative distance in order to minimize fitness instead of
-				//maximize.
-		    	m_distance_matrix[i][j]= atoi(sub.c_str());
-		    	m_distance_matrix[j][i]= atoi(sub.c_str());//<-symmetric m_distance_matrix
-		    	if (sub=="0")
-		    	{
-		    		i++;
-		    		j=0;
-		    	}
-		    	else
-		    	{
-		    		j++;
-		    	}
-		    }
-		    else
-		    {
-		    	break;
-		    }
-		} while (iss);
-	}
+// 	//FILL DISTANCE m_distance_matrix
+// 	if (coordinatesData==true)
+// 	{
+// 		//CALCULATE EUCLIDEAN DISTANCES
+// 		for (int i=0;i<m_size;i++)
+// 		{
+// 			//get coordinate A
+// 			float *coordA=coordinates[i];
+// 			float coordAx = coordA[0];
+// 			float coordAy = coordA[1];
+// 			for (int j=i;j<m_size;j++)
+// 			{
+// 				//get coordinate B.
+// 				float *coordB=coordinates[j];
+// 				float coordBx=coordB[0];
+// 				float coordBy=coordB[1];
+// 				float euclidean;
+// 				if (DISTANCE_TYPE=="GEO")
+// 				{
+// 					//calculate geographic distance between A and B.
+// 					euclidean=CalculateGEODistance(coordAx, coordAy, coordBx, coordBy);
+// 				}
+// 				else
+// 				{
+// 					//calculate euclidean distance between A and B.
+// 					float absolute= fabs(pow((coordAx-coordBx),2) + pow((coordAy-coordBy),2));
+// 					euclidean= sqrt(absolute);
+//                 }
+// 				m_distance_matrix[i][j]=  euclidean;
+// 				m_distance_matrix[j][i]= euclidean;//<-symmetric m_distance_matrix
+// 			}
+// 		}
+// 	}
+// 	else
+// 	{
+// 		//FILL DISTANCE m_distance_matrix
+// 		istringstream iss(data);
+// 		int i=0;
+// 		int j=0;
+// 		do
+// 		{
+// 			string sub;
+// 		    iss >> sub;
+// 		    if (sub!=""){
+// 				//save distance in distances m_distance_matrix. Save negative distance in order to minimize fitness instead of
+// 				//maximize.
+// 		    	m_distance_matrix[i][j]= atoi(sub.c_str());
+// 		    	m_distance_matrix[j][i]= atoi(sub.c_str());//<-symmetric m_distance_matrix
+// 		    	if (sub=="0")
+// 		    	{
+// 		    		i++;
+// 		    		j=0;
+// 		    	}
+// 		    	else
+// 		    	{
+// 		    		j++;
+// 		    	}
+// 		    }
+// 		    else
+// 		    {
+// 		    	break;
+// 		    }
+// 		} while (iss);
+// 	}
  
- 	initialize_variables_PBP(m_size);
+//  	initialize_variables_PBP(m_size);
 
 
-    return (m_size);
-}
+//     return (m_size);
+// }
 
 
 

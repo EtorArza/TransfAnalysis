@@ -36,16 +36,17 @@ class PBP
 	virtual ~PBP();
 	virtual int Read(string filename) = 0;
 	virtual int GetProblemSize() = 0;
-	virtual void Evaluate(CIndividual *indiv) = 0; // update the f_value of the individuals.
 
 
 	/*
 	 * Functions that are valid for all permutation problems. 
 	 * The use of this functions requires the fitness value of the individual to be previously computed.
+	 * No need to define them in the problem class.
 	 */
 	void local_search_iteration(CIndividual *indiv, int operator_id);
 	void move_indiv_towards_reference(CIndividual* indiv, int* ref_permu, int operator_id);
 	void move_indiv_away_reference(CIndividual* indiv, int* ref_permu, int operator_id);
+	void Evaluate(CIndividual *indiv); // update the f_value of the individuals.
 
 
 
@@ -62,7 +63,12 @@ class PBP
 	int *_random_permu3;
 
 
-	// The f_value of the individuals does not change in this functions.
+	/*
+	* Functions to be defined in child class.
+	*
+	*/
+	// The f_value of the individuals does not change in this functions. Just return the delta.
+	virtual float _Evaluate(int * permu) = 0;
 	virtual float fitness_delta_swap(CIndividual *indiv, int i, int j) = 0;
 	virtual float fitness_delta_interchange(CIndividual *indiv, int i, int j) = 0;
 	virtual float fitness_delta_insert(CIndividual *indiv, int i, int j) = 0;

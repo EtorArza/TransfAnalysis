@@ -44,6 +44,7 @@ EXTERN std::string PROBLEM_TYPE;
 // argv[1] --> type of problem, i.e. LOP
 // argv[2] --> path to the problem
 void set_parameters(int argc, char *argv[]);
+void set_parameters(int argc, char const *argv[]);
 std::string return_parameter_string(void);
 void print_parameters(void);
 

@@ -17,6 +17,7 @@
 #define _NERO_NEAT_H_
 
 #include "neattypes.h"
+#include "Tools.h"
 
 namespace NEAT {
 
@@ -122,10 +123,11 @@ namespace NEAT {
     }
 
 
+
     // Hyperbolic tangetnt activation function. Inlined for speed.
     // https://en.wikipedia.org/wiki/Hyperbolic_function#Tanh
     inline real_t ftanh(real_t x){
-        real_t exp_2x = exp(-(x*2));
+        real_t exp_2x = fast_exp(-(x*2));
         return (exp_2x -1) / (exp_2x + 1);
     }
 

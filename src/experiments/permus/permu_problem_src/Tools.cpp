@@ -9,7 +9,7 @@
 
 #include "Tools.h"
 #include <limits.h>
-#include <math.h>
+#include <cmath>
 #include <sys/time.h>
 #include <unistd.h>
 #include <time.h>
@@ -691,7 +691,7 @@ int random_range_integer_uniform(int range_max)
 
 float random_0_1_float()
 {   
-    return drand48();
+    return (float) drand48();
 }
 
 float sigmoid(float x)

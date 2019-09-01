@@ -2,7 +2,9 @@
 
 namespace NEAT {
 
-#define NACTIVATES_PER_INPUT 10
+// a even number is expected here. The maximum layer depth of the network
+// is limited by this number
+#define NACTIVATES_PER_INPUT 6
 
     //---
     //--- CLASS NetworkExecutor<>

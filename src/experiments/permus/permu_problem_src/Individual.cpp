@@ -8,6 +8,7 @@
 
 #include "Individual.h"
 #include "Tools.h"
+#include <limits>
 #include "Parameters.h"
 #include <iomanip>      // std::setprecision
 #include "../permuevaluator.h"
@@ -28,8 +29,8 @@ CIndividual::CIndividual(int length)
 	GenerateRandomPermutation(this->genome, n);
 	GenerateRandomPermutation(this->momentum, n);
 	GenerateRandomPermutation(this->genome_best, n);
-	f_value=MIN_LONG_INTEGER;
-	f_best=MIN_LONG_INTEGER;
+	f_value=std::numeric_limits<float>::lowest();
+	f_best=std::numeric_limits<float>::lowest();
 	id = n_indivs_created;
 	n_indivs_created++;
 }

@@ -20,6 +20,7 @@
 #include <vector>
 #include <string.h>
 #include <stdio.h>
+#include "Individual.h"
 
 using std::ifstream;
 using std::ofstream;
@@ -50,7 +51,7 @@ public:
 	/*
 	 * The number of jobs of the problem.
 	 */
-	int m_size;
+	int n;
 	
 	/*
      * The constructor. It initializes a QAP from a file.
@@ -62,26 +63,18 @@ public:
      */
     virtual ~QAP();
 	
-	/*
-	 * Read QAP file.
-	 */
 	int Read(string filename);
-	
-	/*
-	 * This function evaluates the individuals for the QAP problem.
-	 */
-	float Evaluate(int * genes);
-    
-    /*
-     * This function evaluates the inverted solution of the given individual for the QAP problem.
-     */
-    float EvaluateInv(int * genes);
-	
-    /*
-     * Returns the size of the problem.
-     */
     int GetProblemSize();
-private:
-	
+
+
+
+	float fitness_delta_swap(CIndividual *indiv, int i, int j);
+	float fitness_delta_interchange(CIndividual *indiv, int i, int j);
+	float fitness_delta_insert(CIndividual *indiv, int i, int j);
+
+protected:	
+    float _Evaluate(int *permu);
+
+
 };
 #endif

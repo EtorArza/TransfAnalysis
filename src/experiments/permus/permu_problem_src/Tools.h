@@ -15,6 +15,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <vector>
+#include <cmath>
 
 using std::istream;
 using std::ostream;
@@ -394,7 +395,7 @@ T sum_slice_vec(T *v, int i, int j)
 }
 
 
-// Sum the absolute value of elements from pos i to pos j-1. The python equivalent of sum(v[i:j])
+// Sum the absolute value of real valued elements from pos i to pos j-1. The python equivalent of sum(v[i:j])
 template <class T>
 T sum_abs_val_slice_vec(T *v, int i, int j)
 {
@@ -442,6 +443,16 @@ template <class T>
 void copy_vector(T *v_res, T*v_ref, int len){
 	memcpy(v_res, v_ref, sizeof(T)*len);
 }
+
+
+inline
+float fast_exp(float x) {
+  x = 1.0 + x / 256.0;
+  x *= x; x *= x; x *= x; x *= x;
+  x *= x; x *= x; x *= x; x *= x;
+  return x;
+}
+
 
 
 class PermuTools

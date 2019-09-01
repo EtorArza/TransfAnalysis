@@ -1,6 +1,9 @@
 #pragma once
 
 #include "cpunetwork.h"
+#include "Parameters.h"
+#include <mutex>
+
 
 namespace NEAT {
 
@@ -33,27 +36,29 @@ namespace NEAT {
         virtual void execute(class Network **nets_,
                              OrganismEvaluation *results,
                              size_t nnets) {
-
+            std::mutex mu;
             CpuNetwork **nets = (CpuNetwork **)nets_;
             node_size_t nsensors = nets[0]->get_dims().nnodes.sensor;
-
-//#pragma omp parallel for //num_threads(threads)
+#pragma omp parallel for
             for(size_t inet = 0; inet < nnets; inet++) {
                 CpuNetwork *net = nets[inet];
-                Evaluator eval(config);
+                mu.lock();
+                Evaluator *ev = new Evaluator(config);
+                mu.unlock();
 
-                while(eval.next_step()) {
-                    if(eval.clear_noninput()) {
+                while(ev->next_step()) {
+                    if(ev->clear_noninput()) {
                         net->clear_noninput();
                     }
                     for(node_size_t isensor = 0; isensor < nsensors; isensor++) {
-                        net->load_sensor(isensor, eval.get_sensor(isensor));
+                        net->load_sensor(isensor, ev->get_sensor(isensor));
                     }
-                    net->activate(NACTIVATES_PER_INPUT);
-                    eval.evaluate(net->get_outputs());
+                    net->activate();
+                    ev->evaluate(net->get_outputs());
                 }
 
-                results[inet] = eval.result();
+                results[inet] = ev->result();
+                delete ev;
             }
         }
         

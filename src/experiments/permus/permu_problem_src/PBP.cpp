@@ -29,7 +29,7 @@ void PBP::initialize_variables_PBP(int problem_size)
 {   
     if (problem_size < 2)
     {
-        std::cout << "error, problem size < 2. Instance file not read correctly.";
+        std::cout << "error, problem size < 2. Instance file not read correctly." << std::flush;
         exit(1);
     }
     
@@ -41,6 +41,14 @@ void PBP::initialize_variables_PBP(int problem_size)
     GenerateRandomPermutation(_random_permu3, problem_size);
     problem_size_PBP = problem_size;
 }
+
+void PBP::Evaluate(CIndividual *indiv)
+{
+	float fitness = 0;
+	fitness = _Evaluate(indiv->genome);
+	indiv->f_value = fitness;
+}
+
 
 void PBP::apply_operator_with_fitness_update(CIndividual *indiv, int i, int j, int operator_id)
 {   

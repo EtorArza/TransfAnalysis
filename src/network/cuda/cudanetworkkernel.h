@@ -1,5 +1,5 @@
 #pragma once
-
+#include "Tools.h"
 namespace NEAT {
 
 //--------------------------------------------------------------------------------
@@ -34,7 +34,7 @@ namespace NEAT {
 
     inline __device__ real_t fsigmoid(real_t activesum,real_t slope,real_t constant) {
         //NON-SHIFTED STEEPENED
-        return (1/(1+(exp(-(slope*activesum))))); //Compressed
+        return (1/(1+(fast_exp(-(slope*activesum))))); //Compressed
     }
 
     template<typename Evaluator>

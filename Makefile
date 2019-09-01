@@ -1,5 +1,10 @@
 include Makefile.conf
 
+$(shell export OMP_NUM_THREADS=${N_THREADS})
+
+
+
+
 CC_CUDA=nvcc -DENABLE_CUDA ${NVCC_FLAGS} -arch=sm_13 --compiler-bindir ${PFM_NVCC_CCBIN} -Xcompiler "${OPT} ${INCLUDES} ${OPENMP}"
 
 INCLUDES=$(patsubst %,-I%,$(shell find src -type d))
@@ -26,7 +31,7 @@ DEPENDS+=${CUDA_OBJECTS:%.o=%.d}
 
 ifeq (${DEVMODE}, true)
 	OPT=-O0
-	#OPENMP=-fopenmp
+	OPENMP=-fopenmp
 	MISC_FLAGS=
 	NVCC_FLAGS=-G -g
 else
@@ -76,7 +81,7 @@ obj/cu/%.d: src/%.cu
 else
 obj/cpp/cxx/%.o: src/%.cxx Makefile.conf Makefile
 	@mkdir -p $(shell dirname $@)
-	g++ ${CC_FLAGS} -std=c++98 -MMD $< -o $@
+	g++ ${CC_FLAGS} -std=c++11 -MMD $< -o $@
 endif
 
 obj/cpp/%.o: src/%.cpp Makefile.conf Makefile src/util/std.h.gch

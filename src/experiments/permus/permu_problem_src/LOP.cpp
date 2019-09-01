@@ -111,12 +111,7 @@ float LOP::_Evaluate(int *permu)
 	return fitness;
 }
 
-void LOP::Evaluate(CIndividual *indiv)
-{
-	float fitness = 0;
-	fitness = _Evaluate(indiv->genome);
-	indiv->f_value = fitness;
-}
+
 
 /*
  * Returns the size of the problem.

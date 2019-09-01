@@ -10,12 +10,11 @@
 #include "PBP.h"
 //#include "PFSP.h"
 #include "LOP.h"
-//#include "QAP.h"
+#include "QAP.h"
 //#include "TSP.h"
 //#include "API.h"
 #include "Population.h"
 #include "Tools.h"
-
 
 using namespace std;
 
@@ -47,22 +46,22 @@ struct Config
 PBP *GetProblemInfo(string problemType, string filename)
 {
     PBP *problem;
-    // if (problemType == "PFSP")
+    // if (problemType == "pfsp")
     //     problem = new PFSP();
-    // else if (problemType == "TSP")
+    // else if (problemType == "tsp")
     //     problem = new TSP();
     // else 
-    // if (problemType == "QAP")
-    //      problem = new QAP();
-    //  else if (problemType == "lop")
-    problem = new LOP();
-    // else if (problemType == "API")
+    if (problemType == "qap")
+        {problem = new QAP();}
+    else if (problemType == "lop")
+        {problem = new LOP();}
+    // else if (problemType == "api")
     //     problem = new API();
-    // else
-    // {
-    //     cout << "Wrong problem type was specified." << endl;
-    //     exit(1);
-    // }
+    else
+    {
+         cout << "Wrong problem type was specified." << endl;
+         exit(1);
+    }
 
     //Read the instance.
     problem->Read(filename);
@@ -73,8 +72,8 @@ PBP *GetProblemInfo(string problemType, string filename)
 
 
 
-static void create_config(__out Config *&config_, __out size_t &len_)
-{
+// static void create_config(__out Config *&config_, __out size_t &len_)
+// {
     
 
 //     Config config;
@@ -101,10 +100,11 @@ static void create_config(__out Config *&config_, __out size_t &len_)
 //         trial.max_steps = 2 + 3 * trial.seqlen;
 //     }
 //     memcpy(config_->trials, trials.data(), sizeof(Config::Trial) * config.ntrials);
-}
+// }
 
 struct Evaluator
 {
+
     typedef NEAT::Config Config;
     const Config *config;
     bool terminated;
@@ -119,7 +119,6 @@ struct Evaluator
     PBP *problem;
     CPopulation *pop;
 
-
     // constructor
     __net_eval_decl Evaluator(const Config *config_): config(config_)
     {
@@ -127,12 +126,13 @@ struct Evaluator
         eval.error = 0.0;
         eval.fitness = 0.0;
         // it = 0;
-        int idx_particle = -1;
+        idx_particle = -1;
         // max_it = 10;
 
 //////////////////////////////////////
 
-        char* params[3] = {"binary_name", "lop", "src/experiments/permus/instances/lop/Cebe.lop.n30.1"};
+        //char* params[3] = {"binary_name", "lop", "src/experiments/permus/instances/lop/Cebe.lop.n30.1"};
+        char const *params[3] = {"binary_name", "qap", "src/experiments/permus/instances/qap/tai35a.dat.dat"};
         set_parameters(3, params); // Read parameters from bash.
         //Read the problem instance to optimize.
         problem = GetProblemInfo(PROBLEM_TYPE, INSTANCE_PATH);
@@ -228,10 +228,12 @@ struct Evaluator
         }
         
 
-        
+
         net_idx++;  
         eval.fitness = pop->f_best;
         eval.error = 10000000.0-eval.fitness;
+        delete pop;
+        delete problem;
         return eval;
     }
 };

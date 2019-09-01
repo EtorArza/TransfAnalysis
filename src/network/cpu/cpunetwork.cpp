@@ -20,6 +20,7 @@
 #include "neat.h"
 #include "util.h"
 #include <assert.h>
+#include "networkexecutor.h"
 
 using namespace NEAT;
 using namespace std;
@@ -69,7 +70,7 @@ real_t *CpuNetwork::get_outputs() {
     return activations.data() + dims.nnodes.input;
 }
 
-void CpuNetwork::activate(size_t ncycles) {
+void CpuNetwork::activate() {
     real_t act_other[dims.nnodes.all];
 
     //Copy only input activation state.
@@ -78,8 +79,8 @@ void CpuNetwork::activate(size_t ncycles) {
            sizeof(real_t) * dims.nnodes.input);
 
     real_t *act_curr = activations.data(), *act_new = act_other;
-
-    for(size_t icycle = 0; icycle < ncycles; icycle++) {
+    //cout << "--" << endl;
+    for(size_t icycle = 0; icycle < NACTIVATES_PER_INPUT; icycle++) {
 
         for(size_t i = dims.nnodes.input; i < dims.nnodes.all; i++) {
             NetNode &node = nodes[i];
@@ -88,7 +89,7 @@ void CpuNetwork::activate(size_t ncycles) {
             for(size_t j = node.incoming_start; j < node.incoming_end; j++) {
                 NetLink &link = links[j];
                 sum += link.weight * act_curr[link.in_node_index];
-                //cout << "from=" << (link.in_node_index+1) << ", to=" << (i+1) << ", weight=" << link.weight << ", act[from]=" << act_curr[link.in_node_index] << ", partial=" << link.weight * act_curr[link.in_node_index] << ", sum=" << sum << endl;
+                //cout << "from=" << (link.in_node_index) << ", to=" << (i) << ", weight=" << link.weight << ", act[from]=" << act_curr[link.in_node_index] << ", partial=" << link.weight * act_curr[link.in_node_index] << ", sum=" << sum << endl;
             }
 
             // act_new[i] = NEAT::fsigmoid(sum, 4.924273, 2.4621365);  // Sigmoidal activation.

@@ -57,7 +57,6 @@ public:
     virtual ~LOP();
 	int Read(string filename);
     int GetProblemSize();
-	void Evaluate(CIndividual *indiv);
 
 
 

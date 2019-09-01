@@ -19,12 +19,15 @@
 #include "neat.h"
 #include "rng.h"
 #include "util.h"
+#include <omp.h>
+
 
 using namespace NEAT;
 using namespace std;
 
 #define DEFAULT_RNG_SEED 1
 #define DEFAULT_MAX_GENS 10000
+#define DEFAULT_PARALLEL_THREADS 1
 
 void usage() {
     cerr << "usage: neat [OPTIONS]... experiment_name" << endl;
@@ -46,7 +49,7 @@ void usage() {
     cerr << "  -n population_size   (default=" << env->pop_size << ")" << endl;
     cerr << "  -x max_generations   (default=" << DEFAULT_MAX_GENS << ")" << endl;
     cerr << "  -s search_type       {phased, blended, complexify} (default=phased)" << endl;
-
+    cerr << "  -t num_of_parallel_threads (default=" << DEFAULT_PARALLEL_THREADS << ")" << endl;
 
     exit(1);
 }
@@ -69,14 +72,14 @@ int parse_int(const char *opt, const char *str) {
 }
 
 int main(int argc, char *argv[]) {
-
     int rng_seed = DEFAULT_RNG_SEED;
     int maxgens = DEFAULT_MAX_GENS;
+    int threads = DEFAULT_PARALLEL_THREADS;
     bool force_delete = false;
 
     {
         int opt;
-        while( (opt = getopt(argc, argv, "fc:r:p:g:n:x:s:")) != -1) {
+        while( (opt = getopt(argc, argv, "fc:r:p:g:n:x:t:s:")) != -1) {
             switch(opt) {
             case 'f':
                 force_delete = true;
@@ -92,6 +95,9 @@ int main(int argc, char *argv[]) {
                 break;
             case 'x':
                 maxgens = parse_int("-x", optarg);
+                break;
+            case 't':
+                threads = parse_int("-t", optarg);
                 break;
             case 's':
                 env->search_type = parse_enum<GeneticSearchType>("-s", optarg, {
@@ -118,6 +124,9 @@ int main(int argc, char *argv[]) {
     } else if(exists("experiment_1")) {
         error("Already exists: experiment_1.\nMove your experiment directories or use -f to delete them automatically.")
     }
+
+    omp_set_num_threads(threads);
+
 
     if(env->search_type == GeneticSearchType::BLENDED) {
         env->mutate_delete_node_prob *= 0.1;

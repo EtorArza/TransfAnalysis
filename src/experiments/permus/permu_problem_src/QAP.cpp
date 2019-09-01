@@ -8,6 +8,10 @@
  */
 
 #include "QAP.h"
+#include <assert.h>
+#include "Tools.h"
+
+
 
 /*
  *Class constructor.
@@ -22,7 +26,7 @@ QAP::QAP()
  */
 QAP::~QAP()
 {
-	for (int i=0;i<m_size;i++)
+	for (int i=0;i<n;i++)
 	{
 		delete [] m_distance_matrix[i];
 		delete [] m_flow_matrix[i];
@@ -52,41 +56,41 @@ int QAP::Read(string filename)
 		if (num==0)
 		{
 			//OBTENER EL TAMAÑO DEL PROBLEMA
-			m_size = atoi(sline.c_str());
-			m_distance_matrix = new int*[m_size];
-			m_flow_matrix = new int*[m_size];
-			for (int i=0;i<m_size;i++)
+			n = atoi(sline.c_str());
+			m_distance_matrix = new int*[n];
+			m_flow_matrix = new int*[n];
+			for (int i=0;i<n;i++)
 			{
-				m_distance_matrix[i]= new int[m_size];
-				m_flow_matrix[i] = new int[m_size];
+				m_distance_matrix[i]= new int[n];
+				m_flow_matrix[i] = new int[n];
 			}
 		}
-		else if (1<=num && num<=m_size)
+		else if (1<=num && num<=n)
 		{
 			//LOAD DISTANCE MATRIX
 			char * pch;
 			pch = strtok (line," ");
 			int distance=atoi(pch);
 			m_distance_matrix[num-1][0]=distance;
-			for (int i=1;i < m_size; i++)
+			for (int i=1;i < n; i++)
 			{
 				pch = strtok (NULL, " ,.");
 				distance=atoi(pch);
 				m_distance_matrix[num-1][i]=distance;
 			}
 		}
-		else if (num>m_size && num<=(2*m_size))
+		else if (num>n && num<=(2*n))
 		{
 			//LOAD FLOW MATRIX
 			char * pch;
 			pch = strtok (line," ");
 			int weight=atoi(pch);
-			m_flow_matrix[num-m_size-1][0]=weight;
-			for (int i=1;i < m_size; i++)
+			m_flow_matrix[num-n-1][0]=weight;
+			for (int i=1;i < n; i++)
 			{
 				pch = strtok (NULL, " ,.");
 				weight=atoi(pch);
-				m_flow_matrix[num-m_size-1][i]=weight;
+				m_flow_matrix[num-n-1][i]=weight;
 			}
 		}
  
@@ -138,33 +142,32 @@ int QAP::Read(string filename)
     //PrintMatrix(m_distance_matrix, m_size, m_size, "");
     //PrintMatrix(m_flow_matrix, m_size, m_size, "");
     //exit(1);
-	initialize_variables_PBP(m_size);
+	initialize_variables_PBP(n);
 
 
-	return (m_size);
+	return (n);
 }
 
 /*
  * This function evaluates the individuals for the QAP problem.
  */
-float QAP::Evaluate(int * genes)
+float QAP::_Evaluate(int * genes)
 {
 	float fitness=0;
 	int FactA, FactB;
 	int distAB, flowAB, i ,j;
-	for (i=0;i<m_size;i++)
+	for (i=0;i<n;i++)
 	{
-		for (j=0;j<m_size;j++)
+		for (j=0;j<n;j++)
 		{
 			FactA = genes[i];
 			FactB = genes[j];
 			
-			//distAB= m_distance_matrix[i][j];
-			//flowAB= m_flow_matrix[FactA][FactB];
-            distAB= m_distance_matrix[FactA][FactB];
-            flowAB= m_flow_matrix[i][j];
+			distAB= m_distance_matrix[i][j];
+			flowAB= m_flow_matrix[FactA][FactB];
+
             
-			fitness= fitness+(distAB*flowAB);			
+			fitness += distAB*flowAB;			
 		}
 	}
 	
@@ -173,11 +176,53 @@ float QAP::Evaluate(int * genes)
 
 
 
+
+
+
+	float QAP::fitness_delta_swap(CIndividual *indiv, int i, int j){
+		assert(j == i+1);
+		return fitness_delta_interchange(indiv, i, j);
+	}
+
+	float QAP::fitness_delta_interchange(CIndividual *indiv, int i, int j){
+		int new_fitness_delta = 0;
+		int el_at_pos_i_in_sigma_2;
+        for (int k = 0; k < n; k++)
+		{
+		    if (k==i){
+                el_at_pos_i_in_sigma_2 = indiv->genome[j];
+			}else if(k==j){
+                el_at_pos_i_in_sigma_2 = indiv->genome[i];
+			}else{
+                el_at_pos_i_in_sigma_2 = indiv->genome[k];
+			}
+
+            new_fitness_delta += m_distance_matrix[k][i] * (m_flow_matrix[el_at_pos_i_in_sigma_2][indiv->genome[j]] - m_flow_matrix[indiv->genome[k]][indiv->genome[i]]);
+            new_fitness_delta += m_distance_matrix[i][k] * (m_flow_matrix[indiv->genome[j]][el_at_pos_i_in_sigma_2] - m_flow_matrix[indiv->genome[i]][indiv->genome[k]]);
+
+            if (k == i){
+                continue;
+			}
+            new_fitness_delta += m_distance_matrix[k][j] * (m_flow_matrix[el_at_pos_i_in_sigma_2][indiv->genome[i]] - m_flow_matrix[indiv->genome[k]][indiv->genome[j]]);
+            new_fitness_delta += m_distance_matrix[j][k] * (m_flow_matrix[indiv->genome[i]][el_at_pos_i_in_sigma_2] - m_flow_matrix[indiv->genome[j]][indiv->genome[k]]);
+		}
+		return -new_fitness_delta;
+	}
+
+	float QAP::fitness_delta_insert(CIndividual *indiv, int i, int j){
+		int f_current = indiv->f_value;
+		copy_vector(_random_permu1, indiv->genome, n);
+		InsertAt(_random_permu1, i, j, n);
+		return _Evaluate(_random_permu1) - f_current;
+	}
+	
+
+
 /*
  * Returns the size of the problem.
  */
 int QAP::GetProblemSize()
 {
-    return m_size;
+    return n;
 }
 
