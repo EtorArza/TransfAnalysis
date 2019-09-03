@@ -11,3 +11,4 @@
 /src/util/std.h.gch
 .vscode
 callgrind.*
+__pycache*

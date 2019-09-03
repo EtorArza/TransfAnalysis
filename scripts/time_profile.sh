@@ -1,3 +1,5 @@
+cd ../
+
 cat > Makefile.conf <<EOF
 ENABLE_CUDA=false
 DEVMODE=false

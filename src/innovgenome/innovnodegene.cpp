@@ -43,7 +43,7 @@ InnovNodeGene::~InnovNodeGene() {
 }
 
 void InnovNodeGene::print_to_file(std::ostream &outFile) {
-    outFile<<"node "<<node_id<<" ";
+    outFile<<"node "<<node_id<<" "; 
     outFile<<trait_id<<" ";
-    outFile<<(int)type<<std::endl;
+    outFile<<(int)type<<std::endl; // (BIAS = 0, SENSOR = 1, OUTPUT = 2, HIDDEN = 3)
 }
