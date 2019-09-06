@@ -20,7 +20,9 @@
 #include "rng.h"
 #include "util.h"
 #include <omp.h>
-
+#include "loadnetworkfromfile.h"
+#define EXTERN
+#include "Parameters.h"
 
 using namespace NEAT;
 using namespace std;
@@ -50,7 +52,6 @@ void usage() {
     cerr << "  -x max_generations   (default=" << DEFAULT_MAX_GENS << ")" << endl;
     cerr << "  -s search_type       {phased, blended, complexify} (default=phased)" << endl;
     cerr << "  -t num_of_parallel_threads (default=" << DEFAULT_PARALLEL_THREADS << ")" << endl;
-
     exit(1);
 }
 
@@ -76,6 +77,14 @@ int main(int argc, char *argv[]) {
     int maxgens = DEFAULT_MAX_GENS;
     int threads = DEFAULT_PARALLEL_THREADS;
     bool force_delete = false;
+
+
+
+
+    load_genome("fittest_1500");
+
+    //exit(1);
+
 
     {
         int opt;
@@ -135,10 +144,15 @@ int main(int argc, char *argv[]) {
 
     const char *experiment_name = argv[optind++];
 
+
+
     Experiment *exp = Experiment::get(experiment_name);
     if(exp == nullptr) {
         trap("No such experiment: " << experiment_name);
     }
+
+
+
 
     rng_t rng{rng_seed};
     exp->run(rng, maxgens);

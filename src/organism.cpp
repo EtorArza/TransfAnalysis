@@ -33,8 +33,8 @@ Organism::Organism(const Genome &genome) {
     *this->genome = genome;
     this->net = unique_ptr<Network>(Network::create());
 
-    //Note: We're in the base class constructor, so a derived class' init() won't
-    //      be called. The derived class' constructor must also call init().
+    // Note: We're in the base class constructor, so a derived class' init() won't
+    // be called. The derived class' constructor must also call init().
     init(0);
 }
 

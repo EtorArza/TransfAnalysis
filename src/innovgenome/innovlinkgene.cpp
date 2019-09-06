@@ -74,6 +74,31 @@ InnovLinkGene::InnovLinkGene(InnovLinkGene *g,
 	frozen=g->frozen;
 }
 
+
+//todo: use NodeLookup
+InnovLinkGene::InnovLinkGene(std::string argline) {
+	//InnovLinkGene parameter holders
+	int trait_id;
+	int inodenum;
+	int onodenum;
+	real_t weight;
+	int recur;
+    std::string nothing;
+
+	//Get the gene parameters
+    std::stringstream ss(argline);
+    ss >> nothing >> trait_id >> inodenum >> onodenum >> weight >> recur >> innovation_num >> mutation_num >> enable;
+
+	frozen=false; //TODO: MAYBE CHANGE
+
+    _weight = weight;
+    _in_node_id = inodenum;
+    _out_node_id = onodenum;
+    _is_recurrent = recur;
+    _trait_id = trait_id;
+}
+
+
 //todo: use NodeLookup
 InnovLinkGene::InnovLinkGene(const char *argline) {
 	//InnovLinkGene parameter holders

@@ -1,18 +1,14 @@
 
-#pragma once
-
 #include <string>
 
 
-#ifdef DEFINE_GLOBALS
-#define EXTERN
-#else
+#ifndef EXTERN
 #define EXTERN extern
 #endif
 
 
 
-#define N_OF_INPUT_PARAMS 3
+#define N_OF_INPUT_PARAMS 4
 
 
 // CONSTANT PARAMETERS //
@@ -25,6 +21,7 @@ EXTERN int POPSIZE;
 // binary name
 EXTERN std::string INSTANCE_PATH;
 EXTERN std::string PROBLEM_TYPE;
+EXTERN std::string CONTROLLER_PATH;
 ///////////////////////////
 
 

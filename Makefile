@@ -8,7 +8,7 @@ $(shell export OMP_NUM_THREADS=${N_THREADS})
 CC_CUDA=nvcc -DENABLE_CUDA ${NVCC_FLAGS} -arch=sm_13 --compiler-bindir ${PFM_NVCC_CCBIN} -Xcompiler "${OPT} ${INCLUDES} ${OPENMP}"
 
 INCLUDES=$(patsubst %,-I%,$(shell find src -type d))
-SOURCES=$(shell find src -name "*.cpp")
+SOURCES=$(shell find src/ ! -name "test_permuproblem.cpp" -name "*.cpp")
 CXX_SOURCES=$(shell find src -name "*.cxx")
 
 OBJECTS=${SOURCES:src/%.cpp=obj/cpp/%.o}

@@ -992,3 +992,49 @@ int PermuTools::choose_permu_index_to_move(float* coef_list){
     return choose_index_given_weights(temp_array_float, NEAT::N_COEF);
 }
 
+
+// https://thispointer.com/c-how-to-read-a-file-line-by-line-into-a-vector/
+std::vector<string> read_lines_from_file(string filename){
+    std::ifstream in(filename);
+    std::string str;
+    std::vector<std::string> vecOfStrs;
+
+    // Read the next line from File untill it reaches the end.
+    while (std::getline(in, str))
+    {
+        // Line contains string of length > 0 then save it in vector
+        if (str.size() > 0)
+        {
+            vecOfStrs.push_back(str);
+        }
+    }
+    in.close();
+    if (vecOfStrs.size()< 1){
+        std::cout << endl;
+        std::cout << "file" << filename << "not read correctly." << endl;
+        exit(1);
+    }
+    return vecOfStrs;
+}
+
+
+
+std::vector<string> split(string txt, char ch)
+{
+    size_t pos = txt.find(ch);
+    size_t initialPos = 0;
+    std::vector<std::string> res;
+
+    // Decompose statement
+    while( pos != std::string::npos ) {
+        res.push_back( txt.substr( initialPos, pos - initialPos ) );
+        initialPos = pos + 1;
+
+        pos = txt.find( ch, initialPos );
+    }
+
+    // Add the last one
+    res.push_back( txt.substr( initialPos, std::min( pos, txt.size() ) - initialPos + 1 ) );
+
+    return res;
+}

@@ -39,7 +39,7 @@ namespace NEAT {
             std::mutex mu;
             CpuNetwork **nets = (CpuNetwork **)nets_;
             node_size_t nsensors = nets[0]->get_dims().nnodes.sensor;
-#pragma omp parallel for
+//#pragma omp parallel for
             for(size_t inet = 0; inet < nnets; inet++) {
                 CpuNetwork *net = nets[inet];
                 mu.lock();

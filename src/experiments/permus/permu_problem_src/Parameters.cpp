@@ -28,6 +28,7 @@ void set_parameters(int argc, char *argv[])
   srand(SEED);
   PROBLEM_TYPE = std::string(argv[1]);
   INSTANCE_PATH = std::string(argv[2]);
+  CONTROLLER_PATH = std::string(argv[3]);
   set_other_params();
 
 

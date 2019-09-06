@@ -53,6 +53,9 @@ namespace NEAT {
 		// Special constructor off a file assume word "trait" has been read in
 		Trait(const char *argline);
 
+		// Special constructor off a file assume word "trait" has been read in
+		Trait(std::string argline);
+
 		// Special Constructor creates a new Trait which is the average of 2 existing traits passed in
 		Trait(const Trait &t1, const Trait &t2);
 

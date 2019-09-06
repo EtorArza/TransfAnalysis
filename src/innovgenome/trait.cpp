@@ -53,6 +53,22 @@ Trait::Trait(Trait *t) {
 }
 
 
+
+Trait::Trait(string argline) {
+
+	std::vector<std::string> splt_line = split(argline, ' ');
+	splt_line.erase(splt_line.begin());
+
+	trait_id = std::stoi(splt_line[0]);
+
+	for(int count=0;count<NUM_TRAIT_PARAMS;count++) {
+		//strcpy(curword, env->getUnit(argline, curwordnum++, delimiters));
+		//params[count] = atof(curword);
+        params[count] = std::stof(splt_line[count+1]);
+		//iFile>>params[count];
+	}
+}
+
 Trait::Trait(const char *argline) {
 
     std::stringstream ss(argline);

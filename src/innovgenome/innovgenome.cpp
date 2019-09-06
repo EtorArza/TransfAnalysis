@@ -15,6 +15,8 @@
 */
 #include "std.h" // Must be included first. Precompiled header with standard library includes.
 #include "innovgenome.h"
+#include "innovlinkgene.h"
+#include "innovnodegene.h"
 #include "protoinnovlinkgene.h"
 #include "recurrencychecker.h"
 #include "util.h"
@@ -28,6 +30,16 @@ void InnovGenome::reset() {
     nodes.clear();
     links.clear();
 }
+
+
+InnovGenome::InnovGenome(std::vector<Trait> traits, std::vector<InnovNodeGene> nodes, std::vector<InnovLinkGene> links)
+    :InnovGenome(){
+    this->traits = traits;
+    this->nodes = nodes;
+    this->links = links;
+}
+
+
 
 InnovGenome::InnovGenome()
     : node_lookup(nodes) {

@@ -12,3 +12,4 @@
 .vscode
 callgrind.*
 __pycache*
+.out

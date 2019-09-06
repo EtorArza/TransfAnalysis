@@ -1,5 +1,4 @@
-#ifndef TOOLS_H
-#define TOOLS_H
+#pragma once
 /*
  *  Tools.h
  *  RankingEDAsCEC
@@ -444,6 +443,11 @@ void copy_vector(T *v_res, T*v_ref, int len){
 	memcpy(v_res, v_ref, sizeof(T)*len);
 }
 
+// https://thispointer.com/c-how-to-read-a-file-line-by-line-into-a-vector/
+std::vector<string> read_lines_from_file(string filename);
+
+std::vector<string> split(string txt, char ch);
+
 
 inline
 float fast_exp(float x) {
@@ -496,4 +500,3 @@ private:
 
 
 
-#endif /* TOOLS_H */

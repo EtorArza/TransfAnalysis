@@ -32,6 +32,8 @@ namespace NEAT {
 		int get_last_node_id(); //Return id of final InnovNodeGene in InnovGenome
 		real_t get_last_gene_innovnum(); //Return last innovation number in InnovGenome
 
+
+		InnovGenome(std::vector<Trait> traits, std::vector<InnovNodeGene> nodes, std::vector<InnovLinkGene> links);
         InnovGenome();
         InnovGenome(rng_t rng,
                     size_t ntraits,

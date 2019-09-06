@@ -80,6 +80,9 @@ namespace NEAT {
 		//Construct a gene from a file spec given traits and nodes
 		InnovLinkGene(const char *argline);
 
+		//Construct a gene from a file spec given traits and nodes
+		InnovLinkGene(std::string argline);
+
 		// Copy Constructor
 		InnovLinkGene(const InnovLinkGene& gene);
 

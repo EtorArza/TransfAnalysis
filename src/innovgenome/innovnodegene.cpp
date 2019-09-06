@@ -39,6 +39,29 @@ InnovNodeGene::InnovNodeGene (const char *argline) {
 	frozen=false;  //TODO: Maybe change
 }
 
+
+InnovNodeGene::InnovNodeGene (std::string argline) {
+	std::vector<std::string> splt_line = split(argline, ' ');
+    splt_line.erase(splt_line.begin());
+
+    int nodety;
+    //int nodepl;
+    node_id = std::stoi(splt_line[0]);
+    trait_id = std::stoi(splt_line[1]);
+    nodety = std::stoi(splt_line[2]);
+    //nodepl = std::stoi(splt_line[3]);
+
+    type = (nodetype)nodety;
+
+    if(trait_id == 0){
+        trait_id = 1;
+    }
+
+	// Get the Sensor Identifier and Parameter String
+	// mySensor = SensorRegistry::getSensor(id, param);
+	frozen=false;  //TODO: Maybe change
+}
+
 InnovNodeGene::~InnovNodeGene() {
 }
 

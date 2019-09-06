@@ -32,6 +32,8 @@ namespace NEAT {
 		InnovNodeGene(nodetype ntype,int nodeid);
 		// Construct the node out of a file specification using given list of traits
 		InnovNodeGene (const char *argline);
+   		InnovNodeGene (std::string argline);
+
 
 		~InnovNodeGene();
 
