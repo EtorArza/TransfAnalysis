@@ -47,6 +47,7 @@ class PBP
 	void move_indiv_towards_reference(CIndividual* indiv, int* ref_permu, int operator_id);
 	void move_indiv_away_reference(CIndividual* indiv, int* ref_permu, int operator_id);
 	void Evaluate(CIndividual *indiv); // update the f_value of the individuals.
+	float Evaluate(int *genome); // update the f_value of the individuals.
 
 
 

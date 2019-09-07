@@ -53,7 +53,7 @@ public:
 
   void Print();
   void end_iteration(); // sort the population, check if the best solution was improved, and coompute neat imputs.
-
+  void Reset();
 
   float* get_neat_input_individual_i(int i);
   void apply_neat_output_to_individual_i(float* output_neat, int i);
@@ -65,6 +65,7 @@ public:
    * popinfo[i][j] has information about propertie i from individual j.
    */
   float **pop_info;
+  stopwatch *timer;
 
 private:
 
@@ -86,7 +87,6 @@ private:
   PBP * problem;
   PermuTools *pt;
   float relative_time();
-  stopwatch *timer;
 
 
 

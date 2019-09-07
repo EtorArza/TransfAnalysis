@@ -17,6 +17,7 @@
 #include "innovgenome.h"
 #include "innovlinkgene.h"
 #include "innovnodegene.h"
+#include "cpunetwork.h"
 #include "protoinnovlinkgene.h"
 #include "recurrencychecker.h"
 #include "util.h"
@@ -1285,6 +1286,97 @@ void InnovGenome::init_phenotype(Network &net) {
     //--- Configure the net
     //---
     net.configure(dims, netnodes, netlinks_sorted);
+}
+
+
+void InnovGenome::init_phenotype(CpuNetwork *net) {
+    size_t nnodes = nodes.size();
+    assert(nnodes <= NODES_MAX);
+
+    //---
+    //--- Count how many of each type of node.
+    //---
+    NetDims dims;
+    memset(&dims, 0, sizeof(dims));
+
+    for(size_t i = 0; i < nnodes; i++) {
+        InnovNodeGene &node = nodes[i];
+
+        switch(node.type) {
+        case NT_BIAS:
+            dims.nnodes.bias++;
+            break;
+        case NT_SENSOR:
+            dims.nnodes.sensor++;
+            break;
+        case NT_OUTPUT:
+            dims.nnodes.output++;
+            break;
+        case NT_HIDDEN:
+            dims.nnodes.hidden++;
+            break;
+        default:
+            panic();
+        }
+    }
+    dims.nnodes.all = nnodes;
+    dims.nnodes.input = dims.nnodes.bias + dims.nnodes.sensor;
+    dims.nnodes.noninput = dims.nnodes.output + dims.nnodes.hidden;
+
+    //---
+    //--- Create unsorted array of links, converting node ID to index in process.
+    //---
+    NetLink netlinks[links.size()];
+    size_t nlinks = 0;
+    size_t node_nlinks[nnodes];
+    memset(node_nlinks, 0, sizeof(size_t) * nnodes);
+
+    for(InnovLinkGene &link: links) {
+		if(link.enable) {
+            NetLink &netlink = netlinks[nlinks++];
+
+            netlink.weight = link.weight();
+            netlink.in_node_index = get_node_index(link.in_node_id());
+            netlink.out_node_index = get_node_index(link.out_node_id());
+
+            node_nlinks[netlink.out_node_index]++;
+		}
+    }
+    assert(nlinks <= LINKS_MAX);
+
+    dims.nlinks = nlinks;
+
+    //---
+    //--- Determine layout of links for each node in sorted array
+    //---
+    NetNode netnodes[nnodes];
+    netnodes[0].incoming_start = 0;
+    netnodes[0].incoming_end = node_nlinks[0];
+    for(size_t i = 1; i < nnodes; i++) {
+        NetNode &prev = netnodes[i-1];
+        NetNode &curr = netnodes[i];
+
+        curr.incoming_start = prev.incoming_end;
+        curr.incoming_end = curr.incoming_start + node_nlinks[i];
+    }
+    assert(netnodes[nnodes - 1].incoming_end == nlinks);
+    
+    //---
+    //--- Create sorted links
+    //---
+    memset(node_nlinks, 0, sizeof(size_t) * nnodes);
+    NetLink netlinks_sorted[nlinks];
+    for(size_t i = 0; i < nlinks; i++) {
+        NetLink &netlink = netlinks[i];
+        size_t inode = netlink.out_node_index;
+        size_t isorted = netnodes[inode].incoming_start + node_nlinks[inode]++;
+        netlinks_sorted[isorted] = netlink;
+    }
+
+    //---
+    //--- Configure the net
+    //---
+    net->configure(dims, netnodes, netlinks_sorted);
 }
 
 InnovLinkGene *InnovGenome::find_link(int in_node_id, int out_node_id, bool is_recurrent) {

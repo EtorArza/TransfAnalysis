@@ -1011,7 +1011,7 @@ std::vector<string> read_lines_from_file(string filename){
     in.close();
     if (vecOfStrs.size()< 1){
         std::cout << endl;
-        std::cout << "file" << filename << "not read correctly." << endl;
+        std::cout << "file: \"" << filename << "\" not read correctly." << endl;
         exit(1);
     }
     return vecOfStrs;

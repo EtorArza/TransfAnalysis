@@ -98,7 +98,7 @@ float CalculateGEODistance(float latitudeX, float latitudeY, float longitudeX, f
 // 			//FILL DISTANCE m_distance_matrix
 // 			char * coordPieces;
 // 			coordPieces = strtok (line," ");
-// 			if (strcmp(coordPieces, " "))
+// 			if (strcmp(coordPieces, " ")==0)
 // 			{
 // 				coordPieces = strtok (NULL," ");
 // 			}

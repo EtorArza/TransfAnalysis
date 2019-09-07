@@ -20,6 +20,7 @@
 #include "innovnodegene.h"
 #include "innovnodelookup.h"
 #include "innovation.h"
+#include "cpunetwork.h"
 
 namespace NEAT {
 
@@ -148,6 +149,8 @@ namespace NEAT {
         node_size_t get_node_index(int id);
 
         virtual void init_phenotype(class Network &net) override;
+		void init_phenotype(CpuNetwork *net);
+
 
 	private:
         void reset();

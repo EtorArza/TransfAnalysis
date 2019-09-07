@@ -13,3 +13,4 @@
 callgrind.*
 __pycache*
 .out
+fittest*

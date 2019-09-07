@@ -66,6 +66,9 @@ void CpuNetwork::load_sensor(size_t isensor,
     activations[dims.nnodes.bias + isensor] = activation;
 }
 
+
+
+
 real_t *CpuNetwork::get_outputs() {
     return activations.data() + dims.nnodes.input;
 }

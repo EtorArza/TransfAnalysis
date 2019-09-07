@@ -49,6 +49,10 @@ void PBP::Evaluate(CIndividual *indiv)
 	indiv->f_value = fitness;
 }
 
+float PBP::Evaluate(int *genome)
+{
+	return _Evaluate(genome);
+}
 
 void PBP::apply_operator_with_fitness_update(CIndividual *indiv, int i, int j, int operator_id)
 {   

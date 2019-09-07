@@ -54,6 +54,21 @@ CPopulation::CPopulation(PBP *problem)
     end_iteration();
 }
 
+void CPopulation::Reset(){
+    f_best = MIN_INTEGER;
+    GenerateRandomPermutation(this->genome_best, n);
+    for (size_t i = 0; i < popsize; i++)
+    {
+        delete m_individuals[i];
+        m_individuals[i] = new CIndividual(n);
+    }
+    terminated = false;
+    timer->tic();
+    evaluate_population();
+    end_iteration();
+}
+
+
 /*
  * Destructor function.
  */

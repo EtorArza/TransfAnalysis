@@ -29,16 +29,7 @@ real_t progress_print_decider;
 
 struct Config
 {   
-    uchar width;
-    uchar height;
-    struct Trial
-    {
-        uchar seqlen;
-        ushort max_steps;
-        uchar max_dist;
-    };
-    ushort ntrials;
-    Trial trials[];
+
 };
 
 
@@ -59,7 +50,7 @@ PBP *GetProblemInfo(string problemType, string filename)
     //     problem = new API();
     else
     {
-         cout << "Wrong problem type was specified." << endl;
+         cout << "Wrong problem type was specified. PLease, specify qap, lop, tsp or pfsp" << endl;
          exit(1);
     }
 
@@ -71,37 +62,6 @@ PBP *GetProblemInfo(string problemType, string filename)
 
 
 
-
-// static void create_config(__out Config *&config_, __out size_t &len_)
-// {
-    
-
-//     Config config;
-
-
-//     config.ntrials = 0;
-
-
-//     vector<Config::Trial> trials;
-
-
-
-// #ifdef Truncate_Seq
-//                 for (size_t i = Truncate_Seq; i < seq.length(); i++)
-//                 {
-//                     trial.seq[i] = 0.5;
-//                 }
-// #endif
-
-
-//     for (size_t i = 0; i < config.ntrials; i++)
-//     {
-//         Config::Trial &trial = trials[i];
-//         trial.max_steps = 2 + 3 * trial.seqlen;
-//     }
-//     memcpy(config_->trials, trials.data(), sizeof(Config::Trial) * config.ntrials);
-// }
-
 struct Evaluator
 {
 
@@ -110,6 +70,8 @@ struct Evaluator
     bool terminated;
     OrganismEvaluation eval;
     int idx_particle;
+    int n_of_repetitions_completed;
+    float* v_of_fitness;
 
     // ushort max_it;
 
@@ -127,16 +89,19 @@ struct Evaluator
         eval.fitness = 0.0;
         // it = 0;
         idx_particle = -1;
+        n_of_repetitions_completed = 0;
         // max_it = 10;
 
 //////////////////////////////////////
 
         //char* params[3] = {"binary_name", "lop", "src/experiments/permus/instances/lop/Cebe.lop.n30.1"};
+        
         char const *params[3] = {"binary_name", "qap", "src/experiments/permus/instances/qap/tai35a.dat.dat"};
         set_parameters(3, params); // Read parameters from bash.
         //Read the problem instance to optimize.
         problem = GetProblemInfo(PROBLEM_TYPE, INSTANCE_PATH);
         pop = new CPopulation(problem);
+        v_of_fitness = new float[REPEATED_EVALUATIONS];
 
 
 
@@ -166,35 +131,28 @@ struct Evaluator
             terminated = pop->terminated;
         }
         idx_particle = idx_particle % POPSIZE;
-        return true;
+
+        if (terminated)
+        {
+            v_of_fitness[n_of_repetitions_completed] = pop->f_best;
+            if (n_of_repetitions_completed < REPEATED_EVALUATIONS - 1) // another evaluation needed
+            {
+                n_of_repetitions_completed++;
+                terminated = false;
+                pop->Reset();
+            }else{
+                terminated = true;
+            }
+        }
+
+
+    return true;
     }
 
     // load the sensory input
     __net_eval_decl real_t get_sensor(node_size_t sensor_index)
     {
-//         switch (sensor_t(sensor_index))
-//         {
-//         case sensor_relat_f:
-//             return 0.0;
-//         case sensor_time:
-//             return 0.0;
-//         case sensor_rand:
-//             return 0.0;
-//         case sensor_relat_spars:
-//             return 0.0;
-//         case sensor_is_local_optima:
-//             return 0.0;
-//         case sensor_ham_dist_from_theoneabove:
-//             return 0.0;
-//         default:
-// #ifdef ENABLE_CUDA
-//             return 0.0;
-// #else
-//             abort();
-// #endif
-//         }
     return pop->pop_info[idx_particle][sensor_index];
-
     }
 
     // load the outputs, and assign fitness if it it is the last iteration.
@@ -230,7 +188,8 @@ struct Evaluator
 
 
         net_idx++;  
-        eval.fitness = pop->f_best;
+        //eval.fitness = pop->f_best;
+        eval.fitness = Average(v_of_fitness,REPEATED_EVALUATIONS);
         eval.error = 10000000.0-eval.fitness;
         delete pop;
         delete problem;

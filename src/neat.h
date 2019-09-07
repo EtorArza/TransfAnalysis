@@ -117,10 +117,10 @@ namespace NEAT {
 	// the old output and some other node. 
 	// When not right-shifted, the steepened slope is closest to a linear
 	// ascent as possible between -0.5 and 0.5
-    inline real_t fsigmoid(real_t activesum,real_t slope,real_t constant) {
-        //NON-SHIFTED STEEPENED
-        return (1/(1+(exp(-(slope*activesum))))); //Compressed
-    }
+    // inline real_t fsigmoid(real_t activesum,real_t slope,real_t constant) {
+    //     //NON-SHIFTED STEEPENED
+    //     return (1/(1+(exp(-(slope*activesum))))); //Compressed
+    // }
 
 
 

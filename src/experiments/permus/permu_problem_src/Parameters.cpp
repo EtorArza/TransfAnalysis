@@ -13,8 +13,9 @@
 
 void set_other_params(){
   SEED = 2;
-  MAX_TIME = 1;
+  MAX_TIME = 0.25;
   POPSIZE = 20;
+  REPEATED_EVALUATIONS = 20;
 }
 
 
@@ -23,12 +24,16 @@ void set_other_params(){
 // input parameters from bash
 void set_parameters(int argc, char *argv[])
 {
-  assert(N_OF_INPUT_PARAMS == argc);
+  assert(N_OF_INPUT_PARAMS_TRAIN == argc || N_OF_INPUT_PARAMS_TEST == argc);
   // SEED = atoi(argv[i]);
   srand(SEED);
   PROBLEM_TYPE = std::string(argv[1]);
   INSTANCE_PATH = std::string(argv[2]);
-  CONTROLLER_PATH = std::string(argv[3]);
+  if (N_OF_INPUT_PARAMS_TEST == argc)
+  {
+      CONTROLLER_PATH = std::string(argv[3]);
+  }
+
   set_other_params();
 
 
@@ -37,12 +42,18 @@ void set_parameters(int argc, char *argv[])
 // char const *params[3] = {"binary_name", "param_1", "param_2"}
 void set_parameters(int argc, char const *argv[])
 {
-  assert(N_OF_INPUT_PARAMS == argc);
-  // SEED = atoi(argv[i]);
-  srand(SEED);
-  PROBLEM_TYPE = std::string(argv[1]);
-  INSTANCE_PATH = std::string(argv[2]);
-  set_other_params();
+
+char* tmp[argc];
+
+for (int i = 0; i < argc; i++)
+{
+  tmp[i] = (char*) argv[i];
+}
+
+set_parameters(argc, tmp);
+
+
+
 }
 
 

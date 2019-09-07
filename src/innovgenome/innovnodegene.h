@@ -40,7 +40,7 @@ namespace NEAT {
         inline void set_trait_id(int id) { assert(id > 0); trait_id = id; }
         inline int get_trait_id() const {return trait_id;}
 
-		inline const nodetype get_type() const {return type;}
+		inline nodetype get_type() const {return type;}
 		inline void set_type(nodetype t) {type = t;}
 
 		// Print the node to a file

@@ -66,9 +66,7 @@ int main(int argc, char *argv[])
     cout << "loaded";
     exit(0);
 
-    //Read the problem instance to optimize.
-    problem = GetProblemInfo(PROBLEM_TYPE, INSTANCE_PATH);
-    pop = new CPopulation(problem);
+
 
 
 
