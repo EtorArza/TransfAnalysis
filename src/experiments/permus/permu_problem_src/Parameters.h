@@ -1,6 +1,7 @@
 
 #include <string>
-
+#include "PBP.h"
+#include <mutex>
 
 #ifndef EXTERN
 #define EXTERN extern
@@ -38,7 +39,6 @@ EXTERN std::string CONTROLLER_PATH;
 ///////////////////////////
 
 
-
 // argv[0] --> name of the binary executable
 // argv[1] --> type of problem, i.e. LOP
 // argv[2] --> path to the problem
@@ -49,7 +49,7 @@ void print_parameters(void);
 
 
 
-
+PBP *GetProblemInfo(std::string problemType, std::string filename);
 
 
 // NEAT PARAMETERS //

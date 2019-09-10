@@ -13,6 +13,7 @@
 #include <iomanip>      // std::setprecision
 #include "../permuevaluator.h"
 
+
 // The object storing the values of all the individuals
 // that have been created during the execution of the
 // program. 
@@ -20,19 +21,20 @@
 int CIndividual::n_indivs_created = 0;
 
 
-CIndividual::CIndividual(int length)
+CIndividual::CIndividual(int length, RandomNumberGenerator* rng)
 {
 	n = length;
 	genome = new int[n];
 	momentum = new int[n];
 	genome_best = new int[n];
-	GenerateRandomPermutation(this->genome, n);
-	GenerateRandomPermutation(this->momentum, n);
-	GenerateRandomPermutation(this->genome_best, n);
+	GenerateRandomPermutation(this->genome, n, rng); 
+	GenerateRandomPermutation(this->momentum, n, rng); 
+	GenerateRandomPermutation(this->genome_best, n, rng);
 	f_value=std::numeric_limits<float>::lowest();
 	f_best=std::numeric_limits<float>::lowest();
 	id = n_indivs_created;
 	n_indivs_created++;
+
 }
 
 
@@ -133,7 +135,8 @@ void CIndividual::PrintGenome()
  */
 CIndividual * CIndividual::Clone()
 {
-	CIndividual * ind = new CIndividual(n);
+	RandomNumberGenerator tmp_rng;
+	CIndividual * ind = new CIndividual(n, &tmp_rng);
 	ind->SetGenome(genome);
 	ind->f_value = this->f_value;
 	return ind;

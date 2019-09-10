@@ -60,72 +60,57 @@ namespace NEAT {
 
             network_evaluator = unique_ptr<NetworkEvaluator>(create_evaluator());
             
-            int nsuccesses = 0;
-            vector<int> success_generations;
             vector<size_t> nnodes;
             vector<size_t> nlinks;
             vector<real_t> fitness;
 
-            for(int expcount = 1; expcount <= env->num_runs; expcount++) {
-                mkdir( get_dir_path(expcount) );
+            mkdir( get_dir_path(1) );
+            //Create a unique rng sequence for this experiment
+            rng_t rng_exp(rng.integer());
 
-                //Create a unique rng sequence for this experiment
-                rng_t rng_exp(rng.integer());
+            fittest = nullptr;
+            env->genome_manager = GenomeManager::create();
+            vector<unique_ptr<Genome>> genomes = create_seeds(rng_exp);
 
-                fittest = nullptr;
-                env->genome_manager = GenomeManager::create();
-                vector<unique_ptr<Genome>> genomes = create_seeds(rng_exp);
+            //Spawn the Population
+            pop = Population::create(rng_exp, genomes);
+    
+            bool success = false;
+            int gen;
+            for(gen = 1; !success && (gen <= gens); gen++) {
+                cout << "\n\n";
+                cout << "Epoch " << gen << endl;	
 
-                //Spawn the Population
-                pop = Population::create(rng_exp, genomes);
-      
-                bool success = false;
-                int gen;
-                for(gen = 1; !success && (gen <= gens); gen++) {
-                    cout << "Epoch " << gen << " . Experiment " << expcount << "/" << env->num_runs << endl;	
+                static Timer timer("epoch");
+                timer.start();
 
-                    static Timer timer("epoch");
-                    timer.start();
-
-                    if(gen != 1) {
-                        pop->next_generation();
-                    }
-
-                    evaluate();
-
-                    if(is_success(fittest.get())) {
-                        success = true;
-                        nsuccesses++;
-                    }
-
-                    timer.stop();
-                    Timer::report();
-
-                    //Don't print on success because we'll exit the loop and print then.
-                    if(!success && (gen % env->print_every == 0))
-                        print(expcount, gen);
+                if(gen != 1) {
+                    pop->next_generation();
                 }
 
-                if(success) {
-                    success_generations.push_back(gen);
-                }
+                evaluate();
+
+                timer.stop();
+                Timer::report();
+                
+
+                #define SAVE_NETWORK_EVERY_K_GENS 2
+                if (gen % SAVE_NETWORK_EVERY_K_GENS == 0)
                 {
-                    Genome::Stats gstats = fittest->genome->get_stats();
-                    fitness.push_back(fittest->eval.fitness);
-                    nnodes.push_back(gstats.nnodes);
-                    nlinks.push_back(gstats.nlinks);
+                    print(1, gen);
                 }
-
-                print(expcount, gen - 1);
-
-                delete pop;
-                delete env->genome_manager;
+                #undef SAVE_NETWORK_EVERY_K_GENS
             }
 
-            cout << "Failures: " << (env->num_runs - nsuccesses) << " out of " << env->num_runs << " runs" << endl;
-            if(success_generations.size() > 0) {
-                cout << "Success generations: " << stats(success_generations) << endl;
+            {
+                Genome::Stats gstats = fittest->genome->get_stats();
+                fitness.push_back(fittest->eval.fitness);
+                nnodes.push_back(gstats.nnodes);
+                nlinks.push_back(gstats.nlinks);
             }
+            delete pop;
+            delete env->genome_manager;
+
             cout << "fitness stats: " << stats(fitness) << endl;
             cout << "nnodes stats: " << stats(nnodes) << endl;
             cout << "nlinks stats: " << stats(nlinks) << endl;

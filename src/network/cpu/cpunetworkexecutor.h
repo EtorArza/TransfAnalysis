@@ -36,32 +36,37 @@ namespace NEAT {
         virtual void execute(class Network **nets_,
                              OrganismEvaluation *results,
                              size_t nnets) {
-            std::mutex mu;
+            
             CpuNetwork **nets = (CpuNetwork **)nets_;
-            node_size_t nsensors = nets[0]->get_dims().nnodes.sensor;
-#pragma omp parallel for
+            double progress_print_decider = 0.0;
+            bool printed_bracket = false;
+            #pragma omp parallel for
             for(size_t inet = 0; inet < nnets; inet++) {
                 CpuNetwork *net = nets[inet];
-                mu.lock();
                 Evaluator *ev = new Evaluator(config);
-                mu.unlock();
-
-                while(ev->next_step()) {
-                    if(ev->clear_noninput()) {
-                        net->clear_noninput();
-                    }
-                    for(node_size_t isensor = 0; isensor < nsensors; isensor++) {
-                        net->load_sensor(isensor, ev->get_sensor(isensor));
-                    }
-                    net->activate();
-                    ev->evaluate(net->get_outputs());
-                }
-
-                results[inet] = ev->result();
+                OrganismEvaluation eval;
+                eval.fitness = ev->FitnessFunction(net);
+                eval.error   = -100000000 + eval.fitness;
+                results[inet] = eval;
                 delete ev;
+
+                // print progress.
+                std::mutex mut;
+                mut.lock();
+                if (!printed_bracket){std::cout << "[" << std::flush; printed_bracket = true;}
+                progress_print_decider += 15.0 / (double) nnets;
+                if (inet == 0){}
+                while (progress_print_decider >= 1.0)
+                {
+                    std::cout << "." << std::flush;
+                    progress_print_decider--;
+                }
+                mut.unlock();
             }
+            std::cout << "]" << std::endl;
         }
-        
+
+
     };
 
     //---

@@ -11,11 +11,13 @@
 #include "Tools.h"
 #include "Individual.h"
 #include "Parameters.h"
+#include <assert.h>
 #include "../permuevaluator.h"
 
 
 PBP::PBP()
 {
+    rng = new RandomNumberGenerator();
 }
 
 PBP::~PBP()
@@ -23,6 +25,7 @@ PBP::~PBP()
     delete[] _random_permu1;
     delete[] _random_permu2;
     delete[] _random_permu3;
+    delete rng;
 }
 // This function needs to be called when the read procedure is called
 void PBP::initialize_variables_PBP(int problem_size)
@@ -34,11 +37,11 @@ void PBP::initialize_variables_PBP(int problem_size)
     }
     
     _random_permu1 = new int[problem_size];
-    GenerateRandomPermutation(_random_permu1, problem_size);
+    GenerateRandomPermutation(_random_permu1, problem_size,rng);
     _random_permu2 = new int[problem_size];
-    GenerateRandomPermutation(_random_permu2, problem_size);
+    GenerateRandomPermutation(_random_permu2, problem_size,rng);
     _random_permu3 = new int[problem_size];
-    GenerateRandomPermutation(_random_permu3, problem_size);
+    GenerateRandomPermutation(_random_permu3, problem_size,rng);
     problem_size_PBP = problem_size;
 }
 
@@ -52,6 +55,13 @@ void PBP::Evaluate(CIndividual *indiv)
 float PBP::Evaluate(int *genome)
 {
 	return _Evaluate(genome);
+}
+
+std::mutex PBP::mut;
+int PBP::Read_with_mutex(string filename){
+    PBP::mut.lock();
+    this->Read(filename);
+    PBP::mut.unlock();
 }
 
 void PBP::apply_operator_with_fitness_update(CIndividual *indiv, int i, int j, int operator_id)
@@ -106,7 +116,7 @@ void PBP::local_search_iteration(CIndividual *indiv, int operator_id)
     switch (operator_id)
     {
     case NEAT::SWAP:
-        shuffle_vector(_random_permu1, problem_size_PBP);
+        shuffle_vector(_random_permu1, problem_size_PBP, rng);
         for (int i = 0; i < problem_size_PBP; i++)
         {
             int r = _random_permu1[i];
@@ -122,8 +132,8 @@ void PBP::local_search_iteration(CIndividual *indiv, int operator_id)
         break;
 
     case NEAT::EXCH:
-        shuffle_vector(_random_permu1, this->problem_size_PBP);
-        shuffle_vector(_random_permu2, this->problem_size_PBP);
+        shuffle_vector(_random_permu1, this->problem_size_PBP, rng);
+        shuffle_vector(_random_permu2, this->problem_size_PBP, rng);
         for (int i = 0; i < this->problem_size_PBP; i++)
         {
             for (int j = 0; j < this->problem_size_PBP; j++)
@@ -141,8 +151,8 @@ void PBP::local_search_iteration(CIndividual *indiv, int operator_id)
         break;
 
     case NEAT::INSERT:
-        shuffle_vector(_random_permu1, this->problem_size_PBP);
-        shuffle_vector(_random_permu2, this->problem_size_PBP);
+        shuffle_vector(_random_permu1, this->problem_size_PBP,rng);
+        shuffle_vector(_random_permu2, this->problem_size_PBP,rng);
         for (int i = 0; i < this->problem_size_PBP; i++)
         {
             for (int j = 0; j < this->problem_size_PBP; j++)
@@ -261,7 +271,7 @@ void PBP::obtain_indexes_step_towards(int *permu, int *ref_permu, int* i, int* j
             _random_permu1[idx] = _random_permu2[ref_permu[idx]];
         }
 
-        GenerateRandomPermutation(_random_permu2, problem_size_PBP);
+        GenerateRandomPermutation(_random_permu2, problem_size_PBP,rng);
 
         // compute inverse (position) of permu^-1 \circ ref_permu  
         for (int i = 0; i < problem_size_PBP; i++)
@@ -290,7 +300,7 @@ void PBP::obtain_indexes_step_towards(int *permu, int *ref_permu, int* i, int* j
         {   
             _random_permu1[idx] = Find(permu, problem_size_PBP, ref_permu[idx]);
         }
-        shuffle_vector(_random_permu2, problem_size_PBP);
+        shuffle_vector(_random_permu2, problem_size_PBP,rng);
         
         for (int idx = 0; idx < problem_size_PBP; idx++)
         {
@@ -331,7 +341,7 @@ void PBP::obtain_indexes_step_towards(int *permu, int *ref_permu, int* i, int* j
             _random_permu3[_random_permu1[i]] = i;
         }
 
-        GenerateRandomPermutation(_random_permu2, problem_size_PBP);
+        GenerateRandomPermutation(_random_permu2, problem_size_PBP,rng);
         int max = 0;
         int arg_max = 0;
 
@@ -359,7 +369,7 @@ void PBP::obtain_indexes_step_towards(int *permu, int *ref_permu, int* i, int* j
         exit(1);
         break;
     }
-
+    assert(isPermutation(permu, this->problem_size_PBP));
 }
 
 void PBP::obtain_indexes_step_away(int *permu, int *ref_permu, int* i, int* j, int operator_id)
@@ -379,7 +389,7 @@ void PBP::obtain_indexes_step_away(int *permu, int *ref_permu, int* i, int* j, i
             _random_permu1[idx] = _random_permu2[ref_permu[idx]];
         }
 
-        GenerateRandomPermutation(_random_permu2, problem_size_PBP);
+        GenerateRandomPermutation(_random_permu2, problem_size_PBP,rng);
 
         // compute inverse (position) of permu^-1 \circ ref_permu
         for (int i = 0; i < problem_size_PBP; i++)
@@ -409,7 +419,7 @@ void PBP::obtain_indexes_step_away(int *permu, int *ref_permu, int* i, int* j, i
         {   
             _random_permu1[idx] = Find(permu, problem_size_PBP, ref_permu[idx]);
         }
-        shuffle_vector(_random_permu2, problem_size_PBP);
+        shuffle_vector(_random_permu2, problem_size_PBP,rng);
         
         for (int idx = 0; idx < problem_size_PBP; idx++)
         {
@@ -430,17 +440,26 @@ void PBP::obtain_indexes_step_away(int *permu, int *ref_permu, int* i, int* j, i
     }
     case NEAT::INSERT:
     {
+        assert(isPermutation(permu, problem_size_PBP)) ;
+        assert(isPermutation(ref_permu, problem_size_PBP)) ;
+        assert(isPermutation(_random_permu1, problem_size_PBP)) ;
+        assert(isPermutation(_random_permu2, problem_size_PBP)) ;
+        assert(isPermutation(_random_permu3, problem_size_PBP)) ;
+
         // compute inverse (position) of permu
         for (int i = 0; i < problem_size_PBP; i++)
         {
             _random_permu2[permu[i]] = i;
         }
 
+        assert(isPermutation(_random_permu2, problem_size_PBP)) ;
+
         for (int idx = 0; idx < problem_size_PBP; idx++) // compute permu^-1 \circ ref_permu  
         {
             _random_permu1[idx] = _random_permu2[ref_permu[idx]];
         }
 
+        assert(isPermutation(_random_permu1, problem_size_PBP)) ;
 
         // compute inverse (position) of permu^-1 \circ ref_permu  
         for (int i = 0; i < problem_size_PBP; i++)
@@ -448,7 +467,12 @@ void PBP::obtain_indexes_step_away(int *permu, int *ref_permu, int* i, int* j, i
             _random_permu3[_random_permu1[i]] = i;
         }
 
-        GenerateRandomPermutation(_random_permu2, problem_size_PBP);
+        assert(isPermutation(_random_permu3, problem_size_PBP)) ;
+
+
+        GenerateRandomPermutation(_random_permu2, problem_size_PBP,rng);
+        assert(isPermutation(_random_permu2, problem_size_PBP)) ;
+
         int max = MAX_INTEGER;
         int arg_max = 0;
 
@@ -462,10 +486,11 @@ void PBP::obtain_indexes_step_away(int *permu, int *ref_permu, int* i, int* j, i
             }
         }
         *i = arg_max;
-        *j = random_integer_uniform(problem_size_PBP);
+        *j = rng->random_integer_uniform(problem_size_PBP);
+        assert(*j < 35);
         while (*i ==*j)
         {
-            *j = random_integer_uniform(problem_size_PBP);
+            *j = rng->random_integer_uniform(problem_size_PBP);
         }
         
         break;
@@ -492,4 +517,6 @@ void PBP::move_indiv_away_reference(CIndividual* indiv, int* ref_permu, int oper
     obtain_indexes_step_away(indiv->genome, ref_permu, &i, &j, operator_id);
     // std::cout << "(" << i << "," << j << ")" << endl;
     apply_operator_with_fitness_update(indiv, i, j, operator_id);
+    assert(isPermutation(indiv->genome, this->problem_size_PBP)) ;
+
 }

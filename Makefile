@@ -1,6 +1,5 @@
 include Makefile.conf
 
-$(shell export OMP_NUM_THREADS=${N_THREADS})
 
 
 
@@ -37,7 +36,7 @@ ifeq (${DEVMODE}, true)
 else
 	OPT=-O3
 	OPENMP=-fopenmp
-	MISC_FLAGS=
+	MISC_FLAGS=-DNDEBUG
 endif
 
 

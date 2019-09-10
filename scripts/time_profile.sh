@@ -11,9 +11,9 @@ EOF
 make
 rm callgrind.out*
 
-valgrind --tool=callgrind --trace-children=yes --dump-instr=yes --collect-jumps=yes ./neat -f -n 20 permu -t 1 -x 5
+valgrind --tool=callgrind --trace-children=yes --dump-instr=yes --collect-jumps=yes ./neat test "qap" "src/experiments/permus/instances/qap/tai35a.dat.dat" "fittest_20"
 
-#valgrind --tool=callgrind --trace-children=yes ./neat -f -n 20 permu -t 1 -x 5
+#valgrind --tool=callgrind --trace-children=yes ./neat test "qap" "src/experiments/permus/instances/qap/tai35a.dat.dat" "fittest_20"
 
 
 kcachegrind callgrind.out*

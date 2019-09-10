@@ -11,6 +11,7 @@
 #include "Parameters.h"
 #include "Tools.h"
 #include "../permuevaluator.h"
+#include <assert.h>
 
 using std::cerr;
 using std::cout;
@@ -19,17 +20,16 @@ using std::istream;
 using std::ostream;
 
 
-/*
- * Constructor function.
- */
-CPopulation::CPopulation(PBP *problem)
-{   this->problem = problem;
+
+void CPopulation::init_class(PBP *problem, RandomNumberGenerator* rng){
+    this->rng = rng;
+    this->problem = problem;
     this->popsize = POPSIZE;
     this->n = problem->GetProblemSize();
 
     genome_best = new int[n];
     f_best = MIN_INTEGER;
-    GenerateRandomPermutation(this->genome_best, n);
+    GenerateRandomPermutation(this->genome_best, n, this->rng);
 
 
     m_individuals.resize(popsize);
@@ -40,7 +40,7 @@ CPopulation::CPopulation(PBP *problem)
     //Initialize population with random solutions
     for (int i = 0; i < popsize; i++)
     {
-        m_individuals[i] = new CIndividual(n);
+        m_individuals[i] = new CIndividual(n, this->rng);
     }
 
     for (int i = 0; i < popsize; i++)
@@ -54,13 +54,25 @@ CPopulation::CPopulation(PBP *problem)
     end_iteration();
 }
 
+CPopulation::CPopulation(PBP *problem)
+{   
+    RandomNumberGenerator* tmp_rng = new RandomNumberGenerator();
+    init_class(problem, tmp_rng);
+}
+
+
+CPopulation::CPopulation(PBP *problem, RandomNumberGenerator* rng)
+{   
+    init_class(problem, rng);
+}
+
 void CPopulation::Reset(){
     f_best = MIN_INTEGER;
-    GenerateRandomPermutation(this->genome_best, n);
-    for (size_t i = 0; i < popsize; i++)
+    GenerateRandomPermutation(this->genome_best, n, rng);
+    for (int i = 0; i < popsize; i++)
     {
         delete m_individuals[i];
-        m_individuals[i] = new CIndividual(n);
+        m_individuals[i] = new CIndividual(n, rng);
     }
     terminated = false;
     timer->tic();
@@ -82,6 +94,7 @@ CPopulation::~CPopulation()
     m_individuals.clear();
     delete timer;
     delete pt;
+    delete rng;
     delete[] pop_info;
     delete[] permus;
     delete[] genome_best;
@@ -134,7 +147,11 @@ void CPopulation::apply_neat_output_to_individual_i(float* output_neat, int i){
         int operator_id = argmax(output_neat + 1, NEAT::N_OPERATORS);
         float* coef = output_neat + (NEAT::__output_N - NEAT::N_COEF);
         this->move_individual_i_based_on_coefs(coef, i, operator_id);
+        assert(isPermutation(this->m_individuals[i]->genome, this->n));
+
     }
+
+
 }
 
 
@@ -245,7 +262,7 @@ void CPopulation::comp_r_number()
 {
     for (int i = 0; i < POPSIZE; i++)
     {
-        float res =  random_0_1_float();
+        float res =  rng->random_0_1_float();
         pop_info[i][NEAT::R_NUMBER] = res;
     }
 }
@@ -302,16 +319,21 @@ void CPopulation::copy_references_of_genomes_from_individuals_to_permus(){
 
 void CPopulation::move_individual_i_based_on_coefs(float* coef_list, int i, int operator_id){
 
-    int idx = pt->choose_permu_index_to_move(coef_list);
+    int idx = pt->choose_permu_index_to_move(coef_list, rng);
     if (idx == -1){
         return;
     }
+
+    assert(isPermutation(this->m_individuals[i]->genome, this->n)) ;
 
     bool towards = coef_list[idx] > 0;
     idx += (NEAT::__output_N - NEAT::N_COEF);
 
     int* ref_permu;
     
+    assert(isPermutation(this->m_individuals[i]->genome, this->n)) ;
+
+
     switch (idx)
     {
     case NEAT::c_momentum:
@@ -341,14 +363,23 @@ void CPopulation::move_individual_i_based_on_coefs(float* coef_list, int i, int 
 
     if (idx != NEAT::c_momentum)
     {
+
         copy_vector(this->m_individuals[i]->momentum, ref_permu, n);
+        assert(isPermutation(this->m_individuals[i]->genome, this->n)) ;
+
     }
     
 
     if(towards){
         problem->move_indiv_towards_reference(m_individuals[i], ref_permu, operator_id);
+        assert(isPermutation(this->m_individuals[i]->genome, this->n)) ;
+
     }else
     {
         problem->move_indiv_away_reference(m_individuals[i], ref_permu, operator_id);
+        assert(isPermutation(ref_permu, this->n)) ;
+
+        assert(isPermutation(this->m_individuals[i]->genome, this->n)) ;
+
     }
 }

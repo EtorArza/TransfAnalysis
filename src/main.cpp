@@ -26,6 +26,9 @@
 #include "QAP.h"
 #include "LOP.h"
 #include "permuevaluator.h"
+#include "Tools.h"
+#include "FitnessFunction_permus.h"
+
 
 #define EXTERN
 #include "Parameters.h"
@@ -50,7 +53,6 @@ void usage()
 
     cerr << "[OPTIONS] for train" << endl;
     cerr << "  -f                   Force deletion of any data from previous run." << endl;
-    cerr << "  -c num_experiments   (default=" << env->num_runs << ")" << endl;
     cerr << "  -r RNG_seed          (default=" << DEFAULT_RNG_SEED << ")" << endl;
     cerr << "  -n population_size   (default=" << env->pop_size << ")" << endl;
     cerr << "  -x max_generations   (default=" << DEFAULT_MAX_GENS << ")" << endl;
@@ -107,29 +109,7 @@ int parse_int(const char *opt, const char *str)
 }
 
 
-PBP *GetProblemInfo(std::string problemType, std::string filename)
-{
-    PBP *problem;
-    // if (problemType == "pfsp")
-    //     problem = new PFSP();
-    // else if (problemType == "tsp")
-    //     problem = new TSP();else 
-    if (problemType == "qap")
-        {problem = new QAP();}
-    else if (problemType == "lop")
-        {problem = new LOP();}
-    // else if (problemType == "api")
-    //     problem = new API();
-    else
-    {
-         cout << "Wrong problem type was specified." << endl;
-         exit(1);
-     }
 
-    //Read the instance.
-    problem->Read(filename);
-    return problem;
-}
 
 
 int main(int argc, char *argv[])
@@ -149,15 +129,12 @@ int main(int argc, char *argv[])
 
         {
             int opt;
-            while ((opt = getopt(argc, argv, "fc:r:p:g:n:x:t:s:")) != -1)
+            while ((opt = getopt(argc, argv, "fr:p:g:n:x:t:s:")) != -1)
             {
                 switch (opt)
                 {
                 case 'f':
                     force_delete = true;
-                    break;
-                case 'c':
-                    env->num_runs = parse_int("-c", optarg);
                     break;
                 case 'r':
                     rng_seed = parse_int("-r", optarg);
@@ -226,55 +203,12 @@ int main(int argc, char *argv[])
     set_parameters(argc - 1, argv+ 1);
 
     CpuNetwork net = load_network(CONTROLLER_PATH);
-    // CpuNetwork* net = (CpuNetwork* ) &org->net;
-    
-
-
-    PBP* problem;
-    CPopulation* pop;
-
-   float *controller_input = new float[NEAT::__sensor_N];
-   float *controller_output = new float[NEAT::__output_N];
-
-
-    //Read the problem instance to optimize.
-    problem = GetProblemInfo(PROBLEM_TYPE, INSTANCE_PATH);
-    pop = new CPopulation(problem);
+    float f_best = FitnessFunction_permu(&net);
 
     
-    int counter = 0;
-    while (!pop->terminated)
-    {   
-        if (counter % 100 == 0)
-        {
-        cout << pop->f_best << endl;
-        }
-        
-
-        for (int i = 0; i < POPSIZE; i++)
-        {
-            controller_input = pop->get_neat_input_individual_i(i); // compute input
-            net.clear_noninput();
-            for (size_t j = 0;j < NEAT::__sensor_N; j++) // load inputs
-            {   
-                net.load_sensor(controller_input[j], j);
-            }
-            net.activate();
-            controller_output = net.get_outputs();
-            pop->apply_neat_output_to_individual_i(controller_output, i);
-        }
-        pop->end_iteration();
-        counter++;
-    }
-
-    if (pop->f_best != problem->Evaluate(pop->genome_best))
-    {
-        cout << "Error, the fitness of the best individual in the population does not match the best fitness." << endl;
-        exit(1);
-    }
 
 
-    cout << INSTANCE_PATH << "|" << PROBLEM_TYPE << "|" << pop->f_best << endl;
+    cout << INSTANCE_PATH << "|" << PROBLEM_TYPE << "|" << f_best << endl;
 
 
     return 0;

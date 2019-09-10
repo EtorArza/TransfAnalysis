@@ -74,6 +74,9 @@ struct Evaluator {
         istep = -1;
     }
 
+    __net_eval_decl float FitnessFunction(CpuNetwork* net) {
+    }
+
     __net_eval_decl bool next_step() {
         return ++istep < int(config->nsteps);
     }

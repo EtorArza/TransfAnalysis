@@ -82,6 +82,7 @@ namespace NEAT {
         virtual void execute(class Network **nets_,
                              class OrganismEvaluation *results,
                              size_t nnets) = 0;
+
     };
 
 } // namespace NEAT
