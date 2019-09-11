@@ -176,7 +176,6 @@ void SpeciesPopulation::next_generation() {
         total += o.adjusted_fitness;
     }
 	overall_average=total/total_organisms;
-    std::cout << "----------------" << std::endl;
 	std::cout<<"Generation "<<generation<<": "<<"overall_average = "<<overall_average<<std::endl;
 
 	//Now compute expected number of offspring for each individual organism
@@ -239,13 +238,13 @@ void SpeciesPopulation::next_generation() {
             highest_last_changed=0;
             new_highest_fitness = true;
 
-            printf("NEW POPULATION RECORD FITNESS: %lg, delta=%lg @ gen=%d\n",
+            printf("NEW POPULATION (ADJUSTED) RECORD FITNESS: %lg, delta=%lg @ gen=%d\n",
                    highest_fitness, highest_fitness - old_highest, generation);
         } else {
             ++highest_last_changed;
             new_highest_fitness = false;
 
-            printf("%zu generations since last population fitness record: %lg\n",
+            printf("%zu generations since last population (adjusted) fitness record: %lg\n",
                    size_t(highest_last_changed), highest_fitness);
         }
     }

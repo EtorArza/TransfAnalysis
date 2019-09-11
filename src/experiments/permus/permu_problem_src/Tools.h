@@ -46,10 +46,8 @@ double TotalVariationDivergence(double *P, double *Q, int size);
  */
 bool isPermutation(int *permutation, int size);
 
-/*
- * Generates a random permutation of size 'n' in the given array.
- */
-void GenerateRandomPermutation(int *permutation, int n);
+
+
 
 /*
  * Determines if a given string contains a certain substring.
@@ -70,6 +68,13 @@ void PrintArray(long double *array, int length, string text);
  * Prints the given doubles array in the standard output.
  */
 void PrintArray(double *array, int length, string text);
+
+
+/*
+ * Prints the given float array in the standard output.
+ */
+void PrintArray(float *array, int length, string text);
+
 
 
 /*
@@ -274,44 +279,13 @@ void which_indexes_correspond_to_repeated_vectors(T **vec_array, int vec_len, in
     }
 }
 
-/*
-Shuffle vector given its length.
-*/
-void shuffle_vector(int *vec, int len);
 
 
-/*
-Get random integer on interval [0, max - 1], faster but slightly biased
-*/
-int random_integer_fast(int max);
-
-/*
-Get random integer on interval [min, max - 1], faster but slightly biased
-*/
-int random_integer_fast(int min, int max);
-
-// Get random integer on interval [min, max - 1]
-// https://ericlippert.com/2013/12/16/how-much-bias-is-introduced-by-the-remainder-technique/
-int random_integer_uniform(int min, int max = 0);
-
-// chooses a random integer from {0,1,2, range_max - 1}, at uniform (may be a little slower)
-int random_range_integer_uniform(int range_max);
-
-// return a random uniform float on the interval [0,1]
-float random_0_1_float();
 
 // apply sigmoid function
 float sigmoid(float x);
 
-// Choose an index given the probabilities
-int choose_index_given_probabilities(float *probabilities_array, int max_index);
 
-
-// Choose an index given positive weights
-int choose_index_given_weights(float *weights_array, int max_index);
-
-// Sample from a bernouilli distribution.
-bool coin_toss(float p_of_true);
 
 // round a float into the nearest integer
 int tools_round(float x);
@@ -362,7 +336,7 @@ void normalize_vector(T *array, int len)
     }
 }
 
-
+void seed_xorshf96();
 
 
 template <class T>
@@ -457,6 +431,56 @@ float fast_exp(float x) {
   return x;
 }
 
+class RandomNumberGenerator{
+
+    public:
+
+
+        RandomNumberGenerator(){x=123456789, y=362436069, z=521288629;}
+        ~RandomNumberGenerator(){};
+        void seed(void);
+        void seed(int seed);
+
+        std::vector<unsigned long> get_state();
+        void set_state(std::vector<unsigned long> seed_state);
+        int random_integer_fast(int max){return xorshf96() % max;}
+        int random_integer_fast(int min, int max){return min + (xorshf96() % (max - min));}
+        int random_integer_uniform(int max);
+        int random_integer_uniform(int min, int max);
+        float random_0_1_float();
+
+
+
+
+        unsigned long x, y, z;
+        int xorshf96(void);
+
+
+};
+
+
+// Generate Random Permutation
+void GenerateRandomPermutation(int *permutation, int n);
+void GenerateRandomPermutation(int *permutation, int n, RandomNumberGenerator* rng);
+
+
+// Choose an index given the probabilities
+int choose_index_given_probabilities(float *probabilities_array, int max_index);
+int choose_index_given_probabilities(float *probabilities_array, int len, RandomNumberGenerator* rng);
+
+
+// Choose an index given positive weights
+int choose_index_given_weights(float *weights_array, int max_index);
+int choose_index_given_weights(float *weights_array, int max_index, RandomNumberGenerator* rng);
+
+
+// Sample from a bernouilli distribution.
+bool coin_toss(float p_of_true);
+bool coin_toss(float p_of_true, RandomNumberGenerator* rng);
+
+
+void shuffle_vector(int *vec, int len);
+void shuffle_vector(int *vec, int len, RandomNumberGenerator* rng);
 
 
 class PermuTools
@@ -478,9 +502,12 @@ public:
     void compute_first_marginal(int** permu_list, int m);
     float get_distance_to_marginal(int* permu);
     int choose_permu_index_to_move(float* coef_list);
+    int choose_permu_index_to_move(float* coef_list, RandomNumberGenerator* rng);
+
 
 private:
     void convert_to_permu(int* res);
+    RandomNumberGenerator* rng;
 };
 
 

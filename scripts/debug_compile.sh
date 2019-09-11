@@ -11,9 +11,7 @@ EOF
 
 make
 
-date
-./neat -f -n 8 permu -t 1 -x 6
-date
+
 
 
 

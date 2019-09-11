@@ -1,6 +1,7 @@
 
 #include <string>
-
+#include "PBP.h"
+#include <mutex>
 
 #ifndef EXTERN
 #define EXTERN extern
@@ -8,13 +9,15 @@
 
 
 
-#define N_OF_INPUT_PARAMS 4
+#define N_OF_INPUT_PARAMS_TRAIN 3
+#define N_OF_INPUT_PARAMS_TEST 4
 
 
 // CONSTANT PARAMETERS //
 EXTERN int SEED;
 EXTERN float MAX_TIME;
 EXTERN int POPSIZE;
+EXTERN int REPEATED_EVALUATIONS;
 /////////////////////////
 
 // BASH INPUT PARAMETERS //
@@ -36,7 +39,6 @@ EXTERN std::string CONTROLLER_PATH;
 ///////////////////////////
 
 
-
 // argv[0] --> name of the binary executable
 // argv[1] --> type of problem, i.e. LOP
 // argv[2] --> path to the problem
@@ -47,7 +49,7 @@ void print_parameters(void);
 
 
 
-
+PBP *GetProblemInfo(std::string problemType, std::string filename);
 
 
 // NEAT PARAMETERS //

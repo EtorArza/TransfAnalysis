@@ -12,6 +12,7 @@
 #include "evaluatorexperiment.h"
 #include "neat.h"
 #include "neattypes.h"
+#include "cpunetwork.h"
 
 #include "experiment.h"
 #include "genomemanager.h"
@@ -138,7 +139,7 @@
 
 namespace NEAT
 {
-Organism *load_organism(string filename)
+CpuNetwork load_network(string filename)
 {
 
     // str.find(str2) --> str contains str2
@@ -148,7 +149,58 @@ Organism *load_organism(string filename)
     std::vector<InnovNodeGene> nodes;
     std::vector<InnovLinkGene> links;
 
+
+
+    // load dims
+    NEAT::NetDims dims;
+    memset(&dims, 0, sizeof(dims));
+    int node_counter = 0;
     // load dims and load node names
+    for (size_t i = 0; i < string_vector.size(); i++)
+    {
+        string line = string_vector[i];
+        if (line.find("node") != line.npos)
+        {
+            dims.nnodes.all++;
+            int node_type = line.back() - '0';
+            switch (node_type)
+            {
+            case 0: // bias node
+                dims.nnodes.bias++;
+                dims.nnodes.input++;
+                break;
+            case 1: // sensor node
+                dims.nnodes.sensor++;
+                dims.nnodes.input++;
+                break;
+            case 2: // output node
+                dims.nnodes.output++;
+                dims.nnodes.noninput++;
+
+                break;
+            case 3: // hidden node
+                dims.nnodes.hidden++;
+                dims.nnodes.noninput++;
+                break;
+
+            default:
+                break;
+            }
+            node_counter++;
+        }
+        else if (line.find("gene") != line.npos)
+        {
+            dims.nlinks++;
+        }
+    }
+
+    // NEAT::NetNode* netnodes = new NEAT::NetNode[dims.nnodes.all];
+    // NEAT::NetLink* netlinks = new NEAT::NetLink[dims.nlinks];
+
+    // size_t netnode_index = 0;
+    // size_t netlink_index = 0;
+
+    // load trait, nodes and and links
     for (size_t i = 0; i < string_vector.size(); i++)
     {
         string line = string_vector[i];
@@ -170,12 +222,17 @@ Organism *load_organism(string filename)
 
     env->genome_manager = NEAT::GenomeManager::create();
 
-    Organism *org;
-    org = new Organism(g);
-    org->population_index = 10000;
-    org->write(cout);
-    return org;
+    
 
+    // Organism *org;
+    // org = new Organism(g);
+    CpuNetwork net;
+    g.init_phenotype(&net);
+    return net;
+    // org->population_index = 10000;
+    //org->write(cout);
+    // return org;
+    // return net;
     // std::unique_ptr<NetworkEvaluator> network_evaluator;
     // network_evaluator = unique_ptr<NetworkEvaluator>(NEAT::create_evaluator());
 }

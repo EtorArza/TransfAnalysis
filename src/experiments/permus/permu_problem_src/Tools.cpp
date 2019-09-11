@@ -21,6 +21,9 @@
 
 #define TEMP_FLOAT_ARRAY_SIZE 30
 
+
+
+
 /*
  * Returs the first position at which value appears in array. If it does not appear, then it returns -1;
  */
@@ -90,19 +93,7 @@ bool isPermutation(int *permutation, int size)
     return result;
 }
 
-/*
- * Generates a random permutation of size 'n' in the given array.
- */
-void GenerateRandomPermutation(int *permutation, int n)
-{
-    for (int i = 0; i < n; ++i)
-    {   
-        int j = random_integer_fast(0, i+1);
-        // int j = rand() % (i + 1);
-        permutation[i] = permutation[j];
-        permutation[j] = i;
-    }
-}
+
 
 /*
  * Determines if a given string contains a certain substring.
@@ -122,9 +113,8 @@ bool strContains(const string inputStr, const string searchStr)
 /*
  * Prints in standard output 'length' integer elements of a given array.
  */
-void PrintArray(int *array, int length, string text)
+void PrintArray(int *array, int length)
 {
-    cout << text;
     for (int i = 0; i < length; i++)
     {
         cout << array[i] << " ";
@@ -135,9 +125,8 @@ void PrintArray(int *array, int length, string text)
 /*
  * Prints in standard output 'length' long double elements of a given array.
  */
-void PrintArray(long double *array, int length, string text)
+void PrintArray(long double *array, int length)
 {
-    cout << text;
     for (int i = 0; i < length; i++)
     {
         cout << array[i] << " ";
@@ -145,25 +134,13 @@ void PrintArray(long double *array, int length, string text)
     cout << " " << endl;
 }
 
-/*
- * Prints in the standard output the 'size' elements of the given array..
- */
-void PrintArray(int *array, int size)
-{
-    for (int i = 0; i < size; i++)
-    {
-        cout << array[i] << " ";
-    }
-    cout << " " << endl;
-}
 
 /*
  * Prints in standard output 'length' double elements of a given array.
  */
-void PrintArray(double *array, int length, string text)
+void PrintArray(double *array, int length)
 {
     int i;
-    cout << text;
     for (i = 0; i < length; i++)
         printf("%3.5f,", array[i]);
     printf("\n ");
@@ -201,6 +178,15 @@ void PrintMatrix(double **matrix, int length, int length2, string text)
     }
     cout << " " << endl;
 }
+
+
+void PrintArray(float *array, int length, string text){
+    int i;
+    for (i = 0; i < length; i++)
+        printf("%3.5f,", array[i]);
+    printf("\n ");
+}
+
 
 /*
  * Prints in standard output 'lengthxlength' double elements of a given matrix.
@@ -614,34 +600,53 @@ double stopwatch::getTick()
     return theTick;
 }
 
-static unsigned long x=123456789, y=362436069, z=521288629;
 
-int xorshf96(void) {          //period 2^96-1
-unsigned long t;
-    x ^= x << 16;
-    x ^= x >> 5;
-    x ^= x << 1;
+int RandomNumberGenerator::xorshf96(void)
+{ //period 2^96-1
+    unsigned long t;
+    this->x ^= this->x << 16;
+    this->x ^= this->x >> 5;
+    this->x ^= this->x << 1;
 
-   t = x;
-   x = y;
-   y = z;
-   z = t ^ x ^ y;
+    t = this->x;
+    this->x = this->y;
+    this->y = this->z;
+    this->z = t ^ this->x ^ this->y;
 
-  return z & INT_MAX;
+    return z & INT_MAX;
 }
 
-int random_integer_fast(int max)
-{
-    return xorshf96() % max;
+
+
+
+void RandomNumberGenerator::seed(void){
+    struct timespec ts;
+    clock_gettime(CLOCK_REALTIME, &ts);
+    int seed =  ts.tv_nsec; // modulus with a big number, but not too big
+    x = seed;
 }
 
-int random_integer_fast(int min, int max)
-{
-    return min + (xorshf96() % (max - min));
+void RandomNumberGenerator::seed(int seed){
+    x = seed;
 }
+
+
+std::vector<unsigned long> RandomNumberGenerator::get_state(){
+    std::vector<unsigned long> res = {x, y, z};
+    return res;
+}
+
+
+void RandomNumberGenerator::set_state(std::vector<unsigned long> seed_state){
+    x = seed_state[0];
+    y = seed_state[1];
+    z = seed_state[2];
+}
+
+
 
 // https://ericlippert.com/2013/12/16/how-much-bias-is-introduced-by-the-remainder-technique/
-int random_integer_uniform(int min, int max)
+int RandomNumberGenerator::random_integer_uniform(int min, int max)
 {
 
     //LOG->write("min: ", false);
@@ -655,7 +660,7 @@ int random_integer_uniform(int min, int max)
         int range = min;
         while (true)
         {
-            int value = rand();
+            int value = xorshf96();
             if (value < RAND_MAX - RAND_MAX % range)
             {
 
@@ -671,28 +676,55 @@ int random_integer_uniform(int min, int max)
     else
     {
         assert(max > min);
-        int range = static_cast<int>(max - min + 1);
+        int range = max - min;
         while (true)
         {
             int value = rand();
             if (value < RAND_MAX - RAND_MAX % range)
-            {
-                return min + value % range;
+            {   
+                int res = min + (value % range);
+                assert(res < max);
+                assert(res >= min);
+                return res;
             }
         }
     }
 }
 
 // chooses a random integer from {0,1,2, range_max - 1}
-int random_range_integer_uniform(int range_max)
+int RandomNumberGenerator::random_integer_uniform(int range_max)
 {
-    return random_integer_uniform(range_max);
+    return random_integer_uniform(0, range_max);
 }
 
-float random_0_1_float()
+float RandomNumberGenerator::random_0_1_float()
 {   
-    return (float) drand48();
+    // cout << endl << xorshf96() << endl;
+    // cout << (float) xorshf96() / (float) INT_MAX << endl;
+    return (float) xorshf96() / (float) INT_MAX;
 }
+
+void GenerateRandomPermutation(int *permutation, int n)
+{
+    RandomNumberGenerator* rng = new RandomNumberGenerator();
+    rng->seed();
+    GenerateRandomPermutation(permutation, n, rng);
+    delete rng;
+    
+}
+
+void GenerateRandomPermutation(int *permutation, int n, RandomNumberGenerator* rng)
+{
+    for (int i = 0; i < n; ++i)
+    {
+        permutation[i] = i;
+    }
+    shuffle_vector(permutation, n, rng);
+    assert(isPermutation(permutation, n)) ;
+
+}
+
+
 
 float sigmoid(float x)
 {
@@ -701,7 +733,17 @@ float sigmoid(float x)
 
 int choose_index_given_probabilities(float *probabilities_array, int len)
 {
-    float r = random_0_1_float();
+RandomNumberGenerator* tmp_rng = new RandomNumberGenerator();
+tmp_rng->seed();
+int res = choose_index_given_probabilities(probabilities_array, len, tmp_rng);
+delete tmp_rng;
+return res;
+}
+
+int choose_index_given_probabilities(float *probabilities_array, int len, RandomNumberGenerator* rng)
+{   
+    
+    float r = rng->random_0_1_float();
     float cum_prob = 0;
 
     for (int i = 0; i < len; i++)
@@ -713,16 +755,25 @@ int choose_index_given_probabilities(float *probabilities_array, int len)
         }
     }
 
-    return choose_index_given_probabilities(probabilities_array, len);
+    return choose_index_given_probabilities(probabilities_array, len, rng);
 
     //cout << endl;
     //cout << "cum_prob = " << cum_prob << endl;
     //assert(cum_prob > 0.99999);
 }
 
-int choose_index_given_weights(float *weights_array, int len)
+int choose_index_given_weights(float *weights_array, int len){
+    RandomNumberGenerator* rng = new RandomNumberGenerator;
+    rng->seed();
+    int res = choose_index_given_weights(weights_array, len, rng);
+    delete rng;
+    return res;
+}
+
+
+int choose_index_given_weights(float *weights_array, int len, RandomNumberGenerator* rng)
 {
-    float r = random_0_1_float();
+    float r = rng->random_0_1_float();
     float cum_sum = 0;
     float total = 0;
 
@@ -742,7 +793,7 @@ int choose_index_given_weights(float *weights_array, int len)
         }
     }
 
-    return choose_index_given_weights(weights_array, len);
+    return choose_index_given_weights(weights_array, len, rng);
 
     //cout << endl;
     //cout << "cum_prob = " << cum_prob << endl;
@@ -751,7 +802,17 @@ int choose_index_given_weights(float *weights_array, int len)
 
 bool coin_toss(float p_of_true)
 {
-    if (random_0_1_float() < p_of_true)
+    RandomNumberGenerator* rng = new RandomNumberGenerator();
+    rng->seed();
+    bool res = coin_toss(p_of_true, rng);
+    delete rng;
+    return res;
+}
+
+
+bool coin_toss(float p_of_true, RandomNumberGenerator* rng)
+{
+    if (rng->random_0_1_float() < p_of_true)
     {
         return true;
     }
@@ -773,11 +834,22 @@ int tools_round(float x)
     }
 }
 
+
 void shuffle_vector(int *vec, int len)
+{
+    RandomNumberGenerator* rng = new RandomNumberGenerator();
+    rng->seed();
+    shuffle_vector(vec, len, rng);
+    delete rng;
+}
+
+
+
+void shuffle_vector(int *vec, int len, RandomNumberGenerator* rng)
 {
     for (int i = 0; i < len - 1; i++)
     {
-        int pos = rand() % (len - i) + i;
+        int pos = rng->random_integer_fast(i, len);
         //int pos = (int) (unif_rand() * (len-i) + i);
         int aux = vec[i];
         vec[i] = vec[pos];
@@ -787,8 +859,11 @@ void shuffle_vector(int *vec, int len)
 
 
 
+
 PermuTools::PermuTools(int n)
 {   
+    rng = new RandomNumberGenerator;
+    rng->seed();
     this->n = n;
     random_permu1 = new int[n];
     random_permu2 = new int[n];
@@ -809,13 +884,14 @@ PermuTools::PermuTools(int n)
         identity_permu[i] = i;
     }
     
-    GenerateRandomPermutation(random_permu1, n);
-    GenerateRandomPermutation(random_permu2, n);
-    GenerateRandomPermutation(temp_array, n);
+    GenerateRandomPermutation(random_permu1, n, rng);
+    GenerateRandomPermutation(random_permu2, n, rng);
+    GenerateRandomPermutation(temp_array, n, rng);
 }
 
 PermuTools::~PermuTools()
 {
+    delete rng;
     delete[] this->random_permu1;
     delete[] this->random_permu2;
     delete[] this->temp_array;
@@ -830,7 +906,7 @@ PermuTools::~PermuTools()
 }
 
 
-
+/* 
 // combines the permutations considering the coefficients simmilarly to \cite{wang_discrete_2012}. 
 // The zeroes on their paper are -1 in our implementation
 void PermuTools::combine_permus(int** permu_list, float* coef_list, int* res){
@@ -904,9 +980,10 @@ void PermuTools::combine_permus(int** permu_list, float* coef_list, int* res){
     }
     convert_to_permu(res);
     delete[] coef_list_copy;
-} 
+}  
+*/
 
-// Auxiliary function for combine_permus 
+/* // Auxiliary function for combine_permus 
 void PermuTools::convert_to_permu(int* res){
     std::set<int> existing;
     std::set<int> missing(this->identity_permu, this->identity_permu+n);
@@ -941,6 +1018,7 @@ void PermuTools::convert_to_permu(int* res){
         res[temp_array[i]] = el;
     }
 }
+*/
 
 
 void PermuTools::compute_first_marginal(int** permu_list, int m){
@@ -977,6 +1055,10 @@ float PermuTools::get_distance_to_marginal(int* permu){
 }
 
 int PermuTools::choose_permu_index_to_move(float* coef_list){
+    return choose_permu_index_to_move(coef_list, this->rng);
+}
+
+int PermuTools::choose_permu_index_to_move(float* coef_list, RandomNumberGenerator* input_rng){
 
     assert(TEMP_FLOAT_ARRAY_SIZE >= NEAT::N_COEF);
     
@@ -989,9 +1071,8 @@ int PermuTools::choose_permu_index_to_move(float* coef_list){
         return -1;
     }
 
-    return choose_index_given_weights(temp_array_float, NEAT::N_COEF);
+    return choose_index_given_weights(temp_array_float, NEAT::N_COEF, input_rng);
 }
-
 
 // https://thispointer.com/c-how-to-read-a-file-line-by-line-into-a-vector/
 std::vector<string> read_lines_from_file(string filename){
@@ -1011,7 +1092,7 @@ std::vector<string> read_lines_from_file(string filename){
     in.close();
     if (vecOfStrs.size()< 1){
         std::cout << endl;
-        std::cout << "file" << filename << "not read correctly." << endl;
+        std::cout << "file: \"" << filename << "\" not read correctly." << endl;
         exit(1);
     }
     return vecOfStrs;

@@ -1,6 +1,7 @@
 #pragma once
 
 
+
 namespace NEAT {
 
     const int SWAP = 0;

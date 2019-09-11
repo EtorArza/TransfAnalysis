@@ -14,6 +14,7 @@
 #include <fstream>
 #include <limits.h>
 #include <iostream>
+#include "Tools.h"
 #include "../permuevaluator.h"
 using namespace std;
 using std::istream;
@@ -25,7 +26,7 @@ class CIndividual
 public:
 	// The constructor. The constructed individual has
 	// all zeroes as its genes.
-	CIndividual(int length);
+	CIndividual(int length, RandomNumberGenerator* rng);
 
 	~CIndividual();
 	void SetGenome(int *genes);

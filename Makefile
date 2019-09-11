@@ -1,6 +1,5 @@
 include Makefile.conf
 
-$(shell export OMP_NUM_THREADS=${N_THREADS})
 
 
 
@@ -37,10 +36,11 @@ ifeq (${DEVMODE}, true)
 else
 	OPT=-O3
 	OPENMP=-fopenmp
-	MISC_FLAGS=-Werror
+	MISC_FLAGS=-DNDEBUG
 endif
 
-CC_FLAGS=-Wall ${DEFINES} ${MISC_FLAGS} ${PROFILE} ${INCLUDES} ${OPENMP} ${OPT} -c -g -gdwarf-3
+
+CC_FLAGS=-Wall ${DEFINES} ${MISC_FLAGS} ${PROFILE} ${INCLUDES} ${OPENMP} ${OPT} -c -g -gdwarf-3  -Wextra
 .PHONY: clean default
 
 default: ./neat

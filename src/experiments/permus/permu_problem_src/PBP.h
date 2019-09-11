@@ -17,16 +17,20 @@
 #include <string.h>
 #include <stdio.h>
 #include "Individual.h"
+#include "Tools.h"
+#include  <mutex>
 
 
 
 
-using namespace std;
 using std::string;
 using std::stringstream;
 
 class PBP
 {
+
+	static std::mutex mut;
+
   public:
 	PBP();
 
@@ -37,7 +41,6 @@ class PBP
 	virtual int Read(string filename) = 0;
 	virtual int GetProblemSize() = 0;
 
-
 	/*
 	 * Functions that are valid for all permutation problems. 
 	 * The use of this functions requires the fitness value of the individual to be previously computed.
@@ -47,6 +50,8 @@ class PBP
 	void move_indiv_towards_reference(CIndividual* indiv, int* ref_permu, int operator_id);
 	void move_indiv_away_reference(CIndividual* indiv, int* ref_permu, int operator_id);
 	void Evaluate(CIndividual *indiv); // update the f_value of the individuals.
+	float Evaluate(int *genome); // update the f_value of the individuals.
+	int Read_with_mutex(string filename);
 
 
 
@@ -62,6 +67,7 @@ class PBP
 	int *_random_permu2;
 	int *_random_permu3;
 
+	RandomNumberGenerator *rng;
 
 	/*
 	* Functions to be defined in child class.

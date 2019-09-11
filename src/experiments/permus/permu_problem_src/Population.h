@@ -31,7 +31,12 @@ class CPopulation
 {
 
 public:
+  // if no rng object is provided, a new one is generated
   CPopulation(PBP *problem);
+  CPopulation(PBP *problem, RandomNumberGenerator* rng);
+  void init_class(PBP *problem, RandomNumberGenerator* rng);
+
+
   virtual ~CPopulation();
 
   struct Better
@@ -53,11 +58,10 @@ public:
 
   void Print();
   void end_iteration(); // sort the population, check if the best solution was improved, and coompute neat imputs.
-
+  void Reset();
 
   float* get_neat_input_individual_i(int i);
   void apply_neat_output_to_individual_i(float* output_neat, int i);
-
   bool terminated;
 
    /*
@@ -65,6 +69,8 @@ public:
    * popinfo[i][j] has information about propertie i from individual j.
    */
   float **pop_info;
+  stopwatch *timer;
+  RandomNumberGenerator *rng;
 
 private:
 
@@ -86,7 +92,6 @@ private:
   PBP * problem;
   PermuTools *pt;
   float relative_time();
-  stopwatch *timer;
 
 
 

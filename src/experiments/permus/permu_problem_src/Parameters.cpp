@@ -7,42 +7,91 @@
 #include <sstream>
 #include <fstream>
 #include "Tools.h"
-
+#include "PBP.h"
+#include "LOP.h"
+#include "TSP.h"
+#include "QAP.h"
 
 
 
 void set_other_params(){
   SEED = 2;
-  MAX_TIME = 1;
+  MAX_TIME = 1.0;
   POPSIZE = 20;
+  REPEATED_EVALUATIONS = 5;
 }
 
 
+PBP *GetProblemInfo(std::string problemType, std::string filename)
+{
+    PBP *problem;
+    // if (problemType == "pfsp")
+    //     problem = new PFSP();
+    // else if (problemType == "tsp")
+    //     problem = new TSP();else 
+    if (problemType == "qap")
+        {problem = new QAP();}
+    else if (problemType == "lop")
+        {problem = new LOP();}
+    // else if (problemType == "api")
+    //     problem = new API();
+    else
+    {
+         cout << "Wrong problem type was specified." << endl;
+         exit(1);
+     }
 
+    //Read the instance.
+    problem->Read_with_mutex(filename);
+    return problem;
+}
+
+
+bool parameters_set = false;
+std::mutex mut;
 
 // input parameters from bash
 void set_parameters(int argc, char *argv[])
 {
-  assert(N_OF_INPUT_PARAMS == argc);
+  if (parameters_set)
+  {
+    return;
+  }
+  
+  mut.lock();
+  if (parameters_set)
+  {
+    mut.unlock();
+    return;
+  }
+  assert(N_OF_INPUT_PARAMS_TRAIN == argc || N_OF_INPUT_PARAMS_TEST == argc);
   // SEED = atoi(argv[i]);
   srand(SEED);
   PROBLEM_TYPE = std::string(argv[1]);
   INSTANCE_PATH = std::string(argv[2]);
-  CONTROLLER_PATH = std::string(argv[3]);
+  if (N_OF_INPUT_PARAMS_TEST == argc)
+  {
+      CONTROLLER_PATH = std::string(argv[3]);
+  }
+
   set_other_params();
-
-
+  mut.unlock();
+  parameters_set = true;
 }
 
 // char const *params[3] = {"binary_name", "param_1", "param_2"}
 void set_parameters(int argc, char const *argv[])
 {
-  assert(N_OF_INPUT_PARAMS == argc);
-  // SEED = atoi(argv[i]);
-  srand(SEED);
-  PROBLEM_TYPE = std::string(argv[1]);
-  INSTANCE_PATH = std::string(argv[2]);
-  set_other_params();
+
+char* tmp[argc];
+
+for (int i = 0; i < argc; i++)
+{
+  tmp[i] = (char*) argv[i];
+}
+
+set_parameters(argc, tmp);
+
 }
 
 
