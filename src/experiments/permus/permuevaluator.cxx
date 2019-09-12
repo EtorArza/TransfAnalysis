@@ -55,7 +55,7 @@ float FitnessFunction_permu(NEAT::CpuNetwork *net)
         v_of_fitness[n_of_repetitions_completed] = pop->f_best;
     }
     float res = Average(v_of_fitness, REPEATED_EVALUATIONS);
-    delete v_of_fitness;
+    delete[] v_of_fitness;
     delete pop;
     delete problem;
     return res;

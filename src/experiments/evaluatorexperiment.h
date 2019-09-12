@@ -94,7 +94,7 @@ namespace NEAT {
                 Timer::report();
                 
 
-                #define SAVE_NETWORK_EVERY_K_GENS 2
+                #define SAVE_NETWORK_EVERY_K_GENS 100
                 if (gen % SAVE_NETWORK_EVERY_K_GENS == 0)
                 {
                     print(1, gen);

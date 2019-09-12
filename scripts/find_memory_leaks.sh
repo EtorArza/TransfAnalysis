@@ -8,4 +8,4 @@ PFM_LD_FLAGS=
 PFM_NVCC_CCBIN=
 EOF
 make
-valgrind   --leak-check=yes ./neat -f -n 20 permu -t 1 -x 5
+valgrind   --leak-check=yes ./neat "train" -f -n 20 -2 -x 4

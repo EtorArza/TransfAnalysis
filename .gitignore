@@ -12,5 +12,7 @@
 .vscode
 callgrind.*
 __pycache*
-.out
+*.out
 fittest*
+*.png
+*.pdf

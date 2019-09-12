@@ -22,13 +22,13 @@
 
 namespace NEAT {
 
-	// ---------------------------------------------  
+	// ---------------------------------------------
 	// SPECIES CLASS:
-	//   A Species is a group of similar Organisms      
+	//   A Species is a group of similar Organisms
 	//   Reproduction takes place mostly within a
 	//   single species, so that compatible organisms
-	//   can mate.                                      
-	// ---------------------------------------------  
+	//   can mate.
+	// ---------------------------------------------
 	class Species {
 	public:
 		int id;

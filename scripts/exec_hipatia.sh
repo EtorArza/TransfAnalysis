@@ -37,7 +37,7 @@ EOF
 make
 
 date
-./neat "train" -f -n 1000 -t 70 -x 300
+./neat "train" -f -n 2000 -t 70 -x 900
 date
 cp experiment_1/ -v -r $SRCDIR
 

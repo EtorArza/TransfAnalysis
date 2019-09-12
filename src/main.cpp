@@ -205,9 +205,6 @@ int main(int argc, char *argv[])
     CpuNetwork net = load_network(CONTROLLER_PATH);
     float f_best = FitnessFunction_permu(&net);
 
-    
-
-
     cout << INSTANCE_PATH << "|" << PROBLEM_TYPE << "|" << f_best << endl;
 
 
