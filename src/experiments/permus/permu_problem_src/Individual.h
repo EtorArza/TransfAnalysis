@@ -16,11 +16,15 @@
 #include <iostream>
 #include "Tools.h"
 #include "../permuevaluator.h"
+
+
 using namespace std;
 using std::istream;
 using std::ostream;
 
-
+namespace NEAT{
+class CpuNetwork;
+}
 class CIndividual
 {
 public:
@@ -57,8 +61,13 @@ public:
 	float relative_time = 0;
 	float sparsity = 0;
 	float distance = 0;
+	
+	std::vector<float> activation;
+
+
 
 private:
 	static int n_indivs_created;
 };
+
 

@@ -20,8 +20,9 @@
 
 using namespace std;
 
-float FitnessFunction_permu(NEAT::CpuNetwork *net)
+float FitnessFunction_permu( NEAT::CpuNetwork *net)
 {
+
     float* v_of_fitness;
     PBP *problem;
     CPopulation *pop;
@@ -34,32 +35,49 @@ float FitnessFunction_permu(NEAT::CpuNetwork *net)
     v_of_fitness = new float[REPEATED_EVALUATIONS];
 
 
+    for (int i = 0; i < POPSIZE; i++)
+    {
+        pop->m_individuals[i]->activation = std::vector<float>(net->activations);
+    }
+
+
+
     for (int n_of_repetitions_completed = 0; n_of_repetitions_completed < REPEATED_EVALUATIONS; n_of_repetitions_completed++)
     {
         pop->rng->seed();
-        pop->Reset();
+        pop->Reset(); // here all networks are deleted denwedfjhfrjoirefojirewerioj
+        for (int i = 0; i < POPSIZE; i++)
+        {   
+            std::swap(net->activations, pop->m_individuals[i]->activation);
+            net->clear_noninput(); 
+            std::swap(net->activations, pop->m_individuals[i]->activation);
+        }
+
         while (!pop->terminated)
         {
             for (int i = 0; i < POPSIZE; i++)
-            {
-                net->clear_noninput();
+            {   
+                std::swap(net->activations, pop->m_individuals[i]->activation);
                 for (int sns_idx = 0; sns_idx < NEAT::__sensor_N; sns_idx++)
                 {
                     net->load_sensor(sns_idx, pop->get_neat_input_individual_i(i)[sns_idx]);
                 }
                 net->activate();
                 pop->apply_neat_output_to_individual_i(net->get_outputs(), i);
+                std::swap(net->activations, pop->m_individuals[i]->activation);
             }
             pop->end_iteration();
         }
         v_of_fitness[n_of_repetitions_completed] = pop->f_best;
     }
     float res = Average(v_of_fitness, REPEATED_EVALUATIONS);
+
+
+
     delete[] v_of_fitness;
     delete pop;
     delete problem;
     return res;
-
 }
 
 namespace NEAT

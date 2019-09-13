@@ -70,9 +70,12 @@ void CPopulation::Reset(){
     f_best = MIN_INTEGER;
     GenerateRandomPermutation(this->genome_best, n, rng);
     for (int i = 0; i < popsize; i++)
-    {
+    {   
+        auto tmp = std::vector<float>();
+        std::swap(tmp, m_individuals[i]->activation);
         delete m_individuals[i];
         m_individuals[i] = new CIndividual(n, rng);
+        std::swap(tmp, m_individuals[i]->activation);
     }
     terminated = false;
     timer->tic();

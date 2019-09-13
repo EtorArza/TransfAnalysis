@@ -18,7 +18,7 @@ void set_other_params(){
   SEED = 2;
   MAX_TIME = 0.25;
   POPSIZE = 20;
-  REPEATED_EVALUATIONS = 40;
+  REPEATED_EVALUATIONS = 5;
 }
 
 

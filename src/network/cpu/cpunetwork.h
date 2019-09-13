@@ -8,14 +8,16 @@ namespace NEAT {
     //--- CLASS CpuNetwork
     //---
 	class CpuNetwork : public Network {
-    private:
+    public:
         NetDims dims;
 		std::vector<NetNode> nodes;
 		std::vector<NetLink> links;
-        std::vector<real_t> activations;
 
-    public:
+        std::vector<real_t> activations;
         CpuNetwork() {}
+
+        //CpuNetwork(const CpuNetwork&  other);
+
 		virtual ~CpuNetwork() {}
 
 		void activate();
@@ -23,6 +25,8 @@ namespace NEAT {
         void set_activations(__in std::vector<real_t> &newacts);
 
         void clear_noninput();
+        std::vector<real_t> get_noninput(){return activations;};
+        void set_noninput(std::vector<real_t> activations){this->activations = activations;};
         void load_sensor(size_t isensor, real_t activation);
         real_t *get_outputs();
 

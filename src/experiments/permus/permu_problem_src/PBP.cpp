@@ -60,8 +60,9 @@ float PBP::Evaluate(int *genome)
 std::mutex PBP::mut;
 int PBP::Read_with_mutex(string filename){
     PBP::mut.lock();
-    this->Read(filename);
+    int res = this->Read(filename);
     PBP::mut.unlock();
+    return res;
 }
 
 void PBP::apply_operator_with_fitness_update(CIndividual *indiv, int i, int j, int operator_id)

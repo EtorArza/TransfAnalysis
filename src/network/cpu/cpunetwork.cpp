@@ -30,11 +30,21 @@ Network *Network::create() {
     return new CpuNetwork();
 }
 
+// // copy constructor
+// CpuNetwork::CpuNetwork(const CpuNetwork&  other){ 
+//     this->activations = std::vector<real_t>(other.activations);
+
+//     this->dims = other.dims;
+//     this->links = other.links;
+//     this->nodes = other.nodes;
+
+// }
+
 // Requires nodes to be sorted by type: BIAS, SENSOR, OUTPUT, HIDDEN
 void CpuNetwork::configure(const NetDims &dims_,
                            NetNode *nodes_,
                            NetLink *links_) {
-    dims = dims_;
+    this->dims = dims_;
 
     nodes.resize(dims.nnodes.all);
     for(size_t i = 0; i < dims.nnodes.all; i++) {
@@ -56,9 +66,7 @@ void CpuNetwork::configure(const NetDims &dims_,
 }
 
 void CpuNetwork::clear_noninput() {
-    memset(activations.data() + dims.nnodes.input,
-           0,
-           sizeof(real_t) * (dims.nnodes.all - dims.nnodes.input));
+    std::fill(activations.begin()+dims.nnodes.input, activations.end(), 0);
 }
 
 void CpuNetwork::load_sensor(size_t isensor,
