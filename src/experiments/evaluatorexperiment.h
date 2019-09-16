@@ -95,7 +95,7 @@ namespace NEAT {
                 
 
                 #define SAVE_NETWORK_EVERY_K_GENS 100
-                if (gen % SAVE_NETWORK_EVERY_K_GENS == 0)
+                if (gen % SAVE_NETWORK_EVERY_K_GENS == 0 || gen == gens)
                 {
                     print(1, gen);
                 }

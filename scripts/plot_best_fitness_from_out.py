@@ -28,4 +28,4 @@ plt.ylabel("Fitness")
 
 plt.axhline(optimum)
 
-plt.savefig("../convergence_neat.pdf")
+plt.savefig("convergence_neat.pdf")

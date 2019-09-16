@@ -9,23 +9,14 @@
 #pragma once
 
 
-#include <vector>
-#include <algorithm>
 #include <string.h>
-#include <sstream>
-#include <stdlib.h>
-#include <stdio.h>
-#include <fstream>
-#include <iostream>
 #include "Individual.h"
-#include "PBP.h"
-#include "Tools.h"
 
-using std::istream;
-using std::ostream;
-using std::string;
-using std::stringstream;
-using namespace std;
+class PBP;
+class RandomNumberGenerator;
+class PermuTools;
+class Tabu;
+
 
 class CPopulation
 {
@@ -54,7 +45,7 @@ public:
 
  	float f_best;
 	int* genome_best;
-
+  Tabu* tab;
 
   void Print();
   void end_iteration(); // sort the population, check if the best solution was improved, and coompute neat imputs.
@@ -110,7 +101,7 @@ private:
   // first choose a permu proportionally to its weight. 
   // Then if weight is positive move towards, otherwise, move away from.
   // to permuevaluator.h contains which permutations are considered.
-  void move_individual_i_based_on_coefs(float* coef_list, int i, int operator_id);
+  void move_individual_i_based_on_coefs(float* coef_list, int i, NEAT::operator_t operator_id, float accept_or_reject_worse);
 
 
  

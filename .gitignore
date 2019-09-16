@@ -16,3 +16,4 @@ __pycache*
 fittest*
 *.png
 *.pdf
+slurm*

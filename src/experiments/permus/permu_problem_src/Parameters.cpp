@@ -16,9 +16,10 @@
 
 void set_other_params(){
   SEED = 2;
-  MAX_TIME = 0.25;
+  MAX_TIME = 1.0;
   POPSIZE = 20;
-  REPEATED_EVALUATIONS = 5;
+  REPEATED_EVALUATIONS = 161;
+  TABU_LENGTH = 40;
 }
 
 

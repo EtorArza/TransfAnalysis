@@ -4,11 +4,12 @@
 
 namespace NEAT {
 
-    const int SWAP = 0;
-    const int EXCH = 1;
-    const int INSERT = 2;
-
-    const int N_OPERATORS = 3;
+    enum operator_t{
+    SWAP = 0,
+    EXCH = 1,
+    INSERT = 2,
+    N_OPERATORS = 3,
+    };
 
     enum sensor_t {
         OPT_SWAP = SWAP, // 1 if local optima for swap neighborhood. 0 else.
@@ -19,7 +20,8 @@ namespace NEAT {
         DISTANCE = 5,
         SPARSITY = 6,
         R_NUMBER = 7,
-        __sensor_N = 8
+        __sensor_N = 8,
+
     };
 
     const int N_COEF = 4;
@@ -28,11 +30,13 @@ namespace NEAT {
         O_ID_SWAP = SWAP + 1,
         O_ID_EXCH = EXCH + 1,
         O_ID_INSERT = INSERT + 1,
-        c_momentum = 4,
-        c_pers_best = 5,
-        c_best_known = 6,
-        c_above = 7,
-        __output_N = 8
+        accept_or_reject_worse = 4,
+        TABU = 5,
+        c_momentum = 6,
+        c_pers_best = 7,
+        c_best_known = 8,
+        c_above = 9,
+        __output_N = 10,
     };
 
     class NetworkEvaluator *create_permu_evaluator();

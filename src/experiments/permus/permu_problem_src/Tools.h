@@ -305,6 +305,41 @@ float Average(T *array, int len)
     return (float)sum / len;
 }
 
+
+#include <algorithm>
+// compute the average value of the elements on the array dropping the best and worst quarter
+template <class T>
+float Average_drop_top_bottom_quartile(T *array, int len)
+{
+
+    if (len < 4)
+    {
+        return Average(array, len);
+    }
+    
+    float sum = 0;
+    std::sort(array,array+len);
+    for (int i = len/4; i < len/4*3; i++)
+    {
+        sum += array[i];
+    }
+
+    return (float)sum / (len/4*3 - len/4);
+}
+
+
+
+template <class T>
+T median(T *array, int len)
+{
+
+    std::nth_element(array, array + len/2, array+len);
+
+    return *(array+len/2);
+
+}
+
+
 // compute the variance of the elements on the array
 template <class T>
 float Variance(T *array, int len)

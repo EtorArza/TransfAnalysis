@@ -10,6 +10,7 @@
 #include "PBP.h"
 #include "Parameters.h"
 #include "Tools.h"
+#include "Tabu.h"
 #include "../permuevaluator.h"
 #include <assert.h>
 
@@ -26,7 +27,8 @@ void CPopulation::init_class(PBP *problem, RandomNumberGenerator* rng){
     this->problem = problem;
     this->popsize = POPSIZE;
     this->n = problem->GetProblemSize();
-
+    tab = new Tabu(rng, n);
+    problem->tab = this->tab;
     genome_best = new int[n];
     f_best = MIN_INTEGER;
     GenerateRandomPermutation(this->genome_best, n, this->rng);
@@ -78,6 +80,7 @@ void CPopulation::Reset(){
         std::swap(tmp, m_individuals[i]->activation);
     }
     terminated = false;
+    tab->reset();
     timer->tic();
     evaluate_population();
     end_iteration();
@@ -135,21 +138,25 @@ void CPopulation::Print()
 
 
 void CPopulation::apply_neat_output_to_individual_i(float* output_neat, int i){
-    if 
-    (    
+    float accept_or_reject_worse = output_neat[NEAT::accept_or_reject_worse];
+    tab->tabu_coef_neat = output_neat[(int) NEAT::TABU];
+
+    if
+    (
         (-CUTOFF_0 < output_neat[0] && output_neat[0] < CUTOFF_0) ||
         (sum_abs_val_slice_vec(output_neat, 1, 1+NEAT::N_OPERATORS) == 0) 
     )
-    {
-        return;
-    }else if(output_neat[0] < -CUTOFF_0){ // Local-search iteration.
+    {return;}
+
+
+    else if(output_neat[0] < -CUTOFF_0){ // Local-search iteration.
         //#TODO check if unconnected output is 0.
-        int operator_id = argmax(output_neat + 1, NEAT::N_OPERATORS);
+        NEAT::operator_t operator_id = (NEAT::operator_t) argmax(output_neat + 1, NEAT::N_OPERATORS);
         this->problem->local_search_iteration(m_individuals[i], operator_id);
     }else if(output_neat[0] > CUTOFF_0){ // Move-with coeficients.
-        int operator_id = argmax(output_neat + 1, NEAT::N_OPERATORS);
+        NEAT::operator_t operator_id = (NEAT::operator_t) argmax(output_neat + 1, NEAT::N_OPERATORS);
         float* coef = output_neat + (NEAT::__output_N - NEAT::N_COEF);
-        this->move_individual_i_based_on_coefs(coef, i, operator_id);
+        this->move_individual_i_based_on_coefs(coef, i, operator_id, accept_or_reject_worse);
         assert(isPermutation(this->m_individuals[i]->genome, this->n));
 
     }
@@ -320,12 +327,13 @@ void CPopulation::copy_references_of_genomes_from_individuals_to_permus(){
 }
  
 
-void CPopulation::move_individual_i_based_on_coefs(float* coef_list, int i, int operator_id){
+void CPopulation::move_individual_i_based_on_coefs(float* coef_list, int i, NEAT::operator_t operator_id, float accept_or_reject_worse){
 
     int idx = pt->choose_permu_index_to_move(coef_list, rng);
     if (idx == -1){
         return;
     }
+
 
     assert(isPermutation(this->m_individuals[i]->genome, this->n)) ;
 
@@ -374,14 +382,13 @@ void CPopulation::move_individual_i_based_on_coefs(float* coef_list, int i, int 
     
 
     if(towards){
-        problem->move_indiv_towards_reference(m_individuals[i], ref_permu, operator_id);
+        problem->move_indiv_towards_reference(m_individuals[i], ref_permu, operator_id, accept_or_reject_worse);
         assert(isPermutation(this->m_individuals[i]->genome, this->n)) ;
 
     }else
     {
-        problem->move_indiv_away_reference(m_individuals[i], ref_permu, operator_id);
+        problem->move_indiv_away_reference(m_individuals[i], ref_permu, operator_id, accept_or_reject_worse);
         assert(isPermutation(ref_permu, this->n)) ;
-
         assert(isPermutation(this->m_individuals[i]->genome, this->n)) ;
 
     }
