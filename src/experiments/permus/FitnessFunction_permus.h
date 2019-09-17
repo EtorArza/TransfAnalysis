@@ -1,3 +1,3 @@
 #include "cpunetwork.h"
 
-float FitnessFunction_permu(NEAT::CpuNetwork *net);
+float FitnessFunction_permu(NEAT::CpuNetwork *net, int n_evals);

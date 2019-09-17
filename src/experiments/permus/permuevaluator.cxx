@@ -20,7 +20,7 @@
 
 using namespace std;
 
-float FitnessFunction_permu( NEAT::CpuNetwork *net)
+float FitnessFunction_permu( NEAT::CpuNetwork *net, int n_evals)
 {
 
     float* v_of_fitness;
@@ -32,7 +32,7 @@ float FitnessFunction_permu( NEAT::CpuNetwork *net)
     //Read the problem instance to optimize.
     problem = GetProblemInfo(PROBLEM_TYPE, INSTANCE_PATH);
     pop = new CPopulation(problem);
-    v_of_fitness = new float[REPEATED_EVALUATIONS];
+    v_of_fitness = new float[n_evals];
 
 
     for (int i = 0; i < POPSIZE; i++)
@@ -42,7 +42,7 @@ float FitnessFunction_permu( NEAT::CpuNetwork *net)
 
 
 
-    for (int n_of_repetitions_completed = 0; n_of_repetitions_completed < REPEATED_EVALUATIONS; n_of_repetitions_completed++)
+    for (int n_of_repetitions_completed = 0; n_of_repetitions_completed < n_evals; n_of_repetitions_completed++)
     {
         pop->rng->seed();
         pop->Reset(); // here all networks are deleted denwedfjhfrjoirefojirewerioj
@@ -70,7 +70,7 @@ float FitnessFunction_permu( NEAT::CpuNetwork *net)
         }
         v_of_fitness[n_of_repetitions_completed] = pop->f_best;
     }
-    float res = median(v_of_fitness, REPEATED_EVALUATIONS);
+    float res = median(v_of_fitness, n_evals);
 
 
 
@@ -94,7 +94,33 @@ struct Evaluator
         return true;
     }
     __net_eval_decl float FitnessFunction(CpuNetwork* net){
-        return FitnessFunction_permu(net);
+
+        float res = (float) -MAX_INTEGER;
+
+        for (int i = 0; i < N_REPEATED_EVALS; i++)
+        {
+            if (res >= BEST_FOUND_FITNESS)
+            {
+                res = FitnessFunction_permu(net, REPEATED_EVALUATIONS[i]);
+            }
+            else
+            {
+                return res;
+            }
+        }
+
+
+        if (res > BEST_FOUND_FITNESS)
+        {
+            std::mutex mut;
+            mut.lock();
+            BEST_FOUND_FITNESS = res;
+            mut.unlock();
+        }
+
+
+
+        return res;
     }
 };
 

@@ -7,7 +7,7 @@
 #SBATCH --ntasks=1 # number of tasks
 #SBATCH --ntasks-per-node=1 #number of tasks per node
 #SBATCH --mem=128G
-#SBATCH --cpus-per-task=70 # number of CPUs
+#SBATCH --cpus-per-task=72 # number of CPUs
 #SBATCH --time=5-00:00:00 #Walltime
 #SBATCH -p large
 #SBATCH --exclude=n[001-016]
@@ -29,7 +29,6 @@ ENABLE_CUDA=false
 DEVMODE=false
 CFLAGS=-fopenmp -std=c++11 -pthread
 
-N_THREADS=70
 PFM_LD_FLAGS=
 PFM_NVCC_CCBIN=
 EOF
@@ -37,7 +36,7 @@ EOF
 make
 
 date
-./neat "train" -f -n 490 -t 70 -x 200 -s "complexify"
+./neat "train" -f -n 5000 -t 72 -x 1500 -s "complexify"
 date
 cp experiment_1/ -v -r $SRCDIR
 

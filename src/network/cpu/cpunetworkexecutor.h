@@ -51,8 +51,8 @@ namespace NEAT {
                 delete ev;
 
                 // print progress.
-                std::mutex mut;
-                mut.lock();
+                std::mutex mutx;
+                mutx.lock();
                 if (!printed_bracket){std::cout << "[" << std::flush; printed_bracket = true;}
                 progress_print_decider += 15.0 / (double) nnets;
                 if (inet == 0){}
@@ -61,7 +61,7 @@ namespace NEAT {
                     std::cout << "." << std::flush;
                     progress_print_decider--;
                 }
-                mut.unlock();
+                mutx.unlock();
             }
             std::cout << "]" << std::endl;
         }

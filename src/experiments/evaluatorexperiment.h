@@ -152,6 +152,7 @@ namespace NEAT {
 
             timer.stop();
 
+            // Fittest is not evaluated.
             if(!fittest || (best->eval.fitness > fittest->eval.fitness)) {
                 fittest = pop->make_copy(best->population_index);
             }

@@ -12,12 +12,13 @@
 #define N_OF_INPUT_PARAMS_TRAIN 3
 #define N_OF_INPUT_PARAMS_TEST 4
 
-
+#define _N_REPEATED_EVALS 5
 // CONSTANT PARAMETERS //
 EXTERN int SEED;
 EXTERN float MAX_TIME;
 EXTERN int POPSIZE;
-EXTERN int REPEATED_EVALUATIONS;
+EXTERN int REPEATED_EVALUATIONS[_N_REPEATED_EVALS];
+EXTERN int N_REPEATED_EVALS;
 EXTERN int TABU_LENGTH;
 /////////////////////////
 
@@ -30,13 +31,18 @@ EXTERN std::string CONTROLLER_PATH;
 
 
 // TECHNICAL PARAMETERS // 
-#define DEBUG_MODE false
 #define MAX_INTEGER 100000000
 #define MIN_INTEGER -100000000
 #define MAX_LONG_INTEGER 429496729500000
 #define MIN_LONG_INTEGER -42949672950000
 #define MAX(A,B) ( (A > B) ? A : B)
 #define MIN(A,B) ( (A < B) ? A : B)
+
+// NEAT PARAMETERS //
+# define CUTOFF_0 0.25
+EXTERN float BEST_FOUND_FITNESS;
+//////////////////////
+
 ///////////////////////////
 
 
@@ -53,6 +59,4 @@ void print_parameters(void);
 PBP *GetProblemInfo(std::string problemType, std::string filename);
 
 
-// NEAT PARAMETERS //
-# define CUTOFF_0 0.25
-//////////////////////
+
