@@ -101,6 +101,7 @@ CPopulation::~CPopulation()
     delete timer;
     delete pt;
     delete rng;
+    delete tab;
     delete[] pop_info;
     delete[] permus;
     delete[] genome_best;

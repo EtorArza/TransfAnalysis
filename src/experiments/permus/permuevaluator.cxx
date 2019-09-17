@@ -95,7 +95,7 @@ struct Evaluator
     }
     __net_eval_decl float FitnessFunction(CpuNetwork* net){
 
-        float res = (float) -MAX_INTEGER;
+        float res = FitnessFunction_permu(net, 1);
 
         for (int i = 0; i < N_REPEATED_EVALS; i++)
         {
