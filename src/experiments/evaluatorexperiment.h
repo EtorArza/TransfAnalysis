@@ -8,7 +8,7 @@
 #include "stats.h"
 #include "timer.h"
 #include "util.h"
-
+#include "Parameters.h"
 namespace NEAT {
 
 //------------------------------
@@ -73,13 +73,18 @@ namespace NEAT {
             vector<unique_ptr<Genome>> genomes = create_seeds(rng_exp);
 
             //Spawn the Population
+            CURRENT_TIME = MIN_TIME;
             pop = Population::create(rng_exp, genomes);
     
             bool success = false;
             int gen;
-            for(gen = 1; !success && (gen <= gens); gen++) {
+            for(gen = 1; !success && (gen <= gens) && (global_timer.toc() < MAX_TRAIN_TIME); gen++) {
                 cout << "\n\n";
-                cout << "Epoch " << gen << endl;	
+                float progress = ((float) global_timer.toc() / (float) MAX_TRAIN_TIME);
+                cout << "Epoch " << gen << ", progress: " << progress << endl;	
+                cout << "Time left:" << ((float) MAX_TRAIN_TIME - global_timer.toc()) / ((float) MAX_TRAIN_TIME) / 60.0 / 60.0 << "h" << endl;
+                
+                CURRENT_TIME = (MAX_TIME - MIN_TIME) * progress + MIN_TIME; // Update pso time
 
                 static Timer timer("epoch");
                 timer.start();
@@ -95,7 +100,7 @@ namespace NEAT {
                 
 
                 #define SAVE_NETWORK_EVERY_K_GENS 100
-                if (gen % SAVE_NETWORK_EVERY_K_GENS == 0 || gen == gens)
+                if (gen % SAVE_NETWORK_EVERY_K_GENS == 0 || progress > 1.0)
                 {
                     print(1, gen);
                 }

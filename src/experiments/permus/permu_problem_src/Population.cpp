@@ -113,7 +113,7 @@ CPopulation::~CPopulation()
 void CPopulation::end_iteration(){
     SortPopulation();
     get_population_info();
-    if(timer->toc() > MAX_TIME)
+    if(timer->toc() > CURRENT_TIME)
     {
         terminated = true;
     }
@@ -217,7 +217,7 @@ void CPopulation::comp_relative_time()
 {
     for (int i = 0; i < POPSIZE; i++)
     {
-        float res =  timer->toc() / MAX_TIME;
+        float res =  timer->toc() / CURRENT_TIME;
         this->m_individuals[i]->relative_time = res;
         pop_info[i][NEAT::RELATIVE_TIME] = res;
     }

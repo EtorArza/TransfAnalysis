@@ -39,7 +39,7 @@ using namespace NEAT;
 using namespace std;
 
 #define DEFAULT_RNG_SEED 1
-#define DEFAULT_MAX_GENS 10000
+#define DEFAULT_MAX_TRAIN_TIME 2*24*60*60
 #define DEFAULT_PARALLEL_THREADS 1
 
 void usage()
@@ -56,7 +56,7 @@ void usage()
     cerr << "  -f                   Force deletion of any data from previous run." << endl;
     cerr << "  -r RNG_seed          (default=" << DEFAULT_RNG_SEED << ")" << endl;
     cerr << "  -n population_size   (default=" << env->pop_size << ")" << endl;
-    cerr << "  -x max_generations   (default=" << DEFAULT_MAX_GENS << ")" << endl;
+    cerr << "  -x max_train_time   (default=" << DEFAULT_MAX_TRAIN_TIME << ")" << endl;
     cerr << "  -s search_type       {phased, blended, complexify} (default=phased)" << endl;
     cerr << "  -t num_of_parallel_threads (default=" << DEFAULT_PARALLEL_THREADS << ")" << endl;
 
@@ -116,8 +116,8 @@ int parse_int(const char *opt, const char *str)
 int main(int argc, char *argv[])
 {
     int rng_seed = DEFAULT_RNG_SEED;
-    int maxgens = DEFAULT_MAX_GENS;
     int threads = DEFAULT_PARALLEL_THREADS;
+    int max_time = DEFAULT_MAX_TRAIN_TIME;
     bool force_delete = false;
 
     if (argc < 3)
@@ -144,7 +144,7 @@ int main(int argc, char *argv[])
                     env->pop_size = parse_int("-n", optarg);
                     break;
                 case 'x':
-                    maxgens = parse_int("-x", optarg);
+                    max_time = parse_int("-x", optarg);
                     break;
                 case 't':
                     threads = parse_int("-t", optarg);
@@ -178,7 +178,7 @@ int main(int argc, char *argv[])
         }
 
         omp_set_num_threads(threads);
-
+        MAX_TRAIN_TIME = max_time; 
         if (env->search_type == GeneticSearchType::BLENDED)
         {
             env->mutate_delete_node_prob *= 0.1;
@@ -187,9 +187,9 @@ int main(int argc, char *argv[])
 
         const char * prob_name = "permu";
         Experiment *exp = Experiment::get(prob_name);
-
         rng_t rng{rng_seed};
-        exp->run(rng, maxgens);
+        global_timer.tic();
+        exp->run(rng, 10000000);
         return 0;
 
     }else if (strcmp(argv[1], "test") == 0){

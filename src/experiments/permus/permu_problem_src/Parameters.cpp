@@ -15,7 +15,9 @@
 
 
 void set_other_params(){
-  MAX_TIME = 5.0;
+  MAX_TIME = 10.0;
+  MIN_TIME = 0.1;
+
   POPSIZE = 20;
   TABU_LENGTH = 40;
   BEST_FOUND_FITNESS = -FLT_MAX;
