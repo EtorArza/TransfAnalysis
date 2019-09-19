@@ -32,6 +32,7 @@
 
 #define EXTERN
 #include "Parameters.h"
+#include <iomanip>      // std::setprecision
 
 
 using namespace NEAT;
@@ -205,7 +206,11 @@ int main(int argc, char *argv[])
     CpuNetwork net = load_network(CONTROLLER_PATH);
     float f_best = FitnessFunction_permu(&net, REPEATED_EVALUATIONS[0]);
 
-    cout << INSTANCE_PATH << "|" << PROBLEM_TYPE << "|" << f_best << endl;
+    //cout << INSTANCE_PATH << "|" << PROBLEM_TYPE << "|" << f_best << endl;
+    cout << std::setprecision(10);
+    cout << std::flush;
+    cout << f_best;
+    cout << std::flush;
 
 
     return 0;

@@ -13,6 +13,7 @@
 #include "Tabu.h"
 #include "../permuevaluator.h"
 #include <assert.h>
+#include <float.h>
 
 using std::cerr;
 using std::cout;
@@ -30,7 +31,7 @@ void CPopulation::init_class(PBP *problem, RandomNumberGenerator* rng){
     tab = new Tabu(rng, n);
     problem->tab = this->tab;
     genome_best = new int[n];
-    f_best = MIN_INTEGER;
+    f_best = -FLT_MAX;
     GenerateRandomPermutation(this->genome_best, n, this->rng);
 
 
@@ -69,7 +70,7 @@ CPopulation::CPopulation(PBP *problem, RandomNumberGenerator* rng)
 }
 
 void CPopulation::Reset(){
-    f_best = MIN_INTEGER;
+    f_best = -FLT_MAX;
     GenerateRandomPermutation(this->genome_best, n, rng);
     for (int i = 0; i < popsize; i++)
     {   

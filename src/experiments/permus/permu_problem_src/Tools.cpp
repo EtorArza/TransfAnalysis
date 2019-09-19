@@ -484,7 +484,7 @@ void RandomKeys(int *a, double *criteriaValues, int size)
     int minPos = 0;
     for (i = 0; i < size; i++)
     {
-        min = MAX_INTEGER;
+        min = 10000000;
         for (j = 0; j < size; j++)
         {
             criteria = criteriaValues[j];

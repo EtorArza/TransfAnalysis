@@ -26,9 +26,7 @@ float FitnessFunction_permu( NEAT::CpuNetwork *net, int n_evals)
     float* v_of_fitness;
     PBP *problem;
     CPopulation *pop;
-    //char* params[3] = {"binary_name", "lop", "src/experiments/permus/instances/lop/Cebe.lop.n30.1"};
-    char const *params[3] = {"binary_name", "qap", "src/experiments/permus/instances/qap/tai35a.dat.dat"};
-    set_parameters(3, params); // Read parameters from bash.
+
     //Read the problem instance to optimize.
     problem = GetProblemInfo(PROBLEM_TYPE, INSTANCE_PATH);
     pop = new CPopulation(problem);
@@ -94,7 +92,11 @@ struct Evaluator
         return true;
     }
     __net_eval_decl float FitnessFunction(CpuNetwork* net){
-
+        
+        //char* params[3] = {"binary_name", "lop", "src/experiments/permus/instances/lop/Cebe.lop.n30.1"};
+        char const *params[3] = {"binary_name", "qap", "src/experiments/permus/instances/qap/tai35a.dat.dat"};
+        set_parameters(3, params); // Read parameters from bash.
+        
         float res = FitnessFunction_permu(net, 1);
 
         for (int i = 0; i < N_REPEATED_EVALS; i++)

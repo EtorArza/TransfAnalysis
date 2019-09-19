@@ -11,23 +11,20 @@
 #include "LOP.h"
 #include "TSP.h"
 #include "QAP.h"
-
+#include <float.h>
 
 
 void set_other_params(){
-  SEED = 2;
-  MAX_TIME = 0.1;
+  MAX_TIME = 5.0;
   POPSIZE = 20;
   TABU_LENGTH = 40;
-  BEST_FOUND_FITNESS = -MAX_INTEGER;
+  BEST_FOUND_FITNESS = -FLT_MAX;
   N_REPEATED_EVALS = _N_REPEATED_EVALS;
   REPEATED_EVALUATIONS[0] = 1;
   REPEATED_EVALUATIONS[1] = 3;
   REPEATED_EVALUATIONS[2] = 9;
   REPEATED_EVALUATIONS[3] = 27;
   REPEATED_EVALUATIONS[4] = 81;
-
-
 }
 
 
@@ -73,17 +70,18 @@ void set_parameters(int argc, char *argv[])
     mut.unlock();
     return;
   }
+
   assert(N_OF_INPUT_PARAMS_TRAIN == argc || N_OF_INPUT_PARAMS_TEST == argc);
   // SEED = atoi(argv[i]);
-  srand(SEED);
+  set_other_params();
   PROBLEM_TYPE = std::string(argv[1]);
   INSTANCE_PATH = std::string(argv[2]);
   if (N_OF_INPUT_PARAMS_TEST == argc)
   {
       CONTROLLER_PATH = std::string(argv[3]);
+      MAX_TIME = stof(argv[4]);
   }
 
-  set_other_params();
   mut.unlock();
   parameters_set = true;
 }
@@ -113,8 +111,6 @@ std::string return_parameter_string(void)
   result += PROBLEM_TYPE;
   result += ", ";
   result += INSTANCE_PATH;
-  result += ", ";
-  result += std::to_string(SEED);
   result += ", ";
   result += std::to_string(MAX_TIME);
   result += ", ";

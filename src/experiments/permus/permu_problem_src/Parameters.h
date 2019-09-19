@@ -2,7 +2,6 @@
 #include <string>
 #include "PBP.h"
 #include <mutex>
-
 #ifndef EXTERN
 #define EXTERN extern
 #endif
@@ -10,11 +9,10 @@
 
 
 #define N_OF_INPUT_PARAMS_TRAIN 3
-#define N_OF_INPUT_PARAMS_TEST 4
+#define N_OF_INPUT_PARAMS_TEST 5
 
 #define _N_REPEATED_EVALS 5
 // CONSTANT PARAMETERS //
-EXTERN int SEED;
 EXTERN float MAX_TIME;
 EXTERN int POPSIZE;
 EXTERN int REPEATED_EVALUATIONS[_N_REPEATED_EVALS];
@@ -31,8 +29,6 @@ EXTERN std::string CONTROLLER_PATH;
 
 
 // TECHNICAL PARAMETERS // 
-#define MAX_INTEGER 100000000
-#define MIN_INTEGER -100000000
 #define MAX_LONG_INTEGER 429496729500000
 #define MIN_LONG_INTEGER -42949672950000
 #define MAX(A,B) ( (A > B) ? A : B)

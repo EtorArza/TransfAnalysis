@@ -14,6 +14,8 @@
 #include <assert.h>
 #include "../permuevaluator.h"
 #include "Tabu.h"
+#include <limits.h>
+
 
 PBP::PBP()
 {
@@ -514,7 +516,7 @@ void PBP::obtain_indexes_step_away(int *permu, int *ref_permu, int* i, int* j, N
         GenerateRandomPermutation(_random_permu2, problem_size_PBP,rng);
         assert(isPermutation(_random_permu2, problem_size_PBP)) ;
 
-        int max = MAX_INTEGER;
+        int max = __INT_MAX__;
         int arg_max = 0;
 
         for (int idx = 0; idx < problem_size_PBP; idx++) 
