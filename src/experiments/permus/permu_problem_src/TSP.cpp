@@ -30,30 +30,30 @@ TSP::~TSP()
 }
 
 
-float CalculateGEODistance(float latitudeX, float latitudeY, float longitudeX, float longitudeY)
+double CalculateGEODistance(double latitudeX, double latitudeY, double longitudeX, double longitudeY)
 {
-	float PI = 3.141592;
-	float RRR = 6378.388;
+	double PI = 3.141592;
+	double RRR = 6378.388;
 	
-	float deg = (float)((int)latitudeX);
-	float min = latitudeX - deg;
-	float latitudeI = PI * (deg + 5.0 * min / 3.0 ) / 180.0;
+	double deg = (double)((int)latitudeX);
+	double min = latitudeX - deg;
+	double latitudeI = PI * (deg + 5.0 * min / 3.0 ) / 180.0;
 	
-	deg = (float)((int)latitudeY);
+	deg = (double)((int)latitudeY);
 	min = latitudeY - deg;
-	float longitudeI = PI * (deg + 5.0 * min / 3.0 ) / 180.0;
+	double longitudeI = PI * (deg + 5.0 * min / 3.0 ) / 180.0;
 	
-	deg = (float)((int)longitudeX);
+	deg = (double)((int)longitudeX);
 	min = longitudeX - deg;
-	float latitudeJ = PI * (deg + 5.0 * min / 3.0 ) / 180.0;
+	double latitudeJ = PI * (deg + 5.0 * min / 3.0 ) / 180.0;
 	
-	deg = (float)((int)longitudeY);
+	deg = (double)((int)longitudeY);
 	min = longitudeY - deg;
-	float longitudeJ = PI * (deg + 5.0 * min / 3.0 ) / 180.0;
+	double longitudeJ = PI * (deg + 5.0 * min / 3.0 ) / 180.0;
 	
-	float q1 = cos(longitudeI - longitudeJ);
-	float q2 = cos(latitudeI - latitudeJ);
-	float q3 = cos(latitudeI + latitudeJ);
+	double q1 = cos(longitudeI - longitudeJ);
+	double q2 = cos(latitudeI - latitudeJ);
+	double q3 = cos(latitudeI + latitudeJ);
 	
 	return (int)(RRR * acos(0.5 * ((1.0+q1) * q2 - (1.0 - q1) * q3)) + 1.0);
 }
@@ -67,7 +67,7 @@ float CalculateGEODistance(float latitudeX, float latitudeY, float longitudeX, f
 // 	bool readm_distance_matrix=false;
 // 	bool coordinatesData=false;
 // 	string DISTANCE_TYPE;
-// 	float **coordinates;
+// 	double **coordinates;
 // 	char line[2048]; // variable for input value
 // 	string data="";
 // 	ifstream indata;
@@ -104,10 +104,10 @@ float CalculateGEODistance(float latitudeX, float latitudeY, float longitudeX, f
 // 			}
 // 			int coordNum = atoi(coordPieces);
 // 			coordPieces = strtok (NULL, " ");
-// 			float latitud = atof(coordPieces);
+// 			double latitud = atof(coordPieces);
 // 			coordPieces = strtok (NULL, " ");
-// 			float longitud = atof(coordPieces);
-// 			float *coordinate= new float[2];
+// 			double longitud = atof(coordPieces);
+// 			double *coordinate= new double[2];
 // 			coordinate[0]=latitud;
 // 			coordinate[1]=longitud;
 			
@@ -149,17 +149,17 @@ float CalculateGEODistance(float latitudeX, float latitudeY, float longitudeX, f
 // 		else if (sline=="NODE_COORD_SECTION"){
 // 			readm_distance_matrix=true;
 // 			coordinatesData=true;
-// 			coordinates= new float*[m_size];
+// 			coordinates= new double*[m_size];
 // 		}
 		
 // 	}
 // 	indata.close();
 	
 // 	//BUILD DISTANCE m_distance_matrix
-// 	m_distance_matrix = new float*[m_size];
+// 	m_distance_matrix = new double*[m_size];
 // 	for (int i=0;i<m_size;i++)
 // 	{
-// 		m_distance_matrix[i]= new float[m_size];
+// 		m_distance_matrix[i]= new double[m_size];
 // 	}
 	
 // 	//FILL DISTANCE m_distance_matrix
@@ -169,16 +169,16 @@ float CalculateGEODistance(float latitudeX, float latitudeY, float longitudeX, f
 // 		for (int i=0;i<m_size;i++)
 // 		{
 // 			//get coordinate A
-// 			float *coordA=coordinates[i];
-// 			float coordAx = coordA[0];
-// 			float coordAy = coordA[1];
+// 			double *coordA=coordinates[i];
+// 			double coordAx = coordA[0];
+// 			double coordAy = coordA[1];
 // 			for (int j=i;j<m_size;j++)
 // 			{
 // 				//get coordinate B.
-// 				float *coordB=coordinates[j];
-// 				float coordBx=coordB[0];
-// 				float coordBy=coordB[1];
-// 				float euclidean;
+// 				double *coordB=coordinates[j];
+// 				double coordBx=coordB[0];
+// 				double coordBy=coordB[1];
+// 				double euclidean;
 // 				if (DISTANCE_TYPE=="GEO")
 // 				{
 // 					//calculate geographic distance between A and B.
@@ -187,7 +187,7 @@ float CalculateGEODistance(float latitudeX, float latitudeY, float longitudeX, f
 // 				else
 // 				{
 // 					//calculate euclidean distance between A and B.
-// 					float absolute= fabs(pow((coordAx-coordBx),2) + pow((coordAy-coordBy),2));
+// 					double absolute= fabs(pow((coordAx-coordBx),2) + pow((coordAy-coordBy),2));
 // 					euclidean= sqrt(absolute);
 //                 }
 // 				m_distance_matrix[i][j]=  euclidean;
@@ -272,10 +272,10 @@ int TSP::Read(string filename)
 	indata.close();
     
 	//BUILD MATRIX
-	m_distance_matrix = new float*[m_size];
+	m_distance_matrix = new double*[m_size];
 	for (int i=0;i<m_size;i++)
 	{
-		m_distance_matrix[i]= new float[m_size];
+		m_distance_matrix[i]= new double[m_size];
 	}
     
 	istringstream iss(data);
@@ -309,10 +309,10 @@ int TSP::Read(string filename)
  /*
  * This function evaluates the fitness of the solution for the TSP problem.
  */
-float TSP::Evaluate(int * genes)
+double TSP::Evaluate(int * genes)
 {
-	float distanceSum=0;
-	float distAB=0;
+	double distanceSum=0;
+	double distAB=0;
 	int IDCityA, IDCityB;
 	for (int i=0;i<m_size;i++)
 	{

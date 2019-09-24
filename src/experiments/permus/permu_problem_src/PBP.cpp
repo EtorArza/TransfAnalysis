@@ -49,12 +49,12 @@ void PBP::initialize_variables_PBP(int problem_size)
 
 void PBP::Evaluate(CIndividual *indiv)
 {
-	float fitness = 0;
+	double fitness = 0;
 	fitness = _Evaluate(indiv->genome);
 	indiv->f_value = fitness;
 }
 
-float PBP::Evaluate(int *genome)
+double PBP::Evaluate(int *genome)
 {
 	return _Evaluate(genome);
 }
@@ -67,13 +67,13 @@ int PBP::Read_with_mutex(string filename){
     return res;
 }
 
-void PBP::apply_operator_with_fitness_update(CIndividual *indiv, int i, int j, NEAT::operator_t operator_id, float accept_or_reject_worse)
+void PBP::apply_operator_with_fitness_update(CIndividual *indiv, int i, int j, NEAT::operator_t operator_id, double accept_or_reject_worse)
 {   
     if(i==j && j==-1){
         return;
     }
 
-    float r = 2*(this->rng->random_0_1_float()-0.5001);
+    double r = 2*(this->rng->random_0_1_double()-0.5001);
     
     bool reject_worse = false;
     bool moved = false;
@@ -82,7 +82,7 @@ void PBP::apply_operator_with_fitness_update(CIndividual *indiv, int i, int j, N
         reject_worse = true;
     }
 
-    float delta = 0;
+    double delta = 0;
 
     switch (operator_id)
     {
@@ -547,7 +547,7 @@ void PBP::obtain_indexes_step_away(int *permu, int *ref_permu, int* i, int* j, N
 }
 
 
-void PBP::move_indiv_towards_reference(CIndividual* indiv, int* ref_permu, NEAT::operator_t operator_id, float accept_or_reject_worse){
+void PBP::move_indiv_towards_reference(CIndividual* indiv, int* ref_permu, NEAT::operator_t operator_id, double accept_or_reject_worse){
     int i,j;
     obtain_indexes_step_towards(indiv->genome, ref_permu, &i, &j, operator_id);
     if (tab->is_tabu(i,j))
@@ -562,7 +562,7 @@ void PBP::move_indiv_towards_reference(CIndividual* indiv, int* ref_permu, NEAT:
 }
 
 
-void PBP::move_indiv_away_reference(CIndividual* indiv, int* ref_permu, NEAT::operator_t operator_id, float accept_or_reject_worse){
+void PBP::move_indiv_away_reference(CIndividual* indiv, int* ref_permu, NEAT::operator_t operator_id, double accept_or_reject_worse){
     int i,j;
     obtain_indexes_step_away(indiv->genome, ref_permu, &i, &j, operator_id);
     // std::cout << "(" << i << "," << j << ")" << endl;

@@ -40,7 +40,7 @@ public:
     /*
      * Matrix of distances between the cities.
      */
-	float ** m_distance_matrix;
+	double ** m_distance_matrix;
 	
 	/*
 	 * The number of cities.
@@ -70,7 +70,7 @@ public:
 	/*
 	 * This function evaluates the fitness of the solution for the TSP problem.
 	 */
-	float Evaluate(int * genes);
+	double Evaluate(int * genes);
 
   
     /*

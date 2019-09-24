@@ -39,13 +39,19 @@ namespace NEAT {
             
             CpuNetwork **nets = (CpuNetwork **)nets_;
             double progress_print_decider = 0.0;
+            double* f_values = new double[nnets];
             bool printed_bracket = false;
+
+
+
+            // evaluate the individuals 
             #pragma omp parallel for
             for(size_t inet = 0; inet < nnets; inet++) {
                 CpuNetwork *net = nets[inet];
                 Evaluator *ev = new Evaluator(config);
                 OrganismEvaluation eval;
                 eval.fitness = ev->FitnessFunction(net);
+                f_values[inet] = eval.fitness;
                 eval.error   = -100000000 + eval.fitness;
                 results[inet] = eval;
                 delete ev;
@@ -64,9 +70,30 @@ namespace NEAT {
                 mutx.unlock();
             }
             std::cout << "]" << std::endl;
+
+            // reevaluate top n_of_threads_omp, with a minimum of 5 and a maximum of nnets.
+            double cut_value = obtain_kth_largest_value(f_values, min(max(n_of_threads_omp, 5), static_cast<int>(nnets)), nnets);
+            #pragma omp parallel for
+            for(size_t inet = 0; inet < nnets; inet++) {
+                if (cut_value >= f_values[inet])
+                {   
+                    f_values[inet] -= 1000000.0; // apply a discount to the individuals that are not reevaluated
+                    continue;
+                }
+                else
+                {
+                    CpuNetwork *net = nets[inet];
+                    Evaluator *ev = new Evaluator(config);
+                    OrganismEvaluation eval;
+                    eval.fitness = ev->FitnessFunction_reevaluation(net);
+                    f_values[inet] = eval.fitness;
+                    eval.error = -100000000 + eval.fitness;
+                    results[inet] = eval;
+                    delete ev;
+                }
+            }
+            delete[] f_values;
         }
-
-
     };
 
     //---

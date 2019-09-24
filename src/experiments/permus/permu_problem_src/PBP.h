@@ -47,17 +47,17 @@ class PBP
 	 * No need to define them in the problem class.
 	 */
 	void local_search_iteration(CIndividual *indiv, NEAT::operator_t operator_id);
-	void move_indiv_towards_reference(CIndividual* indiv, int* ref_permu, NEAT::operator_t operator_id, float accept_or_reject_worse=1.0);
-	void move_indiv_away_reference(CIndividual* indiv, int* ref_permu, NEAT::operator_t operator_id, float accept_or_reject_worse=1.0);
+	void move_indiv_towards_reference(CIndividual* indiv, int* ref_permu, NEAT::operator_t operator_id, double accept_or_reject_worse=1.0);
+	void move_indiv_away_reference(CIndividual* indiv, int* ref_permu, NEAT::operator_t operator_id, double accept_or_reject_worse=1.0);
 	void Evaluate(CIndividual *indiv); // update the f_value of the individuals.
-	float Evaluate(int *genome); // update the f_value of the individuals.
+	double Evaluate(int *genome); // update the f_value of the individuals.
 	int Read_with_mutex(string filename);
 	Tabu* tab;
 
 
   protected:
 
-	void apply_operator_with_fitness_update(CIndividual *indiv, int i, int j, NEAT::operator_t operator_id, float accept_or_reject_worse=1.0);
+	void apply_operator_with_fitness_update(CIndividual *indiv, int i, int j, NEAT::operator_t operator_id, double accept_or_reject_worse=1.0);
 
 
 	// This function needs to be executed on problem read.
@@ -74,10 +74,10 @@ class PBP
 	*
 	*/
 	// The f_value of the individuals does not change in this functions. Just return the delta.
-	virtual float _Evaluate(int * permu) = 0;
-	virtual float fitness_delta_swap(CIndividual *indiv, int i, int j) = 0;
-	virtual float fitness_delta_interchange(CIndividual *indiv, int i, int j) = 0;
-	virtual float fitness_delta_insert(CIndividual *indiv, int i, int j) = 0;
+	virtual double _Evaluate(int * permu) = 0;
+	virtual double fitness_delta_swap(CIndividual *indiv, int i, int j) = 0;
+	virtual double fitness_delta_interchange(CIndividual *indiv, int i, int j) = 0;
+	virtual double fitness_delta_insert(CIndividual *indiv, int i, int j) = 0;
 
 
   private:

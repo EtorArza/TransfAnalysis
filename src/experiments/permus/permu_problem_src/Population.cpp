@@ -31,13 +31,13 @@ void CPopulation::init_class(PBP *problem, RandomNumberGenerator* rng){
     tab = new Tabu(rng, n);
     problem->tab = this->tab;
     genome_best = new int[n];
-    f_best = -FLT_MAX;
+    f_best = -DBL_MAX;
     GenerateRandomPermutation(this->genome_best, n, this->rng);
 
 
     m_individuals.resize(popsize);
 
-    pop_info = new float *[popsize];
+    pop_info = new double *[popsize];
     permus = new int *[popsize]; // this contains the references to te permus in the individuals, so no initialization/destruction.
 
     //Initialize population with random solutions
@@ -48,7 +48,7 @@ void CPopulation::init_class(PBP *problem, RandomNumberGenerator* rng){
 
     for (int i = 0; i < popsize; i++)
     {
-        pop_info[i] = new float[NEAT::__sensor_N];
+        pop_info[i] = new double[NEAT::__sensor_N];
     }
     pt = new PermuTools(n);
     timer = new stopwatch();
@@ -70,11 +70,11 @@ CPopulation::CPopulation(PBP *problem, RandomNumberGenerator* rng)
 }
 
 void CPopulation::Reset(){
-    f_best = -FLT_MAX;
+    f_best = -DBL_MAX;
     GenerateRandomPermutation(this->genome_best, n, rng);
     for (int i = 0; i < popsize; i++)
     {   
-        auto tmp = std::vector<float>();
+        auto tmp = std::vector<double>();
         std::swap(tmp, m_individuals[i]->activation);
         delete m_individuals[i];
         m_individuals[i] = new CIndividual(n, rng);
@@ -113,7 +113,7 @@ CPopulation::~CPopulation()
 void CPopulation::end_iteration(){
     SortPopulation();
     get_population_info();
-    if(timer->toc() > CURRENT_TIME)
+    if(timer->toc() > MAX_TIME_PSO)
     {
         terminated = true;
     }
@@ -133,14 +133,14 @@ void CPopulation::Print()
 
 
 
-  float* CPopulation::get_neat_input_individual_i(int i){
+  double* CPopulation::get_neat_input_individual_i(int i){
       return pop_info[i];
   }
 
 
 
-void CPopulation::apply_neat_output_to_individual_i(float* output_neat, int i){
-    float accept_or_reject_worse = output_neat[NEAT::accept_or_reject_worse];
+void CPopulation::apply_neat_output_to_individual_i(double* output_neat, int i){
+    double accept_or_reject_worse = output_neat[NEAT::accept_or_reject_worse];
     tab->tabu_coef_neat = output_neat[(int) NEAT::TABU];
 
     if
@@ -157,7 +157,7 @@ void CPopulation::apply_neat_output_to_individual_i(float* output_neat, int i){
         this->problem->local_search_iteration(m_individuals[i], operator_id);
     }else if(output_neat[0] > CUTOFF_0){ // Move-with coeficients.
         NEAT::operator_t operator_id = (NEAT::operator_t) argmax(output_neat + 1, NEAT::N_OPERATORS);
-        float* coef = output_neat + (NEAT::__output_N - NEAT::N_COEF);
+        double* coef = output_neat + (NEAT::__output_N - NEAT::N_COEF);
         this->move_individual_i_based_on_coefs(coef, i, operator_id, accept_or_reject_worse);
         assert(isPermutation(this->m_individuals[i]->genome, this->n));
 
@@ -207,7 +207,7 @@ void CPopulation::comp_relative_position()
 {
     for (int i = 0; i < POPSIZE; i++)
     {
-        float res =  (float)i / (float)POPSIZE;
+        double res =  (double)i / (double)POPSIZE;
         this->m_individuals[i]->relative_pos = res;
         pop_info[i][NEAT::RELATIVE_POSITION] = res;
     }
@@ -217,7 +217,7 @@ void CPopulation::comp_relative_time()
 {
     for (int i = 0; i < POPSIZE; i++)
     {
-        float res =  timer->toc() / CURRENT_TIME;
+        double res =  timer->toc() / MAX_TIME_PSO;
         this->m_individuals[i]->relative_time = res;
         pop_info[i][NEAT::RELATIVE_TIME] = res;
     }
@@ -228,16 +228,16 @@ void CPopulation::comp_distance()
 {
 
     // First, compute the distance of each permu with respect the  next permu
-    pop_info[0][NEAT::DISTANCE] = (float)Hamming_distance(m_individuals[0]->genome, m_individuals[1]->genome, n);
+    pop_info[0][NEAT::DISTANCE] = (double)Hamming_distance(m_individuals[0]->genome, m_individuals[1]->genome, n);
     for (int i = 1; i < POPSIZE - 1; i++)
     {
-        pop_info[i][NEAT::DISTANCE] = (float)Hamming_distance(m_individuals[i]->genome, m_individuals[i + 1]->genome, n);
+        pop_info[i][NEAT::DISTANCE] = (double)Hamming_distance(m_individuals[i]->genome, m_individuals[i + 1]->genome, n);
     }
     pop_info[POPSIZE - 1][NEAT::DISTANCE] = pop_info[POPSIZE - 2][NEAT::DISTANCE];
 
     // Then, assign to result_vector[i], the minimun of the distances between the next an the prev permus.
-    float distance_respect_to_previous = pop_info[0][NEAT::DISTANCE];
-    float temp;
+    double distance_respect_to_previous = pop_info[0][NEAT::DISTANCE];
+    double temp;
     for (int i = 1; i < POPSIZE - 1; i++)
     {
         temp = pop_info[i][NEAT::DISTANCE];
@@ -248,7 +248,7 @@ void CPopulation::comp_distance()
     // Finally, normalize the values for them to be between 0 and 1.
     for (int i = 0; i < POPSIZE; i++)
     {
-        pop_info[i][NEAT::DISTANCE] /= (float)n;
+        pop_info[i][NEAT::DISTANCE] /= (double)n;
     }
 
     // copy values into individuals
@@ -274,7 +274,7 @@ void CPopulation::comp_r_number()
 {
     for (int i = 0; i < POPSIZE; i++)
     {
-        float res =  rng->random_0_1_float();
+        double res =  rng->random_0_1_double();
         pop_info[i][NEAT::R_NUMBER] = res;
     }
 }
@@ -282,9 +282,9 @@ void CPopulation::comp_r_number()
 void CPopulation::load_local_opt(){
 for (int i = 0; i < POPSIZE; i++)
 {
-    pop_info[i][NEAT::OPT_SWAP] = (float) m_individuals[i]->is_local_optimum[NEAT::SWAP];
-    pop_info[i][NEAT::OPT_EXCH] = (float) m_individuals[i]->is_local_optimum[NEAT::EXCH];
-    pop_info[i][NEAT::OPT_INSERT] = (float) m_individuals[i]->is_local_optimum[NEAT::INSERT];
+    pop_info[i][NEAT::OPT_SWAP] = (double) m_individuals[i]->is_local_optimum[NEAT::SWAP];
+    pop_info[i][NEAT::OPT_EXCH] = (double) m_individuals[i]->is_local_optimum[NEAT::EXCH];
+    pop_info[i][NEAT::OPT_INSERT] = (double) m_individuals[i]->is_local_optimum[NEAT::INSERT];
 }
 }
 
@@ -329,7 +329,7 @@ void CPopulation::copy_references_of_genomes_from_individuals_to_permus(){
 }
  
 
-void CPopulation::move_individual_i_based_on_coefs(float* coef_list, int i, NEAT::operator_t operator_id, float accept_or_reject_worse){
+void CPopulation::move_individual_i_based_on_coefs(double* coef_list, int i, NEAT::operator_t operator_id, double accept_or_reject_worse){
 
     int idx = pt->choose_permu_index_to_move(coef_list, rng);
     if (idx == -1){

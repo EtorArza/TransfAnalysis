@@ -44,6 +44,20 @@ using namespace std;
 
 void usage()
 {
+
+    // int *permu = new int[12];
+
+    // GenerateRandomPermutation(permu, 12);
+    
+    // PrintArray(permu, 12);
+
+    // cout << obtain_kth_largest_value(permu, 1, 12) << endl;
+    // cout << obtain_kth_smallest_value(permu, 3, 12) << endl;
+    // PrintArray(permu, 12);
+
+    // exit(0); 
+
+
     cerr << "usage: ./neat train [OPTIONS]" << endl;
     cerr << " OR " << endl;
     cerr << "usage: ./neat test controller_path instance_path problem_type" << endl;
@@ -178,6 +192,14 @@ int main(int argc, char *argv[])
         }
 
         omp_set_num_threads(threads);
+        n_of_threads_omp = threads;
+
+        if (threads < 7)
+        {
+            cout << "warning, a minimum of 7 threads is recommended for this implementation of NEAT to function correctly." << endl;
+        }
+        
+
         MAX_TRAIN_TIME = max_time; 
         if (env->search_type == GeneticSearchType::BLENDED)
         {
@@ -202,12 +224,11 @@ int main(int argc, char *argv[])
 
 
     set_parameters(argc - 1, argv+ 1);
-
     CpuNetwork net = load_network(CONTROLLER_PATH);
-    float f_best = FitnessFunction_permu(&net, REPEATED_EVALUATIONS[0]);
+    double f_best = FitnessFunction_permu(&net, 1);
 
     //cout << INSTANCE_PATH << "|" << PROBLEM_TYPE << "|" << f_best << endl;
-    cout << std::setprecision(10);
+    cout << std::setprecision(15);
     cout << std::flush;
     cout << f_best;
     cout << std::flush;

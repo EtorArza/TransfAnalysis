@@ -72,19 +72,18 @@ namespace NEAT {
             env->genome_manager = GenomeManager::create();
             vector<unique_ptr<Genome>> genomes = create_seeds(rng_exp);
 
-            //Spawn the Population
-            CURRENT_TIME = MIN_TIME;
+
             pop = Population::create(rng_exp, genomes);
     
             bool success = false;
-            int gen;
-            for(gen = 1; !success && (gen <= gens) && (global_timer.toc() < MAX_TRAIN_TIME); gen++) {
+            
+            int gen = 0;
+            for(double progress = 0; progress < 1.0; progress = ((double) global_timer.toc() / (double) MAX_TRAIN_TIME)) {
+                gen++;
                 cout << "\n\n";
-                float progress = ((float) global_timer.toc() / (float) MAX_TRAIN_TIME);
                 cout << "Epoch " << gen << ", progress: " << progress << endl;	
-                cout << "Time left:" << ((float) MAX_TRAIN_TIME - global_timer.toc()) / ((float) MAX_TRAIN_TIME) / 60.0 / 60.0 << "h" << endl;
+                cout << "Time left:" << ((double) MAX_TRAIN_TIME - global_timer.toc()) / 60.0 / 60.0 << "h" << endl;
                 
-                CURRENT_TIME = (MAX_TIME - MIN_TIME) * progress + MIN_TIME; // Update pso time
 
                 static Timer timer("epoch");
                 timer.start();

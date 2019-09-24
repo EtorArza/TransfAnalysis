@@ -10,18 +10,15 @@
 
 #define N_OF_INPUT_PARAMS_TRAIN 3
 #define N_OF_INPUT_PARAMS_TEST 5
-#define _N_REPEATED_EVALS 5
+#define _N_REPEATED_EVALS 2
 
 class stopwatch;
 // CONSTANT PARAMETERS //
-EXTERN float MAX_TIME;
-EXTERN float MIN_TIME;
-EXTERN float CURRENT_TIME;
+EXTERN double MAX_TIME_PSO;
 EXTERN int POPSIZE;
 EXTERN int REPEATED_EVALUATIONS[_N_REPEATED_EVALS];
 EXTERN int N_REPEATED_EVALS;
 EXTERN int TABU_LENGTH;
-EXTERN float FINAL_MAX_TIME;
 /////////////////////////
 
 // BASH INPUT PARAMETERS //
@@ -32,7 +29,8 @@ EXTERN std::string CONTROLLER_PATH;
 ///////////////////////////
 
 // TRAIN PARAMS //
-EXTERN float MAX_TRAIN_TIME;
+EXTERN int n_of_threads_omp;
+EXTERN double MAX_TRAIN_TIME;
 EXTERN stopwatch global_timer;
 ///////////////////////////
 
@@ -44,7 +42,7 @@ EXTERN stopwatch global_timer;
 
 // NEAT PARAMETERS //
 # define CUTOFF_0 0.25
-EXTERN float BEST_FOUND_FITNESS;
+EXTERN double BEST_FOUND_FITNESS;
 //////////////////////
 
 ///////////////////////////

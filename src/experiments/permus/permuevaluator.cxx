@@ -20,22 +20,22 @@
 
 using namespace std;
 
-float FitnessFunction_permu( NEAT::CpuNetwork *net, int n_evals)
+double FitnessFunction_permu( NEAT::CpuNetwork *net, int n_evals)
 {
 
-    float* v_of_fitness;
+    double* v_of_fitness;
     PBP *problem;
     CPopulation *pop;
 
     //Read the problem instance to optimize.
     problem = GetProblemInfo(PROBLEM_TYPE, INSTANCE_PATH);
     pop = new CPopulation(problem);
-    v_of_fitness = new float[n_evals];
+    v_of_fitness = new double[n_evals];
 
 
     for (int i = 0; i < POPSIZE; i++)
     {
-        pop->m_individuals[i]->activation = std::vector<float>(net->activations);
+        pop->m_individuals[i]->activation = std::vector<double>(net->activations);
     }
 
 
@@ -66,9 +66,17 @@ float FitnessFunction_permu( NEAT::CpuNetwork *net, int n_evals)
             }
             pop->end_iteration();
         }
-        v_of_fitness[n_of_repetitions_completed] = pop->f_best;
+        if (!isPermutation(pop->genome_best, pop->n))
+        {
+            cout << "final result is not permutation" << endl;
+            cout << "final permu: " ;
+            PrintArray(pop->genome_best, pop->n);
+            exit(1);
+        }
+        
+        v_of_fitness[n_of_repetitions_completed] = problem->Evaluate(pop->genome_best);
     }
-    float res = median(v_of_fitness, n_evals);
+    double res = median(v_of_fitness, n_evals);
 
 
 
@@ -86,44 +94,26 @@ struct Evaluator
     typedef NEAT::Config Config;
     const Config *config;
     __net_eval_decl Evaluator(const Config *config_): config(config_){};
-    // Check if evaluation is terminated. If it is, __net_eval_decl OrganismEvaluation result() is called.
-    __net_eval_decl bool next_step()
-    {
-        return true;
-    }
-    __net_eval_decl float FitnessFunction(CpuNetwork* net){
-        
-        //char* params[3] = {"binary_name", "lop", "src/experiments/permus/instances/lop/Cebe.lop.n30.1"};
-        char const *params[3] = {"binary_name", "qap", "src/experiments/permus/instances/qap/tai35a.dat.dat"};
+
+
+
+    __net_eval_decl double FitnessFunction(CpuNetwork* net){
+        //char* params[3] = {"binary_name", "lop", "instances/lop/N-be75eec_500"};
+        char const *params[3] = {"binary_name", "qap", "instances/qap/tai35a.dat.dat"};
         set_parameters(3, params); // Read parameters from bash.
-        
-        float res = FitnessFunction_permu(net, 1);
-
-        for (int i = 0; i < N_REPEATED_EVALS; i++)
-        {
-            if (res >= BEST_FOUND_FITNESS)
-            {
-                res = FitnessFunction_permu(net, REPEATED_EVALUATIONS[i]);
-            }
-            else
-            {
-                return res;
-            }
-        }
-
-
-        if (res > BEST_FOUND_FITNESS)
-        {
-            std::mutex mut;
-            mut.lock();
-            BEST_FOUND_FITNESS = res;
-            mut.unlock();
-        }
-
-
-
+        double res = FitnessFunction_permu(net, REPEATED_EVALUATIONS[0]);
         return res;
     }
+
+    __net_eval_decl double FitnessFunction_reevaluation(CpuNetwork* net){
+        //char* params[3] = {"binary_name", "lop", "instances/lop/N-be75eec_500"};
+        char const *params[3] = {"binary_name", "qap", "instances/qap/tai35a.dat.dat"};
+        set_parameters(3, params); // Read parameters from bash.
+        double res = FitnessFunction_permu(net, REPEATED_EVALUATIONS[1]);
+        return res;
+    }
+
+
 };
 
 class PermuEvaluator : public NetworkEvaluator
@@ -154,9 +144,6 @@ public:
     {
         executor->execute(nets_, results, nnets);
     }
-
-
-
 
 };
 

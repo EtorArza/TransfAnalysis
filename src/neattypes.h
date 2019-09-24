@@ -4,7 +4,7 @@
 // CUDA compiler (C++11 features not currently supported).
 namespace NEAT {
 
-    typedef float real_t;
+    typedef double real_t;
 
     typedef unsigned char uchar;
     typedef unsigned short ushort;

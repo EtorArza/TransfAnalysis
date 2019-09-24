@@ -14,7 +14,7 @@ public:
 	void set_tabu(int i, int j);
 	bool is_tabu(int i, int j);
 	void reset();
-	float tabu_coef_neat = 0.0;
+	double tabu_coef_neat = 0.0;
 
 private:
 	RandomNumberGenerator* rng;

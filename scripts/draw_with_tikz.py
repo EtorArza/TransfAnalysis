@@ -20,10 +20,13 @@ node_names = {
     "11":r"operator \\ swap",
     "12":r"operator \\exchange",
     "13":r"operator \\ insert",
-    "14":r"momentum",
+    "14":r"repeat \\ last",
     "15":r"personal \\ best",
     "16":r"best \\ known",
-    "17":r"the one \\ above"
+    "17":r"the one \\ above",
+    "18":r"accept \\ worse",
+    "19":r"tabu"
+
 }
 
 
@@ -34,7 +37,7 @@ class names:
     
     def next(self):
         res = str(self.index)
-        self.index += 8/self.max_number
+        self.index += 9/self.max_number
         return res
     def reset(self):
         self.index = 0
@@ -107,7 +110,7 @@ while "node" in line:
             counter.set_max_number(n_input)
             n_flag +=1
         pass
-        print(r"\node"+ shape+ "("+name+") at (" + counter.next() + r",0) {\tiny \tabcolsep=0cm \begin{tabular}{c} "+node_names[name]+r" \end{tabular}};")
+        print(r"\node"+ shape+ "("+name+") at (" + counter.next() + r",7) {\tiny \tabcolsep=0cm \begin{tabular}{c} "+node_names[name]+r" \end{tabular}};")
     elif splt_line[3] == "2":  # output nodes
         if n_flag == 2:
             counter.reset()
@@ -116,7 +119,7 @@ while "node" in line:
         pass
         name = splt_line[1]
         output_nodes.add(name)
-        print(r"\node"+ shape+ "("+name+") at (" + counter.next() + r",5) {\tiny \tabcolsep=0cm \begin{tabular}{c} "+node_names[name]+r" \end{tabular}};")
+        print(r"\node"+ shape+ "("+name+") at (" + counter.next() + r",0) {\tiny \tabcolsep=0cm \begin{tabular}{c} "+node_names[name]+r" \end{tabular}};")
     elif splt_line[3] == "3":  # hidden nodes
         if n_flag == 3:
             counter.reset()
@@ -124,7 +127,7 @@ while "node" in line:
             n_flag +=1
         pass
         name = splt_line[1]
-        print(r"\node"+ shape+ "("+name+") at (" + counter.next() + ","+str(1 + 3*random.random())+") {"+" };")
+        print(r"\node"+ shape+ "("+name+") at (" + counter.next() + ","+str(3 + 2*random.random())+") {"+" };")
     
     
     
@@ -156,7 +159,7 @@ while "gene" in line:
         print(r"\path[->,, line width = "+w+"mm, "+c+",every loop/.style={looseness=5}] ("+splt_line[2] +r") edge  [in=120,out=60,loop] node { } ();")
     
     elif splt_line[2] in output_nodes and splt_line[3] in output_nodes: #if output nodes connected
-        print(r"\path [->, line width = "+w+"mm, "+c+",looseness="+str(2/(abs(int(splt_line[2])- int(splt_line[3]))))+"] ("+splt_line[2]+") edge node {$ $} ("+splt_line[3]+");")
+        print(r"\path [->, line width = "+w+"mm, "+c+",looseness="+str(4/(abs(int(splt_line[2])- int(splt_line[3]))))+"] ("+splt_line[2]+") edge node {$ $} ("+splt_line[3]+");")
     else:
         print(r"\path [->, line width = "+w+"mm, "+c+"] ("+splt_line[2]+") edge node {$ $} ("+splt_line[3]+");")
     

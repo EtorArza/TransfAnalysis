@@ -30,8 +30,8 @@ CIndividual::CIndividual(int length, RandomNumberGenerator* rng)
 	GenerateRandomPermutation(this->genome, n, rng); 
 	GenerateRandomPermutation(this->momentum, n, rng); 
 	GenerateRandomPermutation(this->genome_best, n, rng);
-	f_value=std::numeric_limits<float>::lowest();
-	f_best=std::numeric_limits<float>::lowest();
+	f_value=std::numeric_limits<double>::lowest();
+	f_best=std::numeric_limits<double>::lowest();
 	id = n_indivs_created;
 	n_indivs_created++;
 
@@ -76,7 +76,7 @@ ostream & operator<<(ostream & os,CIndividual * & individual)
 	os << std::setprecision(0);
 	os << std::fixed;
 	os << std::setfill(' ');
-    os << (float) individual->genome[0];
+    os << (double) individual->genome[0];
 	for(int i=1;i<individual->n;i++){
 		os << std::setw(0);
 		os << ", ";
@@ -85,7 +85,7 @@ ostream & operator<<(ostream & os,CIndividual * & individual)
 		os << std::setfill(' ');
 		os << std::setw(2);
 
-        os << (float) individual->genome[i];
+        os << (double) individual->genome[i];
 	}
 	os << std::setw(0);
 	os << "]";

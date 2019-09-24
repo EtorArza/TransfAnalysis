@@ -15,6 +15,7 @@
 #include <stdio.h>
 #include <vector>
 #include <cmath>
+#include <algorithm>
 
 using std::istream;
 using std::ostream;
@@ -57,23 +58,23 @@ bool strContains(const string inputStr, const string searchStr);
 /*
  * Prints in standard output 'length' integer elements of a given array.
  */
-void PrintArray(int *array, int length, string text);
+void PrintArray(int *array, int length);
 
 /*
  * Prints in standard output 'length' long double elements of a given array.
  */
-void PrintArray(long double *array, int length, string text);
+void PrintArray(long double *array, int length);
 
 /*
  * Prints the given doubles array in the standard output.
  */
-void PrintArray(double *array, int length, string text);
+void PrintArray(double *array, int length);
 
 
 /*
- * Prints the given float array in the standard output.
+ * Prints the given double array in the standard output.
  */
-void PrintArray(float *array, int length, string text);
+void PrintArray(float *array, int length);
 
 
 
@@ -168,7 +169,7 @@ void tic();
 /*
  * Return time since last tic().
  */
-float toc();
+double toc();
 
 /*
  * Convert to string.
@@ -283,33 +284,33 @@ void which_indexes_correspond_to_repeated_vectors(T **vec_array, int vec_len, in
 
 
 // apply sigmoid function
-float sigmoid(float x);
+double sigmoid(double x);
 
 
 
-// round a float into the nearest integer
-int tools_round(float x);
+// round a double into the nearest integer
+int tools_round(double x);
 
 // compute the average value of the elements on the array
 template <class T>
-float Average(T *array, int len)
+double Average(T *array, int len)
 {
 
-    float sum = 0;
+    double sum = 0;
 
     for (int i = 0; i < len; i++)
     {
         sum += array[i];
     }
 
-    return (float)sum / len;
+    return (double)sum / len;
 }
 
 
 #include <algorithm>
 // compute the average value of the elements on the array dropping the best and worst quarter
 template <class T>
-float Average_drop_top_bottom_quartile(T *array, int len)
+double Average_drop_top_bottom_quartile(T *array, int len)
 {
 
     if (len < 4)
@@ -317,14 +318,14 @@ float Average_drop_top_bottom_quartile(T *array, int len)
         return Average(array, len);
     }
     
-    float sum = 0;
+    double sum = 0;
     std::sort(array,array+len);
     for (int i = len/4; i < len/4*3; i++)
     {
         sum += array[i];
     }
 
-    return (float)sum / (len/4*3 - len/4);
+    return (double)sum / (len/4*3 - len/4);
 }
 
 
@@ -342,18 +343,18 @@ T median(T *array, int len)
 
 // compute the variance of the elements on the array
 template <class T>
-float Variance(T *array, int len)
+double Variance(T *array, int len)
 {
 
-    float mean = Average(array, len);
+    double mean = Average(array, len);
 
-    float var = 0;
+    double var = 0;
     for (int i = 0; i < len; i++)
     {
         var += (array[i] - mean) * (array[i] - mean);
     }
 
-    return (float)var / len;
+    return (double)var / len;
 }
 
 // Normalize a vector so that the sum of all the elements on it is 1
@@ -459,7 +460,7 @@ std::vector<string> split(string txt, char ch);
 
 
 inline
-float fast_exp(float x) {
+double fast_exp(double x) {
   x = 1.0 + x / 256.0;
   x *= x; x *= x; x *= x; x *= x;
   x *= x; x *= x; x *= x; x *= x;
@@ -482,7 +483,7 @@ class RandomNumberGenerator{
         int random_integer_fast(int min, int max){return min + (xorshf96() % (max - min));}
         int random_integer_uniform(int max);
         int random_integer_uniform(int min, int max);
-        float random_0_1_float();
+        double random_0_1_double();
 
 
 
@@ -500,18 +501,18 @@ void GenerateRandomPermutation(int *permutation, int n, RandomNumberGenerator* r
 
 
 // Choose an index given the probabilities
-int choose_index_given_probabilities(float *probabilities_array, int max_index);
-int choose_index_given_probabilities(float *probabilities_array, int len, RandomNumberGenerator* rng);
+int choose_index_given_probabilities(double *probabilities_array, int max_index);
+int choose_index_given_probabilities(double *probabilities_array, int len, RandomNumberGenerator* rng);
 
 
 // Choose an index given positive weights
-int choose_index_given_weights(float *weights_array, int max_index);
-int choose_index_given_weights(float *weights_array, int max_index, RandomNumberGenerator* rng);
+int choose_index_given_weights(double *weights_array, int max_index);
+int choose_index_given_weights(double *weights_array, int max_index, RandomNumberGenerator* rng);
 
 
 // Sample from a bernouilli distribution.
-bool coin_toss(float p_of_true);
-bool coin_toss(float p_of_true, RandomNumberGenerator* rng);
+bool coin_toss(double p_of_true);
+bool coin_toss(double p_of_true, RandomNumberGenerator* rng);
 
 
 void shuffle_vector(int *vec, int len);
@@ -529,15 +530,15 @@ public:
     int* random_permu1;
     int* random_permu2;
     int* temp_array;
-    float* temp_array_float;
+    double* temp_array_double;
     int* identity_permu;
-    float** first_marginal;
+    double** first_marginal;
 
-    void combine_permus(int** permu_list, float* coef_list, int* res);
+    void combine_permus(int** permu_list, double* coef_list, int* res);
     void compute_first_marginal(int** permu_list, int m);
-    float get_distance_to_marginal(int* permu);
-    int choose_permu_index_to_move(float* coef_list);
-    int choose_permu_index_to_move(float* coef_list, RandomNumberGenerator* rng);
+    double get_distance_to_marginal(int* permu);
+    int choose_permu_index_to_move(double* coef_list);
+    int choose_permu_index_to_move(double* coef_list, RandomNumberGenerator* rng);
 
 
 private:
@@ -552,13 +553,32 @@ public:
     stopwatch(){tt_tic = getTick();}
     ~stopwatch(){}
     void tic() { tt_tic = getTick();}
-    float toc() { return (float) (getTick() - tt_tic);}
+    double toc() { return (double) (getTick() - tt_tic);}
 private:
     double getTick();
     double tt_tic;
 
 };
 
+template <class T>
+T obtain_kth_smallest_value(T *v, int k, int len)
+{
+    if (k < 1 || k > len)
+    {
+        cout << "error, 0 < k < len + 1 must hold, k=" << k << " and len=" << len << " were provided. Exiting..." << endl;
+        exit(1); 
+    }
+    
+    T *v_copy = new T[len];
+    memcpy(v_copy, v, sizeof(T)*len);
+    std::nth_element(v_copy, v_copy + k -1, v_copy + len);
+    T res = v_copy[k -1];
+    delete[] v_copy;
+    return res;
+}
 
-
-
+template <class T>
+T obtain_kth_largest_value(T *v, int k, int len)
+{
+    return obtain_kth_smallest_value(v, (len - k + 1), len);
+}

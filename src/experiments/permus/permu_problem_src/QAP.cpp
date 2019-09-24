@@ -151,9 +151,9 @@ int QAP::Read(string filename)
 /*
  * This function evaluates the individuals for the QAP problem.
  */
-float QAP::_Evaluate(int * genes)
+double QAP::_Evaluate(int * genes)
 {
-	float fitness=0;
+	double fitness=0;
 	int FactA, FactB;
 	int distAB, flowAB, i ,j;
 	for (i=0;i<n;i++)
@@ -179,12 +179,12 @@ float QAP::_Evaluate(int * genes)
 
 
 
-	float QAP::fitness_delta_swap(CIndividual *indiv, int i, int j){
+	double QAP::fitness_delta_swap(CIndividual *indiv, int i, int j){
 		assert(j == i+1);
 		return fitness_delta_interchange(indiv, i, j);
 	}
 
-	float QAP::fitness_delta_interchange(CIndividual *indiv, int i, int j){
+	double QAP::fitness_delta_interchange(CIndividual *indiv, int i, int j){
 		int new_fitness_delta = 0;
 		int el_at_pos_i_in_sigma_2;
         for (int k = 0; k < n; k++)
@@ -209,7 +209,7 @@ float QAP::_Evaluate(int * genes)
 		return -new_fitness_delta;
 	}
 
-	float QAP::fitness_delta_insert(CIndividual *indiv, int i, int j){
+	double QAP::fitness_delta_insert(CIndividual *indiv, int i, int j){
 		int f_current = indiv->f_value;
 		copy_vector(_random_permu1, indiv->genome, n);
 		InsertAt(_random_permu1, i, j, n);

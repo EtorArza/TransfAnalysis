@@ -15,18 +15,14 @@
 
 
 void set_other_params(){
-  MAX_TIME = 10.0;
-  MIN_TIME = 0.1;
-
+  MAX_TIME_PSO = 1.0;
   POPSIZE = 20;
   TABU_LENGTH = 40;
-  BEST_FOUND_FITNESS = -FLT_MAX;
+  BEST_FOUND_FITNESS = -DBL_MAX;
   N_REPEATED_EVALS = _N_REPEATED_EVALS;
-  REPEATED_EVALUATIONS[0] = 1;
-  REPEATED_EVALUATIONS[1] = 3;
-  REPEATED_EVALUATIONS[2] = 9;
-  REPEATED_EVALUATIONS[3] = 27;
-  REPEATED_EVALUATIONS[4] = 81;
+  REPEATED_EVALUATIONS[0] = 3;
+  REPEATED_EVALUATIONS[1] = 201;
+
 }
 
 
@@ -81,7 +77,7 @@ void set_parameters(int argc, char *argv[])
   if (N_OF_INPUT_PARAMS_TEST == argc)
   {
       CONTROLLER_PATH = std::string(argv[3]);
-      MAX_TIME = stof(argv[4]);
+      MAX_TIME_PSO = stof(argv[4]);
   }
 
   mut.unlock();
@@ -114,7 +110,7 @@ std::string return_parameter_string(void)
   result += ", ";
   result += INSTANCE_PATH;
   result += ", ";
-  result += std::to_string(MAX_TIME);
+  result += std::to_string(MAX_TIME_PSO);
   result += ", ";
   result += std::to_string(POPSIZE);
   result += ", ";

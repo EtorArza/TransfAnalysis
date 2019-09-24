@@ -30,7 +30,7 @@ LOP::~LOP()
  */
 int LOP::Read(string filename)
 {
-	char line[2048]; // variable for input value
+	char line[5048]; // variable for input value
 	string data = "";
 	ifstream indata;
 	indata.open(filename.c_str(), ios::in);
@@ -38,7 +38,7 @@ int LOP::Read(string filename)
 	while (!indata.eof())
 	{
 
-		indata.getline(line, 2048);
+		indata.getline(line, 5048);
 		stringstream ss;
 		string sline;
 		ss << line;
@@ -63,10 +63,10 @@ int LOP::Read(string filename)
 	indata.close();
 
 	//BUILD MATRIX
-	m_matrix = new float *[n];
+	m_matrix = new double *[n];
 	for (int i = 0; i < n; i++)
 	{
-		m_matrix[i] = new float[n];
+		m_matrix[i] = new double[n];
 	}
 
 	istringstream iss(data);
@@ -79,7 +79,7 @@ int LOP::Read(string filename)
 		if (sub != "")
 		{
 			//save distance in distances matrix.
-			m_matrix[i][j] = atof(sub.c_str());
+			m_matrix[i][j] = (double) atof(sub.c_str());
 			if (j == (n - 1))
 			{
 				i++;
@@ -101,13 +101,14 @@ int LOP::Read(string filename)
 	return n;
 }
 
-float LOP::_Evaluate(int *permu)
+double LOP::_Evaluate(int *permu)
 {
-	float fitness = 0;
+	double fitness = 0;
 	int i, j;
+
 	for (i = 0; i < n - 1; i++)
 		for (j = i + 1; j < n; j++)
-			fitness += (float)m_matrix[permu[i]][permu[j]];
+			fitness += m_matrix[permu[i]][permu[j]];
 	return fitness;
 }
 
@@ -122,7 +123,7 @@ int LOP::GetProblemSize()
 }
 
 // The Linear Ordering Problem: Instances, Search Space Analysis and Algorithms (Schiavinotto 2004)
-float LOP::fitness_delta_swap(CIndividual *indiv, int i, int j)
+double LOP::fitness_delta_swap(CIndividual *indiv, int i, int j)
 {
 	if(i==j){
 		return 0;
@@ -150,7 +151,7 @@ float LOP::fitness_delta_swap(CIndividual *indiv, int i, int j)
  * offers no computational advantage over Insertn, and this dissertation will not consider
  * it further 
  */
-float LOP::fitness_delta_interchange(CIndividual *indiv, int i, int j)
+double LOP::fitness_delta_interchange(CIndividual *indiv, int i, int j)
 {
 	// the idea is to perform two insertion operations, assuming i < j. First insert item_i in position j, and then item_j in pos i
 	if (i==j){
@@ -170,9 +171,9 @@ float LOP::fitness_delta_interchange(CIndividual *indiv, int i, int j)
 	}
 }
 
-float LOP::fitness_delta_insert(CIndividual *indiv, int i, int j)
+double LOP::fitness_delta_insert(CIndividual *indiv, int i, int j)
 {
-	float delta = 0;
+	double delta = 0;
 	if (i > j)
 	{
 		for (int k = j; k < i; k++)

@@ -33,7 +33,7 @@ SpeciesPopulation::SpeciesPopulation(rng_t rng,
     : norgs(seeds.size())
     , generation(0)
     , orgs(rng, seeds, seeds.size())
-    , highest_fitness(std::numeric_limits<float>::lowest())
+    , highest_fitness(std::numeric_limits<double>::lowest())
     , highest_last_changed(0) {
 
 	spawn();

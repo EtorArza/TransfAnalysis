@@ -43,7 +43,7 @@ public:
   int n;
   int popsize;
 
- 	float f_best;
+ 	double f_best;
 	int* genome_best;
   Tabu* tab;
 
@@ -51,15 +51,15 @@ public:
   void end_iteration(); // sort the population, check if the best solution was improved, and coompute neat imputs.
   void Reset();
 
-  float* get_neat_input_individual_i(int i);
-  void apply_neat_output_to_individual_i(float* output_neat, int i);
+  double* get_neat_input_individual_i(int i);
+  void apply_neat_output_to_individual_i(double* output_neat, int i);
   bool terminated;
 
    /*
    * Population info. Information about each individual. 
    * popinfo[i][j] has information about propertie i from individual j.
    */
-  float **pop_info;
+  double **pop_info;
   stopwatch *timer;
   RandomNumberGenerator *rng;
 
@@ -82,7 +82,7 @@ private:
 
   PBP * problem;
   PermuTools *pt;
-  float relative_time();
+  double relative_time();
 
 
 
@@ -91,7 +91,7 @@ private:
   * Each permutation is compared with the next and previous permutations.
   * For example, if permutations on position 5 and 6 are the same, then result_vector[5] = result_vector[6] = 0
   */
-  void get_info_Hamming_distance_from_adjacent_permus(float *result_vector);
+  void get_info_Hamming_distance_from_adjacent_permus(double *result_vector);
   int **permus; //this is only intended to temporally store the permutations for computations.
 
   // copy the reference of the permutations in the individuals to a matrix of permutations for analisys in sparsity and distances.
@@ -101,7 +101,7 @@ private:
   // first choose a permu proportionally to its weight. 
   // Then if weight is positive move towards, otherwise, move away from.
   // to permuevaluator.h contains which permutations are considered.
-  void move_individual_i_based_on_coefs(float* coef_list, int i, NEAT::operator_t operator_id, float accept_or_reject_worse);
+  void move_individual_i_based_on_coefs(double* coef_list, int i, NEAT::operator_t operator_id, double accept_or_reject_worse);
 
 
  

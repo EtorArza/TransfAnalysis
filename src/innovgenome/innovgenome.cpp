@@ -271,7 +271,7 @@ void InnovGenome::mutate_link_weights(real_t power,real_t rate,mutator mut_type)
 		//another, entirely random weight.  It is meant to bias such mutations
 		//to the tail of a genome, because that is where less time-tested links
 		//reside.  The gausspoint and coldgausspoint represent values above
-		//which a random float will signify that kind of mutation.  
+		//which a random double will signify that kind of mutation.  
 
 		//Don't mutate weights of frozen links
 		if (!(gene.frozen)) {

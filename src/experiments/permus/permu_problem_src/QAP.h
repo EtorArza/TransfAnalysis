@@ -68,12 +68,12 @@ public:
 
 
 
-	float fitness_delta_swap(CIndividual *indiv, int i, int j);
-	float fitness_delta_interchange(CIndividual *indiv, int i, int j);
-	float fitness_delta_insert(CIndividual *indiv, int i, int j);
+	double fitness_delta_swap(CIndividual *indiv, int i, int j);
+	double fitness_delta_interchange(CIndividual *indiv, int i, int j);
+	double fitness_delta_insert(CIndividual *indiv, int i, int j);
 
 protected:	
-    float _Evaluate(int *permu);
+    double _Evaluate(int *permu);
 
 
 };

@@ -26,6 +26,6 @@ plt.plot(fitnesses)
 plt.xlabel("Iteration")
 plt.ylabel("Fitness")
 
-plt.axhline(optimum)
+#plt.axhline(optimum)
 
 plt.savefig("convergence_neat.pdf")

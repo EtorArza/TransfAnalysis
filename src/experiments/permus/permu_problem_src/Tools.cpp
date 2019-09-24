@@ -19,7 +19,7 @@
 #include <set>
 #include "../permuevaluator.h"
 
-#define TEMP_FLOAT_ARRAY_SIZE 30
+#define TEMP_double_ARRAY_SIZE 30
 
 
 
@@ -138,7 +138,7 @@ void PrintArray(long double *array, int length)
 /*
  * Prints in standard output 'length' double elements of a given array.
  */
-void PrintArray(double *array, int length)
+void PrintArray(float *array, int length)
 {
     int i;
     for (i = 0; i < length; i++)
@@ -149,10 +149,9 @@ void PrintArray(double *array, int length)
 /*
  * Prints in the standard output given matrix.
  */
-void PrintMatrix(int **matrix, int length, int length2, string text)
+void PrintMatrix(int **matrix, int length, int length2)
 {
     int i, j;
-    cout << text;
     for (i = 0; i < length; i++)
     {
         cout << "" << endl;
@@ -164,10 +163,9 @@ void PrintMatrix(int **matrix, int length, int length2, string text)
     cout << " " << endl;
 }
 
-void PrintMatrix(double **matrix, int length, int length2, string text)
+void PrintMatrix(double **matrix, int length, int length2)
 {
     int i, j;
-    cout << text;
     for (i = 0; i < length; i++)
     {
         cout << "" << endl;
@@ -180,7 +178,7 @@ void PrintMatrix(double **matrix, int length, int length2, string text)
 }
 
 
-void PrintArray(float *array, int length, string text){
+void PrintArray(double *array, int length){
     int i;
     for (i = 0; i < length; i++)
         printf("%3.5f,", array[i]);
@@ -697,11 +695,11 @@ int RandomNumberGenerator::random_integer_uniform(int range_max)
     return random_integer_uniform(0, range_max);
 }
 
-float RandomNumberGenerator::random_0_1_float()
+double RandomNumberGenerator::random_0_1_double()
 {   
     // cout << endl << xorshf96() << endl;
-    // cout << (float) xorshf96() / (float) INT_MAX << endl;
-    return (float) xorshf96() / (float) INT_MAX;
+    // cout << (double) xorshf96() / (double) INT_MAX << endl;
+    return (double) xorshf96() / (double) INT_MAX;
 }
 
 void GenerateRandomPermutation(int *permutation, int n)
@@ -726,12 +724,12 @@ void GenerateRandomPermutation(int *permutation, int n, RandomNumberGenerator* r
 
 
 
-float sigmoid(float x)
+double sigmoid(double x)
 {
     return 1.0 / (1.0 + exp(-x));
 }
 
-int choose_index_given_probabilities(float *probabilities_array, int len)
+int choose_index_given_probabilities(double *probabilities_array, int len)
 {
 RandomNumberGenerator* tmp_rng = new RandomNumberGenerator();
 tmp_rng->seed();
@@ -740,11 +738,11 @@ delete tmp_rng;
 return res;
 }
 
-int choose_index_given_probabilities(float *probabilities_array, int len, RandomNumberGenerator* rng)
+int choose_index_given_probabilities(double *probabilities_array, int len, RandomNumberGenerator* rng)
 {   
     
-    float r = rng->random_0_1_float();
-    float cum_prob = 0;
+    double r = rng->random_0_1_double();
+    double cum_prob = 0;
 
     for (int i = 0; i < len; i++)
     {
@@ -762,7 +760,7 @@ int choose_index_given_probabilities(float *probabilities_array, int len, Random
     //assert(cum_prob > 0.99999);
 }
 
-int choose_index_given_weights(float *weights_array, int len){
+int choose_index_given_weights(double *weights_array, int len){
     RandomNumberGenerator* rng = new RandomNumberGenerator;
     rng->seed();
     int res = choose_index_given_weights(weights_array, len, rng);
@@ -771,11 +769,11 @@ int choose_index_given_weights(float *weights_array, int len){
 }
 
 
-int choose_index_given_weights(float *weights_array, int len, RandomNumberGenerator* rng)
+int choose_index_given_weights(double *weights_array, int len, RandomNumberGenerator* rng)
 {
-    float r = rng->random_0_1_float();
-    float cum_sum = 0;
-    float total = 0;
+    double r = rng->random_0_1_double();
+    double cum_sum = 0;
+    double total = 0;
 
     for (int i = 0; i < len; i++)
     {
@@ -800,7 +798,7 @@ int choose_index_given_weights(float *weights_array, int len, RandomNumberGenera
     //assert(cum_prob > 0.99999);
 }
 
-bool coin_toss(float p_of_true)
+bool coin_toss(double p_of_true)
 {
     RandomNumberGenerator* rng = new RandomNumberGenerator();
     rng->seed();
@@ -810,9 +808,9 @@ bool coin_toss(float p_of_true)
 }
 
 
-bool coin_toss(float p_of_true, RandomNumberGenerator* rng)
+bool coin_toss(double p_of_true, RandomNumberGenerator* rng)
 {
-    if (rng->random_0_1_float() < p_of_true)
+    if (rng->random_0_1_double() < p_of_true)
     {
         return true;
     }
@@ -822,7 +820,7 @@ bool coin_toss(float p_of_true, RandomNumberGenerator* rng)
     }
 }
 
-int tools_round(float x)
+int tools_round(double x)
 {
     if (x <= 0.0)
     {
@@ -868,14 +866,14 @@ PermuTools::PermuTools(int n)
     random_permu1 = new int[n];
     random_permu2 = new int[n];
     temp_array = new int[n];
-    temp_array_float = new float[TEMP_FLOAT_ARRAY_SIZE];
+    temp_array_double = new double[TEMP_double_ARRAY_SIZE];
 
     identity_permu = new int[n];
-    first_marginal = new float*[n];
+    first_marginal = new double*[n];
 
     for (int i = 0; i < n; i++)
     {
-        first_marginal[i] = new float[n];
+        first_marginal[i] = new double[n];
     }
 
 
@@ -895,7 +893,7 @@ PermuTools::~PermuTools()
     delete[] this->random_permu1;
     delete[] this->random_permu2;
     delete[] this->temp_array;
-    delete[] this->temp_array_float;
+    delete[] this->temp_array_double;
     delete[] this->identity_permu;
 
     for (int i = 0; i < n; i++)
@@ -909,7 +907,7 @@ PermuTools::~PermuTools()
 /* 
 // combines the permutations considering the coefficients simmilarly to \cite{wang_discrete_2012}. 
 // The zeroes on their paper are -1 in our implementation
-void PermuTools::combine_permus(int** permu_list, float* coef_list, int* res){
+void PermuTools::combine_permus(int** permu_list, double* coef_list, int* res){
     int m = NEAT::N_COEF;
     int non_zero = 0; // number of non-zero coef.
     int positive = 0; // number of strictly positive coef
@@ -937,8 +935,8 @@ void PermuTools::combine_permus(int** permu_list, float* coef_list, int* res){
     QuickSort2Desc(coef_list, permu_list, 0, m - 1, false);
 
     // normalize positive weights
-    float sum_of_pos_w = sum_slice_vec(coef_list, 0, positive);
-    float *coef_list_copy = new float[NEAT::N_COEF];
+    double sum_of_pos_w = sum_slice_vec(coef_list, 0, positive);
+    double *coef_list_copy = new double[NEAT::N_COEF];
 
     std::copy(coef_list, coef_list+NEAT::N_COEF, coef_list_copy);
 
@@ -949,7 +947,7 @@ void PermuTools::combine_permus(int** permu_list, float* coef_list, int* res){
     }
     
     // normalize_neg_weights, considering their relative weight with respect to pos weights
-    float sum_of_neg_w = -sum_slice_vec(coef_list_copy,positive,m);
+    double sum_of_neg_w = -sum_slice_vec(coef_list_copy,positive,m);
     for (int i = positive; i < m; i++)
     {
         coef_list_copy[i] /= -(sum_of_pos_w + sum_of_neg_w);
@@ -965,10 +963,10 @@ void PermuTools::combine_permus(int** permu_list, float* coef_list, int* res){
 
     for (int i = positive + zero; i < m; i++)
     {
-        float r = 0;
+        double r = 0;
         for (int j = 0; j < n; j++)
         {
-            r = random_0_1_float();
+            r = random_0_1_double();
             if (r < coef_list_copy[i])
             {
                 if (res[j] == permu_list[i][j])
@@ -1033,7 +1031,7 @@ void PermuTools::compute_first_marginal(int** permu_list, int m){
         }
     }
 
-    float normalized_base_freq = 1.0 / (float) m;
+    double normalized_base_freq = 1.0 / (double) m;
 
     for (int i = 0; i < m; i++)
     {
@@ -1045,8 +1043,8 @@ void PermuTools::compute_first_marginal(int** permu_list, int m){
 }
 
 
-float PermuTools::get_distance_to_marginal(int* permu){
-    float res = 0.0;
+double PermuTools::get_distance_to_marginal(int* permu){
+    double res = 0.0;
     for (int i = 0; i < n; i++)
     {
         res += this->first_marginal[permu[i]][i];
@@ -1054,24 +1052,24 @@ float PermuTools::get_distance_to_marginal(int* permu){
     return res;
 }
 
-int PermuTools::choose_permu_index_to_move(float* coef_list){
+int PermuTools::choose_permu_index_to_move(double* coef_list){
     return choose_permu_index_to_move(coef_list, this->rng);
 }
 
-int PermuTools::choose_permu_index_to_move(float* coef_list, RandomNumberGenerator* input_rng){
+int PermuTools::choose_permu_index_to_move(double* coef_list, RandomNumberGenerator* input_rng){
 
-    assert(TEMP_FLOAT_ARRAY_SIZE >= NEAT::N_COEF);
+    assert(TEMP_double_ARRAY_SIZE >= NEAT::N_COEF);
     
     for (int i = 0; i < NEAT::N_COEF; i++)
     {
-        temp_array_float[i] = abs(coef_list[i]);
+        temp_array_double[i] = abs(coef_list[i]);
     }
 
-    if(sum_abs_val_slice_vec(temp_array_float, 0, NEAT::N_COEF) == 0.0){
+    if(sum_abs_val_slice_vec(temp_array_double, 0, NEAT::N_COEF) == 0.0){
         return -1;
     }
 
-    return choose_index_given_weights(temp_array_float, NEAT::N_COEF, input_rng);
+    return choose_index_given_weights(temp_array_double, NEAT::N_COEF, input_rng);
 }
 
 // https://thispointer.com/c-how-to-read-a-file-line-by-line-into-a-vector/

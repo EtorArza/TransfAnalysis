@@ -2,7 +2,7 @@
 /neat
 /experiment_*
 /G*
-/*out*
+/*.out
 /obj
 /bin
 /tmp/
@@ -12,7 +12,6 @@
 .vscode
 callgrind.*
 __pycache*
-*.out
 fittest*
 *.png
 *.pdf

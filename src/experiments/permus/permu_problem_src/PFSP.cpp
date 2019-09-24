@@ -35,7 +35,7 @@ PFSP::~PFSP()
 /*
  * Evaluates the given solution with the total flow time criterion.
  */
-float PFSP::Evaluate(int * genes)
+double PFSP::Evaluate(int * genes)
 {
     for (int i=0;i<m_machines;i++) m_timeTable[i]=0;
 	int j,z, job;
@@ -49,7 +49,7 @@ float PFSP::Evaluate(int * genes)
 		m_timeTable[j]=m_timeTable[j-1]+m_processingtimes[j][first_gene];
 	}
 	
-	float fitness=m_timeTable[m_machines-1];
+	double fitness=m_timeTable[m_machines-1];
 	for (z=1;z<m_jobs;z++)
 	{
 		job=genes[z];
