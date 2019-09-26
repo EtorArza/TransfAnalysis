@@ -46,16 +46,19 @@ void usage()
 {
 
     // int *permu = new int[12];
+    // int *temp = new int[12];
 
     // GenerateRandomPermutation(permu, 12);
-    
-    // PrintArray(permu, 12);
 
-    // cout << obtain_kth_largest_value(permu, 1, 12) << endl;
-    // cout << obtain_kth_smallest_value(permu, 3, 12) << endl;
-    // PrintArray(permu, 12);
+    // permu[0] = 0;
 
-    // exit(0); 
+    // PrintArray(permu, 12);
+    // compute_order(permu, 12, temp);
+    // // cout << obtain_kth_largest_value(permu, 1, 12) << endl;
+    // // cout << obtain_kth_smallest_value(permu, 3, 12) << endl;
+    // PrintArray(temp, 12);
+
+    exit(0); 
 
 
     cerr << "usage: ./neat train [OPTIONS]" << endl;
@@ -196,9 +199,22 @@ int main(int argc, char *argv[])
 
         if (threads < 7)
         {
-            cout << "warning, a minimum of 7 threads is recommended for this implementation of NEAT to function correctly." << endl;
+            set_other_params();
+            cout << "Warning: a minimum of 7 threads is recommended for this implementation of NEAT to function correctly." << endl;
+            cout << "With the current settings, processing a generation takes around " ; 
+            cout << ((env->pop_size*MAX_TIME_PSO / (double)2 * (double)REPEATED_EVALUATIONS[0] + (double)(5/threads + 1) * (double)REPEATED_EVALUATIONS[1])) / 3600.0; 
+            cout << "h,  which might be too long." << endl << endl;
         }
-        
+
+        if (env->pop_size < 1000)
+        {
+            cout << "Warning: The population size of the controllers might be too low." << endl;
+            cout << "The provided population size of the controllers is " << env->pop_size << ", a value of at least 1000 is recommended." << endl;
+            cout << "For example, to use a population size of 1500, use the \"-n 1500\" argument." << endl;
+            cout << endl << endl;
+        }
+
+
 
         MAX_TRAIN_TIME = max_time; 
         if (env->search_type == GeneticSearchType::BLENDED)

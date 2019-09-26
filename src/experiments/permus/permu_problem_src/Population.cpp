@@ -33,7 +33,8 @@ void CPopulation::init_class(PBP *problem, RandomNumberGenerator* rng){
     genome_best = new int[n];
     f_best = -DBL_MAX;
     GenerateRandomPermutation(this->genome_best, n, this->rng);
-
+    templ_double_array = new double[POPSIZE];
+    templ_double_array2 = new double[POPSIZE];
 
     m_individuals.resize(popsize);
 
@@ -106,6 +107,8 @@ CPopulation::~CPopulation()
     delete[] pop_info;
     delete[] permus;
     delete[] genome_best;
+    delete[] templ_double_array;
+    delete[] templ_double_array2;
 }
 
 
@@ -227,35 +230,58 @@ void CPopulation::comp_relative_time()
 void CPopulation::comp_distance()
 {
 
-    // First, compute the distance of each permu with respect the  next permu
-    pop_info[0][NEAT::DISTANCE] = (double)Hamming_distance(m_individuals[0]->genome, m_individuals[1]->genome, n);
-    for (int i = 1; i < POPSIZE - 1; i++)
-    {
-        pop_info[i][NEAT::DISTANCE] = (double)Hamming_distance(m_individuals[i]->genome, m_individuals[i + 1]->genome, n);
-    }
-    pop_info[POPSIZE - 1][NEAT::DISTANCE] = pop_info[POPSIZE - 2][NEAT::DISTANCE];
-
-    // Then, assign to result_vector[i], the minimun of the distances between the next an the prev permus.
-    double distance_respect_to_previous = pop_info[0][NEAT::DISTANCE];
-    double temp;
-    for (int i = 1; i < POPSIZE - 1; i++)
-    {
-        temp = pop_info[i][NEAT::DISTANCE];
-        pop_info[i][NEAT::DISTANCE] = MIN(pop_info[i][NEAT::DISTANCE], distance_respect_to_previous);
-        distance_respect_to_previous = temp;
+    // use the ranking of the differences in fitness with respect to the previous one. 
+    templ_double_array[0] = DBL_MAX;
+    for (int i = 1; i < POPSIZE; i++)
+    {   
+        double val = m_individuals[i-1]->f_value -  m_individuals[i]->f_value;
+        templ_double_array[i] = val;
     }
 
-    // Finally, normalize the values for them to be between 0 and 1.
+    compute_order_double(templ_double_array, POPSIZE, templ_double_array2);
+
+
+    // copy normalized values into individuals
     for (int i = 0; i < POPSIZE; i++)
-    {
-        pop_info[i][NEAT::DISTANCE] /= (double)n;
+    {   
+        double val = templ_double_array2[i] / (double) POPSIZE;
+        m_individuals[i]->distance = val;
+        pop_info[i][NEAT::DISTANCE] = val;
     }
 
-    // copy values into individuals
-    for (int i = 0; i < POPSIZE; i++)
-    {
-        m_individuals[i]->distance = pop_info[i][NEAT::DISTANCE];
-    }
+//region old_implementation_hamming_distance
+    // // minimum of Hamming distance between the previous one and the next one 
+    // // First, compute the distance of each permu with respect the  next permu
+    // pop_info[0][NEAT::DISTANCE] = (double)Hamming_distance(m_individuals[0]->genome, m_individuals[1]->genome, n);
+    // for (int i = 1; i < POPSIZE - 1; i++)
+    // {
+    //     pop_info[i][NEAT::DISTANCE] = (double)Hamming_distance(m_individuals[i]->genome, m_individuals[i + 1]->genome, n);
+    // }
+    // pop_info[POPSIZE - 1][NEAT::DISTANCE] = pop_info[POPSIZE - 2][NEAT::DISTANCE];
+
+    // // Then, assign to result_vector[i], the minimun of the distances between the next an the prev permus.
+    // double distance_respect_to_previous = pop_info[0][NEAT::DISTANCE];
+    // double temp;
+    // for (int i = 1; i < POPSIZE - 1; i++)
+    // {
+    //     temp = pop_info[i][NEAT::DISTANCE];
+    //     pop_info[i][NEAT::DISTANCE] = MIN(pop_info[i][NEAT::DISTANCE], distance_respect_to_previous);
+    //     distance_respect_to_previous = temp;
+    // }
+
+    // // Finally, normalize the values for them to be between 0 and 1.
+    // for (int i = 0; i < POPSIZE; i++)
+    // {
+    //     pop_info[i][NEAT::DISTANCE] /= (double)n;
+    // }
+
+    // // copy values into individuals
+    // for (int i = 0; i < POPSIZE; i++)
+    // {
+    //     m_individuals[i]->distance = pop_info[i][NEAT::DISTANCE];
+    // }
+//endregion old_implementation_hamming_distance
+
 }
 
 

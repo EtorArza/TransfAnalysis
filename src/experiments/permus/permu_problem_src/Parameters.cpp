@@ -21,7 +21,7 @@ void set_other_params(){
   BEST_FOUND_FITNESS = -DBL_MAX;
   N_REPEATED_EVALS = _N_REPEATED_EVALS;
   REPEATED_EVALUATIONS[0] = 3;
-  REPEATED_EVALUATIONS[1] = 201;
+  REPEATED_EVALUATIONS[1] = 101;
 
 }
 
@@ -32,7 +32,7 @@ PBP *GetProblemInfo(std::string problemType, std::string filename)
     // if (problemType == "pfsp")
     //     problem = new PFSP();
     // else if (problemType == "tsp")
-    //     problem = new TSP();else 
+    //     problem = new TSP();else
     if (problemType == "qap")
         {problem = new QAP();}
     else if (problemType == "lop")

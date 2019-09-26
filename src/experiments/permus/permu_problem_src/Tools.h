@@ -582,3 +582,56 @@ T obtain_kth_largest_value(T *v, int k, int len)
 {
     return obtain_kth_smallest_value(v, (len - k + 1), len);
 }
+
+
+
+class sort_indices
+{
+   private:
+     int* mparr;
+   public:
+     sort_indices(int* parr) : mparr(parr) {}
+     bool operator()(int i, int j) const { return mparr[i]<mparr[j]; }
+};
+
+
+class sort_indices_double
+{
+   private:
+     double* mparr;
+   public:
+     sort_indices_double(double* parr) : mparr(parr) {}
+     bool operator()(int i, int j) const { return mparr[i]<mparr[j]; }
+};
+
+
+template <class T>
+void compute_order_int(T* v, int len, int* order_res){
+    int* temp = new int[len];
+    for (int i = 0; i < len; i++)
+    {
+        temp[i] = i;
+    }
+    std::sort(temp, temp+len, sort_indices(v));
+    for (int i = 0; i < len; i++)
+    {
+        order_res[temp[i]] = i;
+    }
+    delete[] temp;
+}
+
+
+template <class T>
+void compute_order_double(T* v, int len, double* order_res){
+    int* temp = new int[len];
+    for (int i = 0; i < len; i++)
+    {
+        temp[i] = i;
+    }
+    std::sort(temp, temp+len, sort_indices_double(v));
+    for (int i = 0; i < len; i++)
+    {
+        order_res[temp[i]] = (double) i;
+    }
+    delete[] temp;
+}

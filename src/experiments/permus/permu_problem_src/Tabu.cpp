@@ -71,12 +71,13 @@ void Tabu::set_tabu(int i, int j){
 
 bool Tabu::is_tabu(int i, int j)
 {
-	// if tabu coef is near zero, return
-	if (this->tabu_coef_neat < CUTOFF_0)
+	// if tabu coef is near zero, return false, hence, not use tabu
+	if (this->tabu_coef_neat < CUTOFF_0 && this->tabu_coef_neat > -CUTOFF_0)
 	{
 		return false;
 	}
-	else if (this->tabu_coef_neat > -CUTOFF_0)
+
+	if (i==-1 || j==-1)
 	{
 		return false;
 	}

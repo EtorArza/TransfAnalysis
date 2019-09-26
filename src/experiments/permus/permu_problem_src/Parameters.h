@@ -55,7 +55,7 @@ void set_parameters(int argc, char *argv[]);
 void set_parameters(int argc, char const *argv[]);
 std::string return_parameter_string(void);
 void print_parameters(void);
-
+void set_other_params();
 
 
 PBP *GetProblemInfo(std::string problemType, std::string filename);

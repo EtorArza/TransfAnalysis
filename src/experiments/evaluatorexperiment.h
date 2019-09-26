@@ -98,12 +98,15 @@ namespace NEAT {
                 Timer::report();
                 
 
-                #define SAVE_NETWORK_EVERY_K_GENS 100
-                if (gen % SAVE_NETWORK_EVERY_K_GENS == 0 || progress > 1.0)
+                #define SAVE_THIS_MANY_NETWORKS_DURING_CONVERGENCE 8 
+                int number_of_saved = 1;
+                double save_every = MAX_TRAIN_TIME / (double) SAVE_THIS_MANY_NETWORKS_DURING_CONVERGENCE * 0.999;
+                if (save_every * number_of_saved  < global_timer.toc())
                 {
+                    number_of_saved++;
                     print(1, gen);
                 }
-                #undef SAVE_NETWORK_EVERY_K_GENS
+                #undef SAVE_THIS_MANY_NETWORKS_DURING_CONVERGENCE
             }
 
             {

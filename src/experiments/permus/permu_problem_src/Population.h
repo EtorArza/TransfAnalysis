@@ -82,6 +82,8 @@ private:
 
   PBP * problem;
   PermuTools *pt;
+  double *templ_double_array;
+  double *templ_double_array2;
   double relative_time();
 
 
