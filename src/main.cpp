@@ -14,6 +14,7 @@
   limitations under the License.
 */
 #include "std.h" // Must be included first. Precompiled header with standard library includes.
+#include "INIReader.h"
 #include <unistd.h>
 #include "experiment.h"
 #include "neat.h"
@@ -58,7 +59,6 @@ void usage()
     // // cout << obtain_kth_smallest_value(permu, 3, 12) << endl;
     // PrintArray(temp, 12);
 
-    exit(0); 
 
 
     cerr << "usage: ./neat train [OPTIONS]" << endl;
@@ -103,87 +103,78 @@ void usage()
     exit(1);
 }
 
-template <typename T>
-T parse_enum(const char *opt, string str, map<string, T> vals)
-{
-    auto it = vals.find(str);
-    if (it == vals.end())
-    {
-        error("Invalid value for " << opt << ": " << str);
-    }
-    return it->second;
-}
-
-int parse_int(const char *opt, const char *str)
-{
-    try
-    {
-        return stoi(str);
-    }
-    catch (...)
-    {
-        error("Expecting integer argument for " << opt << ", found '" << str << "'.");
-    }
-}
-
 
 
 
 
 int main(int argc, char *argv[])
 {
-    int rng_seed = DEFAULT_RNG_SEED;
-    int threads = DEFAULT_PARALLEL_THREADS;
-    int max_time = DEFAULT_MAX_TRAIN_TIME;
-    bool force_delete = false;
 
-    if (argc < 3)
+    if (argc < 2)
     {
-        usage();
+        cout << "Error, no configuration file provided.\n";
         exit(1);
+    }else if (argc > 2)
+    {
+        cout << "Error, too many arguments provided. Provide only path to configuration file.";
+        exit(1);
+
     }
-    else if (strcmp(argv[1], "train") == 0)
+
+    INIReader reader(argv[1]);
+
+    if (reader.ParseError() != 0) {
+        std::cout << "Can't load " << argv[1] << "\n";
+        return 1;
+    }
+
+    string MODE = reader.Get("Global", "mode", "UNKNOWN");
+
+
+
+
+    if (MODE == "train")
     {
 
+
+        bool force_delete = reader.GetBoolean("NEAT","DELETE_PREVIOUS_EXPERIMENT", false);
+        int rng_seed = reader.GetInteger("NEAT","SEED", -1);
+        env->pop_size = reader.GetInteger("NEAT", "POPSIZE", -1);
+        int max_time = reader.GetInteger("NEAT", "MAX_TRAIN_TIME", -1);
+        n_of_threads_omp = reader.GetInteger("NEAT", "THREADS", -1);
+        N_EVALS = reader.GetInteger("NEAT", "N_EVALS", -1);
+        N_REEVALS = reader.GetInteger("NEAT","N_REEVALS", -1);
+        string search_type = reader.Get("NEAT", "SEARCH_TYPE", "UNKOWN");
+        PROBLEM_TYPE = reader.Get("Controller", "PROBLEM_TYPE", "UNKOWN");
+        INSTANCE_PATH = reader.Get("Controller", "PROBLEM_PATH", "UNKOWN");
+        MAX_TIME_PSO = reader.GetReal("Controller", "MAX_TIME_PSO", -1.0);
+        POPSIZE = reader.GetInteger("Controller", "POPSIZE", -1);
+        TABU_LENGTH = reader.GetInteger("Controller", "TABU_LENGTH", -1);
+
+
+
+        if (N_OF_INPUT_PARAMS_TEST == argc)
         {
-            int opt;
-            while ((opt = getopt(argc, argv, "fr:p:g:n:x:t:s:")) != -1)
-            {
-                switch (opt)
-                {
-                case 'f':
-                    force_delete = true;
-                    break;
-                case 'r':
-                    rng_seed = parse_int("-r", optarg);
-                    break;
-                case 'n':
-                    env->pop_size = parse_int("-n", optarg);
-                    break;
-                case 'x':
-                    max_time = parse_int("-x", optarg);
-                    break;
-                case 't':
-                    threads = parse_int("-t", optarg);
-                    break;
-                case 's':
-                    env->search_type = parse_enum<GeneticSearchType>("-s", optarg, {{"phased", GeneticSearchType::PHASED}, {"blended", GeneticSearchType::BLENDED}, {"complexify", GeneticSearchType::COMPLEXIFY}});
-                    break;
-                default:
-                    error("Invalid option: -" << (char)opt);
-                }
-            }
+            MAX_TIME_PSO = stof(argv[4]);
         }
 
-        int nargs = argc - optind;
-        if (nargs == 0)
+        if (search_type == "complexify")
         {
-            usage();
+            env->search_type = GeneticSearchType::PHASED;
+        }else if (search_type == "blended"){
+            env->search_type = GeneticSearchType::BLENDED;
+        }else if (search_type == "complexify"){
+            env->search_type = GeneticSearchType::COMPLEXIFY;
+        }else{
+            cout << "Error, no search type specified." << endl;
         }
-        else if (nargs > 1)
-        {
-            error("Unexpected argument: " << argv[optind + 1]);
+
+
+        if(n_of_threads_omp < 0){
+            cout << "please specify a valid number of threads on the conf. file" <<endl;
+            exit(1);
         }
+
 
         if (force_delete)
         {
@@ -194,15 +185,13 @@ int main(int argc, char *argv[])
             error("Already exists: experiment_1.\nMove your experiment directories or use -f to delete them automatically. If -f is used, all previous experiments will be deleted.")
         }
 
-        omp_set_num_threads(threads);
-        n_of_threads_omp = threads;
+        omp_set_num_threads(n_of_threads_omp);
 
-        if (threads < 7)
+        if (n_of_threads_omp < 7)
         {
-            set_other_params();
             cout << "Warning: a minimum of 7 threads is recommended for this implementation of NEAT to function correctly." << endl;
             cout << "With the current settings, processing a generation takes around " ; 
-            cout << ((env->pop_size*MAX_TIME_PSO / (double)2 * (double)REPEATED_EVALUATIONS[0] + (double)(5/threads + 1) * (double)REPEATED_EVALUATIONS[1])) / 3600.0; 
+            cout << ((env->pop_size*MAX_TIME_PSO / (double)2 * (double)N_EVALS + (double)(5/n_of_threads_omp + 1) * (double)N_REEVALS)) / 3600.0; 
             cout << "h,  which might be too long." << endl << endl;
         }
 
@@ -223,37 +212,49 @@ int main(int argc, char *argv[])
             env->mutate_delete_link_prob *= 0.1;
         }
 
+
+
+
+
         const char * prob_name = "permu";
         Experiment *exp = Experiment::get(prob_name);
         rng_t rng{rng_seed};
         global_timer.tic();
         exp->run(rng, 10000000);
         return 0;
+    }
+    else if (MODE ==  "test")
+    {
 
-    }else if (strcmp(argv[1], "test") == 0){
+        //const char * prob_name = "permu";
+        //Experiment *exp = Experiment::get(prob_name);
 
+        PROBLEM_TYPE = reader.Get("Controller", "PROBLEM_TYPE", "UNKOWN");
+        INSTANCE_PATH = reader.Get("Controller", "PROBLEM_PATH", "UNKOWN");
+        MAX_TIME_PSO = reader.GetReal("Controller", "MAX_TIME_PSO", -1.0);
+        POPSIZE = reader.GetInteger("Controller", "POPSIZE", -1);
+        TABU_LENGTH = reader.GetInteger("Controller", "TABU_LENGTH", -1);
+        CONTROLLER_PATH = reader.Get("Controller", "CONTROLLER_PATH", "UNKNOWN");
 
-    //const char * prob_name = "permu";
-    //Experiment *exp = Experiment::get(prob_name);
+        if (CONTROLLER_PATH == "UNKNOWN")
+        {
+            cout << "error, controller path not specified in test." << endl;
+        }
+        
+        CpuNetwork net = load_network(CONTROLLER_PATH);
+        double f_best = FitnessFunction_permu(&net, 1);
 
+        //cout << INSTANCE_PATH << "|" << PROBLEM_TYPE << "|" << f_best << endl;
+        cout << std::setprecision(15);
+        cout << std::flush;
+        cout << f_best << std::endl;;
+        cout << std::flush;
 
-
-
-    set_parameters(argc - 1, argv+ 1);
-    CpuNetwork net = load_network(CONTROLLER_PATH);
-    double f_best = FitnessFunction_permu(&net, 1);
-
-    //cout << INSTANCE_PATH << "|" << PROBLEM_TYPE << "|" << f_best << endl;
-    cout << std::setprecision(15);
-    cout << std::flush;
-    cout << f_best;
-    cout << std::flush;
-
-
-    return 0;
-    }else{
-        usage();
+        return 0;
+    }
+    else
+    {
+        cout << "invalid mode provided. Please, use the configuration file to specify either test or train.";
         exit(1);
     }
-
 }

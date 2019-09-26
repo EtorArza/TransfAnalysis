@@ -51,9 +51,7 @@ namespace NEAT {
         virtual ~EvaluatorExperiment() {
         }
 
-        virtual bool is_success(Organism *org) {
-            return org->eval.error <= 0.0000001;
-        }
+
 
         virtual void run(class rng_t &rng, int gens) override {
             using namespace std;
@@ -75,7 +73,6 @@ namespace NEAT {
 
             pop = Population::create(rng_exp, genomes);
     
-            bool success = false;
             
             int gen = 0;
             for(double progress = 0; progress < 1.0; progress = ((double) global_timer.toc() / (double) MAX_TRAIN_TIME)) {

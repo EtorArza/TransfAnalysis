@@ -86,6 +86,7 @@ double FitnessFunction_permu( NEAT::CpuNetwork *net, int n_evals)
     return res;
 }
 
+
 namespace NEAT
 {
 struct Config{};
@@ -98,18 +99,12 @@ struct Evaluator
 
 
     __net_eval_decl double FitnessFunction(CpuNetwork* net){
-        //char* params[3] = {"binary_name", "lop", "instances/lop/N-be75eec_500"};
-        char const *params[3] = {"binary_name", "qap", "instances/qap/tai35a.dat.dat"};
-        set_parameters(3, params); // Read parameters from bash.
-        double res = FitnessFunction_permu(net, REPEATED_EVALUATIONS[0]);
+        double res = FitnessFunction_permu(net, N_EVALS);
         return res;
     }
 
     __net_eval_decl double FitnessFunction_reevaluation(CpuNetwork* net){
-        //char* params[3] = {"binary_name", "lop", "instances/lop/N-be75eec_500"};
-        char const *params[3] = {"binary_name", "qap", "instances/qap/tai35a.dat.dat"};
-        set_parameters(3, params); // Read parameters from bash.
-        double res = FitnessFunction_permu(net, REPEATED_EVALUATIONS[1]);
+        double res = FitnessFunction_permu(net, N_REEVALS);
         return res;
     }
 

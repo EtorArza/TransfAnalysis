@@ -10,14 +10,13 @@
 
 #define N_OF_INPUT_PARAMS_TRAIN 3
 #define N_OF_INPUT_PARAMS_TEST 5
-#define _N_REPEATED_EVALS 2
 
 class stopwatch;
 // CONSTANT PARAMETERS //
 EXTERN double MAX_TIME_PSO;
 EXTERN int POPSIZE;
-EXTERN int REPEATED_EVALUATIONS[_N_REPEATED_EVALS];
-EXTERN int N_REPEATED_EVALS;
+EXTERN int N_EVALS;
+EXTERN int N_REEVALS;
 EXTERN int TABU_LENGTH;
 /////////////////////////
 
@@ -42,7 +41,6 @@ EXTERN stopwatch global_timer;
 
 // NEAT PARAMETERS //
 # define CUTOFF_0 0.25
-EXTERN double BEST_FOUND_FITNESS;
 //////////////////////
 
 ///////////////////////////
