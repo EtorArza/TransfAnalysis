@@ -79,6 +79,8 @@ private:
   void comp_sparsity();
   void comp_r_number();
   void load_local_opt();
+  void comp_order_sparsity();
+
 
   PBP * problem;
   PermuTools *pt;

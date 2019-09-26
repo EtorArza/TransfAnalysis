@@ -201,6 +201,7 @@ void CPopulation::get_population_info(){
     comp_relative_time();
     comp_distance();
     comp_sparsity();
+    comp_order_sparsity();
     comp_r_number();
     load_local_opt();
 }
@@ -290,8 +291,18 @@ void CPopulation::comp_sparsity(){
     pt->compute_first_marginal(permus, POPSIZE);
     for (int i = 0; i < POPSIZE; i++)
     {
-        m_individuals[i]->sparsity = 1.0 - (pt->get_distance_to_marginal(permus[i]) / n);
+        m_individuals[i]->sparsity = 1.0 - pt->get_distance_to_marginal(permus[i]);
         pop_info[i][NEAT::SPARSITY] = m_individuals[i]->sparsity;
+    }
+}
+
+
+void CPopulation::comp_order_sparsity(){
+    pt->compute_order_marginal(permus, POPSIZE);
+    for (int i = 0; i < POPSIZE; i++)
+    {
+        m_individuals[i]->order_sparsity = 1.0 - pt->get_distance_to_order_marginal(permus[i]);
+        pop_info[i][NEAT::ORDER_SPARSITY] = m_individuals[i]->sparsity;
     }
 }
 

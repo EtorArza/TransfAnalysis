@@ -40,6 +40,8 @@ double FitnessFunction_permu( NEAT::CpuNetwork *net, int n_evals)
 
 
 
+    int counter = 0;
+
     for (int n_of_repetitions_completed = 0; n_of_repetitions_completed < n_evals; n_of_repetitions_completed++)
     {
         pop->rng->seed();
@@ -50,11 +52,12 @@ double FitnessFunction_permu( NEAT::CpuNetwork *net, int n_evals)
             net->clear_noninput(); 
             std::swap(net->activations, pop->m_individuals[i]->activation);
         }
-
         while (!pop->terminated)
-        {
+        {   
+            counter ++;
             for (int i = 0; i < POPSIZE; i++)
             {   
+                
                 std::swap(net->activations, pop->m_individuals[i]->activation);
                 for (int sns_idx = 0; sns_idx < NEAT::__sensor_N; sns_idx++)
                 {
@@ -77,7 +80,7 @@ double FitnessFunction_permu( NEAT::CpuNetwork *net, int n_evals)
         v_of_fitness[n_of_repetitions_completed] = problem->Evaluate(pop->genome_best);
     }
     double res = median(v_of_fitness, n_evals);
-
+    //cout << counter << endl;
 
 
     delete[] v_of_fitness;

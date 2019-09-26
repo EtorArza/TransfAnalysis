@@ -19,8 +19,9 @@ namespace NEAT {
         RELATIVE_TIME = 4,
         DISTANCE = 5,
         SPARSITY = 6,
-        R_NUMBER = 7,
-        __sensor_N = 8,
+        ORDER_SPARSITY = 7,
+        R_NUMBER = 8,
+        __sensor_N = 9,
 
     };
 

@@ -8,8 +8,6 @@
 
 
 
-#define N_OF_INPUT_PARAMS_TRAIN 3
-#define N_OF_INPUT_PARAMS_TEST 5
 
 class stopwatch;
 // CONSTANT PARAMETERS //

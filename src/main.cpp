@@ -61,43 +61,7 @@ void usage()
 
 
 
-    cerr << "usage: ./neat train [OPTIONS]" << endl;
-    cerr << " OR " << endl;
-    cerr << "usage: ./neat test controller_path instance_path problem_type" << endl;
-
-
-
-    cerr << "--- TRAIN ---" << endl;
-
-    cerr << "[OPTIONS] for train" << endl;
-    cerr << "  -f                   Force deletion of any data from previous run." << endl;
-    cerr << "  -r RNG_seed          (default=" << DEFAULT_RNG_SEED << ")" << endl;
-    cerr << "  -n population_size   (default=" << env->pop_size << ")" << endl;
-    cerr << "  -x max_train_time   (default=" << DEFAULT_MAX_TRAIN_TIME << ")" << endl;
-    cerr << "  -s search_type       {phased, blended, complexify} (default=phased)" << endl;
-    cerr << "  -t num_of_parallel_threads (default=" << DEFAULT_PARALLEL_THREADS << ")" << endl;
-
-
-
-    cerr << endl;
-    cerr << endl;
-    cerr << endl;
-
-    cerr << "--- TEST ---" << endl;
-    cerr << "controller_path -> path to the file containing the controller." << endl;
-    cerr << "instances_path -> path to the file containing problem instance." << endl;
-    cerr << "problem_type -> Either \"tsp\", \"lop\", \"qap\" or \"PFSP\" " << endl;
-    cerr << "for example: \n\n./neat \"test\" \"experiment_1/fittest_1500\" \"instances\\lop\\instance.txt\" \"lop\"" << endl;
-
-    cerr << endl;
-    // cerr << "experiment names: ";
-    // auto names = Experiment::get_names();
-    // for(size_t i = 0; i < names.size(); i++) {
-    //     if(i != 0)
-    //         cerr << ", ";
-    //     cerr << names[i];
-    // }
-    // cerr << endl;
+    cerr << "usage: ./neat path_of_config_file" << endl;
     cerr << endl;
 
     exit(1);
@@ -153,10 +117,7 @@ int main(int argc, char *argv[])
 
 
 
-        if (N_OF_INPUT_PARAMS_TEST == argc)
-        {
-            MAX_TIME_PSO = stof(argv[4]);
-        }
+
 
         if (search_type == "complexify")
         {
@@ -243,6 +204,13 @@ int main(int argc, char *argv[])
         
         CpuNetwork net = load_network(CONTROLLER_PATH);
         double f_best = FitnessFunction_permu(&net, 1);
+
+        for (int i = 0; i < 5; i++)
+        {
+            double f_best = FitnessFunction_permu(&net, 1);
+            cout << f_best << "," << endl;
+        }
+        
 
         //cout << INSTANCE_PATH << "|" << PROBLEM_TYPE << "|" << f_best << endl;
         cout << std::setprecision(15);

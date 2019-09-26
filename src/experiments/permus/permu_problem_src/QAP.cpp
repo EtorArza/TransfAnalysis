@@ -187,25 +187,70 @@ double QAP::_Evaluate(int * genes)
 	double QAP::fitness_delta_interchange(CIndividual *indiv, int i, int j){
 		int new_fitness_delta = 0;
 		int el_at_pos_i_in_sigma_2;
-        for (int k = 0; k < n; k++)
+		if (i > j)
 		{
-		    if (k==i){
-                el_at_pos_i_in_sigma_2 = indiv->genome[j];
-			}else if(k==j){
-                el_at_pos_i_in_sigma_2 = indiv->genome[i];
-			}else{
-                el_at_pos_i_in_sigma_2 = indiv->genome[k];
-			}
+			int aux = i;
+			i = j;
+			j = aux;
+		}else if(i==j){
+			return 0;
+		}
+
+        for (int k = 0; k < i; k++)
+		{
+
+            el_at_pos_i_in_sigma_2 = indiv->genome[k];
+		
 
             new_fitness_delta += m_distance_matrix[k][i] * (m_flow_matrix[el_at_pos_i_in_sigma_2][indiv->genome[j]] - m_flow_matrix[indiv->genome[k]][indiv->genome[i]]);
             new_fitness_delta += m_distance_matrix[i][k] * (m_flow_matrix[indiv->genome[j]][el_at_pos_i_in_sigma_2] - m_flow_matrix[indiv->genome[i]][indiv->genome[k]]);
 
-            if (k == i){
-                continue;
-			}
+
             new_fitness_delta += m_distance_matrix[k][j] * (m_flow_matrix[el_at_pos_i_in_sigma_2][indiv->genome[i]] - m_flow_matrix[indiv->genome[k]][indiv->genome[j]]);
             new_fitness_delta += m_distance_matrix[j][k] * (m_flow_matrix[indiv->genome[i]][el_at_pos_i_in_sigma_2] - m_flow_matrix[indiv->genome[j]][indiv->genome[k]]);
 		}
+
+		int k = i;
+        el_at_pos_i_in_sigma_2 = indiv->genome[j];
+		new_fitness_delta += m_distance_matrix[k][i] * (m_flow_matrix[el_at_pos_i_in_sigma_2][indiv->genome[j]] - m_flow_matrix[indiv->genome[k]][indiv->genome[i]]);
+        new_fitness_delta += m_distance_matrix[i][k] * (m_flow_matrix[indiv->genome[j]][el_at_pos_i_in_sigma_2] - m_flow_matrix[indiv->genome[i]][indiv->genome[k]]);
+
+		k = j;
+		el_at_pos_i_in_sigma_2 = indiv->genome[i];
+		new_fitness_delta += m_distance_matrix[k][i] * (m_flow_matrix[el_at_pos_i_in_sigma_2][indiv->genome[j]] - m_flow_matrix[indiv->genome[k]][indiv->genome[i]]);
+		new_fitness_delta += m_distance_matrix[i][k] * (m_flow_matrix[indiv->genome[j]][el_at_pos_i_in_sigma_2] - m_flow_matrix[indiv->genome[i]][indiv->genome[k]]);
+
+		new_fitness_delta += m_distance_matrix[k][j] * (m_flow_matrix[el_at_pos_i_in_sigma_2][indiv->genome[i]] - m_flow_matrix[indiv->genome[k]][indiv->genome[j]]);
+		new_fitness_delta += m_distance_matrix[j][k] * (m_flow_matrix[indiv->genome[i]][el_at_pos_i_in_sigma_2] - m_flow_matrix[indiv->genome[j]][indiv->genome[k]]);
+
+		for (int k = i+1; k < j; k++)
+		{
+
+            el_at_pos_i_in_sigma_2 = indiv->genome[k];
+
+
+            new_fitness_delta += m_distance_matrix[k][i] * (m_flow_matrix[el_at_pos_i_in_sigma_2][indiv->genome[j]] - m_flow_matrix[indiv->genome[k]][indiv->genome[i]]);
+            new_fitness_delta += m_distance_matrix[i][k] * (m_flow_matrix[indiv->genome[j]][el_at_pos_i_in_sigma_2] - m_flow_matrix[indiv->genome[i]][indiv->genome[k]]);
+
+
+            new_fitness_delta += m_distance_matrix[k][j] * (m_flow_matrix[el_at_pos_i_in_sigma_2][indiv->genome[i]] - m_flow_matrix[indiv->genome[k]][indiv->genome[j]]);
+            new_fitness_delta += m_distance_matrix[j][k] * (m_flow_matrix[indiv->genome[i]][el_at_pos_i_in_sigma_2] - m_flow_matrix[indiv->genome[j]][indiv->genome[k]]);
+		}
+
+		for (int k = j+1; k < n; k++)
+		{
+
+                el_at_pos_i_in_sigma_2 = indiv->genome[k];
+			
+
+            new_fitness_delta += m_distance_matrix[k][i] * (m_flow_matrix[el_at_pos_i_in_sigma_2][indiv->genome[j]] - m_flow_matrix[indiv->genome[k]][indiv->genome[i]]);
+            new_fitness_delta += m_distance_matrix[i][k] * (m_flow_matrix[indiv->genome[j]][el_at_pos_i_in_sigma_2] - m_flow_matrix[indiv->genome[i]][indiv->genome[k]]);
+
+
+            new_fitness_delta += m_distance_matrix[k][j] * (m_flow_matrix[el_at_pos_i_in_sigma_2][indiv->genome[i]] - m_flow_matrix[indiv->genome[k]][indiv->genome[j]]);
+            new_fitness_delta += m_distance_matrix[j][k] * (m_flow_matrix[indiv->genome[i]][el_at_pos_i_in_sigma_2] - m_flow_matrix[indiv->genome[j]][indiv->genome[k]]);
+		}
+
 		return -new_fitness_delta;
 	}
 

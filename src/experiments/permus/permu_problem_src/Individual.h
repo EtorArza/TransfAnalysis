@@ -60,6 +60,7 @@ public:
 	double relative_pos = 0;
 	double relative_time = 0;
 	double sparsity = 0;
+	double order_sparsity = 0;
 	double distance = 0;
 	
 	std::vector<double> activation;

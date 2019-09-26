@@ -533,10 +533,15 @@ public:
     double* temp_array_double;
     int* identity_permu;
     double** first_marginal;
+    double** order_marginal;
 
     void combine_permus(int** permu_list, double* coef_list, int* res);
     void compute_first_marginal(int** permu_list, int m);
+    void compute_order_marginal(int** permu_list, int m);
+
     double get_distance_to_marginal(int* permu);
+    double get_distance_to_order_marginal(int* permu);
+
     int choose_permu_index_to_move(double* coef_list);
     int choose_permu_index_to_move(double* coef_list, RandomNumberGenerator* rng);
 
@@ -544,6 +549,7 @@ public:
 private:
     void convert_to_permu(int* res);
     RandomNumberGenerator* rng;
+    int it_to_compute_order_marginal = 0;
 };
 
 
