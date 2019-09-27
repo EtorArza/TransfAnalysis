@@ -75,6 +75,8 @@ namespace NEAT {
     
             
             int gen = 0;
+            int number_of_saved = 1;
+
             for(double progress = 0; progress < 1.0; progress = ((double) global_timer.toc() / (double) MAX_TRAIN_TIME)) {
                 gen++;
                 cout << "\n\n";
@@ -96,7 +98,6 @@ namespace NEAT {
                 
 
                 #define SAVE_THIS_MANY_NETWORKS_DURING_CONVERGENCE 8 
-                int number_of_saved = 1;
                 double save_every = MAX_TRAIN_TIME / (double) SAVE_THIS_MANY_NETWORKS_DURING_CONVERGENCE * 0.999;
                 if (save_every * number_of_saved  < global_timer.toc())
                 {

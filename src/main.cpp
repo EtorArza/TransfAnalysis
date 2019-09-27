@@ -39,9 +39,7 @@
 using namespace NEAT;
 using namespace std;
 
-#define DEFAULT_RNG_SEED 1
-#define DEFAULT_MAX_TRAIN_TIME 2*24*60*60
-#define DEFAULT_PARALLEL_THREADS 1
+
 
 void usage()
 {
@@ -119,7 +117,7 @@ int main(int argc, char *argv[])
 
 
 
-        if (search_type == "complexify")
+        if (search_type == "phased")
         {
             env->search_type = GeneticSearchType::PHASED;
         }else if (search_type == "blended"){

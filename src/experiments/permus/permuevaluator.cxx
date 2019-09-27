@@ -20,7 +20,7 @@
 
 using namespace std;
 
-#define COUNTER
+//#define COUNTER
 
 
 double FitnessFunction_permu( NEAT::CpuNetwork *net, int n_evals)
