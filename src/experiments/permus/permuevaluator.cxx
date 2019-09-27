@@ -20,6 +20,9 @@
 
 using namespace std;
 
+#define COUNTER
+
+
 double FitnessFunction_permu( NEAT::CpuNetwork *net, int n_evals)
 {
 
@@ -39,8 +42,9 @@ double FitnessFunction_permu( NEAT::CpuNetwork *net, int n_evals)
     }
 
 
-
+    #ifdef COUNTER
     int counter = 0;
+    #endif
 
     for (int n_of_repetitions_completed = 0; n_of_repetitions_completed < n_evals; n_of_repetitions_completed++)
     {
@@ -54,7 +58,10 @@ double FitnessFunction_permu( NEAT::CpuNetwork *net, int n_evals)
         }
         while (!pop->terminated)
         {   
+            #ifdef COUNTER
             counter ++;
+            #endif
+
             for (int i = 0; i < POPSIZE; i++)
             {   
                 
@@ -79,9 +86,10 @@ double FitnessFunction_permu( NEAT::CpuNetwork *net, int n_evals)
         
         v_of_fitness[n_of_repetitions_completed] = problem->Evaluate(pop->genome_best);
     }
-    double res = median(v_of_fitness, n_evals);
-    //cout << counter << endl;
-
+    double res = Average_drop_top_bottom_quartile(v_of_fitness, n_evals);
+    #ifdef COUNTER
+    cout << counter << endl;
+    #endif
 
     delete[] v_of_fitness;
     delete pop;

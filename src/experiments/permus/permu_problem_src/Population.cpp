@@ -120,6 +120,7 @@ void CPopulation::end_iteration(){
     {
         terminated = true;
     }
+    //PrintMatrix(pop_info, POPSIZE, NEAT::__sensor_N);
 }
 
 
@@ -302,7 +303,7 @@ void CPopulation::comp_order_sparsity(){
     for (int i = 0; i < POPSIZE; i++)
     {
         m_individuals[i]->order_sparsity = 1.0 - pt->get_distance_to_order_marginal(permus[i]);
-        pop_info[i][NEAT::ORDER_SPARSITY] = m_individuals[i]->sparsity;
+        pop_info[i][NEAT::ORDER_SPARSITY] = m_individuals[i]->order_sparsity;
     }
 }
 

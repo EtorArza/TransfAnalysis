@@ -1035,7 +1035,7 @@ void PermuTools::compute_first_marginal(int** permu_list, int m){
         }
     }
 
-    double normalized_base_freq = 1.0 / (double) m / (double) n;
+    double normalized_base_freq = 1.0 / ((double) m * (double) n);
 
     for (int i = 0; i < m; i++)
     {
@@ -1046,6 +1046,7 @@ void PermuTools::compute_first_marginal(int** permu_list, int m){
     }
 }
 
+#define DEPTH_OF_ORDER_MARGINAL 4
 #define COMPUTE_ORDER_MARGINAL_EVERY_K_ITERATIONS 6
 void PermuTools::compute_order_marginal(int** permu_list, int m){
     // in the article "Exploiting Probabilistic Independence for Permutations", they define the first marg in the
@@ -1066,30 +1067,33 @@ void PermuTools::compute_order_marginal(int** permu_list, int m){
         }
     }
 
-    double normalized_base_freq = 1 / (double) (n*(n-1)/2) / (double) m;
+    double normalized_base_freq = 1.0 / ((double) (n*(DEPTH_OF_ORDER_MARGINAL)/2) * (double) m);
 
     for (int i = 0; i < m; i++)
     {
-        for (int j = 0; j < n; j++)
+        for (int j = 0; j < n - DEPTH_OF_ORDER_MARGINAL; j++)
         {
-            for (int k = j+1; k < n; k++)
+            for (int k = j+1; k < j+ DEPTH_OF_ORDER_MARGINAL; k++)
             {
                 if (permu_list[i][j] > permu_list[i][k]) // sum 1 to pos jk only if the number j is before number k
                 {
                     order_marginal[permu_list[i][j]][permu_list[i][k]] += normalized_base_freq;
-
                 }
             }
         }
     }
 }
+#undef COMPUTE_ORDER_MARGINAL_EVERY_K_ITERATIONS
 
-double PermuTools::get_distance_to_marginal(int* permu){
+
+
+
+double PermuTools::get_distance_to_order_marginal(int* permu){
     double res = 0.0;
 
     for (int j = 0; j < n; j++)
     {
-        for (int k = j+1; k < n; k++)
+        for (int k = j+1; k < min(n, j+ DEPTH_OF_ORDER_MARGINAL); k++)
         {
             if (permu[j] > permu[k])
             {
@@ -1097,14 +1101,15 @@ double PermuTools::get_distance_to_marginal(int* permu){
             }
         }
     }
+    return res;
 }
+#undef DEPTH_OF_ORDER_MARGINAL
 
-
-double PermuTools::get_distance_to_order_marginal(int* permu){
+double PermuTools::get_distance_to_marginal(int* permu){
     double res = 0.0;
     for (int i = 0; i < n; i++)
     {
-        res += this->order_marginal[permu[i]][i];
+        res += this->first_marginal[permu[i]][i];
     }
     return res;
 }

@@ -203,13 +203,9 @@ int main(int argc, char *argv[])
         }
         
         CpuNetwork net = load_network(CONTROLLER_PATH);
-        double f_best = FitnessFunction_permu(&net, 1);
+        double f_best = FitnessFunction_permu(&net, 200);
 
-        for (int i = 0; i < 5; i++)
-        {
-            double f_best = FitnessFunction_permu(&net, 1);
-            cout << f_best << "," << endl;
-        }
+
         
 
         //cout << INSTANCE_PATH << "|" << PROBLEM_TYPE << "|" << f_best << endl;
