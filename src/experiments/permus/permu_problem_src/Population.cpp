@@ -203,7 +203,7 @@ void CPopulation::get_population_info(){
     comp_distance();
     comp_sparsity();
     comp_order_sparsity();
-    comp_r_number();
+    //comp_r_number();
     load_local_opt();
 }
 
@@ -308,14 +308,14 @@ void CPopulation::comp_order_sparsity(){
 }
 
 
-void CPopulation::comp_r_number()
-{
-    for (int i = 0; i < POPSIZE; i++)
-    {
-        double res =  rng->random_0_1_double();
-        pop_info[i][NEAT::R_NUMBER] = res;
-    }
-}
+// void CPopulation::comp_r_number()
+// {
+//     for (int i = 0; i < POPSIZE; i++)
+//     {
+//         double res =  rng->random_0_1_double();
+//         pop_info[i][NEAT::R_NUMBER] = res;
+//     }
+// }
 
 void CPopulation::load_local_opt(){
 for (int i = 0; i < POPSIZE; i++)

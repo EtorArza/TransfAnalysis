@@ -20,8 +20,7 @@ namespace NEAT {
         DISTANCE = 5,
         SPARSITY = 6,
         ORDER_SPARSITY = 7,
-        R_NUMBER = 8,
-        __sensor_N = 9,
+        __sensor_N = 8,
 
     };
 
