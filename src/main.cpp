@@ -203,7 +203,7 @@ int main(int argc, char *argv[])
         }
         
         CpuNetwork net = load_network(CONTROLLER_PATH);
-        double f_best = FitnessFunction_permu(&net, 200);
+        double f_best = FitnessFunction_permu(&net, 1);
 
 
         

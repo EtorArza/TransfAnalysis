@@ -11,6 +11,7 @@
 #include "Tools.h"
 #include <assert.h>
 #include "Individual.h"
+#include  <utility>
 /*
  * Class constructor.
  */
@@ -163,11 +164,20 @@ double LOP::fitness_delta_interchange(CIndividual *indiv, int i, int j)
 	}
 	else
 	{	
-		CIndividual *indiv_cop = indiv->Clone();
-		apply_operator_with_fitness_update(indiv_cop, i, j, NEAT::INSERT);
-		int f_value_cop = indiv_cop->f_value + fitness_delta_insert(indiv_cop, j-1, i);
-		delete indiv_cop;
-		return f_value_cop - indiv->f_value;
+		int* permu = indiv->genome;
+		double delta_1 = fitness_delta_insert(indiv, i, j);
+
+		int aux = permu[i];
+		permu[i] = permu[j];
+		permu[j] = aux;
+
+		double delta_2 = fitness_delta_insert(indiv, j-1, i);
+
+		aux = permu[i];
+		permu[i] = permu[j];
+		permu[j] = aux;
+
+		return delta_1 + delta_2;
 	}
 }
 

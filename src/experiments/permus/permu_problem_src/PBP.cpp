@@ -202,9 +202,17 @@ void PBP::local_search_iteration(CIndividual *indiv, NEAT::operator_t operator_i
                     }
 
                     if (fitness_delta_insert(indiv, _random_permu1[i], _random_permu2[j]) > 0)
-                    {
+                    {   
+                        //cout << "peep ";
                         tab->set_tabu(_random_permu1[i], _random_permu2[j]);
+                        double f = Evaluate(indiv->genome) + fitness_delta_insert(indiv, _random_permu1[i], _random_permu2[j]);
                         apply_operator_with_fitness_update(indiv, _random_permu1[i], _random_permu2[j], operator_id);
+
+                        if(!isPermutation(indiv->genome, problem_size_PBP)){
+                            cout << "is NOT permutation" << endl;
+                            exit(1);
+                        }
+                        //cout << f - indiv->f_value;
                         return;
                     }
                 }
