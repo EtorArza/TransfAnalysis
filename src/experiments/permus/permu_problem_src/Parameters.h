@@ -1,7 +1,5 @@
 
 #include <string>
-#include "PBP.h"
-#include <mutex>
 #ifndef EXTERN
 #define EXTERN extern
 #endif
@@ -40,21 +38,4 @@ EXTERN stopwatch global_timer;
 // NEAT PARAMETERS //
 # define CUTOFF_0 0.25
 //////////////////////
-
-///////////////////////////
-
-
-// argv[0] --> name of the binary executable
-// argv[1] --> type of problem, i.e. LOP
-// argv[2] --> path to the problem
-void set_parameters(int argc, char *argv[]);
-void set_parameters(int argc, char const *argv[]);
-std::string return_parameter_string(void);
-void print_parameters(void);
-void set_other_params();
-
-
-PBP *GetProblemInfo(std::string problemType, std::string filename);
-
-
 

@@ -35,14 +35,14 @@ PFSP::~PFSP()
 /*
  * Evaluates the given solution with the total flow time criterion.
  */
-double PFSP::Evaluate(int * genes)
+double PFSP::_Evaluate(int * permu)
 {
     for (int i=0;i<m_machines;i++) m_timeTable[i]=0;
 	int j,z, job;
 	int machine;
     int prev_machine=0;
     
-	int first_gene=genes[0];
+	int first_gene=permu[0];
     m_timeTable[0]=m_processingtimes[0][first_gene];
 	for (j=1;j<m_machines;j++)
 	{
@@ -52,7 +52,7 @@ double PFSP::Evaluate(int * genes)
 	double fitness=m_timeTable[m_machines-1];
 	for (z=1;z<m_jobs;z++)
 	{
-		job=genes[z];
+		job=permu[z];
 		
 		//machine 0 is always incremental, so:
 		m_timeTable[0]+=m_processingtimes[0][job];
@@ -69,20 +69,24 @@ double PFSP::Evaluate(int * genes)
 	return -fitness;
 }
 
+
+ 
+
+
 int PFSP::Read(string filename)
 {
-    cout<<"reading..."<<endl;
+    //cout<<"reading..."<<endl;
 	bool readMatrix=false;
 	bool readDimension=false;
 
-	char line[2048]; // variable for input value
+	char line[5048]; // variable for input value
 	string data="";
 	ifstream indata;
 	indata.open(filename.c_str(),ios::in);
 	while (!indata.eof())
 	{
 		//process lines
-		indata.getline(line, 2048);
+		indata.getline(line, 5048);
 		stringstream ss;
 		string sline;
 		ss << line;

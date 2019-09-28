@@ -9,11 +9,6 @@
 #include "resource.h"
 #include <assert.h>
 #include "PBP.h"
-//#include "PFSP.h"
-#include "LOP.h"
-#include "QAP.h"
-//#include "TSP.h"
-//#include "API.h"
 #include "Population.h"
 #include "Tools.h"
 
@@ -21,6 +16,8 @@
 using namespace std;
 
 //#define COUNTER
+
+PBP *GetProblemInfo(std::string problemType, std::string filename);
 
 
 double FitnessFunction_permu( NEAT::CpuNetwork *net, int n_evals)

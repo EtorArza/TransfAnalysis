@@ -26,6 +26,7 @@
 #include "PBP.h"
 #include "QAP.h"
 #include "LOP.h"
+#include "PFSP.h"
 #include "permuevaluator.h"
 #include "Tools.h"
 #include "FitnessFunction_permus.h"
@@ -44,28 +45,42 @@ using namespace std;
 void usage()
 {
 
-    // int *permu = new int[12];
-    // int *temp = new int[12];
-
-    // GenerateRandomPermutation(permu, 12);
-
-    // permu[0] = 0;
-
-    // PrintArray(permu, 12);
-    // compute_order(permu, 12, temp);
-    // // cout << obtain_kth_largest_value(permu, 1, 12) << endl;
-    // // cout << obtain_kth_smallest_value(permu, 3, 12) << endl;
-    // PrintArray(temp, 12);
-
-
-
-    cerr << "usage: ./neat path_of_config_file" << endl;
+    cerr << "usage: \n ./neat path_of_config_file" << endl;
+    cerr << "for example, \n ./neat \"config_files/test.ini\"" << endl;
     cerr << endl;
-
     exit(1);
 }
 
 
+PBP *GetProblemInfo(std::string problemType, std::string filename)
+{
+    PBP *problem;
+    if (problemType == "pfsp")
+    {
+        problem = new PFSP();
+    }
+    // else if (problemType == "tsp")
+    //     problem = new TSP();
+    else if (problemType == "qap")
+    {
+        problem = new QAP();
+    }
+    else if (problemType == "lop")
+    {
+        problem = new LOP();
+    }
+    // else if (problemType == "api")
+    //     problem = new API();
+    else
+    {
+         cout << "Wrong problem type was specified." << endl;
+         exit(1);
+     }
+
+    //Read the instance.
+    problem->Read_with_mutex(filename);
+    return problem;
+}
 
 
 

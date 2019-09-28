@@ -29,6 +29,9 @@ using std::ifstream;
 using std::stringstream;
 using std::string;
 
+
+class CIndividual;
+
 class PFSP : public PBP
 {
 	
@@ -69,12 +72,28 @@ public:
 	/*
 	 * Evaluates the given solution with the total flow time criterion.
 	 */
-	double Evaluate(int * genes);
+	double _Evaluate(int * permu);
 
-    /*
-	 * Evaluates inverted solution of the given solution with the total flow time criterion.
-	 */
-    double EvaluateInv(int * genes);
+	double fitness_delta_swap(CIndividual *indiv, int i, int j){
+		return fitness_delta_interchange(indiv, i, j);
+	};
+
+	double fitness_delta_interchange(CIndividual *indiv, int i, int j){
+		Swap(indiv->genome, i, j);
+		double res = _Evaluate(indiv->genome);
+		res -= indiv->f_value;
+		Swap(indiv->genome, i, j);
+		return res;
+	};
+
+
+	double fitness_delta_insert(CIndividual *indiv, int i, int j){
+		InsertAt(indiv->genome, i, j, m_jobs);
+		double res = _Evaluate(indiv->genome);
+		res -= indiv->f_value;
+		InsertAt(indiv->genome, j, i, m_jobs);
+		return res;
+	};
 
     /*
      * Returns the size of the problem.
