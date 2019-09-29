@@ -83,7 +83,7 @@ namespace NEAT {
             double cut_value = obtain_kth_largest_value(f_values, n_of_networks_to_reevaluate, static_cast<int>(nnets));
 
             for(size_t inet = 0; inet < nnets; inet++) {
-                if (cut_value >= f_values[inet])
+                if (f_values[inet] < cut_value)
                 {   
                     results[inet].fitness -= 100000000.0;
                     results[inet].error += 100000000.0;

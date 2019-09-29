@@ -173,7 +173,6 @@ int main(int argc, char *argv[])
         {
             cout << "Warning: The population size of the controllers might be too low." << endl;
             cout << "The provided population size of the controllers is " << env->pop_size << ", a value of at least 1000 is recommended." << endl;
-            cout << "For example, to use a population size of 1500, use the \"-n 1500\" argument." << endl;
             cout << endl << endl;
         }
 

@@ -97,6 +97,11 @@ CPopulation::~CPopulation()
     {
         delete[] pop_info[i];
     }
+    for (int i = 0; i < POPSIZE; i++)
+    {
+        delete m_individuals[i];
+    }
+    
     m_individuals.clear();
     delete timer;
     timer=NULL;

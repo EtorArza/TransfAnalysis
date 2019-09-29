@@ -49,7 +49,7 @@ double FitnessFunction_permu(NEAT::CpuNetwork *net_original, int n_evals)
     for (int n_of_repetitions_completed = 0; n_of_repetitions_completed < n_evals; n_of_repetitions_completed++)
     {
         pop->rng->seed();
-        pop->Reset(); // here all networks are deleted denwedfjhfrjoirefojirewerioj
+        pop->Reset();
         for (int i = 0; i < POPSIZE; i++)
         {   
             std::swap(net->activations, pop->m_individuals[i]->activation);
@@ -88,7 +88,7 @@ double FitnessFunction_permu(NEAT::CpuNetwork *net_original, int n_evals)
         net->clear_noninput();
     }
 
-    double res = Average_drop_top_bottom_quartile(v_of_fitness, n_evals);
+    double res = Average(v_of_fitness, n_evals);
     #ifdef COUNTER
     cout << counter << endl;
     #endif
