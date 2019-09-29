@@ -16,7 +16,7 @@ namespace NEAT {
         std::vector<real_t> activations;
         CpuNetwork() {}
 
-        //CpuNetwork(const CpuNetwork&  other);
+        CpuNetwork(const CpuNetwork&  other);
 
 		virtual ~CpuNetwork() {}
 

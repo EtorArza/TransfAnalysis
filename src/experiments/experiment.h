@@ -13,7 +13,7 @@ namespace NEAT {
     public:
         virtual ~Experiment();
 
-        virtual void run(class rng_t &rng, int gens) = 0;
+        virtual void run(class rng_t &rng) = 0;
 
     protected:
         Experiment(const char *name);

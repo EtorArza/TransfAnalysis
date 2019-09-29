@@ -20,12 +20,15 @@ using namespace std;
 PBP *GetProblemInfo(std::string problemType, std::string filename);
 
 
-double FitnessFunction_permu( NEAT::CpuNetwork *net, int n_evals)
+double FitnessFunction_permu(NEAT::CpuNetwork *net_original, int n_evals)
 {
 
     double* v_of_fitness;
     PBP *problem;
     CPopulation *pop;
+
+    NEAT::CpuNetwork tmp_net = *net_original;
+    NEAT::CpuNetwork *net = &tmp_net;
 
     //Read the problem instance to optimize.
     problem = GetProblemInfo(PROBLEM_TYPE, INSTANCE_PATH);
@@ -82,7 +85,9 @@ double FitnessFunction_permu( NEAT::CpuNetwork *net, int n_evals)
         }
         
         v_of_fitness[n_of_repetitions_completed] = problem->Evaluate(pop->genome_best);
+        net->clear_noninput();
     }
+
     double res = Average_drop_top_bottom_quartile(v_of_fitness, n_evals);
     #ifdef COUNTER
     cout << counter << endl;
@@ -91,7 +96,12 @@ double FitnessFunction_permu( NEAT::CpuNetwork *net, int n_evals)
     delete[] v_of_fitness;
     delete pop;
     delete problem;
+    pop=NULL;
+    v_of_fitness=NULL;
+    problem=NULL;
+    net=NULL;
     return res;
+
 }
 
 
@@ -111,8 +121,17 @@ struct Evaluator
         return res;
     }
 
-    __net_eval_decl double FitnessFunction_reevaluation(CpuNetwork* net){
-        double res = FitnessFunction_permu(net, N_REEVALS);
+    // parallelize over the same network
+    __net_eval_decl double FitnessFunction_reevaluation(CpuNetwork* net, int n_reevals){
+  
+        double *v_of_f_values = new double[n_reevals];
+        #pragma omp parallel for num_threads(N_OF_THREADS)
+        for (int i = 0; i < n_reevals; i++)
+        {
+            v_of_f_values[i] = FitnessFunction_permu(net, 1);
+        }
+        double res = Average(v_of_f_values, n_reevals);
+        delete[] v_of_f_values;
         return res;
     }
 
@@ -127,7 +146,7 @@ public:
     PermuEvaluator()
     {
         executor = NetworkExecutor<Evaluator>::create();
-        Evaluator::Config *config;
+        //Evaluator::Config *config;
 
 
         // size_t configlen;

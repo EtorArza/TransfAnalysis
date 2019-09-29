@@ -118,7 +118,7 @@ int main(int argc, char *argv[])
         int rng_seed = reader.GetInteger("NEAT","SEED", -1);
         env->pop_size = reader.GetInteger("NEAT", "POPSIZE", -1);
         int max_time = reader.GetInteger("NEAT", "MAX_TRAIN_TIME", -1);
-        n_of_threads_omp = reader.GetInteger("NEAT", "THREADS", -1);
+        N_OF_THREADS = reader.GetInteger("NEAT", "THREADS", -1);
         N_EVALS = reader.GetInteger("NEAT", "N_EVALS", -1);
         N_REEVALS = reader.GetInteger("NEAT","N_REEVALS", -1);
         string search_type = reader.Get("NEAT", "SEARCH_TYPE", "UNKOWN");
@@ -144,7 +144,7 @@ int main(int argc, char *argv[])
         }
 
 
-        if(n_of_threads_omp < 0){
+        if(N_OF_THREADS < 0){
             cout << "please specify a valid number of threads on the conf. file" <<endl;
             exit(1);
         }
@@ -159,9 +159,9 @@ int main(int argc, char *argv[])
             error("Already exists: experiment_1.\nMove your experiment directories or use -f to delete them automatically. If -f is used, all previous experiments will be deleted.")
         }
 
-        omp_set_num_threads(n_of_threads_omp);
+        omp_set_num_threads(N_OF_THREADS);
 
-        if (n_of_threads_omp < 7)
+        if (N_OF_THREADS < 7)
         {
             cout << "Warning: a minimum of 7 threads is recommended for this implementation of NEAT to function correctly." << endl;
             cout << "With the current settings, processing a generation takes around " ; 
@@ -194,7 +194,7 @@ int main(int argc, char *argv[])
         Experiment *exp = Experiment::get(prob_name);
         rng_t rng{rng_seed};
         global_timer.tic();
-        exp->run(rng, 10000000);
+        exp->run(rng);
         return 0;
     }
     else if (MODE ==  "test")
@@ -210,21 +210,37 @@ int main(int argc, char *argv[])
         TABU_LENGTH = reader.GetInteger("Controller", "TABU_LENGTH", -1);
         CONTROLLER_PATH = reader.Get("Controller", "CONTROLLER_PATH", "UNKNOWN");
 
+        N_EVALS = reader.GetInteger("TestSettings", "N_EVALS", -1);
+        N_OF_THREADS = reader.GetInteger("TestSettings", "THREADS", 1);
+
+        N_OF_THREADS = min(N_OF_THREADS, N_EVALS);
+
+
         if (CONTROLLER_PATH == "UNKNOWN")
         {
             cout << "error, controller path not specified in test." << endl;
         }
         
         CpuNetwork net = load_network(CONTROLLER_PATH);
-        double f_best = FitnessFunction_permu(&net, 1);
+
+        double *v_of_f_values = new double[N_EVALS];
+
+        #pragma omp parallel for num_threads(N_OF_THREADS)
+        for (int i = 0; i < N_EVALS; i++)
+        {
+            v_of_f_values[i] = FitnessFunction_permu(&net, 1);
+        }
+        double res = Average(v_of_f_values, N_EVALS);
+        delete[] v_of_f_values;
+
 
 
         
 
-        //cout << INSTANCE_PATH << "|" << PROBLEM_TYPE << "|" << f_best << endl;
+        //cout << INSTANCE_PATH << "|" << PROBLEM_TYPE << "|" << res << endl;
         cout << std::setprecision(15);
         cout << std::flush;
-        cout << f_best << std::endl;;
+        cout << res << std::endl;;
         cout << std::flush;
 
         return 0;

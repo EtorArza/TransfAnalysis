@@ -30,15 +30,18 @@ Network *Network::create() {
     return new CpuNetwork();
 }
 
-// // copy constructor
-// CpuNetwork::CpuNetwork(const CpuNetwork&  other){ 
-//     this->activations = std::vector<real_t>(other.activations);
+// copy constructor
+CpuNetwork::CpuNetwork(const CpuNetwork&  other){ 
+    this->activations = std::vector<real_t>(other.activations);
 
-//     this->dims = other.dims;
-//     this->links = other.links;
-//     this->nodes = other.nodes;
+    this->dims = other.dims;
+    this->links = other.links;
+    this->nodes = other.nodes;
 
-// }
+}
+
+
+
 
 // Requires nodes to be sorted by type: BIAS, SENSOR, OUTPUT, HIDDEN
 void CpuNetwork::configure(const NetDims &dims_,

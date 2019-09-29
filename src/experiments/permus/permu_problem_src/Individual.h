@@ -31,7 +31,7 @@ public:
 	// The constructor. The constructed individual has
 	// all zeroes as its genes.
 	CIndividual(int length, RandomNumberGenerator* rng);
-
+	void reset(RandomNumberGenerator* rng);
 	~CIndividual();
 	void SetGenome(int *genes);
 	void PrintGenome();

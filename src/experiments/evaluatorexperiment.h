@@ -53,7 +53,7 @@ namespace NEAT {
 
 
 
-        virtual void run(class rng_t &rng, int gens) override {
+        virtual void run(class rng_t &rng) override {
             using namespace std;
 
             network_evaluator = unique_ptr<NetworkEvaluator>(create_evaluator());

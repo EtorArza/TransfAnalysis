@@ -20,6 +20,7 @@
 #include "speciespopulation.h"
 #include "timer.h"
 #include "util.h"
+#include "Parameters.h"
 
 #include <assert.h>
 #include <omp.h>
@@ -311,7 +312,7 @@ void SpeciesPopulation::next_generation() {
         static Timer timer("reproduce");
         timer.start();
 
-#pragma omp parallel for //num_threads(N_OF_THREADS)
+#pragma omp parallel for num_threads(N_OF_THREADS)
         for(size_t iorg = 0; iorg < norgs; iorg++) {
             SpeciesOrganism &baby = orgs.curr()[iorg];
             reproduce_parms_t &parms = reproduce_parms[iorg];
@@ -334,7 +335,7 @@ void SpeciesPopulation::next_generation() {
         timer.start();
 
         {
-#pragma omp parallel for //num_threads(N_OF_THREADS)
+#pragma omp parallel for num_threads(N_OF_THREADS)
             for(size_t i = 0; i < norgs; i++) {
                 SpeciesOrganism &org = orgs.curr()[i];
                 Species *origin_species = reproduce_parms[i].species;

@@ -77,8 +77,7 @@ void CPopulation::Reset(){
     {   
         auto tmp = std::vector<double>();
         std::swap(tmp, m_individuals[i]->activation);
-        delete m_individuals[i];
-        m_individuals[i] = new CIndividual(n, rng);
+        m_individuals[i]->reset(rng);
         std::swap(tmp, m_individuals[i]->activation);
     }
     terminated = false;
@@ -96,19 +95,27 @@ CPopulation::~CPopulation()
 {
     for (int i = 0; i < POPSIZE; i++)
     {
-        delete m_individuals[i];
         delete[] pop_info[i];
     }
     m_individuals.clear();
     delete timer;
+    timer=NULL;
     delete pt;
+    pt=NULL;
     delete rng;
+    rng=NULL;
     delete tab;
+    tab=NULL;
     delete[] pop_info;
+    pop_info=NULL;
     delete[] permus;
+    permus=NULL;
     delete[] genome_best;
+    genome_best=NULL;
     delete[] templ_double_array;
+    templ_double_array=NULL;
     delete[] templ_double_array2;
+    templ_double_array2=NULL;
 }
 
 

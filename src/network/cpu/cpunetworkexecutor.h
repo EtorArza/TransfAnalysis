@@ -46,7 +46,7 @@ namespace NEAT {
 
 
             // evaluate the individuals 
-            #pragma omp parallel for
+            #pragma omp parallel for num_threads(N_OF_THREADS)
             for(size_t inet = 0; inet < nnets; inet++) {
                 CpuNetwork *net = nets[inet];
                 Evaluator *ev = new Evaluator(config);
@@ -72,13 +72,22 @@ namespace NEAT {
             }
             std::cout << "]" << std::endl;
 
-            // reevaluate top n_of_threads_omp, with a minimum of 5 and a maximum of nnets.
-            double cut_value = obtain_kth_largest_value(f_values, min(max(n_of_threads_omp, 5), static_cast<int>(nnets)), nnets);
-            #pragma omp parallel for
+            // // reevaluate top n_of_threads_omp, with a minimum of 5 and a maximum of nnets.
+            // double cut_value = obtain_kth_largest_value(f_values, min(max(n_of_threads_omp, 5), static_cast<int>(nnets)), nnets);
+         
+            // reevaluate top 1% at least N_REEVAL times
+            int actual_n_reevals = (( (N_REEVALS-1) / N_OF_THREADS) + 1) * N_OF_THREADS;
+            int n_of_networks_to_reevaluate = max(1, static_cast<int>(nnets) / 100);
+            cout << "reevaluating top 1% (" << n_of_networks_to_reevaluate << " nets out of " << static_cast<int>(nnets) << ") each "  << actual_n_reevals << " times." << endl;
+
+            double cut_value = obtain_kth_largest_value(f_values, n_of_networks_to_reevaluate, static_cast<int>(nnets));
+
             for(size_t inet = 0; inet < nnets; inet++) {
                 if (cut_value >= f_values[inet])
                 {   
-                    f_values[inet] -= 1000000.0; // apply a discount to the individuals that are not reevaluated
+                    results[inet].fitness -= 100000000.0;
+                    results[inet].error += 100000000.0;
+                    f_values[inet] -= 100000000.0; // apply a discount to the individuals that are not reevaluated
                     continue;
                 }
                 else
@@ -86,7 +95,7 @@ namespace NEAT {
                     CpuNetwork *net = nets[inet];
                     Evaluator *ev = new Evaluator(config);
                     OrganismEvaluation eval;
-                    eval.fitness = ev->FitnessFunction_reevaluation(net);
+                    eval.fitness = ev->FitnessFunction_reevaluation(net, actual_n_reevals);
                     f_values[inet] = eval.fitness;
                     eval.error = -100000000 + eval.fitness;
                     results[inet] = eval;

@@ -37,6 +37,13 @@ CIndividual::CIndividual(int length, RandomNumberGenerator* rng)
 
 }
 
+void CIndividual::reset(RandomNumberGenerator* rng){
+	GenerateRandomPermutation(this->genome, n, rng); 
+	GenerateRandomPermutation(this->momentum, n, rng); 
+	GenerateRandomPermutation(this->genome_best, n, rng);
+	f_value=std::numeric_limits<double>::lowest();
+	f_best=std::numeric_limits<double>::lowest();
+}
 
 CIndividual::~CIndividual()
 {

@@ -68,54 +68,24 @@ struct Evaluator {
     real_t errorsum;
     int istep;
 
-    __net_eval_decl Evaluator(const Config *config_)
-    : config(config_) {
-        errorsum = 0.0;
-        istep = -1;
-    }
 
-    __net_eval_decl double FitnessFunction(CpuNetwork* net) {
-    }
+    __net_eval_decl Evaluator(const Config *config_): config(config_) { }
+
+    __net_eval_decl double FitnessFunction(CpuNetwork* net){return -__DBL_MAX__;};
+
+    __net_eval_decl double FitnessFunction_reevaluation(CpuNetwork* net, int n_reevals){return -__DBL_MAX__;};
+
+    __net_eval_decl bool next_step() { }
+
+    __net_eval_decl bool clear_noninput() { }
+
+    __net_eval_decl real_t get_sensor(node_size_t sensor_index) { }
+
+    __net_eval_decl void evaluate(real_t *actual) { }
+
+    __net_eval_decl OrganismEvaluation result() { }
 
 
-    __net_eval_decl double FitnessFunction_reevaluation(CpuNetwork* net) {
-    }
-
-
-    __net_eval_decl bool next_step() {
-        return ++istep < int(config->nsteps);
-    }
-
-    __net_eval_decl bool clear_noninput() {
-        return config->parms(istep)->clear_noninput;
-    }
-
-    __net_eval_decl real_t get_sensor(node_size_t sensor_index) {
-        return config->inputs(istep)[sensor_index];
-    }
-
-    __net_eval_decl void evaluate(real_t *actual) {
-        real_t *expected = config->outputs(istep);
-        real_t result = 0.0;
-
-        for(size_t i = 0; i < config->noutputs; i++) {
-            real_t err = actual[i] - expected[i];
-            if(err < 0) err *= -1;
-            if(err < 0.05) {
-                err = 0.0;
-            }
-            result += err;
-        }
-
-        errorsum += result * config->parms(istep)->weight;
-    }
-
-    __net_eval_decl OrganismEvaluation result() {
-        OrganismEvaluation eval;
-        eval.error = errorsum;
-        eval.fitness = 1.0 - errorsum/config->max_err;
-        return eval;
-    }
 };
 
 //---

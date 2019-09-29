@@ -21,6 +21,7 @@ EXTERN int TABU_LENGTH;
 EXTERN std::string INSTANCE_PATH;
 EXTERN std::string PROBLEM_TYPE;
 EXTERN std::string CONTROLLER_PATH;
+EXTERN int N_OF_THREADS;
 ///////////////////////////
 
 // TRAIN PARAMS //
