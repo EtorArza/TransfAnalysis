@@ -307,7 +307,14 @@ double Average(T *array, int len)
 }
 
 
-#include <algorithm>
+template <class A, class B>
+void multiply_array_with_value(A* array, B value, int len){
+    for (int i = 0; i < len; i++)
+    {
+        array[i] *= value;
+    }
+}
+
 // compute the average value of the elements on the array dropping the best and worst quarter
 template <class T>
 double Average_drop_top_bottom_quartile(T *array, int len)
@@ -628,8 +635,14 @@ void compute_order_int(T* v, int len, int* order_res){
 
 
 template <class T>
-void compute_order_double(T* v, int len, double* order_res){
+void compute_order_double(T* v, int len, double* order_res, bool reverse = false){
     int* temp = new int[len];
+
+    if (reverse)
+    {
+        multiply_array_with_value(v, -1, len);
+    }
+    
     for (int i = 0; i < len; i++)
     {
         temp[i] = i;
@@ -641,3 +654,7 @@ void compute_order_double(T* v, int len, double* order_res){
     }
     delete[] temp;
 }
+
+
+// if NOT reverse, then the smallest value (0.0 in the case of the normalized result) will NOT change position
+void transform_from_values_to_normalized_rankings(double* reference_and_result, int len, bool reverse = false);

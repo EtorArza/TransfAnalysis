@@ -76,6 +76,8 @@ namespace NEAT {
             
             int gen = 0;
             int number_of_saved = 1;
+            BEST_FITNESS_TRAIN = -__DBL_MAX__;
+            N_TIMES_BEST_FITNESS_IMPROVED_TRAIN = 0;
 
             for(double progress = 0; progress < 1.0; progress = ((double) global_timer.toc() / (double) MAX_TRAIN_TIME)) {
                 gen++;

@@ -5,7 +5,7 @@
 #endif
 
 
-
+// FILE CONTAINING ALL GLOBAL VARIABLES
 
 class stopwatch;
 // CONSTANT PARAMETERS //
@@ -34,7 +34,8 @@ EXTERN stopwatch global_timer;
 #define MIN_LONG_INTEGER -42949672950000
 #define MAX(A,B) ( (A > B) ? A : B)
 #define MIN(A,B) ( (A < B) ? A : B)
-
+EXTERN double BEST_FITNESS_TRAIN;
+EXTERN double N_TIMES_BEST_FITNESS_IMPROVED_TRAIN;
 // NEAT PARAMETERS //
 # define CUTOFF_0 0.25
 //////////////////////

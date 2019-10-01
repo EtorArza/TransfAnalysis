@@ -141,7 +141,7 @@ void PBP::apply_operator_with_fitness_update(CIndividual *indiv, double delta, i
             break;
         }
 
-        double actual_delta = indiv->f_value - Evaluate(indiv->genome);
+        //double actual_delta = indiv->f_value - Evaluate(indiv->genome);
         assert(abs(indiv->f_value - Evaluate(indiv->genome)) < 0.0001);
         moved = true;
     }

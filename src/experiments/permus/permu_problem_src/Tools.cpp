@@ -1179,3 +1179,20 @@ std::vector<string> split(string txt, char ch)
 
     return res;
 }
+
+
+
+// if NOT reverse, then the smallest value (0.0 in the case of the normalized result) will NOT change position
+void transform_from_values_to_normalized_rankings(double* reference_and_result, int len, bool reverse){
+    double* res = new double[len];
+    
+    assert(len >2);
+    compute_order_double(reference_and_result, len, res, reverse);
+    
+    for (int i = 0; i < len; i++)
+    {
+        reference_and_result[i] = res[i] / (double) (len - 1);
+    }
+
+    delete[] res;
+}
