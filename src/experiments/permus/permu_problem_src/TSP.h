@@ -57,21 +57,21 @@ public:
      */
     virtual ~TSP();
 	
-	/*
-	 * Read TSP instance file that belongs to the TSPLIB library.
-	 */
-	int Read2(string filename);
 
-    /*
-	 * Read TSP instance file.
-	 */
+
+	// The cpp inplementation is for the assymetric TSP, however, it is currently redirected to the Read2 function.
 	int Read(string filename);
     
-	/*
-	 * This function evaluates the fitness of the solution for the TSP problem.
-	 */
-	double Evaluate(int * genes);
 
+	// Read the cordenates of cities from file, thus symmertric TSP problems.
+	int Read2(string filename);
+
+
+	double _Evaluate(int * genes);
+
+  	double fitness_delta_swap(CIndividual *indiv, int i, int j);
+	double fitness_delta_interchange(CIndividual *indiv, int i, int j);
+	double fitness_delta_insert(CIndividual *indiv, int i, int j);
   
     /*
      * Returns the size of the problem.

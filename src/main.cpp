@@ -27,6 +27,7 @@
 #include "QAP.h"
 #include "LOP.h"
 #include "PFSP.h"
+#include "TSP.h"
 #include "permuevaluator.h"
 #include "Tools.h"
 #include "FitnessFunction_permus.h"
@@ -59,8 +60,10 @@ PBP *GetProblemInfo(std::string problemType, std::string filename)
     {
         problem = new PFSP();
     }
-    // else if (problemType == "tsp")
-    //     problem = new TSP();
+    else if (problemType == "tsp")
+    {
+        problem = new TSP();
+    }
     else if (problemType == "qap")
     {
         problem = new QAP();
@@ -165,7 +168,7 @@ int main(int argc, char *argv[])
         {
             cout << "Warning: a minimum of 7 threads is recommended for this implementation of NEAT to function correctly." << endl;
             cout << "With the current settings, processing a generation takes around " ; 
-            cout << ((env->pop_size*MAX_TIME_PSO / (double)2 * (double)N_EVALS + (double)(5/n_of_threads_omp + 1) * (double)N_REEVALS)) / 3600.0; 
+            cout << ((env->pop_size*MAX_TIME_PSO / (double)2 * (double)N_EVALS + (double)(5/N_OF_THREADS + 1) * (double)N_REEVALS)) / 3600.0; 
             cout << "h,  which might be too long." << endl << endl;
         }
 

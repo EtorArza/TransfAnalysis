@@ -67,48 +67,25 @@ int PBP::Read_with_mutex(string filename){
     return res;
 }
 
+
 void PBP::apply_operator_with_fitness_update(CIndividual *indiv, int i, int j, NEAT::operator_t operator_id, double accept_or_reject_worse)
 {   
     if(i==j && j==-1){
         return;
     }
-
-    double r = 2*(this->rng->random_0_1_double()-0.5001);
-    
-    bool reject_worse = false;
-    bool moved = false;
-
-    if (r > accept_or_reject_worse){
-        reject_worse = true;
-    }
-
     double delta = 0;
+
 
     switch (operator_id)
     {
     case NEAT::SWAP:
         delta = this->fitness_delta_swap(indiv, i, j);
-        if (delta > 0 || !reject_worse){
-        indiv->f_value = delta + indiv->f_value;
-        Swap(indiv->genome, i, j);
-        moved = true;
-        }
         break;
     case NEAT::EXCH:
         delta = this->fitness_delta_interchange(indiv, i, j);
-        if (delta > 0 || !reject_worse){
-        indiv->f_value = delta + indiv->f_value;
-        Swap(indiv->genome, i, j);
-        moved = true;
-        }
         break;
     case NEAT::INSERT:
         delta = this->fitness_delta_insert(indiv, i, j);
-        if (delta > 0 || !reject_worse){
-        indiv->f_value = delta + indiv->f_value;
-        InsertAt(indiv->genome, i, j, this->problem_size_PBP);
-        moved = true;
-        }
         break;
 
     default:
@@ -116,6 +93,56 @@ void PBP::apply_operator_with_fitness_update(CIndividual *indiv, int i, int j, N
         std::cout << "operator_id not recognized.";
         exit(1);
         break;
+    }
+
+    apply_operator_with_fitness_update(indiv, delta, i, j, operator_id, accept_or_reject_worse);
+
+}
+
+void PBP::apply_operator_with_fitness_update(CIndividual *indiv, double delta, int i, int j, NEAT::operator_t operator_id, double accept_or_reject_worse)
+{
+    if (i == j && j == -1)
+    {
+        return;
+    }
+
+
+
+    double r = 2 * (this->rng->random_0_1_double() - 0.5001);
+
+    bool reject_worse = false;
+    bool moved = false;
+
+    if (r > accept_or_reject_worse)
+    {
+        reject_worse = true;
+    }
+
+    if (delta > 0 || !reject_worse)
+    {
+        indiv->f_value = delta + indiv->f_value;
+
+        switch (operator_id)
+        {
+        case NEAT::SWAP:
+            Swap(indiv->genome, i, j);
+            break;
+
+        case NEAT::EXCH:
+            Swap(indiv->genome, i, j);
+            break;
+
+        case NEAT::INSERT:
+            InsertAt(indiv->genome, i, j, this->problem_size_PBP);
+            break;
+
+        default:
+            std::cout << "operator_id not recognized.";
+            exit(1);
+            break;
+        }
+        assert(abs(indiv->f_value - Evaluate(indiv->genome)) < 0.0001);
+        moved = true;
     }
 
     if (indiv->f_value > indiv->f_best)
@@ -126,13 +153,14 @@ void PBP::apply_operator_with_fitness_update(CIndividual *indiv, int i, int j, N
 
     if (moved)
     {
-    for (int i = 0; i < 3; i++)
-    {
-        indiv->is_local_optimum[i] = false;
+        for (int i = 0; i < 3; i++)
+        {
+            indiv->is_local_optimum[i] = false;
+        }
     }
-    }
-    
 }
+
+
 
 
 void PBP::local_search_iteration(CIndividual *indiv, NEAT::operator_t operator_id)
@@ -141,6 +169,7 @@ void PBP::local_search_iteration(CIndividual *indiv, NEAT::operator_t operator_i
     {
         return;
     }
+
 
 
     switch (operator_id)
@@ -159,10 +188,13 @@ void PBP::local_search_iteration(CIndividual *indiv, NEAT::operator_t operator_i
                 continue;
             }
             
-            if (fitness_delta_swap(indiv, r, r+1) > 0)
+            double delta = fitness_delta_swap(indiv, r, r+1);
+            if (delta > 0)
             {
                 tab->set_tabu(r, r+1);
-                apply_operator_with_fitness_update(indiv, r, r+1, operator_id);
+                apply_operator_with_fitness_update(indiv, delta, r, r+1, operator_id);
+                assert(abs(indiv->f_value - _Evaluate(indiv->genome)) < 0.0001);
+                return;
             }
         }
         break;
@@ -176,10 +208,15 @@ void PBP::local_search_iteration(CIndividual *indiv, NEAT::operator_t operator_i
             {
                 if (i < j && !(tab->is_tabu(_random_permu1[i],_random_permu2[j]) || tab->is_tabu(_random_permu2[j],_random_permu1[i])) )
                 {
-                    if (fitness_delta_interchange(indiv, _random_permu1[i], _random_permu2[j]) > 0)
+                    double delta = fitness_delta_interchange(indiv, _random_permu1[i], _random_permu2[j]);
+                    if (delta > 0)
                     {
+                       	//cout << "(" << i << "," << j << ")" << endl;
                         tab->set_tabu(_random_permu1[i],_random_permu2[j]);
-                        apply_operator_with_fitness_update(indiv, _random_permu1[i], _random_permu2[j], operator_id);
+                        assert(isPermutation(indiv->genome, problem_size_PBP));
+                        apply_operator_with_fitness_update(indiv, delta, _random_permu1[i], _random_permu2[j], operator_id);
+                        assert(isPermutation(indiv->genome, problem_size_PBP));
+                        assert(abs(indiv->f_value - _Evaluate(indiv->genome)) < 0.0001);
                         return;
                     }
                 }
@@ -200,13 +237,13 @@ void PBP::local_search_iteration(CIndividual *indiv, NEAT::operator_t operator_i
                     {
                         continue;
                     }
-
-                    if (fitness_delta_insert(indiv, _random_permu1[i], _random_permu2[j]) > 0)
+                    double delta =fitness_delta_insert(indiv, _random_permu1[i], _random_permu2[j]);
+                    if (delta > 0)
                     {   
                         //cout << "peep ";
                         tab->set_tabu(_random_permu1[i], _random_permu2[j]);
-                        // double f = Evaluate(indiv->genome) + fitness_delta_insert(indiv, _random_permu1[i], _random_permu2[j]);
-                        apply_operator_with_fitness_update(indiv, _random_permu1[i], _random_permu2[j], operator_id);
+                       	//cout << "(" << i << "," << j << ")" << endl;
+                        apply_operator_with_fitness_update(indiv, delta, _random_permu1[i], _random_permu2[j], operator_id);
 
                         // if(!isPermutation(indiv->genome, problem_size_PBP)){
                         //     cout << "is NOT permutation" << endl;
@@ -231,6 +268,7 @@ void PBP::local_search_iteration(CIndividual *indiv, NEAT::operator_t operator_i
     {
         indiv->is_local_optimum[NEAT::OPT_SWAP] = true;
     }
+
 
 
 }
@@ -538,7 +576,7 @@ void PBP::obtain_indexes_step_away(int *permu, int *ref_permu, int* i, int* j, N
         }
         *i = arg_max;
         *j = rng->random_integer_uniform(problem_size_PBP);
-        assert(*j < 35);
+        assert(*j < problem_size_PBP);
         while (*i ==*j)
         {
             *j = rng->random_integer_uniform(problem_size_PBP);
@@ -567,6 +605,8 @@ void PBP::move_indiv_towards_reference(CIndividual* indiv, int* ref_permu, NEAT:
     }
     // std::cout << "(" << i << "," << j << ")" << endl;
     apply_operator_with_fitness_update(indiv, i, j, operator_id, accept_or_reject_worse);
+    assert(abs(indiv->f_value - _Evaluate(indiv->genome)) < 0.0001);
+
 }
 
 
@@ -584,6 +624,7 @@ void PBP::move_indiv_away_reference(CIndividual* indiv, int* ref_permu, NEAT::op
     }
 
     apply_operator_with_fitness_update(indiv, i, j, operator_id, accept_or_reject_worse);
+    assert(abs(indiv->f_value - _Evaluate(indiv->genome)) < 0.0001);
     assert(isPermutation(indiv->genome, this->problem_size_PBP)) ;
 
 }

@@ -57,6 +57,7 @@ class PBP
 
   protected:
 
+	void apply_operator_with_fitness_update(CIndividual *indiv, double delta, int i, int j, NEAT::operator_t operator_id, double accept_or_reject_worse=1.0);
 	void apply_operator_with_fitness_update(CIndividual *indiv, int i, int j, NEAT::operator_t operator_id, double accept_or_reject_worse=1.0);
 
 
@@ -66,6 +67,8 @@ class PBP
 	int *_random_permu1;
 	int *_random_permu2;
 	int *_random_permu3;
+	int problem_size_PBP;
+
 
 	RandomNumberGenerator *rng;
 
@@ -85,5 +88,4 @@ class PBP
 	void obtain_indexes_step_away(int *permu, int *ref_permu, int* i, int* j, NEAT::operator_t operator_id);
 
 
-	int problem_size_PBP;
 };

@@ -25,7 +25,6 @@ EXTERN int N_OF_THREADS;
 ///////////////////////////
 
 // TRAIN PARAMS //
-EXTERN int n_of_threads_omp;
 EXTERN double MAX_TRAIN_TIME;
 EXTERN stopwatch global_timer;
 ///////////////////////////

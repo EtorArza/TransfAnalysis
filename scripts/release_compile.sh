@@ -10,6 +10,3 @@ EOF
 make
 
 
-
-
-./neat test "qap" "src/experiments/permus/instances/qap/tai35a.dat.dat" "fittest_300"
