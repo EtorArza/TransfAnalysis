@@ -82,7 +82,7 @@ namespace NEAT {
             for(double progress = 0; progress < 1.0; progress = ((double) global_timer.toc() / (double) MAX_TRAIN_TIME)) {
                 gen++;
                 cout << "\n\n";
-                cout << "Epoch " << gen << ", progress: " << progress << endl;	
+                cout << "Gen " << gen-1 << ", progress: " << progress << endl;	
                 cout << "Time left:" << ((double) MAX_TRAIN_TIME - global_timer.toc()) / 60.0 / 60.0 << "h" << endl;
                 
 

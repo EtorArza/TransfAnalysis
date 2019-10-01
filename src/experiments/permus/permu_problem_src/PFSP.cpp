@@ -32,9 +32,7 @@ PFSP::~PFSP()
 }
 
 
-/*
- * Evaluates the given solution with the total flow time criterion.
- */
+
 double PFSP::_Evaluate(int * permu)
 {
     for (int i=0;i<m_machines;i++) m_timeTable[i]=0;

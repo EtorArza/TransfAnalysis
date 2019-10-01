@@ -69,9 +69,7 @@ public:
 	 */
 	int Read(string filename);
 	
-	/*
-	 * Evaluates the given solution with the total flow time criterion.
-	 */
+
 	double _Evaluate(int * permu);
 
 	double fitness_delta_swap(CIndividual *indiv, int i, int j){

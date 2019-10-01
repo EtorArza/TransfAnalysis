@@ -21,19 +21,7 @@ cp ./* -v -r $SCRATCH_JOB
 # cp $dsname -v $SCRATCH_JOB/data
 cd $SCRATCH_JOB
 
-# echo `pwd`
-# echo `ls`
-# echo `ls data`
-cat > Makefile.conf <<EOF
-ENABLE_CUDA=false
-DEVMODE=false
-CFLAGS=-fopenmp -std=c++11 -pthread
-
-PFM_LD_FLAGS=
-PFM_NVCC_CCBIN=
-EOF
-
-make
+bash scripts/release_compile.sh
 
 date
 ./neat "config_files/train_hipatia_lop.ini"

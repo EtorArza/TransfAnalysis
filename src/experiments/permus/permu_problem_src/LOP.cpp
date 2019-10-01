@@ -167,8 +167,6 @@ double LOP::fitness_delta_interchange(CIndividual *indiv, int i, int j)
 		double delta_1 = fitness_delta_insert(indiv, i, j);
 
 
-		//double val = indiv->f_value - Evaluate(indiv->genome);
-
 
 		InsertAt(indiv->genome, i, j, problem_size_PBP);
 
