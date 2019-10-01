@@ -90,6 +90,10 @@ PBP *GetProblemInfo(std::string problemType, std::string filename)
 int main(int argc, char *argv[])
 {
 
+    #ifndef NDEBUG
+    cout << "WARNING: Debug mode. Assertions enabled." << endl;
+    #endif
+
     if (argc < 2)
     {
         cout << "Error, no configuration file provided.\n";

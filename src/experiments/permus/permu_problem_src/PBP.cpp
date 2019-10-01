@@ -107,7 +107,6 @@ void PBP::apply_operator_with_fitness_update(CIndividual *indiv, double delta, i
     }
 
 
-
     double r = 2 * (this->rng->random_0_1_double() - 0.5001);
 
     bool reject_worse = false;
@@ -141,6 +140,8 @@ void PBP::apply_operator_with_fitness_update(CIndividual *indiv, double delta, i
             exit(1);
             break;
         }
+
+        double actual_delta = indiv->f_value - Evaluate(indiv->genome);
         assert(abs(indiv->f_value - Evaluate(indiv->genome)) < 0.0001);
         moved = true;
     }
@@ -211,7 +212,7 @@ void PBP::local_search_iteration(CIndividual *indiv, NEAT::operator_t operator_i
                     double delta = fitness_delta_interchange(indiv, _random_permu1[i], _random_permu2[j]);
                     if (delta > 0)
                     {
-                       	//cout << "(" << i << "," << j << ")" << endl;
+                       	//cout << "(" << _random_permu1[i] << "," << _random_permu2[j] << ")" << endl;
                         tab->set_tabu(_random_permu1[i],_random_permu2[j]);
                         assert(isPermutation(indiv->genome, problem_size_PBP));
                         apply_operator_with_fitness_update(indiv, delta, _random_permu1[i], _random_permu2[j], operator_id);

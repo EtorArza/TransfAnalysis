@@ -164,18 +164,23 @@ double LOP::fitness_delta_interchange(CIndividual *indiv, int i, int j)
 	}
 	else
 	{	
-		int* permu = indiv->genome;
 		double delta_1 = fitness_delta_insert(indiv, i, j);
 
-		int aux = permu[i];
-		permu[i] = permu[j];
-		permu[j] = aux;
+
+		//double val = indiv->f_value - Evaluate(indiv->genome);
+
+
+		InsertAt(indiv->genome, i, j, problem_size_PBP);
 
 		double delta_2 = fitness_delta_insert(indiv, j-1, i);
 
-		aux = permu[i];
-		permu[i] = permu[j];
-		permu[j] = aux;
+		InsertAt(indiv->genome, j-1, i, problem_size_PBP);
+
+		Swap(indiv->genome, i, j);
+
+
+		
+		// return val;
 
 		return delta_1 + delta_2;
 	}
@@ -200,3 +205,4 @@ double LOP::fitness_delta_insert(CIndividual *indiv, int i, int j)
 	}
 	return delta;
 }
+ 
