@@ -106,6 +106,7 @@ namespace NEAT {
                 N_TIMES_BEST_FITNESS_IMPROVED_TRAIN++;
                 cout << "[BEST_FITNESS_IMPROVED] --> " << f_values[argmax(f_values, nnets)] << endl;
                 BEST_FITNESS_TRAIN = f_values[argmax(f_values, nnets)];
+                
             }
 
 

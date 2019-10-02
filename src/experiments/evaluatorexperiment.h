@@ -33,6 +33,9 @@ namespace NEAT {
         }
 
     public:
+
+        bool save_best_network = false;
+
         typedef std::function<NetworkEvaluator *()> CreateEvaluatorFunc;
         typedef std::function< std::vector<std::unique_ptr<Genome>> (rng_t rng)> CreateSeedsFunc;
 
@@ -75,13 +78,12 @@ namespace NEAT {
     
             
             int gen = 0;
-            int number_of_saved = 1;
             BEST_FITNESS_TRAIN = -__DBL_MAX__;
             N_TIMES_BEST_FITNESS_IMPROVED_TRAIN = 0;
 
             for(double progress = 0; progress < 1.0; progress = ((double) global_timer.toc() / (double) MAX_TRAIN_TIME)) {
                 gen++;
-                cout << "\n\n";
+                cout << "\n ---------------------------------------------------- \n\n";
                 cout << "Gen " << gen-1 << ", progress: " << progress << endl;	
                 cout << "Time left:" << ((double) MAX_TRAIN_TIME - global_timer.toc()) / 60.0 / 60.0 << "h" << endl;
                 
@@ -97,16 +99,14 @@ namespace NEAT {
 
                 timer.stop();
                 Timer::report();
-                
 
-                #define SAVE_THIS_MANY_NETWORKS_DURING_CONVERGENCE 8 
-                double save_every = MAX_TRAIN_TIME / (double) SAVE_THIS_MANY_NETWORKS_DURING_CONVERGENCE * 0.999;
-                if (save_every * number_of_saved  < global_timer.toc())
+
+
+                if (save_best_network)
                 {
-                    number_of_saved++;
+                    save_best_network = false;
                     print(1, gen);
                 }
-                #undef SAVE_THIS_MANY_NETWORKS_DURING_CONVERGENCE
             }
 
             {
@@ -161,12 +161,13 @@ namespace NEAT {
 
             // Fittest is not evaluated.
             if(!fittest || (best->eval.fitness > fittest->eval.fitness)) {
+                save_best_network = true;
                 fittest = pop->make_copy(best->population_index);
             }
 
             Genome::Stats gstats = fittest->genome->get_stats();
             cout << "fittest [" << fittest->population_index << "]"
-                 << ": fitness=" << fittest->eval.fitness
+                 << ": fitness=" << BEST_FITNESS_TRAIN
                  << ", error=" << fittest->eval.error
                  << ", nnodes=" << gstats.nnodes
                  << ", nlinks=" << gstats.nlinks
