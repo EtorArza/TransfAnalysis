@@ -52,7 +52,6 @@ public:
 	int id;		 // a unique identifier for each individual in the pop.
 	double f_value;
 	bool is_local_optimum[NEAT::N_OPERATORS] = {false, false, false}; // is_local_optimum[OPERATOR_ID] contains if it is optimum or not.
-	int* momentum;
 	double f_best;
 	int* genome_best;
 

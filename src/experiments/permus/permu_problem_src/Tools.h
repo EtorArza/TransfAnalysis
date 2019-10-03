@@ -492,7 +492,7 @@ class RandomNumberGenerator{
         int random_integer_uniform(int min, int max);
         double random_0_1_double();
 
-
+        
 
 
         unsigned long x, y, z;
@@ -525,6 +525,7 @@ bool coin_toss(double p_of_true, RandomNumberGenerator* rng);
 void shuffle_vector(int *vec, int len);
 void shuffle_vector(int *vec, int len, RandomNumberGenerator* rng);
 
+class Lap;
 
 class PermuTools
 {
@@ -537,8 +538,15 @@ public:
     int* random_permu1;
     int* random_permu2;
     int* temp_array;
+    int* temp_array2;
+    int* temp_array3;
+    int* temp_array4;
     double* temp_array_double;
     int* identity_permu;
+
+    int* hamming_mm_consensus;
+    int* kendall_mm_consensus;
+
     double** first_marginal;
     double** order_marginal;
 
@@ -553,9 +561,33 @@ public:
     int choose_permu_index_to_move(double* coef_list, RandomNumberGenerator* rng);
 
 
+    double compute_kendall_distance(int* premu_1, int* permu_2);
+    void compute_kendall_consensus_borda(int **permu_list, int m);
+
+
+    double compute_hamming_distance(int* permu_1, int* permu_2);
+    void compute_hamming_consensus(int **permu_list, int m);
+
+    double compute_hamming_distance_to_consensus(int* permu){ return compute_hamming_distance(permu, hamming_mm_consensus);}
+    double compute_kendall_distance_to_consensus(int* permu){ return compute_kendall_distance(permu, kendall_mm_consensus);}
+
+    double compute_normalized_hamming_distance_to_consensus(int* permu){ return compute_hamming_distance_to_consensus(permu) / (double) n;}
+    double compute_normalized_kendall_distance_to_consensus(int* permu){ return compute_kendall_distance_to_consensus(permu) / (double) (n*(n-1)/2);}
+
+
 private:
     void convert_to_permu(int* res);
     RandomNumberGenerator* rng;
+    
+    Lap* linear_assigment_problem;
+
+    int* lap_rows;
+    int* lap_cols;
+    int* lap_u;
+    int* lap_v;
+
+    int** freq_matrix;
+
     int it_to_compute_order_marginal = 0;
 };
 
@@ -598,22 +630,22 @@ T obtain_kth_largest_value(T *v, int k, int len)
 
 
 
-class sort_indices
+class _sort_indices
 {
    private:
      int* mparr;
    public:
-     sort_indices(int* parr) : mparr(parr) {}
+     _sort_indices(int* parr) : mparr(parr) {}
      bool operator()(int i, int j) const { return mparr[i]<mparr[j]; }
 };
 
 
-class sort_indices_double
+class _sort_indices_double
 {
    private:
      double* mparr;
    public:
-     sort_indices_double(double* parr) : mparr(parr) {}
+     _sort_indices_double(double* parr) : mparr(parr) {}
      bool operator()(int i, int j) const { return mparr[i]<mparr[j]; }
 };
 
@@ -625,7 +657,7 @@ void compute_order_int(T* v, int len, int* order_res){
     {
         temp[i] = i;
     }
-    std::sort(temp, temp+len, sort_indices(v));
+    std::sort(temp, temp+len, _sort_indices(v));
     for (int i = 0; i < len; i++)
     {
         order_res[temp[i]] = i;
@@ -647,7 +679,8 @@ void compute_order_double(T* v, int len, double* order_res, bool reverse = false
     {
         temp[i] = i;
     }
-    std::sort(temp, temp+len, sort_indices_double(v));
+
+    std::sort(temp, temp+len, _sort_indices_double(v));
     for (int i = 0; i < len; i++)
     {
         order_res[temp[i]] = (double) i;

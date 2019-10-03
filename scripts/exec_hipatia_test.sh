@@ -4,11 +4,11 @@
 #SBATCH --error=err/slurm_err_%j.txt
 #SBATCH --ntasks=1 # number of tasks
 #SBATCH --ntasks-per-node=1 #number of tasks per node
-#SBATCH --mem=128G
-#SBATCH --cpus-per-task=72 # number of CPUs
-#SBATCH --time=5-00:00:00 #Walltime
-#SBATCH -p large
-#SBATCH --exclude=n[001-016]
+#SBATCH --mem=8G
+#SBATCH --cpus-per-task=8 # number of CPUs
+#SBATCH --time=0-06:00:00 #Walltime
+#SBATCH -p medium
+#SBATCH --exclude=n[001-004,017-018]
 
 
 
@@ -27,10 +27,10 @@
 
 
 
-if [[ "$#" -ne 2  ]] ; then
-    echo 'Please provide the name of the problem and the name of the instance. $# parameters where provided. Two are needed. Example: '
+if [[ "$#" -ne 3  ]] ; then
+    echo 'Please provide the name of the problem, the name of the instance and the path to the controller. $# parameters where provided. 3 are needed. Example: '
     echo ""
-    echo 'script.sh qap tai35a.dat.dat'
+    echo 'script.sh qap tai35a.dat.dat experiment_results/inter_instance_transfer/qap_tai35a/experiment_1/fittest_1'
     echo ""
     echo 'Exitting...'
     exit 1
@@ -67,7 +67,7 @@ cat > tmp.ini <<EOF
 
 
 [Global] 
-mode = train ;  decide wether to train a controller or test it
+mode = test ;
 
 
 ; Configure parameters of NEAT, relevant only during training
@@ -91,6 +91,7 @@ TABU_LENGTH = 40 ;
 
 PROBLEM_TYPE = $1 ; the kind of permutation problem to be solved by the controller.
 PROBLEM_PATH = $2 ; 
+CONTROLLER_PATH = $3
 
 EOF
 

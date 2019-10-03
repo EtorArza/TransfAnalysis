@@ -18,6 +18,7 @@
 #include "Parameters.h"
 #include <set>
 #include "../permuevaluator.h"
+#include "Lap.h"
 
 #define TEMP_double_ARRAY_SIZE 30
 
@@ -863,19 +864,37 @@ PermuTools::PermuTools(int n)
     rng = new RandomNumberGenerator;
     rng->seed();
     this->n = n;
+    linear_assigment_problem = new Lap(n);
+
+    lap_rows=new int[n];
+    lap_cols=new int[n]; 
+    lap_u=new int[n];
+    lap_v=new int[n];
+
+
+
     random_permu1 = new int[n];
     random_permu2 = new int[n];
     temp_array = new int[n];
+    temp_array2 = new int[n];
+    temp_array3 = new int[n];
+    temp_array4 = new int[n];
     temp_array_double = new double[TEMP_double_ARRAY_SIZE];
 
     identity_permu = new int[n];
     first_marginal = new double*[n];
     order_marginal = new double*[n];
+    freq_matrix = new int*[n];
+
+    hamming_mm_consensus = new int[n];
+    kendall_mm_consensus = new int[n];
+
 
     for (int i = 0; i < n; i++)
     {
         first_marginal[i] = new double[n];
         order_marginal[i] = new double[n];
+        freq_matrix[i] = new int[n];
     }
 
 
@@ -892,9 +911,22 @@ PermuTools::PermuTools(int n)
 PermuTools::~PermuTools()
 {
     delete rng;
+    delete linear_assigment_problem;
+
+    delete[] this->lap_rows; 
+    delete[] this->lap_cols; 
+    delete[] this->lap_u; 
+    delete[] this->lap_v; 
+
+
     delete[] this->random_permu1;
     delete[] this->random_permu2;
     delete[] this->temp_array;
+    delete[] this->temp_array2;
+    delete[] this->temp_array3;
+    delete[] this->temp_array4;
+    delete[] this->hamming_mm_consensus;
+    delete[] this->kendall_mm_consensus;
     delete[] this->temp_array_double;
     delete[] this->identity_permu;
 
@@ -902,9 +934,11 @@ PermuTools::~PermuTools()
     {
         delete[] order_marginal[i];
         delete[] first_marginal[i];
+        delete[] freq_matrix[i];
     }
     delete[] order_marginal;
     delete[] first_marginal;
+    delete[] freq_matrix;
 }
 
 
@@ -1118,6 +1152,7 @@ int PermuTools::choose_permu_index_to_move(double* coef_list){
     return choose_permu_index_to_move(coef_list, this->rng);
 }
 
+
 int PermuTools::choose_permu_index_to_move(double* coef_list, RandomNumberGenerator* input_rng){
 
     assert(TEMP_double_ARRAY_SIZE >= NEAT::N_COEF);
@@ -1133,6 +1168,71 @@ int PermuTools::choose_permu_index_to_move(double* coef_list, RandomNumberGenera
 
     return choose_index_given_weights(temp_array_double, NEAT::N_COEF, input_rng);
 }
+
+
+
+double PermuTools::compute_kendall_distance(int* permu_1, int* permu_2){
+    return (double) Kendall(permu_1, permu_2, n, temp_array, temp_array2, temp_array3, temp_array4);
+}
+
+void PermuTools::compute_kendall_consensus_borda(int **permu_list, int m)
+{
+
+    for (int i = 0; i < n; i++)
+    {
+        temp_array[i] = 0;
+    }
+    
+    for (int j = 0; j < n; j++)
+    {
+        for (int i = 0; i < m; i++)
+        {
+            temp_array[j] += permu_list[i][j];
+        }
+    }
+
+    compute_order_int(temp_array, n, kendall_mm_consensus);
+
+}
+
+void PermuTools::compute_hamming_consensus(int **permu_list, int m)
+{
+    for (int j = 0; j < n; j++)
+    {
+        for (int i = 0; i < n; i++)
+        {
+            freq_matrix[i][j] = 0;
+        }
+    }
+
+    for (int i = 0; i < m; i++)
+        for (int j = 0; j < n; j++)
+            freq_matrix[j][permu_list[i][j]]--;
+    //int cost = -1 * lap.lap(n_, freq, rows, cols, u, v);
+    
+    linear_assigment_problem->execute_lap(freq_matrix, lap_rows, lap_cols, lap_u, lap_v);
+
+    for (int i = 0; i < n; i++)
+        hamming_mm_consensus[i] = lap_rows[i];
+
+}
+
+double PermuTools::compute_hamming_distance(int* permu_1, int* permu_2){
+    return (double) Hamming_distance(permu_1, permu_2, n);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // https://thispointer.com/c-how-to-read-a-file-line-by-line-into-a-vector/
 std::vector<string> read_lines_from_file(string filename){
@@ -1157,6 +1257,8 @@ std::vector<string> read_lines_from_file(string filename){
     }
     return vecOfStrs;
 }
+
+
 
 
 

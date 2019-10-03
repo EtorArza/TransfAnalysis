@@ -24,7 +24,7 @@ namespace NEAT {
 
     };
 
-    const int N_COEF = 4;
+    const int N_COEF = 5;
     enum output_t {
         ls_nothing_move = 0,
         O_ID_SWAP = SWAP + 1,
@@ -32,11 +32,12 @@ namespace NEAT {
         O_ID_INSERT = INSERT + 1,
         accept_or_reject_worse = 4,
         TABU = 5,
-        c_momentum = 6,
-        c_pers_best = 7,
-        c_best_known = 8,
-        c_above = 9,
-        __output_N = 10,
+        c_hamming_consensus = 6,
+        c_kendall_consensus = 7,
+        c_pers_best = 8,
+        c_best_known = 9,
+        c_above = 10,
+        __output_N = 11,
     };
 
     class NetworkEvaluator *create_permu_evaluator();

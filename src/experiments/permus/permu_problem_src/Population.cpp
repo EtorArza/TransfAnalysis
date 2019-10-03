@@ -301,20 +301,20 @@ void CPopulation::comp_distance()
 
 void CPopulation::comp_sparsity(){
     copy_references_of_genomes_from_individuals_to_permus();
-    pt->compute_first_marginal(permus, POPSIZE);
+    pt->compute_hamming_consensus(this->permus, popsize);
     for (int i = 0; i < POPSIZE; i++)
     {
-        m_individuals[i]->sparsity = 1.0 - pt->get_distance_to_marginal(permus[i]);
+        m_individuals[i]->sparsity = 1.0 - pt->compute_normalized_hamming_distance_to_consensus(permus[i]);
         pop_info[i][NEAT::SPARSITY] = m_individuals[i]->sparsity;
     }
 }
 
 
 void CPopulation::comp_order_sparsity(){
-    pt->compute_order_marginal(permus, POPSIZE);
+    pt->compute_kendall_consensus_borda(this->permus, popsize);
     for (int i = 0; i < POPSIZE; i++)
     {
-        m_individuals[i]->order_sparsity = 1.0 - pt->get_distance_to_order_marginal(permus[i]);
+        m_individuals[i]->order_sparsity = 1.0 - pt->compute_normalized_kendall_distance_to_consensus(permus[i]);
         pop_info[i][NEAT::ORDER_SPARSITY] = m_individuals[i]->order_sparsity;
     }
 }
@@ -399,8 +399,11 @@ void CPopulation::move_individual_i_based_on_coefs(double* coef_list, int i, NEA
 
     switch (idx)
     {
-    case NEAT::c_momentum:
-        ref_permu = m_individuals[i]->momentum;
+    case NEAT::c_hamming_consensus:
+        ref_permu = pt->hamming_mm_consensus;
+        break;
+    case NEAT::c_kendall_consensus:
+        ref_permu = pt->kendall_mm_consensus;
         break;
     case NEAT::c_pers_best:
         ref_permu = m_individuals[i]->genome_best;
@@ -424,14 +427,6 @@ void CPopulation::move_individual_i_based_on_coefs(double* coef_list, int i, NEA
         break;
     }
 
-    if (idx != NEAT::c_momentum)
-    {
-
-        copy_vector(this->m_individuals[i]->momentum, ref_permu, n);
-        assert(isPermutation(this->m_individuals[i]->genome, this->n)) ;
-
-    }
-    
 
     if(towards){
         problem->move_indiv_towards_reference(m_individuals[i], ref_permu, operator_id, accept_or_reject_worse);
