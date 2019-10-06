@@ -12,6 +12,7 @@
 #include "Parameters.h"
 #include <iomanip>      // std::setprecision
 #include "../permuevaluator.h"
+#include <float.h>
 
 
 // The object storing the values of all the individuals
@@ -119,7 +120,7 @@ istream & operator>>(istream & is,CIndividual * & individual)
 void CIndividual::SetGenome(int * genome_to_be_placed_in_individual)
 {
 	memcpy(this->genome, genome_to_be_placed_in_individual, sizeof(int)*n);
-	f_value=MIN_LONG_INTEGER;
+	f_value=-DBL_MAX;
 }
 
 /*

@@ -9,6 +9,7 @@
 #include "timer.h"
 #include "util.h"
 #include "Parameters.h"
+#include <float.h>
 namespace NEAT {
 
 //------------------------------
@@ -78,7 +79,7 @@ namespace NEAT {
     
             
             int gen = 0;
-            BEST_FITNESS_TRAIN = -__DBL_MAX__;
+            BEST_FITNESS_TRAIN = -DBL_MAX;
             N_TIMES_BEST_FITNESS_IMPROVED_TRAIN = 0;
 
             for(double progress = 0; progress < 1.0; progress = ((double) global_timer.toc() / (double) MAX_TRAIN_TIME)) {

@@ -75,8 +75,8 @@ mode = train ;  decide wether to train a controller or test it
 MAX_TRAIN_TIME = 43200 ; time in seconds
 POPSIZE = 504 ;
 THREADS = 72 ;
-N_EVALS = 3 ;
-N_REEVALS = 200 ;
+N_EVALS = 50 ;
+N_REEVALS = 1000 ;
 
 SEARCH_TYPE = phased ; only phased, complexify and blended are valid
 DELETE_PREVIOUS_EXPERIMENT = true ;
@@ -101,9 +101,10 @@ date
 ./neat "tmp.ini"
 date
 
-cp experiment_1* -v -r "controllers_$2/"
 
-cp "controllers_$2/" -v -r $SRCDIR
+cp experiment_1* -v -r $SRCDIR
+
+
 
 
 # #end

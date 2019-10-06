@@ -214,11 +214,10 @@ int main(int argc, char *argv[])
         MAX_TIME_PSO = reader.GetReal("Controller", "MAX_TIME_PSO", -1.0);
         POPSIZE = reader.GetInteger("Controller", "POPSIZE", -1);
         TABU_LENGTH = reader.GetInteger("Controller", "TABU_LENGTH", -1);
-        CONTROLLER_PATH = reader.Get("Controller", "CONTROLLER_PATH", "UNKNOWN");
-
+        CONTROLLER_PATH = reader.Get("TestSettings", "CONTROLLER_PATH", "UNKNOWN");
+        N_REPS = reader.GetInteger("TestSettings", "N_REPS", -1);
         N_EVALS = reader.GetInteger("TestSettings", "N_EVALS", -1);
         N_OF_THREADS = reader.GetInteger("TestSettings", "THREADS", 1);
-
         N_OF_THREADS = min(N_OF_THREADS, N_EVALS);
 
 
@@ -226,27 +225,42 @@ int main(int argc, char *argv[])
         {
             cout << "error, controller path not specified in test." << endl;
         }
+
+        if (N_REPS < 0)
+        {
+             cout << "error, N_REPS not provided in test mode." << endl;
+        }
+        
         
         CpuNetwork net = load_network(CONTROLLER_PATH);
 
         double *v_of_f_values = new double[N_EVALS];
 
-        #pragma omp parallel for num_threads(N_OF_THREADS)
-        for (int i = 0; i < N_EVALS; i++)
+        cout << std::setprecision(15);
+        for (int j = 0; j < N_REPS; j++)
         {
-            v_of_f_values[i] = FitnessFunction_permu(&net, 1);
+            #pragma omp parallel for num_threads(N_OF_THREADS)
+            for (int i = 0; i < N_EVALS; i++)
+            {
+                v_of_f_values[i] = FitnessFunction_permu(&net, 1);
+            }
+            double res = Average(v_of_f_values, N_EVALS);
+            cout << res << "|";
         }
-        double res = Average(v_of_f_values, N_EVALS);
         delete[] v_of_f_values;
-
 
 
         
 
-        //cout << INSTANCE_PATH << "|" << PROBLEM_TYPE << "|" << res << endl;
         cout << std::setprecision(15);
         cout << std::flush;
-        cout << res << std::endl;;
+        cout << INSTANCE_PATH   << "|" 
+             << CONTROLLER_PATH << "|" 
+             << PROBLEM_TYPE    << "|" 
+             << N_EVALS         << "|"             
+             << endl;
+
+        // cout << res << std::endl;;
         cout << std::flush;
 
         return 0;

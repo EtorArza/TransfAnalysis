@@ -13,7 +13,6 @@ miscellaneous*
 .vscode
 callgrind.*
 __pycache*
-fittest*
 *.png
 *.pdf
 slurm*

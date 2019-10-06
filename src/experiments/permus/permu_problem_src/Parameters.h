@@ -5,38 +5,47 @@
 #endif
 
 
-// FILE CONTAINING ALL GLOBAL VARIABLES
+// FILE CONTAINING ALL GLOBAL VARIABLES and PARAMETERS
 
 class stopwatch;
-// CONSTANT PARAMETERS //
+
+// PARAMETERS TO BE SPECIFIED IN CONFIG FILE//
 EXTERN double MAX_TIME_PSO;
 EXTERN int POPSIZE;
 EXTERN int N_EVALS;
 EXTERN int N_REEVALS;
 EXTERN int TABU_LENGTH;
-/////////////////////////
-
-// BASH INPUT PARAMETERS //
-// binary name
 EXTERN std::string INSTANCE_PATH;
 EXTERN std::string PROBLEM_TYPE;
-EXTERN std::string CONTROLLER_PATH;
 EXTERN int N_OF_THREADS;
 ///////////////////////////
 
-// TRAIN PARAMS //
+// TRAIN PARAMS TO BE SPECIFIED IN CONFIG FILE//
 EXTERN double MAX_TRAIN_TIME;
 EXTERN stopwatch global_timer;
 ///////////////////////////
 
-// TECHNICAL PARAMETERS // 
-#define MAX_LONG_INTEGER 429496729500000
-#define MIN_LONG_INTEGER -42949672950000
-#define MAX(A,B) ( (A > B) ? A : B)
-#define MIN(A,B) ( (A < B) ? A : B)
+// TEST PARAMS TO BE SPECIFIED IN CONFIG FILE//
+EXTERN std::string CONTROLLER_PATH;
+EXTERN int N_REPS;
+/////////////////////////////////////////////
+
+
+
+//////////////////////////////////////////////////////////////////////////////////////
+
+
+
+// Global variables (Not initialized by the user) // 
 EXTERN double BEST_FITNESS_TRAIN;
 EXTERN double N_TIMES_BEST_FITNESS_IMPROVED_TRAIN;
-// NEAT PARAMETERS //
+///////////////////////////////////////////////////////
+
+// NN consider value near 0 //
 # define CUTOFF_0 0.25
 //////////////////////
 
+// MACROS // 
+#define MAX(A,B) ( (A > B) ? A : B)
+#define MIN(A,B) ( (A < B) ? A : B)
+///////////

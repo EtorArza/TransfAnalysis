@@ -6,8 +6,8 @@
 #SBATCH --ntasks-per-node=1 #number of tasks per node
 #SBATCH --mem=8G
 #SBATCH --cpus-per-task=8 # number of CPUs
-#SBATCH --time=0-06:00:00 #Walltime
-#SBATCH -p medium
+#SBATCH --time=0-00:30:00 #Walltime
+#SBATCH -p short
 #SBATCH --exclude=n[001-004,017-018]
 
 
@@ -63,48 +63,36 @@ make
 echo "-compiled-"
 
 cat > tmp.ini <<EOF
-; config file for train in hpc hipatia
+; config file for test in hpc hipatia
 
 
 [Global] 
 mode = test ;
 
-
-; Configure parameters of NEAT, relevant only during training
-[NEAT]
-MAX_TRAIN_TIME = 43200 ; time in seconds
-POPSIZE = 504 ;
-THREADS = 72 ;
-N_EVALS = 3 ;
-N_REEVALS = 200 ;
-
-SEARCH_TYPE = phased ; only phased, complexify and blended are valid
-DELETE_PREVIOUS_EXPERIMENT = true ;
-SEED = 2 ;
-
+[TestSettings]
+THREADS = 8 ;
+N_EVALS = 500 ;
+N_REPS = 20 ;
+CONTROLLER_PATH = $3 ; 
 
 
 [Controller]
-MAX_TIME_PSO = 0.5 ; Max time the controller has to solve the permutation problem.
+MAX_TIME_PSO = 0.5 ; 
 POPSIZE = 20 ;
 TABU_LENGTH = 40 ;
+N_EVALS = 500 ;
+N_REPS = 20 ;
 
-PROBLEM_TYPE = $1 ; the kind of permutation problem to be solved by the controller.
+PROBLEM_TYPE = $1 ; 
 PROBLEM_PATH = $2 ; 
-CONTROLLER_PATH = $3
 
 EOF
 
 
-
-
 date
-./neat "tmp.ini"
+./neat "tmp.ini" >> res.txt
+cat res.txt >> $SRCDIR/result_controllers.txt
 date
-
-cp experiment_1* -v -r "controllers_$2/"
-
-cp "controllers_$2/" -v -r $SRCDIR
 
 
 # #end

@@ -5,6 +5,7 @@
 #include "staticevaluator.h"
 
 #include <assert.h>
+#include <float.h>
 
 using namespace NEAT;
 using namespace std;
@@ -71,9 +72,9 @@ struct Evaluator {
 
     __net_eval_decl Evaluator(const Config *config_): config(config_) { }
 
-    __net_eval_decl double FitnessFunction(CpuNetwork* net){return -__DBL_MAX__;};
+    __net_eval_decl double FitnessFunction(CpuNetwork* net){return -DBL_MAX;};
 
-    __net_eval_decl double FitnessFunction_reevaluation(CpuNetwork* net, int n_reevals){return -__DBL_MAX__;};
+    __net_eval_decl double FitnessFunction_reevaluation(CpuNetwork* net, int n_reevals){return -DBL_MAX;};
 
     __net_eval_decl bool next_step() { }
 
