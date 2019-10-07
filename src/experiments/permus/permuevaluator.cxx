@@ -17,6 +17,9 @@ using namespace std;
 
 //#define COUNTER
 
+#define USE_MEDIAN_INSTEAD_OF_AVERAGE
+
+
 PBP *GetProblemInfo(std::string problemType, std::string filename);
 
 
@@ -88,7 +91,14 @@ double FitnessFunction_permu(NEAT::CpuNetwork *net_original, int n_evals)
         net->clear_noninput();
     }
 
-    double res = Average(v_of_fitness, n_evals);
+    #ifdef USE_MEDIAN_INSTEAD_OF_AVERAGE
+        double res = median(v_of_fitness, n_evals);
+    #else
+        double res = Average(v_of_fitness, n_evals);
+    #endif
+
+
+
     #ifdef COUNTER
     cout << counter << endl;
     #endif
@@ -123,14 +133,21 @@ struct Evaluator
 
     // parallelize over the same network
     __net_eval_decl double FitnessFunction_reevaluation(CpuNetwork* net, int n_reevals){
-  
+
         double *v_of_f_values = new double[n_reevals];
+        
         #pragma omp parallel for num_threads(N_OF_THREADS)
         for (int i = 0; i < n_reevals; i++)
         {
             v_of_f_values[i] = FitnessFunction_permu(net, 1);
         }
-        double res = Average(v_of_f_values, n_reevals);
+
+        #ifdef USE_MEDIAN_INSTEAD_OF_AVERAGE
+            double res = median(v_of_f_values, n_reevals);
+        #else
+            double res = Average(v_of_f_values, n_reevals);
+        #endif
+        
         delete[] v_of_f_values;
         return res;
     }
