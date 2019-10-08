@@ -78,6 +78,7 @@ double FitnessFunction_permu(NEAT::CpuNetwork *net_original, int n_evals)
                 std::swap(net->activations, pop->m_individuals[i]->activation);
             }
             pop->end_iteration();
+            //pop->Print();
         }
         if (!isPermutation(pop->genome_best, pop->n))
         {

@@ -70,10 +70,14 @@ ostream & operator<<(ostream & os,CIndividual * & individual)
 	os <<individual->f_value<<" - "; 
 	os << std::setprecision(3);
 	os << std::setw(5);
+	os <<individual->is_local_optimum[0]<<" - ";
+	os <<individual->is_local_optimum[1]<<" - ";
+	os <<individual->is_local_optimum[2]<<" - ";
 	os <<individual->relative_pos<<" - "; 
 	os <<individual->relative_time<<" - "; 
 	os <<individual->distance<<" - ";
 	os <<individual->sparsity<<" - "; 
+	os <<individual->order_sparsity<<" - ";
 	os << std::setw(0);
 	os << "[";
 	os << std::setw(2);
