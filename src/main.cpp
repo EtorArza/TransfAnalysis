@@ -127,7 +127,8 @@ int main(int argc, char *argv[])
         int max_time = reader.GetInteger("NEAT", "MAX_TRAIN_TIME", -1);
         N_OF_THREADS = reader.GetInteger("NEAT", "THREADS", -1);
         N_EVALS = reader.GetInteger("NEAT", "N_EVALS", -1);
-        N_REEVALS = reader.GetInteger("NEAT","N_REEVALS", -1);
+        N_REEVALS_TOP_5_PERCENT = reader.GetInteger("NEAT","N_REEVALS_TOP_5_PERCENT", -1);
+        N_EVALS_TO_UPDATE_BK = reader.GetInteger("NEAT","N_EVALS_TO_UPDATE_BK", -1);
         string search_type = reader.Get("NEAT", "SEARCH_TYPE", "UNKOWN");
         PROBLEM_TYPE = reader.Get("Controller", "PROBLEM_TYPE", "UNKOWN");
         INSTANCE_PATH = reader.Get("Controller", "PROBLEM_PATH", "UNKOWN");
@@ -172,9 +173,9 @@ int main(int argc, char *argv[])
 
         if (N_OF_THREADS < 7)
         {
-            cout << "Warning: a minimum of 7 threads is recommended for this implementation of NEAT to function correctly." << endl;
+            cout << "Warning: a minimum of 7 cores (specified by the THREADS parameter) is recommended for this implementation of NEAT to function correctly." << endl;
             cout << "With the current settings, processing a generation takes around " ; 
-            cout << ((env->pop_size*MAX_TIME_PSO / (double)2 * (double)N_EVALS + (double)(5/N_OF_THREADS + 1) * (double)N_REEVALS)) / 3600.0; 
+            cout << ((env->pop_size*MAX_TIME_PSO / (double)2 * (double)N_EVALS + (double)(5/N_OF_THREADS + 1) * (double)N_REEVALS_TOP_5_PERCENT)) / 3600.0; 
             cout << "h,  which might be too long." << endl << endl;
         }
 
