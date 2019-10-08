@@ -21,29 +21,30 @@
 #include "protoinnovlinkgene.h"
 #include "recurrencychecker.h"
 #include "util.h"
+#include "Parameters.h"
 #include <assert.h>
 
 using namespace NEAT;
 using namespace std;
 
-void InnovGenome::reset() {
+void InnovGenome::reset()
+{
     traits.clear();
     nodes.clear();
     links.clear();
 }
 
-
 InnovGenome::InnovGenome(std::vector<Trait> traits, std::vector<InnovNodeGene> nodes, std::vector<InnovLinkGene> links)
-    :InnovGenome(){
+    : InnovGenome()
+{
     this->traits = traits;
     this->nodes = nodes;
     this->links = links;
 }
 
-
-
 InnovGenome::InnovGenome()
-    : node_lookup(nodes) {
+    : node_lookup(nodes)
+{
 }
 
 InnovGenome::InnovGenome(rng_t rng_,
@@ -51,11 +52,13 @@ InnovGenome::InnovGenome(rng_t rng_,
                          size_t ninputs,
                          size_t noutputs,
                          size_t nhidden)
-    : InnovGenome() {
+    : InnovGenome()
+{
 
     rng = rng_;
 
-    for(size_t i = 0; i < ntraits; i++) {
+    for (size_t i = 0; i < ntraits; i++)
+    {
         traits.emplace_back(i + 1,
                             rng.prob(),
                             rng.prob(),
@@ -75,17 +78,20 @@ InnovGenome::InnovGenome(rng_t rng_,
         add_node(nodes, InnovNodeGene(NT_BIAS, node_id++));
 
         //Sensor nodes
-        for(size_t i = 0; i < ninputs; i++) {
+        for (size_t i = 0; i < ninputs; i++)
+        {
             add_node(nodes, InnovNodeGene(NT_SENSOR, node_id++));
         }
 
         //Output nodes
-        for(size_t i = 0; i < noutputs; i++) {
+        for (size_t i = 0; i < noutputs; i++)
+        {
             add_node(nodes, InnovNodeGene(NT_OUTPUT, node_id++));
         }
 
         //Hidden nodes
-        for(size_t i = 0; i < nhidden; i++) {
+        for (size_t i = 0; i < nhidden; i++)
+        {
             add_node(nodes, InnovNodeGene(NT_HIDDEN, node_id++));
         }
     }
@@ -95,44 +101,74 @@ InnovGenome::InnovGenome(rng_t rng_,
     const int node_id_output = node_id_input + ninputs;
     const int node_id_hidden = node_id_output + noutputs;
 
-    assert(nhidden > 0);
-
+    if (START_WITHOUT_HIDDEN)
+    {
+        assert(nhidden > 0);
+    }
+    else
+    {
+        assert(nhidden == 0);
+    }
     int innov = 1;
 
-    //Create links from Bias to all hidden
-    for(size_t i = 0; i < nhidden; i++) {
-        add_link( links, InnovLinkGene(rng.element(traits).trait_id,
-                                       rng.prob(),
-                                       node_id_bias,
-                                       i + node_id_hidden,
-                                       false,
-                                       innov++,
-                                       0.0) );
-    }
+    if (!START_WITHOUT_HIDDEN)
+    {
+        //Create links from Bias to all hidden
+        for (size_t i = 0; i < nhidden; i++)
+        {
+            add_link(links, InnovLinkGene(rng.element(traits).trait_id,
+                                          rng.prob(),
+                                          node_id_bias,
+                                          i + node_id_hidden,
+                                          false,
+                                          innov++,
+                                          0.0));
+        }
 
-    //Create links from all inputs to all hidden
-    for(size_t i = 0; i < ninputs; i++) {
-        for(size_t j = 0; j < nhidden; j++) {
-            add_link( links, InnovLinkGene(rng.element(traits).trait_id,
-                                           rng.prob(),
-                                           i + node_id_input,
-                                           j + node_id_hidden,
-                                           false,
-                                           innov++,
-                                           0.0));
+        //Create links from all inputs to all hidden
+        for (size_t i = 0; i < ninputs; i++)
+        {
+            for (size_t j = 0; j < nhidden; j++)
+            {
+                add_link(links, InnovLinkGene(rng.element(traits).trait_id,
+                                              rng.prob(),
+                                              i + node_id_input,
+                                              j + node_id_hidden,
+                                              false,
+                                              innov++,
+                                              0.0));
+            }
+        }
+
+        //Create links from all hidden to all output
+        for (size_t i = 0; i < nhidden; i++)
+        {
+            for (size_t j = 0; j < noutputs; j++)
+            {
+                add_link(links, InnovLinkGene(rng.element(traits).trait_id,
+                                              rng.prob(),
+                                              i + node_id_hidden,
+                                              j + node_id_output,
+                                              false,
+                                              innov++,
+                                              0.0));
+            }
         }
     }
-
-    //Create links from all hidden to all output
-    for(size_t i = 0; i < nhidden; i++) {
-        for(size_t j = 0; j < noutputs; j++) {
-            add_link( links, InnovLinkGene(rng.element(traits).trait_id,
-                                           rng.prob(),
-                                           i + node_id_hidden,
-                                           j + node_id_output,
-                                           false,
-                                           innov++,
-                                           0.0));
+    else
+    {
+        //Create links from all inputs to all outputs
+        for (size_t i = 0; i < ninputs; i++)
+        {
+            for (size_t j = 0; j < noutputs; j++)
+            {add_link(links, InnovLinkGene(rng.element(traits).trait_id,
+                                              rng.prob(),
+                                              i + node_id_input,
+                                              j + node_id_output,
+                                              false,
+                                              innov++,
+                                              0.0));
+            }
         }
     }
 }

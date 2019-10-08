@@ -134,22 +134,24 @@ int main(int argc, char *argv[])
         MAX_TIME_PSO = reader.GetReal("Controller", "MAX_TIME_PSO", -1.0);
         POPSIZE = reader.GetInteger("Controller", "POPSIZE", -1);
         TABU_LENGTH = reader.GetInteger("Controller", "TABU_LENGTH", -1);
-
-
-
-
+        START_WITHOUT_HIDDEN = reader.GetBoolean("NEAT","START_WITHOUT_HIDDEN", false);
 
         if (search_type == "phased")
         {
             env->search_type = GeneticSearchType::PHASED;
-        }else if (search_type == "blended"){
+        }
+        else if (search_type == "blended")
+        {
             env->search_type = GeneticSearchType::BLENDED;
-        }else if (search_type == "complexify"){
+        }
+        else if (search_type == "complexify")
+        {
             env->search_type = GeneticSearchType::COMPLEXIFY;
-        }else{
+        }
+        else
+        {
             cout << "Error, no search type specified." << endl;
         }
-
 
         if(N_OF_THREADS < 0){
             cout << "please specify a valid number of threads on the conf. file" <<endl;
@@ -186,6 +188,7 @@ int main(int argc, char *argv[])
 
 
         MAX_TRAIN_TIME = max_time; 
+
         if (env->search_type == GeneticSearchType::BLENDED)
         {
             env->mutate_delete_node_prob *= 0.1;

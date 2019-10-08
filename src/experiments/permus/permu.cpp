@@ -14,12 +14,23 @@ static struct PermuInit {
         };
  
         auto create_seeds = [] (rng_t rng_exp) {
+
+            int nhidden;
+
+            if (START_WITHOUT_HIDDEN)
+            {
+                nhidden = 0;
+            }else{
+                nhidden = __sensor_N;
+            }
+            
+
             return env->genome_manager->create_seed_generation(env->pop_size,
                                                         rng_exp,
                                                         1,
-                                                        __sensor_N,
-                                                        __output_N,
-                                                        __sensor_N);
+                                                        __sensor_N,  // number of input nodes.
+                                                        __output_N,  // number output nodes.
+                                                        nhidden); // number of default hidden nodes.
         };
 
         //todo: This is wonky. Should maybe make an explicit static registry func?

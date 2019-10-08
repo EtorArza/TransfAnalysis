@@ -72,15 +72,16 @@ mode = train ;  decide wether to train a controller or test it
 
 ; Configure parameters of NEAT, relevant only during training
 [NEAT]
-MAX_TRAIN_TIME = 172800 ; time in seconds
+MAX_TRAIN_TIME = 43200 ; time in seconds
 POPSIZE = 504 ;
 THREADS = 72 ;
-N_EVALS = 200 ;
-N_REEVALS = 4000 ;
+N_EVALS = 50 ;
+N_REEVALS = 1008 ;
 
-SEARCH_TYPE = phased ; only phased, complexify and blended are valid
+SEARCH_TYPE = phased ;
 DELETE_PREVIOUS_EXPERIMENT = true ;
 SEED = 2 ;
+START_WITHOUT_HIDDEN = true ;
 
 
 
