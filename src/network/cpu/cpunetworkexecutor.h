@@ -54,7 +54,7 @@ public:
             CpuNetwork *net = nets[inet];
             Evaluator *ev = new Evaluator(config);
             OrganismEvaluation eval;
-            f_values[inet] = ev->FitnessFunction(net);
+            f_values[inet] = ev->FitnessFunction(net, N_EVALS);
             results[inet] = eval;
             delete ev;
 
@@ -100,7 +100,11 @@ public:
             {
                 CpuNetwork *net = nets[inet];
                 Evaluator *ev = new Evaluator(config);
-                f_values[inet] = ev->FitnessFunction_reevaluation(net, actual_n_reevals);
+                double *res = new double[actual_n_reevals];
+                ev->FitnessFunction_parallel(net, actual_n_reevals, res);
+                int index_value = arg_element_in_centile_specified_by_percentage(res, actual_n_reevals, 0.75);
+                f_values[inet] = res[index_value];
+                delete[] res;
                 delete ev;
             }
         }
@@ -111,25 +115,42 @@ public:
             int index_most_fit = argmax(f_values, nnets);
             CpuNetwork *net = nets[index_most_fit];
             Evaluator *ev = new Evaluator(config);
-            f_values[index_most_fit] = ev->FitnessFunction_reevaluation(net, N_EVALS_TO_UPDATE_BK);
-            delete ev;
+
+
+            double *res = new double[N_EVALS_TO_UPDATE_BK];
+            ev->FitnessFunction_parallel(net, N_EVALS_TO_UPDATE_BK, res);
+            int index_value_lower_bound = arg_element_in_centile_specified_by_percentage(res, N_EVALS_TO_UPDATE_BK, 0.75);
+            int index_value_upper_bound = arg_element_in_centile_specified_by_percentage(res, N_EVALS_TO_UPDATE_BK, 0.25);
+
+
+
+            // apply a discount to all but the best individual
             for (int i = 0; i < (int) nnets; i++)
             {
                 if (i != index_most_fit)
                 {
-                    f_values[i] -= 1000000000.0; // apply a discount to all but the best individual
+                    f_values[i] -= 1000000000.0; 
                 }
             }
 
-            if (f_values[argmax(f_values, nnets)] > BEST_FITNESS_TRAIN)
+            double pesimistic_fitness = res[index_value_lower_bound];
+            double optimistic_fitness = res[index_value_upper_bound];
+
+            f_values[index_most_fit] = pesimistic_fitness;
+
+            if (pesimistic_fitness > BEST_FITNESS_TRAIN)
             {
                 N_TIMES_BEST_FITNESS_IMPROVED_TRAIN++;
-                cout << "[BEST_FITNESS_IMPROVED] --> " << f_values[argmax(f_values, nnets)] << endl;
-                BEST_FITNESS_TRAIN = f_values[argmax(f_values, nnets)];
+                cout << "[BEST_FITNESS_IMPROVED] --> " << pesimistic_fitness << endl;
+                BEST_FITNESS_TRAIN = optimistic_fitness;
             }
+
+            delete ev;
+            delete[] res;
+
         }
 
-        transform_from_values_to_normalized_rankings(f_values, nnets, false);
+        transform_from_values_to_geometric_ranking_probs(f_values, nnets, false);
         multiply_array_with_value(f_values, 1.0 + ((double)N_TIMES_BEST_FITNESS_IMPROVED_TRAIN / 1000.0), nnets);
 
         // save scaled fitness

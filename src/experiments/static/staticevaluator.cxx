@@ -72,9 +72,9 @@ struct Evaluator {
 
     __net_eval_decl Evaluator(const Config *config_): config(config_) { }
 
-    __net_eval_decl double FitnessFunction(CpuNetwork* net){return -DBL_MAX;};
+    __net_eval_decl double FitnessFunction(CpuNetwork* net, int n_evals){return -DBL_MAX;}
 
-    __net_eval_decl double FitnessFunction_reevaluation(CpuNetwork* net, int n_reevals){return -DBL_MAX;};
+    __net_eval_decl void FitnessFunction_parallel(CpuNetwork* net, int n_reevals, double* res){ }
 
     __net_eval_decl bool next_step() { }
 

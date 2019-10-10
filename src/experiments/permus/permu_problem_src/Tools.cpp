@@ -1331,6 +1331,115 @@ void transform_from_values_to_normalized_rankings(double* reference_and_result, 
 }
 
 
+
+
+
+
+void compute_order_int(int* v, int len, int* order_res, bool reverse){
+    
+    if (reverse)
+    {
+        for (int i = 0; i < len; i++)
+        {
+            v[i] = - v[i];
+        }
+        
+    }
+
+
+    int* temp = new int[len];
+    for (int i = 0; i < len; i++)
+    {
+        temp[i] = i;
+    }
+    std::sort(temp, temp+len, _sort_indices(v));
+    for (int i = 0; i < len; i++)
+    {
+        order_res[temp[i]] = i;
+    }
+    
+    if (reverse)
+    {
+        for (int i = 0; i < len; i++)
+        {
+            v[i] = - v[i];
+        }
+        
+    }
+    delete[] temp;
+}
+
+void compute_order_int_with_doubles_as_ref(double* v, int len, int* order_res, bool reverse){
+    
+    if (reverse)
+    {
+        for (int i = 0; i < len; i++)
+        {
+            v[i] = - v[i];
+        }
+        
+    }
+
+
+    int* temp = new int[len];
+    for (int i = 0; i < len; i++)
+    {
+        temp[i] = i;
+    }
+    std::sort(temp, temp+len, _sort_indices_double(v));
+    for (int i = 0; i < len; i++)
+    {
+        order_res[temp[i]] = i;
+    }
+    
+    if (reverse)
+    {
+        for (int i = 0; i < len; i++)
+        {
+            v[i] = - v[i];
+        }
+        
+    }
+    delete[] temp;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#define p 0.8
+// 1-p will be assigned to the best individual, (1-p)*p to the second one etc.
+void transform_from_values_to_geometric_ranking_probs(double* reference_and_result, int len, bool reverse){
+
+    int* indexes = new int[len];
+    
+    assert(len >2); 
+
+    compute_order_int_with_doubles_as_ref(reference_and_result, len, indexes, reverse);
+    
+    reference_and_result[indexes[0]] = 1.0 - p;
+    for (int i = 1; i < len; i++)
+    {
+        reference_and_result[indexes[i]] = reference_and_result[indexes[i-1]] * p;
+    }
+
+    normalize_vector(reference_and_result, len);
+
+    delete[] indexes;
+}
+
 double tools_round_two_decimals(double x)
 {
 
@@ -1342,3 +1451,6 @@ double tools_round_two_decimals(double x)
     return (float)value / 100; 
 
 }
+
+
+

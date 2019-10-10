@@ -634,7 +634,6 @@ T obtain_kth_largest_value(T *v, int k, int len)
 }
 
 
-
 class _sort_indices
 {
    private:
@@ -655,21 +654,9 @@ class _sort_indices_double
 };
 
 
-template <class T>
-void compute_order_int(T* v, int len, int* order_res){
-    int* temp = new int[len];
-    for (int i = 0; i < len; i++)
-    {
-        temp[i] = i;
-    }
-    std::sort(temp, temp+len, _sort_indices(v));
-    for (int i = 0; i < len; i++)
-    {
-        order_res[temp[i]] = i;
-    }
-    delete[] temp;
-}
+void compute_order_int(int* v, int len, int* order_res, bool reverse = false);
 
+void compute_order_int_with_doubles_as_ref(double* v, int len, int* order_res, bool reverse = false);
 
 template <class T>
 void compute_order_double(T* v, int len, double* order_res, bool reverse = false){
@@ -699,3 +686,31 @@ void transform_from_values_to_normalized_rankings(double* reference_and_result, 
 
 // https://www.geeksforgeeks.org/rounding-floating-point-number-two-decimal-places-c-c/
 double tools_round_two_decimals(double x);
+
+
+void transform_from_values_to_geometric_ranking_probs(double* reference_and_result, int len, bool reverse = false);
+
+
+
+
+// return element in position specified by percentage. For example, percentage=0.25 selects the first element in the first quartile
+// 0.0 selects the largest value in the array.
+template <class T>
+int arg_element_in_centile_specified_by_percentage(T* array, int len, double percentage){
+    
+    int index = tools_round((double) (len - 1) * percentage);
+
+
+    T value = obtain_kth_largest_value(array, index + 1, len);
+
+    for (int i = 0; i < len; i++)
+    {
+        if(value == array[i]){
+            return i;
+        }
+    }
+
+    cout << "error, item not found in function \"arg_element_in_centile_specified_by_percentage\". Exit..." << endl;
+    exit(1);
+
+}
