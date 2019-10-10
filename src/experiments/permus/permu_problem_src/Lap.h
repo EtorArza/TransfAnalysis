@@ -343,14 +343,16 @@ public:
         return lapcost;
     }
 
-private:    
     void seedRandom(unsigned int seed)
     // seed for random number generator.
     {
         srand(seed);
         return;   
     }
-    
+
+ private:    
+
+
     double drandom(void)
     // random number between 0.0 and 1.0 (uncluded).
     {

@@ -249,7 +249,7 @@ int main(int argc, char *argv[])
                 v_of_f_values[i] = FitnessFunction_permu(&net, 1);
             }
             double res = Average(v_of_f_values, N_EVALS);
-            cout << res << "|";
+            cout << res << ",";
         }
         delete[] v_of_f_values;
 

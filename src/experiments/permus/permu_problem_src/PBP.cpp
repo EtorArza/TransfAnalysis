@@ -27,8 +27,19 @@ PBP::~PBP()
     delete[] _random_permu1;
     delete[] _random_permu2;
     delete[] _random_permu3;
-    delete rng;
+    if (!rng_deleted)
+    {
+        delete rng;
+    }
 }
+
+void PBP::load_rng(RandomNumberGenerator *rng){
+    delete rng;
+    this->rng = rng;
+    rng_deleted = true;
+}
+
+
 // This function needs to be called when the read procedure is called
 void PBP::initialize_variables_PBP(int problem_size)
 {   
@@ -175,7 +186,7 @@ void PBP::local_search_iteration(CIndividual *indiv, NEAT::operator_t operator_i
     switch (operator_id)
     {
     case NEAT::SWAP:
-        shuffle_vector(_random_permu1, problem_size_PBP, rng);
+        GenerateRandomPermutation(_random_permu1, problem_size_PBP, rng);
         for (int i = 0; i < problem_size_PBP; i++)
         {
             int r = _random_permu1[i];
@@ -200,8 +211,8 @@ void PBP::local_search_iteration(CIndividual *indiv, NEAT::operator_t operator_i
         break;
 
     case NEAT::EXCH:
-        shuffle_vector(_random_permu1, this->problem_size_PBP, rng);
-        shuffle_vector(_random_permu2, this->problem_size_PBP, rng);
+        GenerateRandomPermutation(_random_permu1, this->problem_size_PBP, rng);
+        GenerateRandomPermutation(_random_permu2, this->problem_size_PBP, rng);
         for (int i = 0; i < this->problem_size_PBP; i++)
         {
             for (int j = 0; j < this->problem_size_PBP; j++)
@@ -225,8 +236,8 @@ void PBP::local_search_iteration(CIndividual *indiv, NEAT::operator_t operator_i
         break;
 
     case NEAT::INSERT:
-        shuffle_vector(_random_permu1, this->problem_size_PBP,rng);
-        shuffle_vector(_random_permu2, this->problem_size_PBP,rng);
+        GenerateRandomPermutation(_random_permu1, this->problem_size_PBP,rng);
+        GenerateRandomPermutation(_random_permu2, this->problem_size_PBP,rng);
         for (int i = 0; i < this->problem_size_PBP; i++)
         {
             for (int j = 0; j < this->problem_size_PBP; j++)
@@ -389,7 +400,8 @@ void PBP::obtain_indexes_step_towards(int *permu, int *ref_permu, int* i, int* j
         {   
             _random_permu1[idx] = Find(permu, problem_size_PBP, ref_permu[idx]);
         }
-        shuffle_vector(_random_permu2, problem_size_PBP,rng);
+
+        GenerateRandomPermutation(_random_permu2, problem_size_PBP,rng);
         
         for (int idx = 0; idx < problem_size_PBP; idx++)
         {
@@ -508,7 +520,7 @@ void PBP::obtain_indexes_step_away(int *permu, int *ref_permu, int* i, int* j, N
         {   
             _random_permu1[idx] = Find(permu, problem_size_PBP, ref_permu[idx]);
         }
-        shuffle_vector(_random_permu2, problem_size_PBP,rng);
+        GenerateRandomPermutation(_random_permu2, problem_size_PBP,rng);
         
         for (int idx = 0; idx < problem_size_PBP; idx++)
         {

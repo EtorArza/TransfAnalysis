@@ -621,12 +621,14 @@ int RandomNumberGenerator::xorshf96(void)
 void RandomNumberGenerator::seed(void){
     struct timespec ts;
     clock_gettime(CLOCK_REALTIME, &ts);
+    y=362436069, z=521288629;
     int seed =  ts.tv_nsec; // modulus with a big number, but not too big
     x = seed;
 }
 
 void RandomNumberGenerator::seed(int seed){
     x = seed;
+    y=362436069, z=521288629;
 }
 
 
@@ -705,6 +707,9 @@ double RandomNumberGenerator::random_0_1_double()
 
 void GenerateRandomPermutation(int *permutation, int n)
 {
+    #ifndef NDEBUG
+    std::cout << "WARNING: new rng created in GenerateRandomPermutation." << endl;
+    #endif
     RandomNumberGenerator* rng = new RandomNumberGenerator();
     rng->seed();
     GenerateRandomPermutation(permutation, n, rng);
@@ -732,11 +737,14 @@ double sigmoid(double x)
 
 int choose_index_given_probabilities(double *probabilities_array, int len)
 {
-RandomNumberGenerator* tmp_rng = new RandomNumberGenerator();
-tmp_rng->seed();
-int res = choose_index_given_probabilities(probabilities_array, len, tmp_rng);
-delete tmp_rng;
-return res;
+    #ifndef NDEBUG
+    std::cout << "WARNING: new rng created in choose_index_given_probabilities." << endl;
+    #endif
+    RandomNumberGenerator* tmp_rng = new RandomNumberGenerator();
+    tmp_rng->seed();
+    int res = choose_index_given_probabilities(probabilities_array, len, tmp_rng);
+    delete tmp_rng;
+    return res;
 }
 
 int choose_index_given_probabilities(double *probabilities_array, int len, RandomNumberGenerator* rng)
@@ -762,6 +770,9 @@ int choose_index_given_probabilities(double *probabilities_array, int len, Rando
 }
 
 int choose_index_given_weights(double *weights_array, int len){
+    #ifndef NDEBUG
+    std::cout << "WARNING: new rng created in choose_index_given_weights." << endl;
+    #endif
     RandomNumberGenerator* rng = new RandomNumberGenerator;
     rng->seed();
     int res = choose_index_given_weights(weights_array, len, rng);
@@ -801,6 +812,9 @@ int choose_index_given_weights(double *weights_array, int len, RandomNumberGener
 
 bool coin_toss(double p_of_true)
 {
+    #ifndef NDEBUG
+    std::cout << "WARNING: new rng created in coin_toss." << endl;
+    #endif
     RandomNumberGenerator* rng = new RandomNumberGenerator();
     rng->seed();
     bool res = coin_toss(p_of_true, rng);
@@ -836,6 +850,9 @@ int tools_round(double x)
 
 void shuffle_vector(int *vec, int len)
 {
+    #ifndef NDEBUG
+    std::cout << "WARNING: new rng created in shuffle_vector." << endl;
+    #endif
     RandomNumberGenerator* rng = new RandomNumberGenerator();
     rng->seed();
     shuffle_vector(vec, len, rng);
@@ -860,9 +877,23 @@ void shuffle_vector(int *vec, int len, RandomNumberGenerator* rng)
 
 
 PermuTools::PermuTools(int n)
-{   
-    rng = new RandomNumberGenerator;
+{
+    #ifndef NDEBUG
+    std::cout << "WARNING: new rng created in PermuTools creation." << endl;
+    #endif
+    this->rng = new RandomNumberGenerator;
     rng->seed();
+    this->delete_rng_is_required = true;
+    init_class(n);
+}
+
+PermuTools::PermuTools(int n, RandomNumberGenerator* rng)
+{
+    this->rng = rng;
+    init_class(n);
+}
+
+void PermuTools::init_class(int n){
     this->n = n;
     linear_assigment_problem = new Lap(n);
 
@@ -908,9 +939,16 @@ PermuTools::PermuTools(int n)
     GenerateRandomPermutation(temp_array, n, rng);
 }
 
+
+
+
 PermuTools::~PermuTools()
 {
-    delete rng;
+    if (this->delete_rng_is_required)
+    {
+        delete rng;
+    }
+
     delete linear_assigment_problem;
 
     delete[] this->lap_rows; 
@@ -1209,7 +1247,7 @@ void PermuTools::compute_hamming_consensus(int **permu_list, int m)
         for (int j = 0; j < n; j++)
             freq_matrix[j][permu_list[i][j]]--;
     //int cost = -1 * lap.lap(n_, freq, rows, cols, u, v);
-    
+    linear_assigment_problem->seedRandom(rng->x);
     linear_assigment_problem->execute_lap(freq_matrix, lap_rows, lap_cols, lap_u, lap_v);
 
     for (int i = 0; i < n; i++)
@@ -1220,13 +1258,6 @@ void PermuTools::compute_hamming_consensus(int **permu_list, int m)
 double PermuTools::compute_hamming_distance(int* permu_1, int* permu_2){
     return (double) Hamming_distance(permu_1, permu_2, n);
 }
-
-
-
-
-
-
-
 
 
 
@@ -1297,4 +1328,17 @@ void transform_from_values_to_normalized_rankings(double* reference_and_result, 
     }
 
     delete[] res;
+}
+
+
+double tools_round_two_decimals(double x)
+{
+
+     // 37.66666 * 100 =3766.66 
+    // 3766.66 + .5 =3767.16    for rounding off value 
+    // then type cast to int so value is 3767 
+    // then divided by 100 so the value converted into 37.67 
+    float value = (int)(x * 100 + .5); 
+    return (float)value / 100; 
+
 }

@@ -51,7 +51,7 @@ void CPopulation::init_class(PBP *problem, RandomNumberGenerator* rng){
     {
         pop_info[i] = new double[NEAT::__sensor_N];
     }
-    pt = new PermuTools(n);
+    pt = new PermuTools(n, rng);
     timer = new stopwatch();
     terminated = false;
     evaluate_population();
@@ -59,14 +59,14 @@ void CPopulation::init_class(PBP *problem, RandomNumberGenerator* rng){
 }
 
 CPopulation::CPopulation(PBP *problem)
-{   
+{
     RandomNumberGenerator* tmp_rng = new RandomNumberGenerator();
     init_class(problem, tmp_rng);
 }
 
 
 CPopulation::CPopulation(PBP *problem, RandomNumberGenerator* rng)
-{   
+{
     init_class(problem, rng);
 }
 
@@ -234,7 +234,7 @@ void CPopulation::comp_relative_time()
 {
     for (int i = 0; i < POPSIZE; i++)
     {
-        double res =  timer->toc() / MAX_TIME_PSO;
+        double res = timer->toc() / MAX_TIME_PSO;
         this->m_individuals[i]->relative_time = res;
         pop_info[i][NEAT::RELATIVE_TIME] = res;
     }

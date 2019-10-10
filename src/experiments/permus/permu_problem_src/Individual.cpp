@@ -41,6 +41,10 @@ void CIndividual::reset(RandomNumberGenerator* rng){
 	GenerateRandomPermutation(this->genome_best, n, rng);
 	f_value=std::numeric_limits<double>::lowest();
 	f_best=std::numeric_limits<double>::lowest();
+	for (int i = 0; i < NEAT::N_OPERATORS; i++)
+	{
+		this->is_local_optimum[i] = false;
+	}
 }
 
 CIndividual::~CIndividual()

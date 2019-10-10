@@ -41,6 +41,7 @@ class PBP
 	virtual int Read(string filename) = 0;
 	virtual int GetProblemSize() = 0;
 
+
 	/*
 	 * Functions that are valid for all permutation problems. 
 	 * The use of this functions requires the fitness value of the individual to be previously computed.
@@ -52,6 +53,7 @@ class PBP
 	void Evaluate(CIndividual *indiv); // update the f_value of the individuals.
 	double Evaluate(int *genome); // update the f_value of the individuals.
 	int Read_with_mutex(string filename);
+	void load_rng(RandomNumberGenerator *rng);
 	Tabu* tab;
 
 
@@ -86,6 +88,6 @@ class PBP
   private:
 	void obtain_indexes_step_towards(int *permu, int *ref_permu, int* i, int* j, NEAT::operator_t operator_id);
 	void obtain_indexes_step_away(int *permu, int *ref_permu, int* i, int* j, NEAT::operator_t operator_id);
-
+	bool rng_deleted = false;
 
 };

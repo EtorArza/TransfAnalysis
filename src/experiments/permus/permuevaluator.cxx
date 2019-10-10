@@ -12,21 +12,18 @@
 #include "Population.h"
 #include "Tools.h"
 
-
 using namespace std;
 
 //#define COUNTER
 
 #define USE_MEDIAN_INSTEAD_OF_AVERAGE
 
-
 PBP *GetProblemInfo(std::string problemType, std::string filename);
-
 
 double FitnessFunction_permu(NEAT::CpuNetwork *net_original, int n_evals)
 {
 
-    double* v_of_fitness;
+    double *v_of_fitness;
     PBP *problem;
     CPopulation *pop;
 
@@ -36,38 +33,50 @@ double FitnessFunction_permu(NEAT::CpuNetwork *net_original, int n_evals)
     //Read the problem instance to optimize.
     problem = GetProblemInfo(PROBLEM_TYPE, INSTANCE_PATH);
     pop = new CPopulation(problem);
-    v_of_fitness = new double[n_evals];
+    problem->load_rng(pop->rng);
 
+    v_of_fitness = new double[n_evals];
 
     for (int i = 0; i < POPSIZE; i++)
     {
         pop->m_individuals[i]->activation = std::vector<double>(net->activations);
     }
 
-
     #ifdef COUNTER
-    int counter = 0;
+        int counter = 0;
     #endif
 
     for (int n_of_repetitions_completed = 0; n_of_repetitions_completed < n_evals; n_of_repetitions_completed++)
     {
+
+        #ifdef COUNTER
+                counter = 0;
+        #endif
+
         pop->rng->seed();
         pop->Reset();
+        //std::cout << "|" << n_of_repetitions_completed << "|" << std::endl;
         for (int i = 0; i < POPSIZE; i++)
-        {   
+        {
             std::swap(net->activations, pop->m_individuals[i]->activation);
-            net->clear_noninput(); 
+            net->clear_noninput();
             std::swap(net->activations, pop->m_individuals[i]->activation);
         }
         while (!pop->terminated)
-        {   
+        {
             #ifdef COUNTER
-            counter ++;
+            counter++;
+            // if (counter < 3 || counter == 50)
+            // {
+            //     std::cout << "iteration number: " << counter << std::endl;
+            //                 pop->Print();
+
+            // }
             #endif
 
             for (int i = 0; i < POPSIZE; i++)
-            {   
-                
+            {
+
                 std::swap(net->activations, pop->m_individuals[i]->activation);
                 for (int sns_idx = 0; sns_idx < NEAT::__sensor_N; sns_idx++)
                 {
@@ -83,13 +92,15 @@ double FitnessFunction_permu(NEAT::CpuNetwork *net_original, int n_evals)
         if (!isPermutation(pop->genome_best, pop->n))
         {
             cout << "final result is not permutation" << endl;
-            cout << "final permu: " ;
+            cout << "final permu: ";
             PrintArray(pop->genome_best, pop->n);
             exit(1);
         }
-        
         v_of_fitness[n_of_repetitions_completed] = problem->Evaluate(pop->genome_best);
         net->clear_noninput();
+        #ifdef COUNTER
+        cout << counter << endl;
+        #endif
     }
 
     #ifdef USE_MEDIAN_INSTEAD_OF_AVERAGE
@@ -98,62 +109,54 @@ double FitnessFunction_permu(NEAT::CpuNetwork *net_original, int n_evals)
         double res = Average(v_of_fitness, n_evals);
     #endif
 
-
-
-    #ifdef COUNTER
-    cout << counter << endl;
-    #endif
-
     delete[] v_of_fitness;
     delete pop;
     delete problem;
-    pop=NULL;
-    v_of_fitness=NULL;
-    problem=NULL;
-    net=NULL;
+    pop = NULL;
+    v_of_fitness = NULL;
+    problem = NULL;
+    net = NULL;
     return res;
-
 }
-
 
 namespace NEAT
 {
-struct Config{};
+struct Config
+{
+};
 struct Evaluator
 {
     typedef NEAT::Config Config;
     const Config *config;
-    __net_eval_decl Evaluator(const Config *config_): config(config_){};
+    __net_eval_decl Evaluator(const Config *config_) : config(config_){};
 
-
-
-    __net_eval_decl double FitnessFunction(CpuNetwork* net){
+    __net_eval_decl double FitnessFunction(CpuNetwork *net)
+    {
         double res = FitnessFunction_permu(net, N_EVALS);
         return res;
     }
 
     // parallelize over the same network
-    __net_eval_decl double FitnessFunction_reevaluation(CpuNetwork* net, int n_reevals){
+    __net_eval_decl double FitnessFunction_reevaluation(CpuNetwork *net, int n_reevals)
+    {
 
         double *v_of_f_values = new double[n_reevals];
-        
-        #pragma omp parallel for num_threads(N_OF_THREADS)
+
+#pragma omp parallel for num_threads(N_OF_THREADS)
         for (int i = 0; i < n_reevals; i++)
         {
             v_of_f_values[i] = FitnessFunction_permu(net, 1);
         }
 
-        #ifdef USE_MEDIAN_INSTEAD_OF_AVERAGE
-            double res = median(v_of_f_values, n_reevals);
-        #else
-            double res = Average(v_of_f_values, n_reevals);
-        #endif
-        
+#ifdef USE_MEDIAN_INSTEAD_OF_AVERAGE
+        double res = median(v_of_f_values, n_reevals);
+#else
+        double res = Average(v_of_f_values, n_reevals);
+#endif
+
         delete[] v_of_f_values;
         return res;
     }
-
-
 };
 
 class PermuEvaluator : public NetworkEvaluator
@@ -165,7 +168,6 @@ public:
     {
         executor = NetworkExecutor<Evaluator>::create();
         //Evaluator::Config *config;
-
 
         // size_t configlen;
         // create_config(config, configlen);
@@ -184,7 +186,6 @@ public:
     {
         executor->execute(nets_, results, nnets);
     }
-
 };
 
 class NetworkEvaluator *create_permu_evaluator()

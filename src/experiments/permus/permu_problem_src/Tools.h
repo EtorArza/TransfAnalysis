@@ -379,7 +379,6 @@ void normalize_vector(T *array, int len)
     }
 }
 
-void seed_xorshf96();
 
 
 template <class T>
@@ -532,6 +531,10 @@ class PermuTools
 public:
 
 	PermuTools(int n);
+    PermuTools(int n, RandomNumberGenerator* rng);
+
+    void init_class(int n);
+
 	~PermuTools();
 
     int n;
@@ -589,6 +592,8 @@ private:
     int** freq_matrix;
 
     int it_to_compute_order_marginal = 0;
+
+    bool delete_rng_is_required = false;
 };
 
 
@@ -691,3 +696,6 @@ void compute_order_double(T* v, int len, double* order_res, bool reverse = false
 
 // if NOT reverse, then the smallest value (0.0 in the case of the normalized result) will NOT change position
 void transform_from_values_to_normalized_rankings(double* reference_and_result, int len, bool reverse = false);
+
+// https://www.geeksforgeeks.org/rounding-floating-point-number-two-decimal-places-c-c/
+double tools_round_two_decimals(double x);
