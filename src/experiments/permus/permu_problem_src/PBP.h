@@ -55,6 +55,7 @@ class PBP
 	int Read_with_mutex(string filename);
 	void load_rng(RandomNumberGenerator *rng);
 	Tabu* tab;
+	RandomNumberGenerator *rng;
 
 
   protected:
@@ -72,7 +73,6 @@ class PBP
 	int problem_size_PBP;
 
 
-	RandomNumberGenerator *rng;
 
 	/*
 	* Functions to be defined in child class.

@@ -29,10 +29,12 @@ double FitnessFunction_permu(NEAT::CpuNetwork *net_original, int n_evals)
     NEAT::CpuNetwork tmp_net = *net_original;
     NEAT::CpuNetwork *net = &tmp_net;
 
-    //Read the problem instance to optimize.
-    problem = GetProblemInfo(PROBLEM_TYPE, INSTANCE_PATH);
+ 
+    problem = GetProblemInfo(PROBLEM_TYPE, INSTANCE_PATH);     //Read the problem instance to optimize.
     pop = new CPopulation(problem);
     problem->load_rng(pop->rng);
+    pop->rng->seed();
+
 
     v_of_fitness = new double[n_evals];
 
@@ -52,7 +54,6 @@ double FitnessFunction_permu(NEAT::CpuNetwork *net_original, int n_evals)
                 counter = 0;
         #endif
 
-        pop->rng->seed();
         pop->Reset();
         //std::cout << "|" << n_of_repetitions_completed << "|" << std::endl;
         for (int i = 0; i < POPSIZE; i++)

@@ -103,11 +103,11 @@ InnovGenome::InnovGenome(rng_t rng_,
 
     if (START_WITHOUT_HIDDEN)
     {
-        assert(nhidden > 0);
+        assert(nhidden == 0);
     }
     else
     {
-        assert(nhidden == 0);
+        assert(nhidden > 0);
     }
     int innov = 1;
 

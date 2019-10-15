@@ -174,11 +174,6 @@ double QAP::_Evaluate(int * genes)
 	return -fitness;
 }
 
-
-
-
-
-
 	double QAP::fitness_delta_swap(CIndividual *indiv, int i, int j){
 		assert(j == i+1);
 		return fitness_delta_interchange(indiv, i, j);
@@ -255,10 +250,11 @@ double QAP::_Evaluate(int * genes)
 	}
 
 	double QAP::fitness_delta_insert(CIndividual *indiv, int i, int j){
-		int f_current = indiv->f_value;
-		copy_vector(_random_permu1, indiv->genome, n);
-		InsertAt(_random_permu1, i, j, n);
-		return _Evaluate(_random_permu1) - f_current;
+		InsertAt(indiv->genome, i, j, problem_size_PBP);
+		double res = _Evaluate(indiv->genome);
+		res -= indiv->f_value;
+		InsertAt(indiv->genome, j, i, problem_size_PBP);
+		return res;
 	}
 	
 

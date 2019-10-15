@@ -19,6 +19,9 @@
 #include <set>
 #include "../permuevaluator.h"
 #include "Lap.h"
+#include <float.h>
+#include <vector>
+
 
 #define TEMP_double_ARRAY_SIZE 30
 
@@ -144,7 +147,7 @@ void PrintArray(float *array, int length)
     int i;
     for (i = 0; i < length; i++)
         printf("%3.5f,", array[i]);
-    printf("\n ");
+    std::cout << std::endl;
 }
 
 /*
@@ -183,7 +186,7 @@ void PrintArray(double *array, int length){
     int i;
     for (i = 0; i < length; i++)
         printf("%3.5f,", array[i]);
-    printf("\n ");
+    std::cout << std::endl;
 }
 
 
@@ -621,14 +624,16 @@ int RandomNumberGenerator::xorshf96(void)
 void RandomNumberGenerator::seed(void){
     struct timespec ts;
     clock_gettime(CLOCK_REALTIME, &ts);
-    y=362436069, z=521288629;
+    y = 362436069UL;
+    this->z = 521288629UL;
     int seed =  ts.tv_nsec; // modulus with a big number, but not too big
-    x = seed;
+    this->x = (unsigned long) seed;
 }
 
 void RandomNumberGenerator::seed(int seed){
-    x = seed;
-    y=362436069, z=521288629;
+    this->x = (unsigned long) seed;
+    this->y=362436069UL; 
+    this->z=521288629UL;
 }
 
 
@@ -1229,7 +1234,7 @@ void PermuTools::compute_kendall_consensus_borda(int **permu_list, int m)
         }
     }
 
-    compute_order_int(temp_array, n, kendall_mm_consensus);
+    compute_order_from_int_to_int(temp_array, n, kendall_mm_consensus);
 
 }
 
@@ -1320,7 +1325,7 @@ void transform_from_values_to_normalized_rankings(double* reference_and_result, 
     double* res = new double[len];
     
     assert(len >2);
-    compute_order_double(reference_and_result, len, res, reverse);
+    compute_order_from_double_to_double(reference_and_result, len, res, reverse);
     
     for (int i = 0; i < len; i++)
     {
@@ -1335,7 +1340,7 @@ void transform_from_values_to_normalized_rankings(double* reference_and_result, 
 
 
 
-void compute_order_int(int* v, int len, int* order_res, bool reverse){
+void compute_order_from_int_to_int(int* v, int len, int* order_res, bool reverse){
     
     if (reverse)
     {
@@ -1369,7 +1374,7 @@ void compute_order_int(int* v, int len, int* order_res, bool reverse){
     delete[] temp;
 }
 
-void compute_order_int_with_doubles_as_ref(double* v, int len, int* order_res, bool reverse){
+void compute_order_from_double_to_int(double* v, int len, int* order_res, bool reverse){
     
     if (reverse)
     {
@@ -1404,11 +1409,78 @@ void compute_order_int_with_doubles_as_ref(double* v, int len, int* order_res, b
 }
 
 
+#define TOL 0.00001
+bool are_doubles_equal(double x1, double x2)
+{
+    if (fabs(x1 - x2) < TOL)
+    {
+        return true;
+    }else{
+        return false;
+    }
+    
+}
 
 
+void compute_order_from_double_to_double(double* v, int len, double* order_res, bool reverse, bool respect_ties){
+    int* temp = new int[len];
+
+    if (reverse)
+    {
+        multiply_array_with_value(v, -1, len);
+    }
+    
+    for (int i = 0; i < len; i++)
+    {
+        temp[i] = i;
+    }
+
+    std::sort(temp, temp+len, _sort_indices_double(v));
+    for (int i = 0; i < len; i++)
+    {
+        order_res[temp[i]] = (double) i;
+    }
+
+    
+    if (respect_ties)
+    {
+        assert(len > 3);
+        int n_equal = 0;
+        double last;
 
 
+        for (int i = 1; i < len; i++)
+        {
+            last = v[temp[i-1]];
 
+            if (are_doubles_equal(last, v[temp[i]]))
+            {
+                n_equal++;
+            }
+
+            if (!are_doubles_equal(last, v[temp[i]]) || i == len - 1)
+            {
+                int last_eq_idx = i-1;
+
+                if(are_doubles_equal(last, v[temp[i]])){
+                    last_eq_idx = i;
+                }
+
+                if (n_equal > 0)
+                {
+                    double av_rank = (order_res[temp[last_eq_idx]] + order_res[temp[last_eq_idx-n_equal]]) / 2.0;
+
+                    for (int j = 0; j <= n_equal ; j++)
+                    {
+                        order_res[temp[last_eq_idx-j]] = av_rank;
+                    }
+                    n_equal = 0;
+                }
+            }
+        }
+    }
+    delete[] temp;
+}
 
 
 
@@ -1427,8 +1499,7 @@ void transform_from_values_to_geometric_ranking_probs(double* reference_and_resu
     
     assert(len >2); 
 
-    compute_order_int_with_doubles_as_ref(reference_and_result, len, indexes, reverse);
-    
+    compute_order_from_double_to_int(reference_and_result, len, indexes, reverse);
     reference_and_result[indexes[0]] = 1.0 - p;
     for (int i = 1; i < len; i++)
     {
@@ -1436,6 +1507,8 @@ void transform_from_values_to_geometric_ranking_probs(double* reference_and_resu
     }
 
     normalize_vector(reference_and_result, len);
+
+
 
     delete[] indexes;
 }
@@ -1453,4 +1526,146 @@ double tools_round_two_decimals(double x)
 }
 
 
+
+double obtain_variance_considering_repetitions(double length, double* array_of_values){
+    double n = length;
+    double N = length * 2.0;
+
+
+    double res = n * n / 12.0;
+
+    double sumand = 0.0;
+
+    // compute sumand
+    {
+
+        std::vector<int> group_indexes;
+
+
+
+        bool* not_yet_considered = new bool[tools_round(length*2.0)];
+
+        for (int i = 0; i < tools_round(length*2.0); i++)
+        {
+            not_yet_considered[i] = true;
+        }
+
+
+
+
+        for (int i = 0; i < tools_round(length*2.0); i++)
+        {
+            if(not_yet_considered[i])
+            {
+                double val = array_of_values[i];
+                int n_of_group_members = 0;
+                for (int j = i; j < tools_round(length*2.0); j++)
+                {
+                    if (not_yet_considered[j] && are_doubles_equal(val, array_of_values[j]))
+                    {
+                        group_indexes.push_back(j);
+                        n_of_group_members++;
+                    }
+                }
+
+                sumand += (double) (n_of_group_members*n_of_group_members*n_of_group_members - n_of_group_members);
+
+                for (auto &index : group_indexes)
+                {
+                    not_yet_considered[index] = false;
+                }
+
+                group_indexes.clear();
+                n_of_group_members = 0;
+            }
+        }
+
+
+        delete[] not_yet_considered;
+
+    }
+
+    res *= (N + 1.0) - (sumand / (N * N-1));
+
+    return sqrt(res);
+
+}
+
+
+
+double from_u_statistic_to_z(double u, double length, double* array_of_values){
+
+    double n = (double) length;
+    double N = (double) length * 2.0;
+
+    double mu = (n * n) / 2.0;
+
+    double sigma = sqrt( n * n * (N + 1.0) / 12.0 );
+
+    double sigma_corrected = obtain_variance_considering_repetitions(length, array_of_values);
+
+    //cout << "--- sigma -> " << sigma << ",   sigma_corrected -> " << sigma_corrected << endl;
+
+    double z = (u - mu) / sigma;
+
+    return z;
+}
+
+
+
+
+
+
+bool is_A_larger_than_B_Mann_Whitney(double* A, double* B, int length){
+
+
+
+    if(length < 20){
+        cout << "A larger sample size than 20 is required to correctly estimate p-value. " << endl;
+        exit(1);
+    }
+
+    double *array_of_values = new double[length*2];
+    double *ranks = new double[length*2];
+
+    for (int i = 0; i < length; i++)
+    {
+        array_of_values[i] = A[i];
+        array_of_values[i + length] = B[i];
+    }
+
+    compute_order_from_double_to_double(array_of_values, length*2, ranks, false, true);
+
+    double r_A = sum_slice_vec(array_of_values, 0, length);
+    double r_B = sum_slice_vec(array_of_values, length, length*2);
+
+
+
+    if(r_A < r_B)
+    {
+        return false;
+    }
+
+ 
+
+
+    //double u_A = length * length + (length * (length+ 1) / 2) - r_A;
+    double u_B = length * length + (length * (length+ 1) / 2) - r_B;
+
+    double z = from_u_statistic_to_z(u_B, length, array_of_values);
+
+   if(abs(z) > 6){
+        return true;
+    }
+
+    cout << "z value: " << z << endl;
+
+    if (z > 3.1) // using a significance level of 0.001
+    {
+        return true;
+    }else{
+        return false;
+    }
+
+}
 

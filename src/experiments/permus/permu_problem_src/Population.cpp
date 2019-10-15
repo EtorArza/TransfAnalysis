@@ -25,6 +25,7 @@ using std::ostream;
 
 void CPopulation::init_class(PBP *problem, RandomNumberGenerator* rng){
     this->rng = rng;
+    this->rng->seed();
     this->problem = problem;
     this->popsize = POPSIZE;
     this->n = problem->GetProblemSize();
@@ -108,7 +109,7 @@ CPopulation::~CPopulation()
     delete pt;
     pt=NULL;
     delete rng;
-    rng=NULL;
+    rng=NULL;    
     delete tab;
     tab=NULL;
     delete[] pop_info;
@@ -252,7 +253,7 @@ void CPopulation::comp_distance()
         templ_double_array[i] = val;
     }
 
-    compute_order_double(templ_double_array, POPSIZE, templ_double_array2);
+    compute_order_from_double_to_double(templ_double_array, POPSIZE, templ_double_array2);
 
 
     // copy normalized values into individuals

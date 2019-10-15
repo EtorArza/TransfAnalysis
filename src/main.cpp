@@ -88,7 +88,32 @@ PBP *GetProblemInfo(std::string problemType, std::string filename)
 
 
 int main(int argc, char *argv[])
-{
+{   
+
+    // int n = 10;
+
+    // double* array_1 = new double[n];
+    // double* order_res = new double[n];
+
+    // for (int i = 0; i < n; i++)
+    // {
+    //     array_1[i] = (double) i+10;
+    // }
+
+    // array_1[0] = 11.0;
+    // array_1[3] = 10.0;
+    // array_1[7] = 18.0;
+    // array_1[6] = 18.0;
+
+    // PrintArray(array_1, n);
+
+    // compute_order_from_double_to_double(array_1, n, order_res, false, true);
+
+    // PrintArray(array_1, n);
+
+    // PrintArray(order_res, n);
+
+    // exit(1);
 
     #ifndef NDEBUG
     cout << "WARNING: Debug mode. Assertions enabled." << endl;
@@ -136,6 +161,15 @@ int main(int argc, char *argv[])
         POPSIZE = reader.GetInteger("Controller", "POPSIZE", -1);
         TABU_LENGTH = reader.GetInteger("Controller", "TABU_LENGTH", -1);
         START_WITHOUT_HIDDEN = reader.GetBoolean("NEAT","START_WITHOUT_HIDDEN", false);
+
+
+        F_VALUES_OBTAINED_BY_BEST_INDIV = new double[N_EVALS_TO_UPDATE_BK];
+        for (int i = 0; i < N_EVALS_TO_UPDATE_BK; i++)
+        {
+            F_VALUES_OBTAINED_BY_BEST_INDIV[i] = -DBL_MAX;
+        }
+        
+
 
         if (search_type == "phased")
         {
@@ -205,6 +239,9 @@ int main(int argc, char *argv[])
         rng_t rng{rng_seed};
         global_timer.tic();
         exp->run(rng);
+
+        delete[] F_VALUES_OBTAINED_BY_BEST_INDIV;
+
         return 0;
     }
     else if (MODE ==  "test")

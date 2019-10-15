@@ -102,56 +102,62 @@ public:
                 Evaluator *ev = new Evaluator(config);
                 double *res = new double[actual_n_reevals];
                 ev->FitnessFunction_parallel(net, actual_n_reevals, res);
-                int index_value = arg_element_in_centile_specified_by_percentage(res, actual_n_reevals, 0.75);
+                int index_value = arg_element_in_centile_specified_by_percentage(res, actual_n_reevals, 0.50);
                 f_values[inet] = res[index_value];
                 delete[] res;
                 delete ev;
             }
         }
 
-        if (f_values[argmax(f_values, nnets)] > BEST_FITNESS_TRAIN)
+        cout << "Reevaluating best indiv of generation" << endl;
+        int index_most_fit = argmax(f_values, nnets);
+        CpuNetwork *net = nets[index_most_fit];
+        Evaluator *ev = new Evaluator(config);
+
+        // apply a discount to all but the best individual
+        for (int i = 0; i < (int) nnets; i++)
         {
-            cout << "Reevaluating best indiv of generation" << endl;
-            int index_most_fit = argmax(f_values, nnets);
-            CpuNetwork *net = nets[index_most_fit];
-            Evaluator *ev = new Evaluator(config);
-
-
-            double *res = new double[N_EVALS_TO_UPDATE_BK];
-            ev->FitnessFunction_parallel(net, N_EVALS_TO_UPDATE_BK, res);
-            int index_value_lower_bound = arg_element_in_centile_specified_by_percentage(res, N_EVALS_TO_UPDATE_BK, 0.75);
-            int index_value_upper_bound = arg_element_in_centile_specified_by_percentage(res, N_EVALS_TO_UPDATE_BK, 0.25);
-
-
-
-            // apply a discount to all but the best individual
-            for (int i = 0; i < (int) nnets; i++)
+            if (i != index_most_fit)
             {
-                if (i != index_most_fit)
-                {
-                    f_values[i] -= 1000000000.0; 
-                }
+                f_values[i] -= 1000000000.0; 
             }
+        }
 
-            double pesimistic_fitness = res[index_value_lower_bound];
-            double optimistic_fitness = res[index_value_upper_bound];
+        double *res = new double[N_EVALS_TO_UPDATE_BK];
+        ev->FitnessFunction_parallel(net, N_EVALS_TO_UPDATE_BK, res);
 
-            f_values[index_most_fit] = pesimistic_fitness;
+        double median = res[arg_element_in_centile_specified_by_percentage(res, N_EVALS_TO_UPDATE_BK, 0.5)];
 
-            if (pesimistic_fitness > BEST_FITNESS_TRAIN)
+
+        if (median > BEST_FITNESS_TRAIN)
+        {
+            cout << "One sided unpaired Mann-Witnney test: ";
+
+            bool update_needed = is_A_larger_than_B_Mann_Whitney(res, F_VALUES_OBTAINED_BY_BEST_INDIV, N_EVALS_TO_UPDATE_BK);
+
+            if (update_needed)
             {
+                cout << "reject H_0, significant difference at alpha = 0.001, " << endl;
                 N_TIMES_BEST_FITNESS_IMPROVED_TRAIN++;
-                cout << "[BEST_FITNESS_IMPROVED] --> " << pesimistic_fitness << endl;
-                BEST_FITNESS_TRAIN = optimistic_fitness;
+                cout << "[BEST_FITNESS_IMPROVED] --> " << median << endl;
+                BEST_FITNESS_TRAIN = median;
+                copy_vector(F_VALUES_OBTAINED_BY_BEST_INDIV, res, N_EVALS_TO_UPDATE_BK);
+            }else{
+                cout << "H_0, no significant difference at alpha = 0.001" << endl;
             }
 
-            delete ev;
-            delete[] res;
 
         }
 
+        delete ev;
+        delete[] res;
+
+        
+
         transform_from_values_to_geometric_ranking_probs(f_values, nnets, false);
+
         multiply_array_with_value(f_values, 1.0 + ((double)N_TIMES_BEST_FITNESS_IMPROVED_TRAIN / 1000.0), nnets);
+
 
         // save scaled fitness
         for (size_t inet = 0; inet < nnets; inet++)

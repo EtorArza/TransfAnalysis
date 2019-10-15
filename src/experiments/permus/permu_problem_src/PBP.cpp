@@ -34,7 +34,7 @@ PBP::~PBP()
 }
 
 void PBP::load_rng(RandomNumberGenerator *rng){
-    delete rng;
+    delete this->rng;
     this->rng = rng;
     rng_deleted = true;
 }
@@ -81,9 +81,10 @@ int PBP::Read_with_mutex(string filename){
 
 void PBP::apply_operator_with_fitness_update(CIndividual *indiv, int i, int j, NEAT::operator_t operator_id, double accept_or_reject_worse)
 {   
-    if(i==j && j==-1){
+    if(i==j || j==-1){
         return;
     }
+
     double delta = 0;
 
 
@@ -112,11 +113,6 @@ void PBP::apply_operator_with_fitness_update(CIndividual *indiv, int i, int j, N
 
 void PBP::apply_operator_with_fitness_update(CIndividual *indiv, double delta, int i, int j, NEAT::operator_t operator_id, double accept_or_reject_worse)
 {
-    if (i == j && j == -1)
-    {
-        return;
-    }
-
 
     double r = 2 * (this->rng->random_0_1_double() - 0.5001);
 
@@ -151,7 +147,13 @@ void PBP::apply_operator_with_fitness_update(CIndividual *indiv, double delta, i
             exit(1);
             break;
         }
+        
+        // cout << "-------------" << endl;
+        // cout << "computed delta: " << delta << endl;
+        // cout << "actual delta: " << abs(indiv->f_value - Evaluate(indiv->genome)) <<  endl;
+        // cout << "updated: " << indiv->f_value << ", actual: " << Evaluate(indiv->genome) <<  endl;
 
+        assert(isPermutation(indiv->genome, problem_size_PBP));
         assert(abs(indiv->f_value - Evaluate(indiv->genome)) < 0.0001);
         moved = true;
     }
@@ -242,7 +244,7 @@ void PBP::local_search_iteration(CIndividual *indiv, NEAT::operator_t operator_i
         {
             for (int j = 0; j < this->problem_size_PBP; j++)
             {
-                if (i != j || (i > 0 &&_random_permu1[j]==_random_permu1[i-1]))
+                if (i != j && (_random_permu2[j] - _random_permu1[i]) != 1)
                 {
                     if (tab->is_tabu(_random_permu1[i], _random_permu2[j]))
                     {
@@ -251,9 +253,24 @@ void PBP::local_search_iteration(CIndividual *indiv, NEAT::operator_t operator_i
                     double delta =fitness_delta_insert(indiv, _random_permu1[i], _random_permu2[j]);
                     if (delta > 0)
                     {   
+
                         //cout << "peep ";
                         tab->set_tabu(_random_permu1[i], _random_permu2[j]);
-                       	//cout << "(" << i << "," << j << ")" << endl;
+                       	// cout << "(" << i << "," << j << ")" << endl;
+                       	// cout << "(" << _random_permu1[i] << "," << _random_permu2[j] << ")" << endl;
+                        
+
+                        assert(abs(indiv->f_value - Evaluate(indiv->genome)) < 0.0001);
+
+                        copy_vector(_random_permu3, indiv->genome, problem_size_PBP);
+                        InsertAt(_random_permu3, _random_permu1[i], _random_permu2[j], problem_size_PBP);
+
+                        assert(isPermutation(_random_permu1, problem_size_PBP));
+                        assert(isPermutation(_random_permu2, problem_size_PBP));
+                        
+                        assert(abs(indiv->f_value + delta - Evaluate(_random_permu3)) < 0.1);
+
+
                         apply_operator_with_fitness_update(indiv, delta, _random_permu1[i], _random_permu2[j], operator_id);
 
                         // if(!isPermutation(indiv->genome, problem_size_PBP)){

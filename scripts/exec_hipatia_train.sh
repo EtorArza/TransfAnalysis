@@ -4,9 +4,9 @@
 #SBATCH --error=err/slurm_err_%j.txt
 #SBATCH --ntasks=1 # number of tasks
 #SBATCH --ntasks-per-node=1 #number of tasks per node
-#SBATCH --mem=128G
-#SBATCH --cpus-per-task=72 # number of CPUs
-#SBATCH --time=5-00:00:00 #Walltime
+#SBATCH --mem=70G
+#SBATCH --cpus-per-task=70 # number of CPUs
+#SBATCH --time=3-00:00:00 #Walltime
 #SBATCH -p large
 #SBATCH --exclude=n[001-016]
 
@@ -67,34 +67,33 @@ cat > tmp.ini <<EOF
 
 
 [Global] 
-mode = train ;  decide wether to train a controller or test it
+mode = train
 
 
-; Configure parameters of NEAT, relevant only during training
 [NEAT]
-MAX_TRAIN_TIME = 43200 ; time in seconds
-POPSIZE = 504 
-THREADS = 72
-N_EVALS = 10
-N_REEVALS_TOP_5_PERCENT = 200
-N_EVALS_TO_UPDATE_BK = 5040
+MAX_TRAIN_TIME = 172800
+POPSIZE = 700
+THREADS = 70
+N_EVALS = 20
+N_REEVALS_TOP_5_PERCENT = 210
+N_EVALS_TO_UPDATE_BK = 5000
 
 
 
-SEARCH_TYPE = phased ;
-DELETE_PREVIOUS_EXPERIMENT = true ;
-SEED = 2 ;
-START_WITHOUT_HIDDEN = true ;
+SEARCH_TYPE = phased
+DELETE_PREVIOUS_EXPERIMENT = true
+SEED = 2
+START_WITHOUT_HIDDEN = false
 
 
 
 [Controller]
-MAX_TIME_PSO = 0.5 ; Max time the controller has to solve the permutation problem.
-POPSIZE = 20 ;
-TABU_LENGTH = 40 ;
+MAX_TIME_PSO = 1.0
+POPSIZE = 20
+TABU_LENGTH = 40
 
-PROBLEM_TYPE = $1 ; the kind of permutation problem to be solved by the controller.
-PROBLEM_PATH = $2 ; 
+PROBLEM_TYPE = $1
+PROBLEM_PATH = $2
 
 EOF
 

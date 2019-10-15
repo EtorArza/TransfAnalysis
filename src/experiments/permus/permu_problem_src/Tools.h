@@ -368,7 +368,7 @@ double Variance(T *array, int len)
 template <class T>
 void normalize_vector(T *array, int len)
 {
-    int sum = 0;
+    T sum = 0;
     for (int i = 0; i < len; i++)
     {
         sum += array[i];
@@ -456,7 +456,11 @@ int argmin(T *v, int len){
 
 template <class T>
 void copy_vector(T *v_res, T*v_ref, int len){
-	memcpy(v_res, v_ref, sizeof(T)*len);
+
+    for (int i = 0; i < len; i++)
+    {
+        v_res[i] = v_ref[i];
+    }
 }
 
 // https://thispointer.com/c-how-to-read-a-file-line-by-line-into-a-vector/
@@ -477,6 +481,7 @@ class RandomNumberGenerator{
 
     public:
 
+        unsigned long x, y, z;
 
         RandomNumberGenerator(){x=123456789, y=362436069, z=521288629;}
         ~RandomNumberGenerator(){};
@@ -494,7 +499,6 @@ class RandomNumberGenerator{
         
 
 
-        unsigned long x, y, z;
         int xorshf96(void);
 
 
@@ -653,32 +657,14 @@ class _sort_indices_double
      bool operator()(int i, int j) const { return mparr[i]<mparr[j]; }
 };
 
+bool are_doubles_equal(double x1, double x2);
 
-void compute_order_int(int* v, int len, int* order_res, bool reverse = false);
+void compute_order_from_int_to_int(int* v, int len, int* order_res, bool reverse = false);
 
-void compute_order_int_with_doubles_as_ref(double* v, int len, int* order_res, bool reverse = false);
+void compute_order_from_double_to_int(double* v, int len, int* order_res, bool reverse = false);
 
-template <class T>
-void compute_order_double(T* v, int len, double* order_res, bool reverse = false){
-    int* temp = new int[len];
+void compute_order_from_double_to_double(double* v, int len, double* order_res, bool reverse = false, bool respect_ties = false);
 
-    if (reverse)
-    {
-        multiply_array_with_value(v, -1, len);
-    }
-    
-    for (int i = 0; i < len; i++)
-    {
-        temp[i] = i;
-    }
-
-    std::sort(temp, temp+len, _sort_indices_double(v));
-    for (int i = 0; i < len; i++)
-    {
-        order_res[temp[i]] = (double) i;
-    }
-    delete[] temp;
-}
 
 
 // if NOT reverse, then the smallest value (0.0 in the case of the normalized result) will NOT change position
@@ -714,3 +700,7 @@ int arg_element_in_centile_specified_by_percentage(T* array, int len, double per
     exit(1);
 
 }
+
+
+
+bool is_A_larger_than_B_Mann_Whitney(double* A, double* B, int length);
