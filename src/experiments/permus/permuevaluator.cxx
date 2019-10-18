@@ -15,7 +15,7 @@
 using namespace std;
 
 //#define COUNTER
-
+//#define PRINT
 
 PBP *GetProblemInfo(std::string problemType, std::string filename);
 
@@ -33,7 +33,7 @@ double FitnessFunction_permu(NEAT::CpuNetwork *net_original, int n_evals)
     problem = GetProblemInfo(PROBLEM_TYPE, INSTANCE_PATH);     //Read the problem instance to optimize.
     pop = new CPopulation(problem);
     problem->load_rng(pop->rng);
-    pop->rng->seed();
+    pop->rng->seed(2);
 
 
     v_of_fitness = new double[n_evals];
@@ -69,8 +69,9 @@ double FitnessFunction_permu(NEAT::CpuNetwork *net_original, int n_evals)
             // if (counter < 3 || counter == 50)
             // {
             //     std::cout << "iteration number: " << counter << std::endl;
-            //                 pop->Print();
-
+            #ifdef PRINT
+            pop->Print();
+            #endif
             // }
             #endif
 

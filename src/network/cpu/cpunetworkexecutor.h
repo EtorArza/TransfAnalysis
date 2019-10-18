@@ -152,12 +152,22 @@ public:
         delete ev;
         delete[] res;
 
-        
+        double* tmp_order = new double[nnets];
 
-        transform_from_values_to_geometric_ranking_probs(f_values, nnets, false);
+        cout << "fitness_array: " << std::flush;
+        PrintArray(f_values, nnets);
 
+        compute_order_from_double_to_double(f_values, nnets, tmp_order, false, true);
+
+        std::swap(f_values, tmp_order);
+
+
+
+        multiply_array_with_value(f_values, 1.0 / (double) (nnets-1), nnets);
         multiply_array_with_value(f_values, 1.0 + ((double)N_TIMES_BEST_FITNESS_IMPROVED_TRAIN / 1000.0), nnets);
 
+        cout << "fitness_array: " << std::flush;
+        PrintArray(f_values, nnets);
 
         // save scaled fitness
         for (size_t inet = 0; inet < nnets; inet++)
@@ -165,7 +175,7 @@ public:
             results[inet].fitness = f_values[inet];
             results[inet].error = 2 - f_values[inet];
         }
-
+        delete[] tmp_order;
         delete[] f_values;
     }
 };
