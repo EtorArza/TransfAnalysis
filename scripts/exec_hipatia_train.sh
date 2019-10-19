@@ -4,11 +4,11 @@
 #SBATCH --error=err/slurm_err_%j.txt
 #SBATCH --ntasks=1 # number of tasks
 #SBATCH --ntasks-per-node=1 #number of tasks per node
-#SBATCH --mem=70G
-#SBATCH --cpus-per-task=70 # number of CPUs
+#SBATCH --mem=32G
+#SBATCH --cpus-per-task=32 # number of CPUs
 #SBATCH --time=3-00:00:00 #Walltime
 #SBATCH -p large
-#SBATCH --exclude=n[001-016]
+#############SBATCH --exclude=n[001-016]
 
 
 
@@ -72,11 +72,11 @@ mode = train
 
 [NEAT]
 MAX_TRAIN_TIME = 172800
-POPSIZE = 700
-THREADS = 70
-N_EVALS = 20
-N_REEVALS_TOP_5_PERCENT = 210
-N_EVALS_TO_UPDATE_BK = 5000
+POPSIZE = 640
+THREADS = 32
+N_EVALS = 5
+N_REEVALS_TOP_5_PERCENT = 64
+N_EVALS_TO_UPDATE_BK = 1600
 
 
 
@@ -88,7 +88,7 @@ START_WITHOUT_HIDDEN = false
 
 
 [Controller]
-MAX_TIME_PSO = 1.0
+MAX_TIME_PSO = 0.5
 POPSIZE = 20
 TABU_LENGTH = 40
 

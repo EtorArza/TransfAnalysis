@@ -12,8 +12,19 @@ export NPROCS=`wc -l < $PBS_NODEFILE`
 
 
 
-prob=${problem_name}
-ins=${instance_path}
+
+
+
+
+if [[ "$#" -ne 2  ]] ; then
+    echo 'Please provide the name of the problem and the name of the instance. $# parameters where provided. Two are needed. Example: '
+    echo ""
+    echo 'script.sh qap tai35a.dat.dat'
+    echo ""
+    echo 'Exitting...'
+    exit 1
+fi
+
 
 
 
@@ -76,9 +87,5 @@ EOF
 date
 ./neat "tmp.ini" >$ OUTPUT_FILE
 date
-
-
-
-
 
 
