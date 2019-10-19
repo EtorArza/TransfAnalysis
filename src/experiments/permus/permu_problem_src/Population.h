@@ -88,7 +88,8 @@ private:
   double *templ_double_array2;
   double relative_time();
 
-
+  double iteration_geom;
+  double iteration_geom_coef;
 
   /* 
   * In this case, 0 means highly cramped, 1 means highly sparse.
