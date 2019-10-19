@@ -278,13 +278,17 @@ int main(int argc, char *argv[])
         double *v_of_f_values = new double[N_EVALS];
 
         cout << std::setprecision(15);
+
+        int initial_seed = 1;
+
         for (int j = 0; j < N_REPS; j++)
         {
             #pragma omp parallel for num_threads(N_OF_THREADS)
             for (int i = 0; i < N_EVALS; i++)
             {
-                v_of_f_values[i] = FitnessFunction_permu(&net, 1);
+                v_of_f_values[i] = FitnessFunction_permu(&net, 1, initial_seed + i);
             }
+            initial_seed += N_EVALS;
             double res = Average(v_of_f_values, N_EVALS);
             cout << res << ",";
         }
