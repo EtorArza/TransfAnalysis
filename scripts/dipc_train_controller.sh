@@ -12,19 +12,8 @@ export NPROCS=`wc -l < $PBS_NODEFILE`
 
 
 
-
-
-
-
-if [[ "$#" -ne 2  ]] ; then
-    echo 'Please provide the name of the problem and the name of the instance. $# parameters where provided. Two are needed. Example: '
-    echo ""
-    echo 'script.sh qap tai35a.dat.dat'
-    echo ""
-    echo 'Exitting...'
-    exit 1
-fi
-
+prob=${problem_name}
+ins=${instance_path}
 
 
 
@@ -58,8 +47,8 @@ mode = train
 MAX_TRAIN_TIME = 3000
 POPSIZE = 520
 THREADS = 52
-N_EVALS = 20
-N_REEVALS_TOP_5_PERCENT = 208
+N_EVALS = 3
+N_REEVALS_TOP_5_PERCENT = 52
 N_EVALS_TO_UPDATE_BK = 5200
 
 
@@ -72,7 +61,7 @@ START_WITHOUT_HIDDEN = false
 
 
 [Controller]
-MAX_TIME_PSO = 1.0
+MAX_TIME_PSO = 0.5
 POPSIZE = 20
 TABU_LENGTH = 40
 

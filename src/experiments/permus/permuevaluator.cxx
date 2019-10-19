@@ -19,7 +19,7 @@ using namespace std;
 
 PBP *GetProblemInfo(std::string problemType, std::string filename);
 
-double FitnessFunction_permu(NEAT::CpuNetwork *net_original, int n_evals)
+double FitnessFunction_permu(NEAT::CpuNetwork *net_original, int n_evals, int seed)
 {
 
     double *v_of_fitness;
@@ -33,7 +33,7 @@ double FitnessFunction_permu(NEAT::CpuNetwork *net_original, int n_evals)
     problem = GetProblemInfo(PROBLEM_TYPE, INSTANCE_PATH);     //Read the problem instance to optimize.
     pop = new CPopulation(problem);
     problem->load_rng(pop->rng);
-    pop->rng->seed(2);
+    pop->rng->seed(seed);
 
 
     v_of_fitness = new double[n_evals];
@@ -53,7 +53,7 @@ double FitnessFunction_permu(NEAT::CpuNetwork *net_original, int n_evals)
         #ifdef COUNTER
                 counter = 0;
         #endif
-
+        pop->rng->seed(seed + n_of_repetitions_completed);
         pop->Reset();
         //std::cout << "|" << n_of_repetitions_completed << "|" << std::endl;
         for (int i = 0; i < POPSIZE; i++)
@@ -126,24 +126,31 @@ struct Evaluator
 {
     typedef NEAT::Config Config;
     const Config *config;
+
+
     __net_eval_decl Evaluator(const Config *config_) : config(config_){};
 
 
     // fitness function in sequential order
-    __net_eval_decl double FitnessFunction(CpuNetwork *net, int n_evals)
+    __net_eval_decl double FitnessFunction(CpuNetwork *net, int n_evals, int initial_seed)
     {
-        double res = FitnessFunction_permu(net, n_evals);
+        int seed_seq = initial_seed;
+        double res = FitnessFunction_permu(net, n_evals, seed_seq);
+        seed_seq += n_evals;
         return res;
     }
 
     // parallelize over the same network
-    __net_eval_decl void FitnessFunction_parallel(CpuNetwork *net, int n_evals, double *res)
+    __net_eval_decl void FitnessFunction_parallel(CpuNetwork *net, int n_evals, double *res, int initial_seed)
     {
+        int seed_parallel = initial_seed;
+
         #pragma omp parallel for num_threads(N_OF_THREADS)
         for (int i = 0; i < n_evals; i++)
         {
-            res[i] = FitnessFunction_permu(net, 1);
+            res[i] = FitnessFunction_permu(net, 1, seed_parallel + i);
         }
+        seed_parallel += n_evals;
     }
 };
 

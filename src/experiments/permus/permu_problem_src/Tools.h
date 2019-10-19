@@ -315,6 +315,38 @@ void multiply_array_with_value(A* array, B value, int len){
     }
 }
 
+template <class T>
+void sum_value_to_array(T* array, T value, int len){
+    for (int i = 0; i < len; i++)
+    {
+        array[i] += value;
+    }
+}
+
+
+template <class A, class B, class C>
+void multiply_two_arrays_elementwise(A* array_1, B* array_2, C* res, int len){
+    for (int i = 0; i < len; i++)
+    {
+        res[i] = array_1[i] * array_2[i];
+    }
+}
+
+
+// Scalar multiplication of vectors: multiply elemntwise and sum them. The return type is the one on the first vector.
+template <class A, class B>
+A scalar_multiplication(A* array_1, B* array_2, int len){
+    A res = 0;
+    for (int i = 0; i < len; i++)
+    {
+        res += array_1[i] * array_2[i];
+    }
+    return res;
+}
+
+
+
+
 // compute the average value of the elements on the array dropping the best and worst quarter
 template <class T>
 double Average_drop_top_bottom_quartile(T *array, int len)
@@ -704,3 +736,25 @@ int arg_element_in_centile_specified_by_percentage(T* array, int len, double per
 
 
 bool is_A_larger_than_B_Mann_Whitney(double* A, double* B, int length);
+
+
+bool is_A_larger_than_B_Signed_Willcoxon(double* A, double* B, int length);
+
+#define TOL 0.00001
+template <class T>
+int sign(T value)
+{
+    if (value < TOL && -TOL < value)
+    {
+        return 0;
+    }
+    else if (value > 0)
+    {
+        return 1;
+    }
+    else
+    {
+        return -1;
+    }
+}
+#undef TOL

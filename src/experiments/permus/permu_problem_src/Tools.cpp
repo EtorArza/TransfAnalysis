@@ -1669,3 +1669,79 @@ bool is_A_larger_than_B_Mann_Whitney(double* A, double* B, int length){
 
 }
 
+
+
+bool is_A_larger_than_B_Signed_Willcoxon(double* A, double* B, int length){
+
+
+
+    if(length < 80){
+        cout << "A larger sample size than 80 is required to correctly estimate p-value. " << endl;
+        exit(1);
+    }
+
+    int *signs = new int[length];
+    double *abs_differences = new double[length];
+    // double *signs_0s_discarded = new double[length];
+    // double *abs_differences_0s_discarded = new double[length];
+    double *ranks = new double[length];
+
+    for (int i = 0; i < length; i++)
+    {
+        abs_differences[i] = abs(A[i] - B[i]);
+        signs[i] = sign(A[i] - B[i]);
+    }
+
+    int N_r = 0;
+    for (int i = 0; i < length; i++)
+    {
+        if (signs[i] != 0)
+        {
+            signs[N_r] = signs[i];
+            abs_differences[N_r] = abs_differences[i];
+            N_r++;
+        }
+    }
+
+
+    compute_order_from_double_to_double(abs_differences, length, ranks, false, true);
+    sum_value_to_array(ranks, 1.0, length);
+
+    double W = scalar_multiplication(abs_differences, signs, N_r);
+
+
+    if(W < 0) // one sided test, W must be positive.
+    {
+        return false;
+    }
+
+    if (N_r < length / 4) // if the observations are the same in more than 75% of the cases, accept H0
+    {
+        return false;
+    }
+    
+    
+
+    double d_N_r = (double) N_r;
+ 
+    double sigma_w = sqrt(d_N_r * (d_N_r + 1.0) * (2.0*d_N_r + 1.0) / 6.0);
+
+    double z = W / sigma_w;
+
+
+    cout << " | z value: " << z << " | ";
+
+   if(abs(z) > 6){
+        return true;
+    }
+
+
+    if (z > 3.1) // using a significance level of 0.001
+    {
+        return true;
+    }else{
+        return false;
+    }
+
+}
+

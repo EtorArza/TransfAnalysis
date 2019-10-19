@@ -46,7 +46,9 @@ public:
         double progress_print_decider = 0.0;
         double *f_values = new double[nnets];
         bool printed_bracket = false;
-
+        RandomNumberGenerator rng;
+        rng.seed();
+        int initial_seed = rng.random_integer_fast(10000000);
         // evaluate the individuals
         #pragma omp parallel for num_threads(N_OF_THREADS)
         for (size_t inet = 0; inet < nnets; inet++)
@@ -54,7 +56,8 @@ public:
             CpuNetwork *net = nets[inet];
             Evaluator *ev = new Evaluator(config);
             OrganismEvaluation eval;
-            f_values[inet] = ev->FitnessFunction(net, N_EVALS);
+            int seed = initial_seed;
+            f_values[inet] = ev->FitnessFunction(net, N_EVALS, seed);
             results[inet] = eval;
             delete ev;
 
@@ -89,6 +92,9 @@ public:
 
         double cut_value = obtain_kth_largest_value(f_values, n_of_networks_to_reevaluate, static_cast<int>(nnets));
 
+        rng.seed();
+        initial_seed = rng.random_integer_fast(10000000);
+
         for (size_t inet = 0; inet < nnets; inet++)
         {
             if (f_values[inet] < cut_value)
@@ -101,7 +107,8 @@ public:
                 CpuNetwork *net = nets[inet];
                 Evaluator *ev = new Evaluator(config);
                 double *res = new double[actual_n_reevals];
-                ev->FitnessFunction_parallel(net, actual_n_reevals, res);
+                int seed = initial_seed;
+                ev->FitnessFunction_parallel(net, actual_n_reevals, res, seed);
                 int index_value = arg_element_in_centile_specified_by_percentage(res, actual_n_reevals, 0.50);
                 f_values[inet] = res[index_value];
                 delete[] res;
@@ -124,16 +131,16 @@ public:
         }
 
         double *res = new double[N_EVALS_TO_UPDATE_BK];
-        ev->FitnessFunction_parallel(net, N_EVALS_TO_UPDATE_BK, res);
+        ev->FitnessFunction_parallel(net, N_EVALS_TO_UPDATE_BK, res, 1);
 
         double median = res[arg_element_in_centile_specified_by_percentage(res, N_EVALS_TO_UPDATE_BK, 0.5)];
 
 
         if (median > BEST_FITNESS_TRAIN)
         {
-            cout << "One sided unpaired Mann-Witnney test: ";
+            cout << "One sided paired sign Willcoxon test: ";
 
-            bool update_needed = is_A_larger_than_B_Mann_Whitney(res, F_VALUES_OBTAINED_BY_BEST_INDIV, N_EVALS_TO_UPDATE_BK);
+            bool update_needed = is_A_larger_than_B_Signed_Willcoxon(res, F_VALUES_OBTAINED_BY_BEST_INDIV, N_EVALS_TO_UPDATE_BK);
 
             if (update_needed)
             {
@@ -155,7 +162,7 @@ public:
         double* tmp_order = new double[nnets];
 
         cout << "fitness_array: " << std::flush;
-        PrintArray(f_values, nnets);
+        //PrintArray(f_values, nnets);
 
         compute_order_from_double_to_double(f_values, nnets, tmp_order, false, true);
 
@@ -167,7 +174,7 @@ public:
         multiply_array_with_value(f_values, 1.0 + ((double)N_TIMES_BEST_FITNESS_IMPROVED_TRAIN / 1000.0), nnets);
 
         cout << "fitness_array: " << std::flush;
-        PrintArray(f_values, nnets);
+        //PrintArray(f_values, nnets);
 
         // save scaled fitness
         for (size_t inet = 0; inet < nnets; inet++)
