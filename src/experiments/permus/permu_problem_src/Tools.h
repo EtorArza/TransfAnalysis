@@ -758,3 +758,6 @@ int sign(T value)
     }
 }
 #undef TOL
+
+std::string from_path_to_filename(std::string file_path);
+

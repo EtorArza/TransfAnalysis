@@ -6,10 +6,8 @@
 #SBATCH --ntasks-per-node=1 #number of tasks per node
 #SBATCH --mem=32G
 #SBATCH --cpus-per-task=32 # number of CPUs
-#SBATCH --time=3-00:00:00 #Walltime
+#SBATCH --time=2-01:30:00 #Walltime
 #SBATCH -p large
-#############SBATCH --exclude=n[001-016]
-
 
 
 # # # #!/bin/bash
@@ -18,11 +16,10 @@
 # # # #SBATCH --error=err/slurm_err_%j.txt
 # # # #SBATCH --ntasks=1 # number of tasks
 # # # #SBATCH --ntasks-per-node=1 #number of tasks per node
-# # # #SBATCH --mem=2G
-# # # #SBATCH --cpus-per-task=2 # number of CPUs
+# # # #SBATCH --mem=12G
+# # # #SBATCH --cpus-per-task=12 # number of CPUs
 # # # #SBATCH --time=0-00:30:00 #Walltime
 # # # #SBATCH -p short
-
 
 
 
@@ -74,8 +71,8 @@ mode = train
 MAX_TRAIN_TIME = 172800
 POPSIZE = 640
 THREADS = 32
-N_EVALS = 5
-N_REEVALS_TOP_5_PERCENT = 64
+N_EVALS = 3
+N_REEVALS_TOP_5_PERCENT = 32
 N_EVALS_TO_UPDATE_BK = 1600
 
 
@@ -88,7 +85,7 @@ START_WITHOUT_HIDDEN = false
 
 
 [Controller]
-MAX_TIME_PSO = 0.5
+MAX_TIME_PSO = 1.5
 POPSIZE = 20
 TABU_LENGTH = 40
 
@@ -104,10 +101,18 @@ date
 ./neat "tmp.ini"
 date
 
-
-cp experiment_1* -v -r $SRCDIR
-
+instance_path=$2
 
 
+echo "$2"
 
-# #end
+filename="${instance_path##*/}"
+instancename="${filename%%.*}"
+
+echo "$instancename"
+
+
+cp "controllers_trained_with_$instancename" -v -r $SRCDIR
+
+
+

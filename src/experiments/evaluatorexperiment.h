@@ -20,16 +20,16 @@ namespace NEAT {
     class EvaluatorExperiment : public Experiment {
     private:
         std::string get_dir_path(int experiment_num) {
-            char buf[1024];
-            sprintf(buf, "./experiment_%d", experiment_num);
-            return buf;
+            return "./" + EXPERIMENT_FOLDER_NAME;
         }
 
         std::string get_fittest_path(int experiment_num, int generation) {
             char buf[1024];
-            sprintf(buf, "%s/fittest_%d",
+            sprintf(buf, "%s/%s_gen_%04d",
                     get_dir_path(experiment_num).c_str(),
-                    generation);
+                    from_path_to_filename(INSTANCE_PATH).c_str(),
+                    generation
+                    );
             return buf;
         }
 

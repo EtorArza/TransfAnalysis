@@ -146,7 +146,6 @@ int main(int argc, char *argv[])
     {
 
 
-        bool force_delete = reader.GetBoolean("NEAT","DELETE_PREVIOUS_EXPERIMENT", false);
         int rng_seed = reader.GetInteger("NEAT","SEED", -1);
         env->pop_size = reader.GetInteger("NEAT", "POPSIZE", -1);
         int max_time = reader.GetInteger("NEAT", "MAX_TRAIN_TIME", -1);
@@ -161,6 +160,9 @@ int main(int argc, char *argv[])
         POPSIZE = reader.GetInteger("Controller", "POPSIZE", -1);
         TABU_LENGTH = reader.GetInteger("Controller", "TABU_LENGTH", -1);
         START_WITHOUT_HIDDEN = reader.GetBoolean("NEAT","START_WITHOUT_HIDDEN", false);
+
+        EXPERIMENT_FOLDER_NAME = "controllers_trained_with_" + from_path_to_filename(INSTANCE_PATH);
+
 
 
         F_VALUES_OBTAINED_BY_BEST_INDIV = new double[N_EVALS_TO_UPDATE_BK];
@@ -194,13 +196,10 @@ int main(int argc, char *argv[])
         }
 
 
-        if (force_delete)
+
+        else if (exists(EXPERIMENT_FOLDER_NAME))
         {
-            sh("rm -rf experiment_*");
-        }
-        else if (exists("experiment_1"))
-        {
-            error("Already exists: experiment_1.\nMove your experiment directories or use -f to delete them automatically. If -f is used, all previous experiments will be deleted.")
+            error("Already exists: " + EXPERIMENT_FOLDER_NAME + ".\nMove your experiment directories or use -f to delete them automatically. If -f is used, all previous experiments will be deleted.")
         }
 
         omp_set_num_threads(N_OF_THREADS);
@@ -213,10 +212,10 @@ int main(int argc, char *argv[])
             cout << "h,  which might be too long." << endl << endl;
         }
 
-        if (env->pop_size < 1000)
+        if (env->pop_size < 500)
         {
             cout << "Warning: The population size of the controllers might be too low." << endl;
-            cout << "The provided population size of the controllers is " << env->pop_size << ", a value of at least 1000 is recommended." << endl;
+            cout << "The provided population size of the controllers is " << env->pop_size << ", a value of at least 500 is recommended." << endl;
             cout << endl << endl;
         }
 
@@ -278,8 +277,11 @@ int main(int argc, char *argv[])
         double *v_of_f_values = new double[N_EVALS];
 
         cout << std::setprecision(15);
-
-        int initial_seed = 1;
+        RandomNumberGenerator* rng;
+        rng = new RandomNumberGenerator();
+        rng->seed();
+        
+        int initial_seed = rng->random_integer_uniform(1000, 10000);
 
         for (int j = 0; j < N_REPS; j++)
         {

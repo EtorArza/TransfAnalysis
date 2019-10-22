@@ -43,6 +43,7 @@ EXTERN int N_REPS;
 EXTERN double BEST_FITNESS_TRAIN;
 EXTERN double N_TIMES_BEST_FITNESS_IMPROVED_TRAIN;
 EXTERN double* F_VALUES_OBTAINED_BY_BEST_INDIV;
+EXTERN std::string EXPERIMENT_FOLDER_NAME;
 ///////////////////////////////////////////////////////
 
 // NN consider value near 0 //

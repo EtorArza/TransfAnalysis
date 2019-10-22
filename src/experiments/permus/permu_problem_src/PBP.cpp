@@ -413,10 +413,24 @@ void PBP::obtain_indexes_step_towards(int *permu, int *ref_permu, int* i, int* j
     }
     case NEAT::EXCH:  // SCHIZVINOTTO 2007
     {
-        for (int idx = 0; idx < problem_size_PBP; idx++) // compute ref_permu \circ permu^-1
-        {   
-            _random_permu1[idx] = Find(permu, problem_size_PBP, ref_permu[idx]);
+
+        // // slow inv
+        // for (int idx = 0; idx < problem_size_PBP; idx++)
+        // {   
+        //     _random_permu1[idx] = Find(permu, problem_size_PBP, ref_permu[idx]);
+        // }
+
+        // fast inv
+        for (int i = 0; i < problem_size_PBP; i++)
+        {
+            _random_permu2[permu[i]] = i;
         }
+
+        for (int idx = 0; idx < problem_size_PBP; idx++)
+        {
+            _random_permu1[idx] = _random_permu2[ref_permu[idx]];
+        }
+
 
         GenerateRandomPermutation(_random_permu2, problem_size_PBP,rng);
         
@@ -533,10 +547,30 @@ void PBP::obtain_indexes_step_away(int *permu, int *ref_permu, int* i, int* j, N
     }
     case NEAT::EXCH:
     {
-        for (int idx = 0; idx < problem_size_PBP; idx++)
-        {   
-            _random_permu1[idx] = Find(permu, problem_size_PBP, ref_permu[idx]);
+        // // slow inv
+        // for (int idx = 0; idx < problem_size_PBP; idx++)
+        // {   
+        //     _random_permu3[idx] = Find(permu, problem_size_PBP, ref_permu[idx]);
+        // }
+
+        // fast inv
+        for (int i = 0; i < problem_size_PBP; i++)
+        {
+            _random_permu2[permu[i]] = i;
         }
+
+        for (int idx = 0; idx < problem_size_PBP; idx++)
+        {
+            _random_permu1[idx] = _random_permu2[ref_permu[idx]];
+        }
+
+
+        // for (int i = 0; i < problem_size_PBP; i++)
+        // {
+        //     assert(_random_permu1[i] == _random_permu3[i]);
+        // }
+        
+
         GenerateRandomPermutation(_random_permu2, problem_size_PBP,rng);
         
         for (int idx = 0; idx < problem_size_PBP; idx++)

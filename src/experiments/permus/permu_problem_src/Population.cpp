@@ -22,7 +22,7 @@ using std::istream;
 using std::ostream;
 
 #define TARGET_N_ITERATIONS_iteration_geom 10000
-#define TARGET_VALUE_iteration_geom 0.8
+#define TARGET_VALUE_iteration_geom 0.5
 
 void CPopulation::init_class(PBP *problem, RandomNumberGenerator* rng){
     this->rng = rng;

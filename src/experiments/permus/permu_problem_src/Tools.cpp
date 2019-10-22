@@ -933,6 +933,13 @@ void PermuTools::init_class(int n){
         freq_matrix[i] = new int[n];
     }
 
+    for (int j = 0; j < n; j++)
+    {
+        for (int i = 0; i < n; i++)
+        {
+            freq_matrix[i][j] = 0;
+        }
+    }
 
     for (int i = 0; i < n; i++)
     {
@@ -1240,13 +1247,7 @@ void PermuTools::compute_kendall_consensus_borda(int **permu_list, int m)
 
 void PermuTools::compute_hamming_consensus(int **permu_list, int m)
 {
-    for (int j = 0; j < n; j++)
-    {
-        for (int i = 0; i < n; i++)
-        {
-            freq_matrix[i][j] = 0;
-        }
-    }
+
 
     for (int i = 0; i < m; i++)
         for (int j = 0; j < n; j++)
@@ -1257,6 +1258,10 @@ void PermuTools::compute_hamming_consensus(int **permu_list, int m)
 
     for (int i = 0; i < n; i++)
         hamming_mm_consensus[i] = lap_rows[i];
+
+    for (int i = 0; i < m; i++)
+        for (int j = 0; j < n; j++)
+            freq_matrix[j][permu_list[i][j]] = 0;
 
 }
 
@@ -1745,3 +1750,26 @@ bool is_A_larger_than_B_Signed_Willcoxon(double* A, double* B, int length){
 
 }
 
+
+
+std::string from_path_to_filename(std::string file_path)
+{
+    std::string filename = file_path;
+    // Remove directory if present.
+    // Do this before extension removal incase directory has a period character.
+    const size_t last_slash_idx = filename.find_last_of("\\/");
+    if (std::string::npos != last_slash_idx)
+    {
+        filename.erase(0, last_slash_idx + 1);
+    }
+
+    // Remove extension if present.
+    size_t period_idx = filename.rfind('.');
+    while (std::string::npos != period_idx)
+    {   
+        filename.erase(period_idx);
+        period_idx = filename.rfind('.');
+    }
+
+    return filename;
+}

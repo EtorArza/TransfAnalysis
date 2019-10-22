@@ -18,7 +18,7 @@ with open(filename) as f:
 fitnesses = []
 for line in lines:
 	if "fittest " in line and "]:" in line:
-		fitness = float(line.split(" ")[2][8:-1])
+		fitness = float(line.split(" ")[4][8:-1])
 		fitnesses.append(fitness)
 		print(fitness)
 
