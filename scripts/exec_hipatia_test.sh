@@ -4,8 +4,8 @@
 #SBATCH --error=err/slurm_err_%j.txt
 #SBATCH --ntasks=1 # number of tasks
 #SBATCH --ntasks-per-node=1 #number of tasks per node
-#SBATCH --mem=8G
-#SBATCH --cpus-per-task=8 # number of CPUs
+#SBATCH --mem=16G
+#SBATCH --cpus-per-task=16 # number of CPUs
 #SBATCH --time=0-00:30:00 #Walltime
 #SBATCH -p short
 #SBATCH --exclude=n[001-004,017-018]
@@ -70,14 +70,14 @@ cat > tmp.ini <<EOF
 mode = test ;
 
 [TestSettings]
-THREADS = 8 ;
+THREADS = 16 ;
 N_EVALS = 500 ;
 N_REPS = 20 ;
 CONTROLLER_PATH = $3 ; 
 
 
 [Controller]
-MAX_TIME_PSO = 0.5 ; 
+MAX_TIME_PSO = 1.5 ; 
 POPSIZE = 20 ;
 TABU_LENGTH = 40 ;
 N_EVALS = 500 ;

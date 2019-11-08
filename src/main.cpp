@@ -282,7 +282,7 @@ int main(int argc, char *argv[])
         rng->seed();
         
         int initial_seed = rng->random_integer_uniform(1000, 10000);
-
+        cout << "[[";
         for (int j = 0; j < N_REPS; j++)
         {
             #pragma omp parallel for num_threads(N_OF_THREADS)
@@ -292,8 +292,14 @@ int main(int argc, char *argv[])
             }
             initial_seed += N_EVALS;
             double res = Average(v_of_f_values, N_EVALS);
-            cout << res << ",";
+            cout << res;
+            if (j < N_REPS-1)
+            {
+                cout << ",";
+            }
+            
         }
+        cout << "],";
         delete[] v_of_f_values;
 
 
@@ -301,11 +307,13 @@ int main(int argc, char *argv[])
 
         cout << std::setprecision(15);
         cout << std::flush;
-        cout << INSTANCE_PATH   << "|" 
-             << CONTROLLER_PATH << "|" 
-             << PROBLEM_TYPE    << "|" 
-             << N_EVALS         << "|"             
+        cout << INSTANCE_PATH   << "," 
+             << CONTROLLER_PATH << "," 
+             << PROBLEM_TYPE    << "," 
+             << N_EVALS
+             << "]"
              << endl;
+
 
         // cout << res << std::endl;;
         cout << std::flush;
