@@ -1623,7 +1623,8 @@ double from_u_statistic_to_z(double u, double length, double* array_of_values){
 
 bool is_A_larger_than_B_Mann_Whitney(double* A, double* B, int length){
 
-
+    cout << "Error, is_A_larger_than_B_Mann_Whitney was used, use willcoxon instead." << endl;
+    exit(1);
 
     if(length < 20){
         cout << "A larger sample size than 20 is required to correctly estimate p-value. " << endl;
@@ -1665,7 +1666,7 @@ bool is_A_larger_than_B_Mann_Whitney(double* A, double* B, int length){
 
     cout << "z value: " << z << endl;
 
-    if (z > 3.1) // using a significance level of 0.001
+    if (z > 2.05) // using a significance level of 0.02
     {
         return true;
     }else{
@@ -1678,7 +1679,7 @@ bool is_A_larger_than_B_Mann_Whitney(double* A, double* B, int length){
 
 bool is_A_larger_than_B_Signed_Willcoxon(double* A, double* B, int length){
 
-
+    #define Z_THRESH 2.05 
 
     if(length < 80){
         cout << "A larger sample size than 80 is required to correctly estimate p-value. " << endl;
@@ -1736,12 +1737,12 @@ bool is_A_larger_than_B_Signed_Willcoxon(double* A, double* B, int length){
 
     cout << " | z value: " << z << " | ";
 
-   if(abs(z) > 6){
+   if(abs(z) > 6.0){
         return true;
     }
 
 
-    if (z > 3.1) // using a significance level of 0.001
+    if (z > Z_THRESH) // using a significance level of 0.02
     {
         return true;
     }else{

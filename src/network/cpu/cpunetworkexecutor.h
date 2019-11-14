@@ -144,13 +144,13 @@ public:
 
             if (update_needed)
             {
-                cout << "reject H_0, significant difference at alpha = 0.001, " << endl;
+                cout << "reject H_0, significant difference at alpha = 0.02, " << endl;
                 N_TIMES_BEST_FITNESS_IMPROVED_TRAIN++;
                 cout << "[BEST_FITNESS_IMPROVED] --> " << median << endl;
                 BEST_FITNESS_TRAIN = median;
                 copy_vector(F_VALUES_OBTAINED_BY_BEST_INDIV, res, N_EVALS_TO_UPDATE_BK);
             }else{
-                cout << "H_0, no significant difference at alpha = 0.001" << endl;
+                cout << "H_0, no significant difference at alpha = 0.02" << endl;
             }
 
 

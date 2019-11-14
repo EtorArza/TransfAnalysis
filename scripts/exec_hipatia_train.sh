@@ -6,7 +6,7 @@
 #SBATCH --ntasks-per-node=1 #number of tasks per node
 #SBATCH --mem=32G
 #SBATCH --cpus-per-task=32 # number of CPUs
-#SBATCH --time=3-01:30:00 #Walltime
+#SBATCH --time=1-01:30:00 #Walltime
 #SBATCH -p large
 
 
@@ -68,7 +68,7 @@ mode = train
 
 
 [NEAT]
-MAX_TRAIN_TIME = 259200
+MAX_TRAIN_TIME = 86400
 POPSIZE = 640
 THREADS = 32
 N_EVALS = 3
