@@ -1,3 +1,6 @@
+#define SAME_SIZE_EXPERIMENT
+
+
 /*
   Copyright 2001 The University of Texas at Austin
 
@@ -82,6 +85,23 @@ PBP *GetProblemInfo(std::string problemType, std::string filename)
 
     //Read the instance.
     problem->Read_with_mutex(filename);
+    #ifdef SAME_SIZE_EXPERIMENT
+        if (problem->GetProblemSize() == 30)
+        {
+            MAX_TIME_PSO = 0.10;
+        }
+        else if(problem->GetProblemSize() == 60)
+        {
+            MAX_TIME_PSO = 0.3;
+        }
+        else
+        {
+            cout << "ERROR, this experiment expects instances of size 60 and 30.";
+            exit(1);
+        }
+
+    #undef SAME_SIZE_EXPERIMENT
+    #endif
     return problem;
 }
 
@@ -299,7 +319,8 @@ int main(int argc, char *argv[])
             }
             
         }
-        cout << "],";
+        cout << "]," << std::flush;
+;
         delete[] v_of_f_values;
 
 
@@ -322,7 +343,7 @@ int main(int argc, char *argv[])
     }
     else
     {
-        cout << "invalid mode provided. Please, use the configuration file to specify either test or train.";
+        cout << "invalid mode provided. Please, use the configuration file to specify either test or train." << endl;
         exit(1);
     }
 }

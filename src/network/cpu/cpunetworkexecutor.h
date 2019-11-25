@@ -97,7 +97,7 @@ public:
 
         for (size_t inet = 0; inet < nnets; inet++)
         {
-            if (f_values[inet] < cut_value)
+            if (f_values[inet] <= cut_value)
             {
                 f_values[inet] -= 1000000000.0; // apply a discount to the individuals that are not reevaluated
                 continue;

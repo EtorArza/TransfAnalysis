@@ -77,7 +77,7 @@ CONTROLLER_PATH = $3 ;
 
 
 [Controller]
-MAX_TIME_PSO = 1.5 ; 
+MAX_TIME_PSO = 0.5 ; 
 POPSIZE = 20 ;
 TABU_LENGTH = 40 ;
 N_EVALS = 500 ;

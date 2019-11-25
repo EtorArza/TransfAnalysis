@@ -8,6 +8,7 @@
 #SBATCH --cpus-per-task=32 # number of CPUs
 #SBATCH --time=1-01:30:00 #Walltime
 #SBATCH -p large
+#SBATCH --exclude=n[001-004,017-018]
 
 
 # # # #!/bin/bash
@@ -71,9 +72,9 @@ mode = train
 MAX_TRAIN_TIME = 86400
 POPSIZE = 640
 THREADS = 32
-N_EVALS = 3
-N_REEVALS_TOP_5_PERCENT = 32
-N_EVALS_TO_UPDATE_BK = 3200
+N_EVALS = 30
+N_REEVALS_TOP_5_PERCENT = 320
+N_EVALS_TO_UPDATE_BK = 32000
 
 
 
@@ -85,7 +86,7 @@ START_WITHOUT_HIDDEN = false
 
 
 [Controller]
-MAX_TIME_PSO = 1.5
+MAX_TIME_PSO = 100000.5
 POPSIZE = 20
 TABU_LENGTH = 40
 

@@ -11,11 +11,14 @@
 #include "PBP.h"
 #include "Population.h"
 #include "Tools.h"
+#include <cfloat>
 
 using namespace std;
 
 //#define COUNTER
 //#define PRINT
+//#define RANDOM_SEARCH
+
 
 PBP *GetProblemInfo(std::string problemType, std::string filename);
 
@@ -53,6 +56,8 @@ double FitnessFunction_permu(NEAT::CpuNetwork *net_original, int n_evals, int se
         #ifdef COUNTER
                 counter = 0;
         #endif
+
+
         pop->rng->seed(seed + n_of_repetitions_completed);
         pop->Reset();
         //std::cout << "|" << n_of_repetitions_completed << "|" << std::endl;
@@ -62,6 +67,15 @@ double FitnessFunction_permu(NEAT::CpuNetwork *net_original, int n_evals, int se
             net->clear_noninput();
             std::swap(net->activations, pop->m_individuals[i]->activation);
         }
+
+
+        #ifdef RANDOM_SEARCH
+        pop->timer->tic();
+        double best_f = -DBL_MAX;
+        GenerateRandomPermutation(pop->genome_best, pop->n, pop->rng);
+        #endif
+
+
         while (!pop->terminated)
         {
             #ifdef COUNTER
@@ -74,6 +88,22 @@ double FitnessFunction_permu(NEAT::CpuNetwork *net_original, int n_evals, int se
             #endif
             // }
             #endif
+
+
+            #ifdef RANDOM_SEARCH
+            double new_f = problem->Evaluate(pop->genome_best);
+            GenerateRandomPermutation(pop->genome_best, pop->n, pop->rng);
+            if (new_f > best_f)
+            {
+                best_f = new_f;
+            }
+            if(pop->timer->toc() > MAX_TIME_PSO)
+            {
+                pop->terminated = true;
+            }
+            continue;
+            #endif
+
 
             for (int i = 0; i < POPSIZE; i++)
             {
