@@ -183,6 +183,7 @@ int main(int argc, char *argv[])
 
         EXPERIMENT_FOLDER_NAME = "controllers_trained_with_" + from_path_to_filename(INSTANCE_PATH);
 
+        cout << "Learning from instance: " << from_path_to_filename(INSTANCE_PATH) << endl;
 
 
         F_VALUES_OBTAINED_BY_BEST_INDIV = new double[N_EVALS_TO_UPDATE_BK];
@@ -301,7 +302,7 @@ int main(int argc, char *argv[])
         rng = new RandomNumberGenerator();
         rng->seed();
         
-        int initial_seed = rng->random_integer_uniform(1000, 10000);
+        int initial_seed = rng->random_integer_uniform(40000000, 50000000);
         cout << "[[";
         for (int j = 0; j < N_REPS; j++)
         {

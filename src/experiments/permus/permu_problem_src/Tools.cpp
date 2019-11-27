@@ -1622,8 +1622,8 @@ double from_u_statistic_to_z(double u, double length, double* array_of_values){
 
 
 
-#define Z_THRESH 2.05 
-#define ALPHA 0.02
+#define Z_THRESH 1.65
+#define ALPHA 0.05
 
 //Unpaired test
 bool is_A_larger_than_B_Mann_Whitney(double* A, double* B, int length){
@@ -1717,8 +1717,8 @@ bool is_A_larger_than_B_Signed_Willcoxon(double* A, double* B, int length){
     }
 
 
-    compute_order_from_double_to_double(abs_differences, length, ranks, false, true);
-    sum_value_to_array(ranks, 1.0, length);
+    compute_order_from_double_to_double(abs_differences, N_r, ranks, false, true);
+    sum_value_to_array(ranks, 1.0, N_r);
 
     double W = scalar_multiplication(abs_differences, signs, N_r);
 

@@ -48,7 +48,7 @@ public:
         bool printed_bracket = false;
         RandomNumberGenerator rng;
         rng.seed();
-        int initial_seed = rng.random_integer_fast(10000000);
+        int initial_seed = rng.random_integer_fast(10050000,20000000);
         // evaluate the individuals
         #pragma omp parallel for num_threads(N_OF_THREADS)
         for (size_t inet = 0; inet < nnets; inet++)
@@ -93,7 +93,7 @@ public:
         double cut_value = obtain_kth_largest_value(f_values, n_of_networks_to_reevaluate, static_cast<int>(nnets));
 
         rng.seed();
-        initial_seed = rng.random_integer_fast(10000000);
+        initial_seed = rng.random_integer_fast(20050000,30000000);
 
         for (size_t inet = 0; inet < nnets; inet++)
         {
@@ -131,7 +131,7 @@ public:
         }
 
         double *res = new double[N_EVALS_TO_UPDATE_BK];
-        ev->FitnessFunction_parallel(net, N_EVALS_TO_UPDATE_BK, res, 1);
+        ev->FitnessFunction_parallel(net, N_EVALS_TO_UPDATE_BK, res, 30050000);
 
 
 
@@ -148,7 +148,7 @@ public:
         if (average > BEST_FITNESS_TRAIN)        {
 
 
-            bool update_needed = is_A_larger_than_B_Signed_Willcoxon(res, F_VALUES_OBTAINED_BY_BEST_INDIV, N_EVALS_TO_UPDATE_BK);
+            bool update_needed = is_A_larger_than_B_Mann_Whitney(res, F_VALUES_OBTAINED_BY_BEST_INDIV, N_EVALS_TO_UPDATE_BK);
 
             if (update_needed)
             {
