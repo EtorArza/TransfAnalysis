@@ -116,7 +116,7 @@ public:
             }
         }
 
-        cout << "Reevaluating best indiv of generation" << endl;
+        cout << "Reevaluating best indiv of generation: ";
         int index_most_fit = argmax(f_values, nnets);
         CpuNetwork *net = nets[index_most_fit];
         Evaluator *ev = new Evaluator(config);
@@ -133,27 +133,30 @@ public:
         double *res = new double[N_EVALS_TO_UPDATE_BK];
         ev->FitnessFunction_parallel(net, N_EVALS_TO_UPDATE_BK, res, 1);
 
-        double median = res[arg_element_in_centile_specified_by_percentage(res, N_EVALS_TO_UPDATE_BK, 0.5)];
 
 
-        if (median > BEST_FITNESS_TRAIN)
-        {
-            cout << "One sided paired sign Willcoxon test: ";
+
+
+
+
+        // double median = res[arg_element_in_centile_specified_by_percentage(res, N_EVALS_TO_UPDATE_BK, 0.5)];
+        double average = Average(res, N_EVALS_TO_UPDATE_BK);
+
+
+        cout << "best this gen: " << average << endl;
+
+        if (average > BEST_FITNESS_TRAIN)        {
+
 
             bool update_needed = is_A_larger_than_B_Signed_Willcoxon(res, F_VALUES_OBTAINED_BY_BEST_INDIV, N_EVALS_TO_UPDATE_BK);
 
             if (update_needed)
             {
-                cout << "reject H_0, significant difference at alpha = 0.02, " << endl;
                 N_TIMES_BEST_FITNESS_IMPROVED_TRAIN++;
-                cout << "[BEST_FITNESS_IMPROVED] --> " << median << endl;
-                BEST_FITNESS_TRAIN = median;
+                cout << "[BEST_FITNESS_IMPROVED] --> " << average << endl;
+                BEST_FITNESS_TRAIN = average;
                 copy_vector(F_VALUES_OBTAINED_BY_BEST_INDIV, res, N_EVALS_TO_UPDATE_BK);
-            }else{
-                cout << "H_0, no significant difference at alpha = 0.02" << endl;
             }
-
-
         }
 
         delete ev;

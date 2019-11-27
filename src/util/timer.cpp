@@ -47,6 +47,7 @@ void Timer::stop() {
 }
 
 void Timer::report() {
+    return; // no need for uninformative text
     for(Timer *t: timers) {
         cout << t->_name << ": n=" << t->_n << ", recent=" << t->_recent << ", mean=" << (t->_total / t->_n) << ", min=" << t->_min << ", max=" << t->_max << ", total=" << t->_total << endl;
     }

@@ -134,7 +134,7 @@ double FitnessFunction_permu(NEAT::CpuNetwork *net_original, int n_evals, int se
         #endif
     }
 
-    double res = median(v_of_fitness, n_evals);
+    double res = Average(v_of_fitness, n_evals);
 
 
     delete[] v_of_fitness;
@@ -178,7 +178,7 @@ struct Evaluator
         #pragma omp parallel for num_threads(N_OF_THREADS)
         for (int i = 0; i < n_evals; i++)
         {
-            res[i] = FitnessFunction_permu(net, 1, seed_parallel + i);
+            res[i] = FitnessFunction_permu(net, N_EVALS, seed_parallel + i);
         }
         seed_parallel += n_evals;
     }

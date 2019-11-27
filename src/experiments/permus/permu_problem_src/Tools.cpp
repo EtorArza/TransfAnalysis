@@ -634,6 +634,7 @@ void RandomNumberGenerator::seed(int seed){
     this->x = (unsigned long) seed;
     this->y=362436069UL; 
     this->z=521288629UL;
+    xorshf96();
 }
 
 
@@ -1621,10 +1622,14 @@ double from_u_statistic_to_z(double u, double length, double* array_of_values){
 
 
 
+#define Z_THRESH 2.05 
+#define ALPHA 0.02
+
+//Unpaired test
 bool is_A_larger_than_B_Mann_Whitney(double* A, double* B, int length){
 
-    cout << "Error, is_A_larger_than_B_Mann_Whitney was used, use willcoxon instead." << endl;
-    exit(1);
+
+
 
     if(length < 20){
         cout << "A larger sample size than 20 is required to correctly estimate p-value. " << endl;
@@ -1649,6 +1654,7 @@ bool is_A_larger_than_B_Mann_Whitney(double* A, double* B, int length){
 
     if(r_A < r_B)
     {
+        cout << "One sided test not performed, z < 0 was found" << endl;
         return false;
     }
 
@@ -1660,26 +1666,27 @@ bool is_A_larger_than_B_Mann_Whitney(double* A, double* B, int length){
 
     double z = from_u_statistic_to_z(u_B, length, array_of_values);
 
-   if(abs(z) > 6){
-        return true;
-    }
 
-    cout << "z value: " << z << endl;
 
-    if (z > 2.05) // using a significance level of 0.02
-    {
+    cout << "Unpaired rank hypotesis testing at alpha =  "<< ALPHA <<  endl;
+
+    cout << "z = " << z << " ";
+
+    if (z > Z_THRESH)
+    {   
+        cout << " > z_thresh = " << Z_THRESH << ", critical diff. found." << endl;
         return true;
     }else{
+        cout << " < z_thresh = " << Z_THRESH << ", no crit. diff." << endl;
         return false;
     }
 
 }
 
 
-
+// Paired test
 bool is_A_larger_than_B_Signed_Willcoxon(double* A, double* B, int length){
 
-    #define Z_THRESH 2.05 
 
     if(length < 80){
         cout << "A larger sample size than 80 is required to correctly estimate p-value. " << endl;
@@ -1718,11 +1725,13 @@ bool is_A_larger_than_B_Signed_Willcoxon(double* A, double* B, int length){
 
     if(W < 0) // one sided test, W must be positive.
     {
+        cout << "One sided test not performed, z < 0 was found" << endl;
         return false;
     }
 
     if (N_r < length / 4) // if the observations are the same in more than 75% of the cases, accept H0
     {
+        cout << "One sided test not performed, sequences are too simmilar." << endl;
         return false;
     }
     
@@ -1735,21 +1744,21 @@ bool is_A_larger_than_B_Signed_Willcoxon(double* A, double* B, int length){
     double z = W / sigma_w;
 
 
-    cout << " | z value: " << z << " | ";
 
-   if(abs(z) > 6.0){
-        return true;
-    }
+    cout << "Paired rank hypothesis testing at alpha =  "<< ALPHA <<  endl;
 
+    cout << "z = " << z << " ";
 
-    if (z > Z_THRESH) // using a significance level of 0.02
-    {
+    if (z > Z_THRESH)
+    {   
+        cout << " > z_thresh = " << Z_THRESH << ", critical diff. found." << endl;
         return true;
     }else{
+        cout << " < z_thresh = " << Z_THRESH << ", no crit. diff." << endl;
         return false;
     }
-
 }
+
 
 
 

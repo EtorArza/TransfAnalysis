@@ -734,10 +734,10 @@ int arg_element_in_centile_specified_by_percentage(T* array, int len, double per
 }
 
 
-
+//Unpaired test
 bool is_A_larger_than_B_Mann_Whitney(double* A, double* B, int length);
 
-
+//Paired test
 bool is_A_larger_than_B_Signed_Willcoxon(double* A, double* B, int length);
 
 #define TOL 0.00001
