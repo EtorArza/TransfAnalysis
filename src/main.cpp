@@ -301,8 +301,8 @@ int main(int argc, char *argv[])
         RandomNumberGenerator* rng;
         rng = new RandomNumberGenerator();
         rng->seed();
-        
         int initial_seed = rng->random_integer_uniform(40000000, 50000000);
+        delete rng;
         cout << "[[";
         for (int j = 0; j < N_REPS; j++)
         {
