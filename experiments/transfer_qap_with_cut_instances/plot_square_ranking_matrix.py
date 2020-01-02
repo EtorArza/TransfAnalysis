@@ -6,6 +6,7 @@ from seaborn import clustermap
 from scipy.ndimage.filters import gaussian_filter
 from copy import deepcopy
 import random
+import fnmatch
 
 
 # save in figures local folder
@@ -144,20 +145,44 @@ for i in range(15):
 """
 
 
+def rename_name(case_name, size_relevant=True, class_relevant=True):
+    new_name = ""
+
+    if class_relevant:
+        if fnmatch.fnmatch(case_name, "*tai*a"):
+            new_name += "Taixxa"
+        elif fnmatch.fnmatch(case_name, "*sko*"):
+            new_name += "Sko"
+        elif fnmatch.fnmatch(case_name, "*tai*b"):
+            new_name += "Taixxb"
+        else:
+            raise Warning("tai*a, sko or tai*b not found in case name "+str(case_name))
+
+    if size_relevant:
+        if "cut30" in case_name:
+            new_name += "size=30"
+        elif "cut60" in case_name:
+            new_name += "size=60"
+        else:
+            raise Warning("cut30 or cut60 not found in case name "+str(case_name))
+
+    return new_name
 
 
-
-
-
-
-def save_fig(d, fig_title, fig_path):
+def save_fig(d, fig_title, fig_path,size_relevant=True, class_relevant=True):
 
     data = d.copy(deep=True)
 
     plt.pcolor(data, )
-    plt.yticks(np.arange(0.5, len(data.index), 1), data.index)
-    plt.xticks(np.arange(0.5, len(data.columns), 1), data.columns, rotation = 90)
-    plt.ylabel("trained with")
+    yticks = [rename_name(el,size_relevant, class_relevant) for el in data.index]
+    xticks = [rename_name(el,size_relevant, class_relevant) for el in data.columns]
+
+
+
+
+    plt.yticks(np.arange(0.5, len(data.index), 1), yticks)
+    plt.xticks(np.arange(0.5, len(data.columns), 1), xticks, rotation = 90)
+    plt.ylabel("trained on")
     plt.xlabel("tested on")
     #plt.title("(average - RS) / (BK - RS)")
     #plt.title("normalized, gaussian smoothing, sigma = 0.7")
@@ -205,9 +230,9 @@ sko_instances = [ins for ins in all_instances if "sko" in ins]
 
 
 
-save_fig(d, "All normalized scores", save_fig_path+"all_norm.pdf") #all
-save_fig(d.loc[small_instances,small_instances], "Small instances", save_fig_path+"small.pdf") # small instances
-save_fig(d.loc[big_instances,big_instances], "Large instances", save_fig_path+"large.pdf") # small instances
-save_fig(d.loc[taia_instances,taia_instances], "taia_instances", save_fig_path+"taia_instances.pdf") # small instances
-save_fig(d.loc[taib_instances,taib_instances], "taib_instances", save_fig_path+"taib_instances.pdf") # small instances
-save_fig(d.loc[sko_instances,sko_instances], "sko_instances", save_fig_path+"sko_instances.pdf") # small instances
+save_fig(d, "All normalized scores", save_fig_path+"all_norm.pdf", True, True) #all
+save_fig(d.loc[small_instances,small_instances], "Small instances", save_fig_path+"small.pdf", False, True) # small instances
+save_fig(d.loc[big_instances,big_instances], "Large instances", save_fig_path+"large.pdf", False, True) # small instances
+save_fig(d.loc[taia_instances,taia_instances], "taia_instances", save_fig_path+"taia_instances.pdf", True, False) # taia instances
+save_fig(d.loc[taib_instances,taib_instances], "taib_instances", save_fig_path+"taib_instances.pdf", True, False) # taib instances
+save_fig(d.loc[sko_instances,sko_instances], "sko_instances", save_fig_path+"sko_instances.pdf", True, False) # sko instances
