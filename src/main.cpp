@@ -110,6 +110,8 @@ PBP *GetProblemInfo(std::string problemType, std::string filename)
 int main(int argc, char *argv[])
 {   
 
+    system("rm -r controllers_trained_with_cut60_tai80b");
+
     // int n = 10;
 
     // double* array_1 = new double[n];
@@ -215,7 +217,6 @@ int main(int argc, char *argv[])
             cout << "please specify a valid number of threads on the conf. file" <<endl;
             exit(1);
         }
-
 
 
         else if (exists(EXPERIMENT_FOLDER_NAME))
@@ -329,9 +330,9 @@ int main(int argc, char *argv[])
 
         cout << std::setprecision(15);
         cout << std::flush;
-        cout << INSTANCE_PATH   << "," 
-             << CONTROLLER_PATH << "," 
-             << PROBLEM_TYPE    << "," 
+        cout << INSTANCE_PATH   << ","
+             << CONTROLLER_PATH << ","
+             << PROBLEM_TYPE    << ","
              << N_EVALS
              << "]"
              << endl;
