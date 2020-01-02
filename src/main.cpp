@@ -33,7 +33,7 @@
 #include "TSP.h"
 #include "permuevaluator.h"
 #include "Tools.h"
-#include "FitnessFunction_permus.h"
+#include "FitnessFunction_permu.h"
 
 
 #define EXTERN
