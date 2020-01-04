@@ -1,6 +1,6 @@
 
+#pragma once
 #include "std.hxx"
-
 #include "networkexecutor.h"
 #include "Parameters.h"
 #include "FitnessFunction_permu.h"
@@ -12,9 +12,62 @@
 #include "Population.h"
 #include "Tools.h"
 #include <cfloat>
+#include "QAP.h"
+#include "LOP.h"
+#include "PFSP.h"
+#include "TSP.h"
 
 
-PBP *GetProblemInfo(std::string problemType, std::string filename);
+PBP *GetProblemInfo(std::string problemType, std::string filename)
+{
+    PBP *problem;
+    if (problemType == "pfsp")
+    {
+        problem = new PFSP();
+    }
+    else if (problemType == "tsp")
+    {
+        problem = new TSP();
+    }
+    else if (problemType == "qap")
+    {
+        problem = new QAP();
+    }
+    else if (problemType == "lop")
+    {
+        problem = new LOP();
+    }
+    // else if (problemType == "api")
+    //     problem = new API();
+    else
+    {
+         cout << "Wrong problem type was specified." << endl;
+         exit(1);
+     }
+
+    //Read the instance.
+    problem->Read_with_mutex(filename);
+    #ifdef SAME_SIZE_EXPERIMENT
+        if (problem->GetProblemSize() == 30)
+        {
+            MAX_TIME_PSO = 0.10;
+        }
+        else if(problem->GetProblemSize() == 60)
+        {
+            MAX_TIME_PSO = 0.3;
+        }
+        else
+        {
+            cout << "ERROR, this experiment expects instances of size 60 and 30.";
+            exit(1);
+        }
+
+    #undef SAME_SIZE_EXPERIMENT
+    #endif
+    return problem;
+}
+
+
 
 double FitnessFunction_permu(NEAT::CpuNetwork *net_original, int n_evals, int seed)
 {
