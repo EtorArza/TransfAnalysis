@@ -78,11 +78,8 @@ namespace NEAT {
     class NetworkEvaluator {
     public:
         virtual ~NetworkEvaluator() {}
-
-        virtual void execute(class Network **nets_,
-                             class OrganismEvaluation *results,
-                             size_t nnets) = 0;
-
+        virtual void execute(class Network **nets_, class OrganismEvaluation *results, size_t nnets) = 0;
+        virtual void run_given_conf_file(std::string conf_file_path) = 0;
     };
 
 } // namespace NEAT

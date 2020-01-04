@@ -220,6 +220,12 @@ public:
         executor->execute(nets_, results, nnets);
     }
 
+    virtual void run_given_conf_file(std::string conf_file_path)
+    {
+       std::cout << "run_given_conf_file should not have been called at staticevaluator.cxx";
+    }
+
+
 };
 
 namespace NEAT {

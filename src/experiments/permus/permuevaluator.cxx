@@ -224,6 +224,9 @@ public:
         Evaluator *ev = new Evaluator(config);
         ev->execute(nets_, results, nnets);
     }
+
+    virtual void run_given_conf_file(std::string conf_file_path){}
+
 };
 
 class NetworkEvaluator *create_permu_evaluator()
