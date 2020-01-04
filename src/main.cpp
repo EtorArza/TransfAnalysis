@@ -20,20 +20,18 @@
 #include <unistd.h>
 #include "Tools.h"
 #include "FitnessFunction_permu.h"
-
-
-#define EXTERN
+#include "experiment.h"
+#include "rng.h"
 #include "Parameters.h"
+#include "evaluatorexperiment.h"
 
 
-using namespace NEAT;
-using namespace std;
 
 
 
 void usage()
 {
-
+    using namespace std;
     cerr << "usage: \n ./neat path_of_config_file" << endl;
     cerr << "for example, \n ./neat \"config_files/test.ini\"" << endl;
     cerr << endl;
@@ -45,22 +43,25 @@ void usage()
 
 int main(int argc, char *argv[])
 {   
+    using namespace std;
+    using namespace NEAT;
 
-    cout << "\n\n---------- BEGIN LICENCE DISCLAIMER----------\n";
+    cout << "\n---------- BEGIN LICENCE DISCLAIMER----------\n";
     cout << "This code is based on accneat. Although some small changes \n";
     cout << "have been made, most of the NEAT algorithm remains unchanged.\n" << endl;
 	cout <<	"Accneat is a fork of Stanley et al.'s implementation with some \n";
     cout << "improvements such as delete mutations and speed improvements, available at \n";
     cout << "https://github.com/sean-dougherty/accneat\n" << endl << endl;
-    cout << "This code also uses a configuration file parser inih, available at https://github.com/jtilly/inih\n" << endl;
-    cout << "The authors of the modified software distributed here are in NO way affiliated with accneat or INIH. Please, \n";
-    cout << "understand that the use of this software requires reading and accepting the licences of both accneat and INIH.\n" << endl << endl;
+    cout << "This code also uses a configuration file parser inih, available at https://github.com/jtilly/inih" << endl;
+    cout << "The authors of the modified software distributed here are in NO way affiliated with accneat or INIH. Please, " << endl;
+    cout << "understand that the use of this software requires reading and accepting the licences of both accneat and INIH." << endl << endl;
     cout << "INIH is distributed with BSD licence, and accneat with APACHE LICENCE 2.0\n";
     cout << "The source code provided here (excluding accneat and INIH) was made by Etor Arza.\n";
     cout << "To keep the licence stuff as painless as possible, the software part writen by \n";
-    cout << "Etor Arza is distributed with APACHE LICENCE 2.0 too.\n\n\n";
-    cout << "This modified software contains some parts of the PerMallows package by Ekhiñe Irurozki available at https://cran.r-project.org/web/packages/PerMallows/index.html" << endl;
-    cout << "----------END LICENCE DISCLAIMER----------\n\n";
+    cout << "Etor Arza is distributed with APACHE LICENCE 2.0 too.\n\n";
+    cout << "This modified software contains some parts of the PerMallows package \n"
+    << "by Ekhiñe Irurozki available at https://cran.r-project.org/web/packages/PerMallows/index.html" << endl;
+    cout << "----------END LICENCE DISCLAIMER----------\n\n\n\n\n\n";
 
     system("rm -r controllers_trained_with_cut60_tai80b");
 
@@ -80,6 +81,13 @@ int main(int argc, char *argv[])
         exit(1);
 
     }
+
+        int rng_seed = 2;
+        const char * prob_name = "permu";
+        Experiment *exp = Experiment::get(prob_name);
+        rng_t rng{rng_seed};
+        global_timer.tic();
+        exp->run_given_conf_file(argv[1]);
 
     return 0;
 }

@@ -1,6 +1,5 @@
 #include "std.h" // Must be included first. Precompiled header with standard library includes.
 #include "std.hxx"
-#include "Parameters.h"
 #include "permuevaluator.h"
 #include "FitnessFunction_permu.h"
 #include "map.h"
@@ -25,6 +24,9 @@
 #include "rng.h"
 #include "util.h"
 #include <iomanip>      // std::setprecision
+
+#define EXTERN
+#include "Parameters.h"
 
 
 using namespace std;
@@ -346,7 +348,6 @@ public:
             env->mutate_delete_node_prob *= 0.1;
             env->mutate_delete_link_prob *= 0.1;
         }
-
 
 
 

@@ -52,8 +52,9 @@ namespace NEAT {
             , create_seeds(create_seeds_) {
         }
 
-        virtual ~EvaluatorExperiment() {
-        }
+        EvaluatorExperiment(const char *name): Experiment(name){}
+
+        virtual ~EvaluatorExperiment() {}
 
 
 
@@ -124,6 +125,12 @@ namespace NEAT {
             cout << "nlinks stats: " << stats(nlinks) << endl;
 
         }
+
+        virtual void run_given_conf_file(std::string conf_file_path) override{
+            network_evaluator = unique_ptr<NetworkEvaluator>(create_evaluator());
+            network_evaluator->run_given_conf_file(conf_file_path);
+        }
+
 
     private:
         void print(int experiment_num,

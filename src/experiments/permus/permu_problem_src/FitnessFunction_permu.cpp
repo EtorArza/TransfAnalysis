@@ -1,5 +1,4 @@
 
-#pragma once
 #include "std.hxx"
 #include "networkexecutor.h"
 #include "Parameters.h"
