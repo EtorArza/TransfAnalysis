@@ -128,30 +128,7 @@ int main(int argc, char *argv[])
 
     system("rm -r controllers_trained_with_cut60_tai80b");
 
-    // int n = 10;
 
-    // double* array_1 = new double[n];
-    // double* order_res = new double[n];
-
-    // for (int i = 0; i < n; i++)
-    // {
-    //     array_1[i] = (double) i+10;
-    // }
-
-    // array_1[0] = 11.0;
-    // array_1[3] = 10.0;
-    // array_1[7] = 18.0;
-    // array_1[6] = 18.0;
-
-    // PrintArray(array_1, n);
-
-    // compute_order_from_double_to_double(array_1, n, order_res, false, true);
-
-    // PrintArray(array_1, n);
-
-    // PrintArray(order_res, n);
-
-    // exit(1);
 
     #ifndef NDEBUG
     cout << "WARNING: Debug mode. Assertions enabled." << endl;

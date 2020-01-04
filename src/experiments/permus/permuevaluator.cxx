@@ -55,8 +55,8 @@ struct Evaluator
         seed_parallel += n_evals;
     }
 
-    // Fitness all train
-    __net_eval_decl void FitnessAllTrain(class Network **nets_, OrganismEvaluation *results, size_t nnets){
+    // compute the fitness value of all networks at training time.
+    __net_eval_decl void execute(class Network **nets_, OrganismEvaluation *results, size_t nnets){
         CpuNetwork **nets = (CpuNetwork **)nets_;
         double progress_print_decider = 0.0;
         double *f_values = new double[nnets];
@@ -222,7 +222,7 @@ public:
     {
         NEAT::Config* config;
         Evaluator *ev = new Evaluator(config);
-        ev->FitnessAllTrain(nets_, results, nnets);
+        ev->execute(nets_, results, nnets);
     }
 };
 
