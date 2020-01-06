@@ -7,8 +7,7 @@
  *
  */
 
-#ifndef _LOP_H__
-#define _LOP_H__
+#pragma once
 
 #include "Tools.h"
 #include "PBP.h"
@@ -70,7 +69,6 @@ public:
 private:
     double _Evaluate(int *permu);
 };
-#endif
 
 
 

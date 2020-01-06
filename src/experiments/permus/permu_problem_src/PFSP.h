@@ -7,8 +7,8 @@
  *
  */
 
-#ifndef _PFSP_H__
-#define _PFSP_H__
+#pragma once
+
 
 #include <stdlib.h>
 #include <math.h>
@@ -103,8 +103,6 @@ private:
 	
 	
 };
-#endif
-
 
 
 

@@ -6,8 +6,7 @@
 //  Copyright (c) 2013 Ekhine Irurozki. All rights reserved.
 //
 
-#ifndef perms_mallows_Lap_h
-#define perms_mallows_Lap_h
+#pragma once
 /************************************************************************
  *
  lapmain.cpp
@@ -370,4 +369,3 @@ public:
 
 
 
-#endif

@@ -13,8 +13,8 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 */
-#ifndef _SPECIES_H_
-#define _SPECIES_H_
+#pragma once
+
 
 #include "neat.h"
 #include "speciesorganism.h"
@@ -100,4 +100,3 @@ namespace NEAT {
 
 }
 
-#endif

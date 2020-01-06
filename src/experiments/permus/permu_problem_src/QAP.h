@@ -7,8 +7,8 @@
  *
  */
 
-#ifndef _QAP_H__
-#define _QAP_H__
+#pragma once
+
 
 #include "PBP.h"
 #include "Tools.h"
@@ -77,4 +77,3 @@ protected:
 
 
 };
-#endif

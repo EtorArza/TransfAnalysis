@@ -13,8 +13,8 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 */
-#ifndef _NERO_NEAT_H_
-#define _NERO_NEAT_H_
+#pragma once
+
 
 #include "neattypes.h"
 #include "Tools.h"
@@ -157,4 +157,3 @@ namespace NEAT {
 
 } // namespace NEAT
 
-#endif

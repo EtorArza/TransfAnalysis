@@ -7,8 +7,8 @@
  *
  */
 
-#ifndef _TSP_H__
-#define _TSP_H__
+#pragma once
+
 
 #include "PBP.h"
 #include "Tools.h"
@@ -80,4 +80,3 @@ public:
 private:
 	
 };
-#endif
