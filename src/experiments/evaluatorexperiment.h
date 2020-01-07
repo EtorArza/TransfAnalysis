@@ -9,6 +9,7 @@
 #include "timer.h"
 #include "util.h"
 #include "Parameters.h"
+#include <chrono>
 #include <float.h>
 namespace NEAT {
 
@@ -27,7 +28,7 @@ namespace NEAT {
             char buf[1024];
             sprintf(buf, "%s/%s_gen_%04d",
                     get_dir_path(experiment_num).c_str(),
-                    from_path_to_filename(INSTANCE_PATH).c_str(),
+                    std::string("_gen_").c_str(),
                     generation
                     );
             return buf;
@@ -52,7 +53,7 @@ namespace NEAT {
             , create_seeds(create_seeds_) {
         }
 
-        EvaluatorExperiment(const char *name): Experiment(name){}
+
 
         virtual ~EvaluatorExperiment() {}
 
@@ -61,8 +62,12 @@ namespace NEAT {
         virtual void run(class rng_t &rng) override {
             using namespace std;
 
-            network_evaluator = unique_ptr<NetworkEvaluator>(create_evaluator());
-            
+            // network evaluator normally created in run_given_conf_file()
+            if (network_evaluator==NULL){
+            cerr << "Waring in class in EvaluatorExperiment: Network evalluator initialized in run() method.\n"
+            << "It should be initialized by calling run_given_conf_file() in this class." << endl;
+            network_evaluator = unique_ptr<NetworkEvaluator>(create_evaluator()); 
+            }
             vector<size_t> nnodes;
             vector<size_t> nlinks;
             vector<real_t> fitness;
@@ -77,7 +82,7 @@ namespace NEAT {
 
 
             pop = Population::create(rng_exp, genomes);
-    
+            
             
             int gen = 0;
             BEST_FITNESS_TRAIN = -DBL_MAX;
@@ -153,7 +158,7 @@ namespace NEAT {
                 nets[i] = pop->get(i)->net.get();
             }
             OrganismEvaluation evaluations[norgs];
-
+            //auto tmp_params = network_evaluator->
             network_evaluator->execute(nets, evaluations, norgs);
             Organism *best = nullptr;
             for(size_t i = 0; i < norgs; i++) {

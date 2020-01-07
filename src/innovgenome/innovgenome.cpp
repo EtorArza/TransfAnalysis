@@ -101,74 +101,47 @@ InnovGenome::InnovGenome(rng_t rng_,
     const int node_id_output = node_id_input + ninputs;
     const int node_id_hidden = node_id_output + noutputs;
 
-    if (START_WITHOUT_HIDDEN)
-    {
-        assert(nhidden == 0);
-    }
-    else
-    {
-        assert(nhidden > 0);
-    }
     int innov = 1;
 
-    if (!START_WITHOUT_HIDDEN)
+    //Create links from Bias to all hidden
+    for (size_t i = 0; i < nhidden; i++)
     {
-        //Create links from Bias to all hidden
-        for (size_t i = 0; i < nhidden; i++)
+        add_link(links, InnovLinkGene(rng.element(traits).trait_id,
+                                      rng.prob(),
+                                      node_id_bias,
+                                      i + node_id_hidden,
+                                      false,
+                                      innov++,
+                                      0.0));
+    }
+
+    //Create links from all inputs to all hidden
+    for (size_t i = 0; i < ninputs; i++)
+    {
+        for (size_t j = 0; j < nhidden; j++)
         {
             add_link(links, InnovLinkGene(rng.element(traits).trait_id,
                                           rng.prob(),
-                                          node_id_bias,
-                                          i + node_id_hidden,
+                                          i + node_id_input,
+                                          j + node_id_hidden,
                                           false,
                                           innov++,
                                           0.0));
         }
-
-        //Create links from all inputs to all hidden
-        for (size_t i = 0; i < ninputs; i++)
-        {
-            for (size_t j = 0; j < nhidden; j++)
-            {
-                add_link(links, InnovLinkGene(rng.element(traits).trait_id,
-                                              rng.prob(),
-                                              i + node_id_input,
-                                              j + node_id_hidden,
-                                              false,
-                                              innov++,
-                                              0.0));
-            }
-        }
-
-        //Create links from all hidden to all output
-        for (size_t i = 0; i < nhidden; i++)
-        {
-            for (size_t j = 0; j < noutputs; j++)
-            {
-                add_link(links, InnovLinkGene(rng.element(traits).trait_id,
-                                              rng.prob(),
-                                              i + node_id_hidden,
-                                              j + node_id_output,
-                                              false,
-                                              innov++,
-                                              0.0));
-            }
-        }
     }
-    else
+
+    //Create links from all hidden to all output
+    for (size_t i = 0; i < nhidden; i++)
     {
-        //Create links from all inputs to all outputs
-        for (size_t i = 0; i < ninputs; i++)
+        for (size_t j = 0; j < noutputs; j++)
         {
-            for (size_t j = 0; j < noutputs; j++)
-            {add_link(links, InnovLinkGene(rng.element(traits).trait_id,
-                                              rng.prob(),
-                                              i + node_id_input,
-                                              j + node_id_output,
-                                              false,
-                                              innov++,
-                                              0.0));
-            }
+            add_link(links, InnovLinkGene(rng.element(traits).trait_id,
+                                          rng.prob(),
+                                          i + node_id_hidden,
+                                          j + node_id_output,
+                                          false,
+                                          innov++,
+                                          0.0));
         }
     }
 }

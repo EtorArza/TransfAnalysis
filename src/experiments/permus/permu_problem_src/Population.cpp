@@ -14,6 +14,7 @@
 #include "../permuevaluator.h"
 #include <assert.h>
 #include <float.h>
+#include "PERMU_params.h"
 
 using std::cerr;
 using std::cout;
@@ -24,20 +25,23 @@ using std::ostream;
 #define TARGET_N_ITERATIONS_iteration_geom 10000
 #define TARGET_VALUE_iteration_geom 0.5
 
-void CPopulation::init_class(PBP *problem, RandomNumberGenerator* rng){
+using namespace PERMU;
+
+void CPopulation::init_class(PBP *problem, RandomNumberGenerator* rng, PERMU::params* parameters){
     this->rng = rng;
     this->problem = problem;
-    this->popsize = POPSIZE;
+    this->popsize = parameters-> POPSIZE;
+    this->max_time_pso = parameters-> MAX_TIME_PSO;
     this->iteration_geom = 1.0;
-    this->iteration_geom_coef = pow(TARGET_VALUE_iteration_geom, 1.0/ ((double) TARGET_N_ITERATIONS_iteration_geom * MAX_TIME_PSO));
+    this->iteration_geom_coef = pow(TARGET_VALUE_iteration_geom, 1.0/ ((double) TARGET_N_ITERATIONS_iteration_geom * parameters-> MAX_TIME_PSO));
     this->n = problem->GetProblemSize();
-    tab = new Tabu(rng, n);
+    tab = new Tabu(rng, n, parameters-> TABU_LENGTH);
     problem->tab = this->tab;
     genome_best = new int[n];
     f_best = -DBL_MAX;
     GenerateRandomPermutation(this->genome_best, n, this->rng);
-    templ_double_array = new double[POPSIZE];
-    templ_double_array2 = new double[POPSIZE];
+    templ_double_array = new double[this->popsize];
+    templ_double_array2 = new double[this->popsize];
 
     m_individuals.resize(popsize);
 
@@ -61,16 +65,16 @@ void CPopulation::init_class(PBP *problem, RandomNumberGenerator* rng){
     end_iteration();
 }
 
-CPopulation::CPopulation(PBP *problem)
+CPopulation::CPopulation(PBP *problem, PERMU::params* parameters)
 {
     RandomNumberGenerator* tmp_rng = new RandomNumberGenerator();
-    init_class(problem, tmp_rng);
+    init_class(problem, tmp_rng, parameters);
 }
 
 
-CPopulation::CPopulation(PBP *problem, RandomNumberGenerator* rng)
+CPopulation::CPopulation(PBP *problem, RandomNumberGenerator* rng, PERMU::params* parameters)
 {
-    init_class(problem, rng);
+    init_class(problem, rng, parameters);
 }
 
 void CPopulation::Reset(){
@@ -97,11 +101,11 @@ void CPopulation::Reset(){
  */
 CPopulation::~CPopulation()
 {
-    for (int i = 0; i < POPSIZE; i++)
+    for (int i = 0; i < this->popsize; i++)
     {
         delete[] pop_info[i];
     }
-    for (int i = 0; i < POPSIZE; i++)
+    for (int i = 0; i < this->popsize; i++)
     {
         delete m_individuals[i];
     }
@@ -133,11 +137,11 @@ void CPopulation::end_iteration(){
     SortPopulation();
     get_population_info();
     iteration_geom *= iteration_geom_coef; // substitute of time, that way we do not depend on randomness
-    if(timer->toc() > MAX_TIME_PSO)
+    if(timer->toc() > this->max_time_pso)
     {
         terminated = true;
     }
-    //PrintMatrix(pop_info, POPSIZE, NEAT::__sensor_N);
+    //PrintMatrix(pop_info, this->popsize, NEAT::__sensor_N);
 }
 
 
@@ -227,9 +231,9 @@ void CPopulation::get_population_info(){
 
 void CPopulation::comp_relative_position()
 {
-    for (int i = 0; i < POPSIZE; i++)
+    for (int i = 0; i < this->popsize; i++)
     {
-        double res =  (double)i / (double)POPSIZE;
+        double res =  (double)i / (double)this->popsize;
         this->m_individuals[i]->relative_pos = res;
         pop_info[i][NEAT::RELATIVE_POSITION] = res;
     }
@@ -237,7 +241,7 @@ void CPopulation::comp_relative_position()
 
 void CPopulation::comp_relative_time()
 {
-    for (int i = 0; i < POPSIZE; i++)
+    for (int i = 0; i < this->popsize; i++)
     {
         double res = this->iteration_geom; // timer->toc() / MAX_TIME_PSO;
         this->m_individuals[i]->relative_time = res;
@@ -251,19 +255,19 @@ void CPopulation::comp_distance()
 
     // use the ranking of the differences in fitness with respect to the previous one. 
     templ_double_array[0] = DBL_MAX;
-    for (int i = 1; i < POPSIZE; i++)
+    for (int i = 1; i < this->popsize; i++)
     {   
         double val = m_individuals[i-1]->f_value -  m_individuals[i]->f_value;
         templ_double_array[i] = val;
     }
 
-    compute_order_from_double_to_double(templ_double_array, POPSIZE, templ_double_array2);
+    compute_order_from_double_to_double(templ_double_array, this->popsize, templ_double_array2);
 
 
     // copy normalized values into individuals
-    for (int i = 0; i < POPSIZE; i++)
+    for (int i = 0; i < this->popsize; i++)
     {   
-        double val = templ_double_array2[i] / (double) POPSIZE;
+        double val = templ_double_array2[i] / (double) this->popsize;
         m_individuals[i]->distance = val;
         pop_info[i][NEAT::DISTANCE] = val;
     }
@@ -272,16 +276,16 @@ void CPopulation::comp_distance()
     // // minimum of Hamming distance between the previous one and the next one 
     // // First, compute the distance of each permu with respect the  next permu
     // pop_info[0][NEAT::DISTANCE] = (double)Hamming_distance(m_individuals[0]->genome, m_individuals[1]->genome, n);
-    // for (int i = 1; i < POPSIZE - 1; i++)
+    // for (int i = 1; i < this->popsize - 1; i++)
     // {
     //     pop_info[i][NEAT::DISTANCE] = (double)Hamming_distance(m_individuals[i]->genome, m_individuals[i + 1]->genome, n);
     // }
-    // pop_info[POPSIZE - 1][NEAT::DISTANCE] = pop_info[POPSIZE - 2][NEAT::DISTANCE];
+    // pop_info[this->popsize - 1][NEAT::DISTANCE] = pop_info[this->popsize - 2][NEAT::DISTANCE];
 
     // // Then, assign to result_vector[i], the minimun of the distances between the next an the prev permus.
     // double distance_respect_to_previous = pop_info[0][NEAT::DISTANCE];
     // double temp;
-    // for (int i = 1; i < POPSIZE - 1; i++)
+    // for (int i = 1; i < this->popsize - 1; i++)
     // {
     //     temp = pop_info[i][NEAT::DISTANCE];
     //     pop_info[i][NEAT::DISTANCE] = MIN(pop_info[i][NEAT::DISTANCE], distance_respect_to_previous);
@@ -289,13 +293,13 @@ void CPopulation::comp_distance()
     // }
 
     // // Finally, normalize the values for them to be between 0 and 1.
-    // for (int i = 0; i < POPSIZE; i++)
+    // for (int i = 0; i < this->popsize; i++)
     // {
     //     pop_info[i][NEAT::DISTANCE] /= (double)n;
     // }
 
     // // copy values into individuals
-    // for (int i = 0; i < POPSIZE; i++)
+    // for (int i = 0; i < this->popsize; i++)
     // {
     //     m_individuals[i]->distance = pop_info[i][NEAT::DISTANCE];
     // }
@@ -306,8 +310,8 @@ void CPopulation::comp_distance()
 
 void CPopulation::comp_sparsity(){
     copy_references_of_genomes_from_individuals_to_permus();
-    pt->compute_hamming_consensus(this->permus, popsize);
-    for (int i = 0; i < POPSIZE; i++)
+    pt->compute_hamming_consensus(this->permus, this->popsize);
+    for (int i = 0; i < this->popsize; i++)
     {
         m_individuals[i]->sparsity = 1.0 - pt->compute_normalized_hamming_distance_to_consensus(permus[i]);
         pop_info[i][NEAT::SPARSITY] = m_individuals[i]->sparsity;
@@ -317,7 +321,7 @@ void CPopulation::comp_sparsity(){
 
 void CPopulation::comp_order_sparsity(){
     pt->compute_kendall_consensus_borda(this->permus, popsize);
-    for (int i = 0; i < POPSIZE; i++)
+    for (int i = 0; i < this->popsize; i++)
     {
         m_individuals[i]->order_sparsity = 1.0 - pt->compute_normalized_kendall_distance_to_consensus(permus[i]);
         pop_info[i][NEAT::ORDER_SPARSITY] = m_individuals[i]->order_sparsity;
@@ -327,7 +331,7 @@ void CPopulation::comp_order_sparsity(){
 
 // void CPopulation::comp_r_number()
 // {
-//     for (int i = 0; i < POPSIZE; i++)
+//     for (int i = 0; i < this->popsize; i++)
 //     {
 //         double res =  rng->random_0_1_double();
 //         pop_info[i][NEAT::R_NUMBER] = res;
@@ -335,7 +339,7 @@ void CPopulation::comp_order_sparsity(){
 // }
 
 void CPopulation::load_local_opt(){
-for (int i = 0; i < POPSIZE; i++)
+for (int i = 0; i < this->popsize; i++)
 {
     pop_info[i][NEAT::OPT_SWAP] = (double) m_individuals[i]->is_local_optimum[NEAT::SWAP];
     pop_info[i][NEAT::OPT_EXCH] = (double) m_individuals[i]->is_local_optimum[NEAT::EXCH];
@@ -351,7 +355,7 @@ for (int i = 0; i < POPSIZE; i++)
 //         problem->local_search_iteration_insertion(m_individuals[permutation_index]);
 //         break;
 //     case ACTION_2_MOVE_AWAY_FROM_WORSE:
-//         if (permutation_index != POPSIZE - 1)
+//         if (permutation_index != this->popsize - 1)
 //         {
 //             problem->move_permutation_away_reference_with_insertion(m_individuals[permutation_index], m_individuals[permutation_index + 1]);
 //         }
@@ -377,7 +381,7 @@ for (int i = 0; i < POPSIZE; i++)
 
 
 void CPopulation::copy_references_of_genomes_from_individuals_to_permus(){
-    for (int i = 0; i < POPSIZE; i++)
+    for (int i = 0; i < this->popsize; i++)
     {
         permus[i] = m_individuals[i]->genome;
     }

@@ -11,6 +11,7 @@
 
 #include <string.h>
 #include "Individual.h"
+#include "PERMU_params.h"
 
 class PBP;
 class RandomNumberGenerator;
@@ -23,9 +24,9 @@ class CPopulation
 
 public:
   // if no rng object is provided, a new one is generated
-  CPopulation(PBP *problem);
-  CPopulation(PBP *problem, RandomNumberGenerator* rng);
-  void init_class(PBP *problem, RandomNumberGenerator* rng);
+  CPopulation(PBP *problem, PERMU::params* parameters);
+  CPopulation(PBP *problem, RandomNumberGenerator* rng, PERMU::params* parameters);
+  void init_class(PBP *problem, RandomNumberGenerator* rng, PERMU::params* parameters);
 
 
   virtual ~CPopulation();
@@ -65,6 +66,7 @@ public:
 
 private:
 
+  double max_time_pso;
   // evaluate the whole population. Only used to initialize the population.
   void evaluate_population();
 

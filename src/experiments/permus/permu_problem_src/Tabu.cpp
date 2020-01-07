@@ -5,14 +5,15 @@
 
 
 
-Tabu::Tabu(RandomNumberGenerator* rng, int n)
+Tabu::Tabu(RandomNumberGenerator* rng, int n, int tabu_length)
 {
 	this->rng = rng;
 	this->n = n;
-	tabu_indices_i = new int[TABU_LENGTH];
-	tabu_indices_j = new int[TABU_LENGTH];
+	this->tabu_length = tabu_length;
+	tabu_indices_i = new int[tabu_length];
+	tabu_indices_j = new int[tabu_length];
 
-	for (int k = 0; k < TABU_LENGTH; k++)
+	for (int k = 0; k < tabu_length; k++)
 	{
 		tabu_indices_i[k] = -1;
 		tabu_indices_j[k] = -1;
@@ -45,7 +46,7 @@ Tabu::~Tabu()
 
 int Tabu::next_index_pos(){
 	index_pos++;
-	index_pos = index_pos % TABU_LENGTH;
+	index_pos = index_pos % tabu_length;
 	return index_pos;
 }
 
@@ -87,7 +88,7 @@ bool Tabu::is_tabu(int i, int j)
 
 void Tabu::reset()
 {
-	for (int k = 0; k < TABU_LENGTH; k++)
+	for (int k = 0; k < tabu_length; k++)
 	{
 		tabu_indices_i[k] = -1;
 		tabu_indices_j[k] = -1;

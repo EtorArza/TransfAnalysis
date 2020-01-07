@@ -17,12 +17,9 @@ static struct PermuInit {
 
             int nhidden;
 
-            if (START_WITHOUT_HIDDEN)
-            {
-                nhidden = 0;
-            }else{
-                nhidden = __sensor_N;
-            }
+
+            nhidden = __sensor_N;
+
             
 
             return env->genome_manager->create_seed_generation(env->pop_size,

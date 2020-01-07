@@ -8,7 +8,7 @@ class Tabu
 {
 public:
 
-	Tabu(RandomNumberGenerator* rng, int n);
+	Tabu(RandomNumberGenerator* rng, int n, int tabu_length);
 	~Tabu();
 
 	void set_tabu(int i, int j);
@@ -17,6 +17,7 @@ public:
 	double tabu_coef_neat = 0.0;
 
 private:
+	int tabu_length;
 	RandomNumberGenerator* rng;
 	static int n_indivs_created;
 	int* tabu_indices_i;

@@ -1,7 +1,7 @@
-
 #include "std.hxx"
 #include "networkexecutor.h"
 #include "Parameters.h"
+#include "PERMU_params.h"
 #include "FitnessFunction_permu.h"
 #include "map.h"
 #include "network.h"
@@ -46,30 +46,14 @@ PBP *GetProblemInfo(std::string problemType, std::string filename)
 
     //Read the instance.
     problem->Read_with_mutex(filename);
-    #ifdef SAME_SIZE_EXPERIMENT
-        if (problem->GetProblemSize() == 30)
-        {
-            MAX_TIME_PSO = 0.10;
-        }
-        else if(problem->GetProblemSize() == 60)
-        {
-            MAX_TIME_PSO = 0.3;
-        }
-        else
-        {
-            cout << "ERROR, this experiment expects instances of size 60 and 30.";
-            exit(1);
-        }
 
-    #undef SAME_SIZE_EXPERIMENT
-    #endif
     return problem;
 }
 
 
 
-double FitnessFunction_permu(NEAT::CpuNetwork *net_original, int n_evals, int seed)
-{
+double FitnessFunction_permu(NEAT::CpuNetwork *net_original, int n_evals, int seed, PERMU::params* parameters)
+{   using namespace PERMU;
 
     double *v_of_fitness;
     PBP *problem;
@@ -79,15 +63,15 @@ double FitnessFunction_permu(NEAT::CpuNetwork *net_original, int n_evals, int se
     NEAT::CpuNetwork *net = &tmp_net;
 
  
-    problem = GetProblemInfo(PROBLEM_TYPE, INSTANCE_PATH);     //Read the problem instance to optimize.
-    pop = new CPopulation(problem);
+    problem = GetProblemInfo(parameters->PROBLEM_TYPE, parameters->INSTANCE_PATH);     //Read the problem instance to optimize.
+    pop = new CPopulation(problem, parameters);
     problem->load_rng(pop->rng);
     pop->rng->seed(seed);
 
 
     v_of_fitness = new double[n_evals];
 
-    for (int i = 0; i < POPSIZE; i++)
+    for (int i = 0; i < pop->popsize; i++)
     {
         pop->m_individuals[i]->activation = std::vector<double>(net->activations);
     }
@@ -107,7 +91,7 @@ double FitnessFunction_permu(NEAT::CpuNetwork *net_original, int n_evals, int se
         pop->rng->seed(seed + n_of_repetitions_completed);
         pop->Reset();
         //std::cout << "|" << n_of_repetitions_completed << "|" << std::endl;
-        for (int i = 0; i < POPSIZE; i++)
+        for (int i = 0; i < pop->popsize; i++)
         {
             std::swap(net->activations, pop->m_individuals[i]->activation);
             net->clear_noninput();
@@ -151,7 +135,7 @@ double FitnessFunction_permu(NEAT::CpuNetwork *net_original, int n_evals, int se
             #endif
 
 
-            for (int i = 0; i < POPSIZE; i++)
+            for (int i = 0; i < pop->popsize; i++)
             {
 
                 std::swap(net->activations, pop->m_individuals[i]->activation);

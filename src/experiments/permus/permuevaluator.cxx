@@ -23,13 +23,12 @@
 #include "neat.h"
 #include "rng.h"
 #include "util.h"
-#include <iomanip>      // std::setprecision
-
-#define EXTERN
+#include <iomanip>
 #include "Parameters.h"
-
+#include "PERMU_params.h"
 
 using namespace std;
+using namespace PERMU;
 
 //#define COUNTER
 //#define PRINT
@@ -39,11 +38,14 @@ using namespace std;
 
 namespace NEAT
 {
-struct Config{};
+struct Config{
+};
 struct Evaluator
 {
+
     typedef NEAT::Config Config;
     const Config *config;
+    params* parameters;
 
 
     __net_eval_decl Evaluator(const Config *config_) : config(config_){};
@@ -53,7 +55,7 @@ struct Evaluator
     __net_eval_decl double FitnessFunction(CpuNetwork *net, int n_evals, int initial_seed)
     {
         int seed_seq = initial_seed;
-        double res = FitnessFunction_permu(net, n_evals, seed_seq);
+        double res = FitnessFunction_permu(net, n_evals, seed_seq, parameters);
         seed_seq += n_evals;
         return res;
     }
@@ -61,18 +63,20 @@ struct Evaluator
     // parallelize over the same network
     __net_eval_decl void FitnessFunction_parallel(CpuNetwork *net, int n_evals, double *res, int initial_seed)
     {
+        using namespace PERMU;
         int seed_parallel = initial_seed;
 
         #pragma omp parallel for num_threads(N_OF_THREADS)
         for (int i = 0; i < n_evals; i++)
         {
-            res[i] = FitnessFunction_permu(net, N_EVALS, seed_parallel + i);
+            res[i] = FitnessFunction_permu(net, parameters->N_EVALS, seed_parallel + i, parameters);
         }
         seed_parallel += n_evals;
     }
 
     // compute the fitness value of all networks at training time.
     __net_eval_decl void execute(class Network **nets_, OrganismEvaluation *results, size_t nnets){
+        using namespace PERMU;
         CpuNetwork **nets = (CpuNetwork **)nets_;
         double progress_print_decider = 0.0;
         double *f_values = new double[nnets];
@@ -85,12 +89,10 @@ struct Evaluator
         for (size_t inet = 0; inet < nnets; inet++)
         {
             CpuNetwork *net = nets[inet];
-            Evaluator *ev = new Evaluator(config);
             OrganismEvaluation eval;
             int seed = initial_seed;
-            f_values[inet] = ev->FitnessFunction(net, N_EVALS, seed);
+            f_values[inet] = this->FitnessFunction(net, parameters->N_EVALS, seed);
             results[inet] = eval;
-            delete ev;
 
             // print progress.
             std::mutex mutx;
@@ -117,7 +119,7 @@ struct Evaluator
         // double cut_value = obtain_kth_largest_value(f_values, min(max(n_of_threads_omp, 5), static_cast<int>(nnets)), nnets);
 
         // reevaluate top 5% at least N_REEVAL times
-        int actual_n_reevals = (((N_REEVALS_TOP_5_PERCENT - 1) / N_OF_THREADS) + 1) * N_OF_THREADS;
+        int actual_n_reevals = (((parameters->N_REEVALS_TOP_5_PERCENT - 1) / N_OF_THREADS) + 1) * N_OF_THREADS;
         int n_of_networks_to_reevaluate = MAX(1, static_cast<int>(nnets) * 5 / 100);
         cout << "reevaluating top 5% (" << n_of_networks_to_reevaluate << " nets out of " << static_cast<int>(nnets) << ") each " << actual_n_reevals << " times." << endl;
 
@@ -136,21 +138,18 @@ struct Evaluator
             else
             {
                 CpuNetwork *net = nets[inet];
-                Evaluator *ev = new Evaluator(config);
                 double *res = new double[actual_n_reevals];
                 int seed = initial_seed;
-                ev->FitnessFunction_parallel(net, actual_n_reevals, res, seed);
+                this->FitnessFunction_parallel(net, actual_n_reevals, res, seed);
                 int index_value = arg_element_in_centile_specified_by_percentage(res, actual_n_reevals, 0.50);
                 f_values[inet] = res[index_value];
                 delete[] res;
-                delete ev;
             }
         }
 
         cout << "Reevaluating best indiv of generation: ";
         int index_most_fit = argmax(f_values, nnets);
         CpuNetwork *net = nets[index_most_fit];
-        Evaluator *ev = new Evaluator(config);
 
         // apply a discount to all but the best individual
         for (int i = 0; i < (int) nnets; i++)
@@ -161,12 +160,12 @@ struct Evaluator
             }
         }
 
-        double *res = new double[N_EVALS_TO_UPDATE_BK];
-        ev->FitnessFunction_parallel(net, N_EVALS_TO_UPDATE_BK, res, 30050000);
+        double *res = new double[parameters->N_EVALS_TO_UPDATE_BK];
+        this->FitnessFunction_parallel(net, parameters->N_EVALS_TO_UPDATE_BK, res, 30050000);
 
 
         // double median = res[arg_element_in_centile_specified_by_percentage(res, N_EVALS_TO_UPDATE_BK, 0.5)];
-        double average = Average(res, N_EVALS_TO_UPDATE_BK);
+        double average = Average(res,parameters->N_EVALS_TO_UPDATE_BK);
 
 
         cout << "best this gen: " << average << endl;
@@ -174,18 +173,17 @@ struct Evaluator
         if (average > BEST_FITNESS_TRAIN)        {
 
 
-            bool update_needed = is_A_larger_than_B_Mann_Whitney(res, F_VALUES_OBTAINED_BY_BEST_INDIV, N_EVALS_TO_UPDATE_BK);
+            bool update_needed = is_A_larger_than_B_Mann_Whitney(res, F_VALUES_OBTAINED_BY_BEST_INDIV, parameters->N_EVALS_TO_UPDATE_BK);
 
             if (update_needed)
             {
                 N_TIMES_BEST_FITNESS_IMPROVED_TRAIN++;
                 cout << "[BEST_FITNESS_IMPROVED] --> " << average << endl;
                 BEST_FITNESS_TRAIN = average;
-                copy_vector(F_VALUES_OBTAINED_BY_BEST_INDIV, res, N_EVALS_TO_UPDATE_BK);
+                copy_vector(F_VALUES_OBTAINED_BY_BEST_INDIV, res, parameters->N_EVALS_TO_UPDATE_BK);
             }
         }
 
-        delete ev;
         delete[] res;
 
         double* tmp_order = new double[nnets];
@@ -223,13 +221,15 @@ struct Evaluator
 
 
 class PermuEvaluator : public NetworkEvaluator
-{
+{   
     NetworkExecutor<Evaluator> *executor;
+    PERMU::params* parameters;
 
 public:
     PermuEvaluator()
-    {
+    {   
         executor = NetworkExecutor<Evaluator>::create();
+        parameters = new PERMU::params();
     }
 
     ~PermuEvaluator()
@@ -243,13 +243,15 @@ public:
     {
         NEAT::Config* config;
         Evaluator *ev = new Evaluator(config);
+        ev->parameters = this->parameters;
         ev->execute(nets_, results, nnets);
     }
 
     virtual void run_given_conf_file(std::string conf_file_path){
     using namespace std;
     using namespace NEAT;
-    
+    using namespace PERMU;
+
     INIReader reader(conf_file_path);
 
     if (reader.ParseError() != 0) {
@@ -261,33 +263,34 @@ public:
 
 
 
-
     if (MODE == "train")
     {
+
+
+
 
 
         int rng_seed = reader.GetInteger("NEAT","SEED", -1);
         env->pop_size = reader.GetInteger("NEAT", "POPSIZE", -1);
         int max_time = reader.GetInteger("NEAT", "MAX_TRAIN_TIME", -1);
         N_OF_THREADS = reader.GetInteger("NEAT", "THREADS", -1);
-        N_EVALS = reader.GetInteger("NEAT", "N_EVALS", -1);
-        N_REEVALS_TOP_5_PERCENT = reader.GetInteger("NEAT","N_REEVALS_TOP_5_PERCENT", -1);
-        N_EVALS_TO_UPDATE_BK = reader.GetInteger("NEAT","N_EVALS_TO_UPDATE_BK", -1);
+        parameters->N_EVALS = reader.GetInteger("NEAT", "N_EVALS", -1);
+        parameters->N_REEVALS_TOP_5_PERCENT = reader.GetInteger("NEAT","N_REEVALS_TOP_5_PERCENT", -1);
+        parameters->N_EVALS_TO_UPDATE_BK = reader.GetInteger("NEAT","N_EVALS_TO_UPDATE_BK", -1);
         string search_type = reader.Get("NEAT", "SEARCH_TYPE", "UNKOWN");
-        PROBLEM_TYPE = reader.Get("Controller", "PROBLEM_TYPE", "UNKOWN");
-        INSTANCE_PATH = reader.Get("Controller", "PROBLEM_PATH", "UNKOWN");
-        MAX_TIME_PSO = reader.GetReal("Controller", "MAX_TIME_PSO", -1.0);
-        POPSIZE = reader.GetInteger("Controller", "POPSIZE", -1);
-        TABU_LENGTH = reader.GetInteger("Controller", "TABU_LENGTH", -1);
-        START_WITHOUT_HIDDEN = reader.GetBoolean("NEAT","START_WITHOUT_HIDDEN", false);
+        parameters->PROBLEM_TYPE = reader.Get("Controller", "PROBLEM_TYPE", "UNKOWN");
+        parameters->INSTANCE_PATH = reader.Get("Controller", "PROBLEM_PATH", "UNKOWN");
+        parameters->MAX_TIME_PSO = reader.GetReal("Controller", "MAX_TIME_PSO", -1.0);
+        parameters->POPSIZE = reader.GetInteger("Controller", "POPSIZE", -1);
+        parameters->TABU_LENGTH = reader.GetInteger("Controller", "TABU_LENGTH", -1);
 
-        EXPERIMENT_FOLDER_NAME = "controllers_trained_with_" + from_path_to_filename(INSTANCE_PATH);
+        EXPERIMENT_FOLDER_NAME = "controllers_trained_with_" + from_path_to_filename(parameters->INSTANCE_PATH);
 
-        cout << "Learning from instance: " << from_path_to_filename(INSTANCE_PATH) << endl;
+        cout << "Learning from instance: " << from_path_to_filename(parameters->INSTANCE_PATH) << endl;
 
 
-        F_VALUES_OBTAINED_BY_BEST_INDIV = new double[N_EVALS_TO_UPDATE_BK];
-        for (int i = 0; i < N_EVALS_TO_UPDATE_BK; i++)
+        F_VALUES_OBTAINED_BY_BEST_INDIV = new double[parameters->N_EVALS_TO_UPDATE_BK];
+        for (int i = 0; i < parameters->N_EVALS_TO_UPDATE_BK; i++)
         {
             F_VALUES_OBTAINED_BY_BEST_INDIV[i] = -DBL_MAX;
         }
@@ -326,16 +329,15 @@ public:
 
         if (N_OF_THREADS < 7)
         {
-            cout << "Warning: a minimum of 7 cores (specified by the THREADS parameter) is recommended for this implementation of NEAT to function correctly." << endl;
-            cout << "With the current settings, processing a generation takes around " ; 
-            cout << ((env->pop_size*MAX_TIME_PSO / (double)2 * (double)N_EVALS + (double)(5/N_OF_THREADS + 1) * (double)N_REEVALS_TOP_5_PERCENT)) / 3600.0; 
-            cout << "h,  which might be too long." << endl << endl;
+            cout << "Warning: a minimum of 7 cores (specified by the THREADS parameter)" 
+            << "is recommended for this implementation of NEAT to function correctly in a reasonable time." << endl;
         }
 
         if (env->pop_size < 500)
         {
             cout << "Warning: The population size of the controllers might be too low." << endl;
-            cout << "The provided population size of the controllers is " << env->pop_size << ", a value of at least 500 is recommended." << endl;
+            cout << "The provided population size of the controllers is " 
+            << env->pop_size << ", a value of at least 500 is recommended." << endl;
             cout << endl << endl;
         }
 
@@ -358,6 +360,7 @@ public:
         global_timer.tic();
         exp->run(rng);
 
+
         delete[] F_VALUES_OBTAINED_BY_BEST_INDIV;
 
         return;
@@ -368,32 +371,32 @@ public:
         //const char * prob_name = "permu";
         //Experiment *exp = Experiment::get(prob_name);
 
-        PROBLEM_TYPE = reader.Get("Controller", "PROBLEM_TYPE", "UNKOWN");
-        INSTANCE_PATH = reader.Get("Controller", "PROBLEM_PATH", "UNKOWN");
-        MAX_TIME_PSO = reader.GetReal("Controller", "MAX_TIME_PSO", -1.0);
-        POPSIZE = reader.GetInteger("Controller", "POPSIZE", -1);
-        TABU_LENGTH = reader.GetInteger("Controller", "TABU_LENGTH", -1);
-        CONTROLLER_PATH = reader.Get("TestSettings", "CONTROLLER_PATH", "UNKNOWN");
-        N_REPS = reader.GetInteger("TestSettings", "N_REPS", -1);
-        N_EVALS = reader.GetInteger("TestSettings", "N_EVALS", -1);
+        parameters->PROBLEM_TYPE = reader.Get("Controller", "PROBLEM_TYPE", "UNKOWN");
+        parameters->INSTANCE_PATH = reader.Get("Controller", "PROBLEM_PATH", "UNKOWN");
+        parameters->MAX_TIME_PSO = reader.GetReal("Controller", "MAX_TIME_PSO", -1.0);
+        parameters->POPSIZE = reader.GetInteger("Controller", "POPSIZE", -1);
+        parameters->TABU_LENGTH = reader.GetInteger("Controller", "TABU_LENGTH", -1);
+        parameters->CONTROLLER_PATH = reader.Get("TestSettings", "CONTROLLER_PATH", "UNKNOWN");
+        parameters->N_REPS = reader.GetInteger("TestSettings", "N_REPS", -1);
+        parameters->N_EVALS = reader.GetInteger("TestSettings", "N_EVALS", -1);
         N_OF_THREADS = reader.GetInteger("TestSettings", "THREADS", 1);
-        N_OF_THREADS = MIN(N_OF_THREADS, N_EVALS);
+        N_OF_THREADS = MIN(N_OF_THREADS, parameters->N_EVALS);
 
 
-        if (CONTROLLER_PATH == "UNKNOWN")
+        if (parameters->CONTROLLER_PATH == "UNKNOWN")
         {
             cout << "error, controller path not specified in test." << endl;
         }
 
-        if (N_REPS < 0)
+        if (parameters->N_REPS < 0)
         {
              cout << "error, N_REPS not provided in test mode." << endl;
         }
         
         
-        CpuNetwork net = load_network(CONTROLLER_PATH);
+        CpuNetwork net = load_network(parameters->CONTROLLER_PATH);
 
-        double *v_of_f_values = new double[N_EVALS];
+        double *v_of_f_values = new double[parameters->N_EVALS];
 
         cout << std::setprecision(15);
         RandomNumberGenerator* rng;
@@ -402,17 +405,17 @@ public:
         int initial_seed = rng->random_integer_uniform(40000000, 50000000);
         delete rng;
         cout << "[[";
-        for (int j = 0; j < N_REPS; j++)
+        for (int j = 0; j < parameters->N_REPS; j++)
         {
             #pragma omp parallel for num_threads(N_OF_THREADS)
-            for (int i = 0; i < N_EVALS; i++)
+            for (int i = 0; i < parameters->N_EVALS; i++)
             {
-                v_of_f_values[i] = FitnessFunction_permu(&net, 1, initial_seed + i);
+                v_of_f_values[i] = FitnessFunction_permu(&net, 1, initial_seed + i, parameters);
             }
-            initial_seed += N_EVALS;
-            double res = Average(v_of_f_values, N_EVALS);
+            initial_seed += parameters->N_EVALS;
+            double res = Average(v_of_f_values, parameters->N_EVALS);
             cout << res;
-            if (j < N_REPS-1)
+            if (j < parameters->N_REPS-1)
             {
                 cout << ",";
             }
@@ -427,10 +430,10 @@ public:
 
         cout << std::setprecision(15);
         cout << std::flush;
-        cout << INSTANCE_PATH   << ","
-             << CONTROLLER_PATH << ","
-             << PROBLEM_TYPE    << ","
-             << N_EVALS
+        cout << parameters->INSTANCE_PATH   << ","
+             << parameters->CONTROLLER_PATH << ","
+             << parameters->PROBLEM_TYPE    << ","
+             << parameters->N_EVALS
              << "]"
              << endl;
 

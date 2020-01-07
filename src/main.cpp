@@ -22,8 +22,11 @@
 #include "FitnessFunction_permu.h"
 #include "experiment.h"
 #include "rng.h"
-#include "Parameters.h"
 #include "evaluatorexperiment.h"
+
+#define EXTERN // this gives the global parameters defined in Parameters.h a global scoope.
+#include "Parameters.h"
+
 
 
 
@@ -82,12 +85,11 @@ int main(int argc, char *argv[])
 
     }
 
-        int rng_seed = 2;
-        const char * prob_name = "permu";
-        Experiment *exp = Experiment::get(prob_name);
-        rng_t rng{rng_seed};
-        global_timer.tic();
-        exp->run_given_conf_file(argv[1]);
+    int rng_seed = 2;
+    const char * prob_name = "permu";
+    Experiment *exp = Experiment::get(prob_name);
+    rng_t rng{rng_seed};
+    exp->run_given_conf_file(argv[1]);
 
     return 0;
 }
