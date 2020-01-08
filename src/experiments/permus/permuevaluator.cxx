@@ -38,17 +38,14 @@ using namespace PERMU;
 
 namespace NEAT
 {
-struct Config{
-};
+
 struct Evaluator
 {
 
-    typedef NEAT::Config Config;
-    const Config *config;
     params* parameters;
 
 
-    __net_eval_decl Evaluator(const Config *config_) : config(config_){};
+    __net_eval_decl Evaluator(){};
 
 
     // fitness function in sequential order
@@ -188,7 +185,7 @@ struct Evaluator
 
         double* tmp_order = new double[nnets];
 
-        cout << "fitness_array: " << std::flush;
+        //cout << "fitness_array: " << std::flush;
         //PrintArray(f_values, nnets);
 
         compute_order_from_double_to_double(f_values, nnets, tmp_order, false, true);
@@ -200,7 +197,7 @@ struct Evaluator
         multiply_array_with_value(f_values, 1.0 / (double) (nnets-1), nnets);
         multiply_array_with_value(f_values, 1.0 + ((double)N_TIMES_BEST_FITNESS_IMPROVED_TRAIN / 1000.0), nnets);
 
-        cout << "fitness_array: " << std::flush;
+        //cout << "fitness_array: " << std::flush;
         //PrintArray(f_values, nnets);
 
         // save scaled fitness
@@ -241,8 +238,7 @@ public:
                          class OrganismEvaluation *results,
                          size_t nnets)
     {
-        NEAT::Config* config;
-        Evaluator *ev = new Evaluator(config);
+        Evaluator *ev = new Evaluator();
         ev->parameters = this->parameters;
         ev->execute(nets_, results, nnets);
     }
@@ -259,16 +255,12 @@ public:
         exit(1);
     }
 
-    string MODE = reader.Get("Global", "mode", "UNKNOWN");
+    string MODE = reader.Get("Global", "MODE", "UNKNOWN");
 
 
 
     if (MODE == "train")
     {
-
-
-
-
 
         int rng_seed = reader.GetInteger("NEAT","SEED", -1);
         env->pop_size = reader.GetInteger("NEAT", "POPSIZE", -1);

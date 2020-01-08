@@ -66,13 +66,16 @@ int main(int argc, char *argv[])
     << "by Ekhiñe Irurozki available at https://cran.r-project.org/web/packages/PerMallows/index.html" << endl;
     cout << "----------END LICENCE DISCLAIMER----------\n\n\n\n\n\n";
 
-    system("rm -r controllers_trained_with_cut60_tai80b");
 
 
 
     #ifndef NDEBUG
     cout << "WARNING: Debug mode. Assertions enabled." << endl;
     #endif
+
+
+    system("rm -r controllers*");
+
 
     if (argc < 2)
     {
@@ -84,6 +87,8 @@ int main(int argc, char *argv[])
         exit(1);
 
     }
+
+
 
     int rng_seed = 2;
     const char * prob_name = "permu";

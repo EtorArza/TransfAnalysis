@@ -27,8 +27,8 @@ namespace NEAT {
         std::string get_fittest_path(int experiment_num, int generation) {
             char buf[1024];
             sprintf(buf, "%s/%s_gen_%04d",
-                    get_dir_path(experiment_num).c_str(),
-                    std::string("_gen_").c_str(),
+                    EXPERIMENT_FOLDER_NAME.c_str(),
+                    EXPERIMENT_FOLDER_NAME.c_str(),
                     generation
                     );
             return buf;

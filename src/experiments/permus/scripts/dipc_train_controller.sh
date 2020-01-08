@@ -51,7 +51,7 @@ cat > tmp.ini <<EOF
 
 
 [Global] 
-mode = train
+MODE = train
 
 
 [NEAT]

@@ -16,8 +16,6 @@ namespace NEAT {
         
         virtual ~NetworkExecutor() {}
 
-        virtual void configure(const typename Evaluator::Config *config,
-                               size_t len) = 0;
 
         virtual void execute(class Network **nets_,
                              class OrganismEvaluation *results,

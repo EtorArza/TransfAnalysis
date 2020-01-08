@@ -67,7 +67,7 @@ cat > tmp.ini <<EOF
 
 
 [Global] 
-mode = test ;
+MODE = test ;
 
 [TestSettings]
 THREADS = 32 ;

@@ -18,25 +18,15 @@ template <typename Evaluator>
 class CpuNetworkExecutor : public NetworkExecutor<Evaluator>
 {
 public:
-    const typename Evaluator::Config *config;
 
     CpuNetworkExecutor()
     {
-        config = NULL;
     }
 
     virtual ~CpuNetworkExecutor()
     {
-        delete config;
     }
 
-    virtual void configure(const typename Evaluator::Config *config_,
-                           size_t len)
-    {
-        void *buf = malloc(len);
-        memcpy(buf, config_, len);
-        config = (const typename Evaluator::Config *)buf;
-    }
 
     void execute(class Network **nets_, OrganismEvaluation *results, size_t nnets)
     {
