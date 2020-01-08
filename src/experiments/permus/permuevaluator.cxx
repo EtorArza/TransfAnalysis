@@ -368,7 +368,6 @@ public:
         parameters->CONTROLLER_PATH = reader.Get("TestSettings", "CONTROLLER_PATH", "UNKNOWN");
         parameters->N_REPS = reader.GetInteger("TestSettings", "N_REPS", -1);
         parameters->N_EVALS = reader.GetInteger("TestSettings", "N_EVALS", -1);
-        N_OF_THREADS = reader.GetInteger("TestSettings", "THREADS", 1);
         N_OF_THREADS = MIN(N_OF_THREADS, parameters->N_EVALS);
 
 
