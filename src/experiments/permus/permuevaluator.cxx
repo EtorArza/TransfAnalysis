@@ -238,6 +238,7 @@ public:
                          class OrganismEvaluation *results,
                          size_t nnets)
     {
+        env->pop_size = POPSIZE_NEAT;
         Evaluator *ev = new Evaluator();
         ev->parameters = this->parameters;
         ev->execute(nets_, results, nnets);
@@ -247,6 +248,7 @@ public:
     using namespace std;
     using namespace NEAT;
     using namespace PERMU;
+
 
     INIReader reader(conf_file_path);
 
@@ -258,14 +260,10 @@ public:
     string MODE = reader.Get("Global", "MODE", "UNKNOWN");
 
 
-
     if (MODE == "train")
     {
 
         int rng_seed = reader.GetInteger("NEAT","SEED", -1);
-        env->pop_size = reader.GetInteger("NEAT", "POPSIZE", -1);
-        int max_time = reader.GetInteger("NEAT", "MAX_TRAIN_TIME", -1);
-        N_OF_THREADS = reader.GetInteger("NEAT", "THREADS", -1);
         parameters->N_EVALS = reader.GetInteger("NEAT", "N_EVALS", -1);
         parameters->N_REEVALS_TOP_5_PERCENT = reader.GetInteger("NEAT","N_REEVALS_TOP_5_PERCENT", -1);
         parameters->N_EVALS_TO_UPDATE_BK = reader.GetInteger("NEAT","N_EVALS_TO_UPDATE_BK", -1);
@@ -281,12 +279,12 @@ public:
         cout << "Learning from instance: " << from_path_to_filename(parameters->INSTANCE_PATH) << endl;
 
 
-        F_VALUES_OBTAINED_BY_BEST_INDIV = new double[parameters->N_EVALS_TO_UPDATE_BK];
-        for (int i = 0; i < parameters->N_EVALS_TO_UPDATE_BK; i++)
-        {
-            F_VALUES_OBTAINED_BY_BEST_INDIV[i] = -DBL_MAX;
-        }
-        
+    F_VALUES_OBTAINED_BY_BEST_INDIV = new double[parameters->N_EVALS_TO_UPDATE_BK];
+    for (int i = 0; i < parameters->N_EVALS_TO_UPDATE_BK; i++)
+    {
+        F_VALUES_OBTAINED_BY_BEST_INDIV[i] = -DBL_MAX;
+    }
+
 
 
         if (search_type == "phased")
@@ -335,7 +333,6 @@ public:
 
 
 
-        MAX_TRAIN_TIME = max_time; 
 
         if (env->search_type == GeneticSearchType::BLENDED)
         {
