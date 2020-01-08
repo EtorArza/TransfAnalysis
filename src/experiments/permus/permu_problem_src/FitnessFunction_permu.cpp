@@ -120,19 +120,7 @@ double FitnessFunction_permu(NEAT::CpuNetwork *net_original, int n_evals, int se
             #endif
 
 
-            #ifdef RANDOM_SEARCH
-            double new_f = problem->Evaluate(pop->genome_best);
-            GenerateRandomPermutation(pop->genome_best, pop->n, pop->rng);
-            if (new_f > best_f)
-            {
-                best_f = new_f;
-            }
-            if(pop->timer->toc() > MAX_TIME_PSO)
-            {
-                pop->terminated = true;
-            }
-            continue;
-            #endif
+
 
 
             for (int i = 0; i < pop->popsize; i++)
