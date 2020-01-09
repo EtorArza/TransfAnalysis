@@ -91,7 +91,7 @@ int main(int argc, char *argv[])
 
 
     int rng_seed = 2;
-    const char * prob_name = "permu";
+    const char * prob_name = "permu_multi";
     Experiment *exp = Experiment::get(prob_name);
     rng_t rng{rng_seed};
     exp->run_given_conf_file(argv[1]);

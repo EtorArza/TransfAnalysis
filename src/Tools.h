@@ -759,5 +759,42 @@ int sign(T value)
 }
 #undef TOL
 
+
+template <class T>
+void append_line_to_file(std::string filename, T data_to_append ) {  
+  std::ofstream outfile;
+  outfile.open(filename, std::ios_base::app); // append instead of overwrite
+  outfile << data_to_append;
+}
+
+
+// sum two arrays of the same length elementwise. The result array is allowed to be one of the summands (although it is not required)
+template <class T>
+void sum_arrays(T* res, T* array_1, T* array_2, int len){
+    for (int i = 0; i < len; i++)
+    {
+        res[i] = array_1[i] + array_2[i];
+    }
+}
+
+
+
+template <class T>
+std::string array_to_string(T* array, int len){
+    std::string res = "[";
+    for (int i = 0; i < len; i++)
+    {
+        if(i != 0){
+            res += ",";
+        }
+        res += to_string(array[i]);
+    }
+    res += "]";
+    return res;
+}
+
+
+
+
 std::string from_path_to_filename(std::string file_path);
 
