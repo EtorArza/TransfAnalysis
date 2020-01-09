@@ -3,6 +3,7 @@
 #include <limits>
 #include "Parameters.h"
 
+namespace PERMU{
 
 
 Tabu::Tabu(RandomNumberGenerator* rng, int n, int tabu_length)
@@ -103,3 +104,5 @@ void Tabu::reset()
 	index_pos = 0;
 	this->tabu_coef_neat = 0;
 	}
+
+}

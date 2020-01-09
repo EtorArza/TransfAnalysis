@@ -25,6 +25,9 @@ using std::ostream;
 namespace NEAT{
 class CpuNetwork;
 }
+
+namespace PERMU{
+
 class CIndividual
 {
 public:
@@ -70,4 +73,5 @@ private:
 	static int n_indivs_created;
 };
 
+}
 

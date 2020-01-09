@@ -10,6 +10,8 @@
 #include "TSP.h"
 #include <assert.h>
 
+namespace PERMU{
+
 /*
  *Class constructor.
  */
@@ -508,4 +510,6 @@ double TSP::fitness_delta_insert(CIndividual *indiv, int i, int j)
 int TSP::GetProblemSize()
 {
 	return m_size;
+}
+
 }

@@ -7,14 +7,16 @@
 #include "network.h"
 #include "resource.h"
 #include <assert.h>
-#include "PBP.h"
-#include "Population.h"
+#include "../permus/permu_problem_src/PBP.h"
+#include "../permus/permu_problem_src/Population.h"
 #include "Tools.h"
 #include <cfloat>
-#include "QAP.h"
-#include "LOP.h"
-#include "PFSP.h"
-#include "TSP.h"
+#include "../permus/permu_problem_src/QAP.h"
+#include "../permus/permu_problem_src/LOP.h"
+#include "../permus/permu_problem_src/PFSP.h"
+#include "../permus/permu_problem_src/TSP.h"
+
+namespace PERMU{
 
 
 PBP *GetProblemInfo(std::string problemType, std::string filename)
@@ -56,8 +58,8 @@ double FitnessFunction_permu(NEAT::CpuNetwork *net_original, int n_evals, int se
 {   using namespace PERMU;
 
     double *v_of_fitness;
-    PBP *problem;
-    CPopulation *pop;
+    PERMU::PBP *problem;
+    PERMU::CPopulation *pop;
 
     NEAT::CpuNetwork tmp_net = *net_original;
     NEAT::CpuNetwork *net = &tmp_net;
@@ -163,4 +165,6 @@ double FitnessFunction_permu(NEAT::CpuNetwork *net_original, int n_evals, int se
     problem = NULL;
     net = NULL;
     return res;
+}
+
 }

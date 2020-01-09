@@ -562,76 +562,74 @@ void shuffle_vector(int *vec, int len, RandomNumberGenerator* rng);
 
 class Lap;
 
+namespace PERMU
+{
 class PermuTools
 {
 public:
-
-	PermuTools(int n);
-    PermuTools(int n, RandomNumberGenerator* rng);
+    PermuTools(int n);
+    PermuTools(int n, RandomNumberGenerator *rng);
 
     void init_class(int n);
 
-	~PermuTools();
+    ~PermuTools();
 
     int n;
-    int* random_permu1;
-    int* random_permu2;
-    int* temp_array;
-    int* temp_array2;
-    int* temp_array3;
-    int* temp_array4;
-    double* temp_array_double;
-    int* identity_permu;
+    int *random_permu1;
+    int *random_permu2;
+    int *temp_array;
+    int *temp_array2;
+    int *temp_array3;
+    int *temp_array4;
+    double *temp_array_double;
+    int *identity_permu;
 
-    int* hamming_mm_consensus;
-    int* kendall_mm_consensus;
+    int *hamming_mm_consensus;
+    int *kendall_mm_consensus;
 
-    double** first_marginal;
-    double** order_marginal;
+    double **first_marginal;
+    double **order_marginal;
 
-    void combine_permus(int** permu_list, double* coef_list, int* res);
-    void compute_first_marginal(int** permu_list, int m);
-    void compute_order_marginal(int** permu_list, int m);
+    void combine_permus(int **permu_list, double *coef_list, int *res);
+    void compute_first_marginal(int **permu_list, int m);
+    void compute_order_marginal(int **permu_list, int m);
 
-    double get_distance_to_marginal(int* permu);
-    double get_distance_to_order_marginal(int* permu);
+    double get_distance_to_marginal(int *permu);
+    double get_distance_to_order_marginal(int *permu);
 
-    int choose_permu_index_to_move(double* coef_list);
-    int choose_permu_index_to_move(double* coef_list, RandomNumberGenerator* rng);
+    int choose_permu_index_to_move(double *coef_list);
+    int choose_permu_index_to_move(double *coef_list, RandomNumberGenerator *rng);
 
-
-    double compute_kendall_distance(int* premu_1, int* permu_2);
+    double compute_kendall_distance(int *premu_1, int *permu_2);
     void compute_kendall_consensus_borda(int **permu_list, int m);
 
-
-    double compute_hamming_distance(int* permu_1, int* permu_2);
+    double compute_hamming_distance(int *permu_1, int *permu_2);
     void compute_hamming_consensus(int **permu_list, int m);
 
-    double compute_hamming_distance_to_consensus(int* permu){ return compute_hamming_distance(permu, hamming_mm_consensus);}
-    double compute_kendall_distance_to_consensus(int* permu){ return compute_kendall_distance(permu, kendall_mm_consensus);}
+    double compute_hamming_distance_to_consensus(int *permu) { return compute_hamming_distance(permu, hamming_mm_consensus); }
+    double compute_kendall_distance_to_consensus(int *permu) { return compute_kendall_distance(permu, kendall_mm_consensus); }
 
-    double compute_normalized_hamming_distance_to_consensus(int* permu){ return compute_hamming_distance_to_consensus(permu) / (double) n;}
-    double compute_normalized_kendall_distance_to_consensus(int* permu){ return compute_kendall_distance_to_consensus(permu) / (double) (n*(n-1)/2);}
-
+    double compute_normalized_hamming_distance_to_consensus(int *permu) { return compute_hamming_distance_to_consensus(permu) / (double)n; }
+    double compute_normalized_kendall_distance_to_consensus(int *permu) { return compute_kendall_distance_to_consensus(permu) / (double)(n * (n - 1) / 2); }
 
 private:
-    void convert_to_permu(int* res);
-    RandomNumberGenerator* rng;
-    
-    Lap* linear_assigment_problem;
+    void convert_to_permu(int *res);
+    RandomNumberGenerator *rng;
 
-    int* lap_rows;
-    int* lap_cols;
-    int* lap_u;
-    int* lap_v;
+    Lap *linear_assigment_problem;
 
-    int** freq_matrix;
+    int *lap_rows;
+    int *lap_cols;
+    int *lap_u;
+    int *lap_v;
+
+    int **freq_matrix;
 
     int it_to_compute_order_marginal = 0;
 
     bool delete_rng_is_required = false;
 };
-
+} // namespace PERMU
 
 class stopwatch
 {

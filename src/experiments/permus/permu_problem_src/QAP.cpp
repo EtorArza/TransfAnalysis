@@ -11,6 +11,7 @@
 #include <assert.h>
 #include "Tools.h"
 
+namespace PERMU{
 
 
 /*
@@ -267,3 +268,4 @@ int QAP::GetProblemSize()
     return n;
 }
 
+}

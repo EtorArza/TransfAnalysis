@@ -32,6 +32,8 @@ using std::ifstream;
 using std::stringstream;
 using std::string;
 
+namespace PERMU{
+
 class TSP : public PBP
 {
 	
@@ -80,3 +82,4 @@ public:
 private:
 	
 };
+}

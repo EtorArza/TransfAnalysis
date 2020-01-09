@@ -16,6 +16,7 @@
 #include "Tabu.h"
 #include <limits.h>
 
+namespace PERMU{
 
 PBP::PBP()
 {
@@ -689,5 +690,7 @@ void PBP::move_indiv_away_reference(CIndividual* indiv, int* ref_permu, NEAT::op
     apply_operator_with_fitness_update(indiv, i, j, operator_id, accept_or_reject_worse);
     assert(abs(indiv->f_value - _Evaluate(indiv->genome)) < 0.0001);
     assert(isPermutation(indiv->genome, this->problem_size_PBP)) ;
+
+}
 
 }

@@ -31,6 +31,7 @@ using std::string;
 
 
 class CIndividual;
+namespace PERMU{
 
 class PFSP : public PBP
 {
@@ -105,5 +106,5 @@ private:
 };
 
 
-
+}
 

@@ -33,6 +33,9 @@ using std::endl;
 using std::stringstream;
 using std::string;
 
+namespace PERMU{
+
+
 class QAP : public PBP
 {
 	
@@ -77,3 +80,5 @@ protected:
 
 
 };
+
+}

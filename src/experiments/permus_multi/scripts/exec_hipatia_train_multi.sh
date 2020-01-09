@@ -80,7 +80,7 @@ START_WITHOUT_HIDDEN = false
 
 
 [Controller]
-MAX_TIME_PSO = 100000.5
+MAX_TIME_PSO = -1.0 ; this will be set based on instance size.
 POPSIZE = 20
 TABU_LENGTH = 40
 

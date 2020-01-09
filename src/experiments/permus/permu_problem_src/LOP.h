@@ -31,6 +31,9 @@ using std::ifstream;
 using std::stringstream;
 using std::string;
 
+namespace PERMU{
+
+
 class LOP : public PBP
 {
 	
@@ -74,3 +77,4 @@ private:
 
 
 
+}

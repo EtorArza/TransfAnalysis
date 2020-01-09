@@ -2,6 +2,7 @@
 
 class RandomNumberGenerator;
 
+namespace PERMU{
 
 
 class Tabu
@@ -31,3 +32,4 @@ private:
 };
 
 
+}

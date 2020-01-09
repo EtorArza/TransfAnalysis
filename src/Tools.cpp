@@ -880,7 +880,8 @@ void shuffle_vector(int *vec, int len, RandomNumberGenerator* rng)
 }
 
 
-
+namespace PERMU
+{
 
 PermuTools::PermuTools(int n)
 {
@@ -1271,7 +1272,7 @@ double PermuTools::compute_hamming_distance(int* permu_1, int* permu_2){
 }
 
 
-
+}
 
 
 

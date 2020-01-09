@@ -19,6 +19,8 @@
 // that have been created during the execution of the
 // program. 
 
+namespace PERMU{
+
 int CIndividual::n_indivs_created = 0;
 
 
@@ -154,5 +156,5 @@ CIndividual * CIndividual::Clone()
 	return ind;
 }
 
-
+}
 

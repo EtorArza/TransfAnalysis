@@ -12,9 +12,11 @@
 #include <assert.h>
 #include "Individual.h"
 #include  <utility>
-/*
- * Class constructor.
- */
+
+
+namespace PERMU{
+
+
 LOP::LOP()
 {
 }
@@ -204,3 +206,4 @@ double LOP::fitness_delta_insert(CIndividual *indiv, int i, int j)
 	return delta;
 }
  
+}

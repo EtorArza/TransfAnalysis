@@ -11,6 +11,9 @@
 #include "Tools.h"
 #include "Parameters.h"
 
+namespace PERMU{
+
+
 /*
  *Class constructor.
  */
@@ -175,3 +178,4 @@ int PFSP::GetProblemSize()
     return m_jobs;
 }
 
+}

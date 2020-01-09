@@ -20,11 +20,13 @@
 #include "Tools.h"
 #include  <mutex>
 
+namespace PERMU{
 
 
 using std::string;
 using std::stringstream;
 class Tabu;
+
 
 class PBP
 {
@@ -91,3 +93,4 @@ class PBP
 	bool rng_deleted = false;
 
 };
+}

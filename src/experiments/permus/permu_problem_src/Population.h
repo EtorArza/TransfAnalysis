@@ -13,8 +13,12 @@
 #include "Individual.h"
 #include "PERMU_params.h"
 
-class PBP;
 class RandomNumberGenerator;
+
+
+namespace PERMU{
+
+class PBP;
 class PermuTools;
 class Tabu;
 
@@ -114,3 +118,4 @@ private:
  
 };
 
+}

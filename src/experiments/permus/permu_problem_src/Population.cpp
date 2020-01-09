@@ -25,7 +25,8 @@ using std::ostream;
 #define TARGET_N_ITERATIONS_iteration_geom 10000
 #define TARGET_VALUE_iteration_geom 0.5
 
-using namespace PERMU;
+
+namespace PERMU{
 
 void CPopulation::init_class(PBP *problem, RandomNumberGenerator* rng, PERMU::params* parameters){
     this->rng = rng;
@@ -448,4 +449,6 @@ void CPopulation::move_individual_i_based_on_coefs(double* coef_list, int i, NEA
         assert(isPermutation(this->m_individuals[i]->genome, this->n)) ;
 
     }
+}
+
 }
