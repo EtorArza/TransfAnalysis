@@ -11,7 +11,7 @@
 #include <limits>
 #include "Parameters.h"
 #include <iomanip>      // std::setprecision
-#include "../permuevaluator.h"
+#include "../real_func_evaluator.h"
 #include <float.h>
 
 
@@ -19,18 +19,22 @@
 // that have been created during the execution of the
 // program. 
 
-namespace PERMU{
-
 int CIndividual::n_indivs_created = 0;
 
 
 CIndividual::CIndividual(int length, RandomNumberGenerator* rng)
 {
 	n = length;
-	genome = new int[n];
-	genome_best = new int[n];
-	GenerateRandomPermutation(this->genome, n, rng); 
-	GenerateRandomPermutation(this->genome_best, n, rng);
+	genome = new double[n];
+	genome_best = new double[n];
+	momentum = new double[n];
+	for (int i = 0; i < n; i++)
+	{
+		momentum[i] = 0.0;
+	}
+	
+	GenerateRandomRealvec_0_1(this->genome, n, rng); 
+	GenerateRandomRealvec_0_1(this->genome_best, n, rng);
 	f_value=std::numeric_limits<double>::lowest();
 	f_best=std::numeric_limits<double>::lowest();
 	id = n_indivs_created;
@@ -39,20 +43,22 @@ CIndividual::CIndividual(int length, RandomNumberGenerator* rng)
 }
 
 void CIndividual::reset(RandomNumberGenerator* rng){
-	GenerateRandomPermutation(this->genome, n, rng); 
-	GenerateRandomPermutation(this->genome_best, n, rng);
+	for (int i = 0; i < n; i++)
+	{
+		momentum[i] = 0.0;
+	}
+	GenerateRandomRealvec_0_1(this->genome, n, rng); 
+	GenerateRandomRealvec_0_1(this->genome_best, n, rng);
 	f_value=std::numeric_limits<double>::lowest();
 	f_best=std::numeric_limits<double>::lowest();
-	for (int i = 0; i < PERMU::N_OPERATORS; i++)
-	{
-		this->is_local_optimum[i] = false;
-	}
+	bk_was_improved = false;
 }
 
 CIndividual::~CIndividual()
 {
 	delete[] this->genome;
 	delete[] this->genome_best;
+	delete[] this->momentum;
 	genome=NULL;
 }
 
@@ -76,9 +82,6 @@ ostream & operator<<(ostream & os,CIndividual * & individual)
 	os <<individual->f_value<<" - "; 
 	os << std::setprecision(3);
 	os << std::setw(5);
-	os <<individual->is_local_optimum[0]<<" - ";
-	os <<individual->is_local_optimum[1]<<" - ";
-	os <<individual->is_local_optimum[2]<<" - ";
 	os <<individual->relative_pos<<" - "; 
 	os <<individual->relative_time<<" - "; 
 	os <<individual->distance<<" - ";
@@ -127,9 +130,9 @@ istream & operator>>(istream & is,CIndividual * & individual)
 /*
  * Sets the given array of ints as the genes of the individual.
  */
-void CIndividual::SetGenome(int * genome_to_be_placed_in_individual)
+void CIndividual::SetGenome(double * genome_to_be_placed_in_individual)
 {
-	memcpy(this->genome, genome_to_be_placed_in_individual, sizeof(int)*n);
+	memcpy(this->genome, genome_to_be_placed_in_individual, sizeof(double)*n);
 	f_value=-DBL_MAX;
 }
 
@@ -156,5 +159,5 @@ CIndividual * CIndividual::Clone()
 	return ind;
 }
 
-}
+
 

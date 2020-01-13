@@ -80,8 +80,9 @@ int PBP::Read_with_mutex(string filename){
 }
 
 
-void PBP::apply_operator_with_fitness_update(CIndividual *indiv, int i, int j, NEAT::operator_t operator_id, double accept_or_reject_worse)
+void PBP::apply_operator_with_fitness_update(CIndividual *indiv, int i, int j, PERMU::operator_t operator_id, double accept_or_reject_worse)
 {   
+
     if(i==j || j==-1){
         return;
     }
@@ -91,13 +92,13 @@ void PBP::apply_operator_with_fitness_update(CIndividual *indiv, int i, int j, N
 
     switch (operator_id)
     {
-    case NEAT::SWAP:
+    case PERMU::SWAP:
         delta = this->fitness_delta_swap(indiv, i, j);
         break;
-    case NEAT::EXCH:
+    case PERMU::EXCH:
         delta = this->fitness_delta_interchange(indiv, i, j);
         break;
-    case NEAT::INSERT:
+    case PERMU::INSERT:
         delta = this->fitness_delta_insert(indiv, i, j);
         break;
 
@@ -112,8 +113,10 @@ void PBP::apply_operator_with_fitness_update(CIndividual *indiv, int i, int j, N
 
 }
 
-void PBP::apply_operator_with_fitness_update(CIndividual *indiv, double delta, int i, int j, NEAT::operator_t operator_id, double accept_or_reject_worse)
+void PBP::apply_operator_with_fitness_update(CIndividual *indiv, double delta, int i, int j, PERMU::operator_t operator_id, double accept_or_reject_worse)
 {
+
+    using namespace PERMU;
 
     double r = 2 * (this->rng->random_0_1_double() - 0.5001);
 
@@ -131,15 +134,15 @@ void PBP::apply_operator_with_fitness_update(CIndividual *indiv, double delta, i
 
         switch (operator_id)
         {
-        case NEAT::SWAP:
+        case SWAP:
             Swap(indiv->genome, i, j);
             break;
 
-        case NEAT::EXCH:
+        case EXCH:
             Swap(indiv->genome, i, j);
             break;
 
-        case NEAT::INSERT:
+        case INSERT:
             InsertAt(indiv->genome, i, j, this->problem_size_PBP);
             break;
 
@@ -177,7 +180,7 @@ void PBP::apply_operator_with_fitness_update(CIndividual *indiv, double delta, i
 
 
 
-void PBP::local_search_iteration(CIndividual *indiv, NEAT::operator_t operator_id)
+void PBP::local_search_iteration(CIndividual *indiv, PERMU::operator_t operator_id)
 {
     if (indiv->is_local_optimum[operator_id])
     {
@@ -188,7 +191,7 @@ void PBP::local_search_iteration(CIndividual *indiv, NEAT::operator_t operator_i
 
     switch (operator_id)
     {
-    case NEAT::SWAP:
+    case PERMU::SWAP:
         GenerateRandomPermutation(_random_permu1, problem_size_PBP, rng);
         for (int i = 0; i < problem_size_PBP; i++)
         {
@@ -213,7 +216,7 @@ void PBP::local_search_iteration(CIndividual *indiv, NEAT::operator_t operator_i
         }
         break;
 
-    case NEAT::EXCH:
+    case PERMU::EXCH:
         GenerateRandomPermutation(_random_permu1, this->problem_size_PBP, rng);
         GenerateRandomPermutation(_random_permu2, this->problem_size_PBP, rng);
         for (int i = 0; i < this->problem_size_PBP; i++)
@@ -238,7 +241,7 @@ void PBP::local_search_iteration(CIndividual *indiv, NEAT::operator_t operator_i
         }
         break;
 
-    case NEAT::INSERT:
+    case PERMU::INSERT:
         GenerateRandomPermutation(_random_permu1, this->problem_size_PBP,rng);
         GenerateRandomPermutation(_random_permu2, this->problem_size_PBP,rng);
         for (int i = 0; i < this->problem_size_PBP; i++)
@@ -293,9 +296,9 @@ void PBP::local_search_iteration(CIndividual *indiv, NEAT::operator_t operator_i
     }
 
     indiv->is_local_optimum[operator_id] = true;
-    if (operator_id == NEAT::EXCH)
+    if (operator_id == PERMU::EXCH)
     {
-        indiv->is_local_optimum[NEAT::OPT_SWAP] = true;
+        indiv->is_local_optimum[PERMU::OPT_SWAP] = true;
     }
 
 
@@ -303,10 +306,10 @@ void PBP::local_search_iteration(CIndividual *indiv, NEAT::operator_t operator_i
 }
 
 // obtain item at pos idx assuming operator operator_id where applied.
-int PBP::item_i_after_operator(int *permu, int idx, NEAT::operator_t operator_id, int i, int j){
+int PBP::item_i_after_operator(int *permu, int idx, PERMU::operator_t operator_id, int i, int j){
     switch (operator_id)
     {
-    case NEAT::SWAP:
+    case PERMU::SWAP:
         if (idx != i && idx != j)
         {
             return permu[idx];
@@ -320,7 +323,7 @@ int PBP::item_i_after_operator(int *permu, int idx, NEAT::operator_t operator_id
         std::cout <<  "idx not valid";
         exit(1);
         break;
-    case NEAT::EXCH:
+    case PERMU::EXCH:
         if (idx != i && idx != j)
         {
             return permu[idx];
@@ -335,7 +338,7 @@ int PBP::item_i_after_operator(int *permu, int idx, NEAT::operator_t operator_id
         exit(1);
         break;
 
-    case NEAT::INSERT:
+    case PERMU::INSERT:
         if(i < j){
             if (idx == j)
             {
@@ -371,11 +374,11 @@ int PBP::item_i_after_operator(int *permu, int idx, NEAT::operator_t operator_id
 }
 
 
-void PBP::obtain_indexes_step_towards(int *permu, int *ref_permu, int* i, int* j, NEAT::operator_t operator_id)
+void PBP::obtain_indexes_step_towards(int *permu, int *ref_permu, int* i, int* j, PERMU::operator_t operator_id)
 {
     switch (operator_id)
     {
-    case NEAT::SWAP:  // SCHIZVINOTTO 2007
+    case PERMU::SWAP:  // SCHIZVINOTTO 2007
     {
 
         // compute inverse (position) of permu
@@ -412,7 +415,7 @@ void PBP::obtain_indexes_step_towards(int *permu, int *ref_permu, int* i, int* j
 
         break;
     }
-    case NEAT::EXCH:  // SCHIZVINOTTO 2007
+    case PERMU::EXCH:  // SCHIZVINOTTO 2007
     {
 
         // // slow inv
@@ -452,7 +455,7 @@ void PBP::obtain_indexes_step_towards(int *permu, int *ref_permu, int* i, int* j
         return;
 
     }
-    case NEAT::INSERT:
+    case PERMU::INSERT:
         // get indices to insert considering the item that makes the biggest "jump"    
     {
 
@@ -505,11 +508,11 @@ void PBP::obtain_indexes_step_towards(int *permu, int *ref_permu, int* i, int* j
     assert(isPermutation(permu, this->problem_size_PBP));
 }
 
-void PBP::obtain_indexes_step_away(int *permu, int *ref_permu, int* i, int* j, NEAT::operator_t operator_id)
+void PBP::obtain_indexes_step_away(int *permu, int *ref_permu, int* i, int* j, PERMU::operator_t operator_id)
 {
     switch (operator_id)
     {
-    case NEAT::SWAP:
+    case PERMU::SWAP:
     {
         // compute inverse (position) of permu
         for (int i = 0; i < problem_size_PBP; i++)
@@ -546,7 +549,7 @@ void PBP::obtain_indexes_step_away(int *permu, int *ref_permu, int* i, int* j, N
 
         break;
     }
-    case NEAT::EXCH:
+    case PERMU::EXCH:
     {
         // // slow inv
         // for (int idx = 0; idx < problem_size_PBP; idx++)
@@ -591,7 +594,7 @@ void PBP::obtain_indexes_step_away(int *permu, int *ref_permu, int* i, int* j, N
         return;
 
     }
-    case NEAT::INSERT:
+    case PERMU::INSERT:
     {
         assert(isPermutation(permu, problem_size_PBP)) ;
         assert(isPermutation(ref_permu, problem_size_PBP)) ;
@@ -657,7 +660,7 @@ void PBP::obtain_indexes_step_away(int *permu, int *ref_permu, int* i, int* j, N
 }
 
 
-void PBP::move_indiv_towards_reference(CIndividual* indiv, int* ref_permu, NEAT::operator_t operator_id, double accept_or_reject_worse){
+void PBP::move_indiv_towards_reference(CIndividual* indiv, int* ref_permu, PERMU::operator_t operator_id, double accept_or_reject_worse){
     int i,j;
     obtain_indexes_step_towards(indiv->genome, ref_permu, &i, &j, operator_id);
     if (tab->is_tabu(i,j))
@@ -674,7 +677,7 @@ void PBP::move_indiv_towards_reference(CIndividual* indiv, int* ref_permu, NEAT:
 }
 
 
-void PBP::move_indiv_away_reference(CIndividual* indiv, int* ref_permu, NEAT::operator_t operator_id, double accept_or_reject_worse){
+void PBP::move_indiv_away_reference(CIndividual* indiv, int* ref_permu, PERMU::operator_t operator_id, double accept_or_reject_worse){
     int i,j;
     obtain_indexes_step_away(indiv->genome, ref_permu, &i, &j, operator_id);
     // std::cout << "(" << i << "," << j << ")" << endl;

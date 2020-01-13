@@ -114,29 +114,6 @@ bool strContains(const string inputStr, const string searchStr)
         return false;
 }
 
-/*
- * Prints in standard output 'length' integer elements of a given array.
- */
-void PrintArray(int *array, int length)
-{
-    for (int i = 0; i < length; i++)
-    {
-        cout << array[i] << " ";
-    }
-    cout << " " << endl;
-}
-
-/*
- * Prints in standard output 'length' long double elements of a given array.
- */
-void PrintArray(long double *array, int length)
-{
-    for (int i = 0; i < length; i++)
-    {
-        cout << array[i] << " ";
-    }
-    cout << " " << endl;
-}
 
 
 /*
@@ -735,6 +712,29 @@ void GenerateRandomPermutation(int *permutation, int n, RandomNumberGenerator* r
 }
 
 
+void GenerateRandomRealvec_0_1(double *real_vec, int n)
+{
+    #ifndef NDEBUG
+    std::cout << "WARNING: new rng created in GenerateRandomPermutation." << endl;
+    #endif
+    RandomNumberGenerator* rng = new RandomNumberGenerator();
+    rng->seed();
+    GenerateRandomRealvec_0_1(real_vec, n, rng);
+    delete rng;
+}
+
+void GenerateRandomRealvec_0_1(double *real_vec, int n, RandomNumberGenerator* rng)
+{
+    for (int i = 0; i < n; ++i)
+    {
+        real_vec[i] = rng->random_0_1_double();
+    }
+}
+
+
+
+
+
 
 double sigmoid(double x)
 {
@@ -998,7 +998,7 @@ PermuTools::~PermuTools()
 // combines the permutations considering the coefficients simmilarly to \cite{wang_discrete_2012}. 
 // The zeroes on their paper are -1 in our implementation
 void PermuTools::combine_permus(int** permu_list, double* coef_list, int* res){
-    int m = NEAT::N_COEF;
+    int m = NEAT::N_PERMU_REFS;
     int non_zero = 0; // number of non-zero coef.
     int positive = 0; // number of strictly positive coef
     int zero = 0; //number of zero coef
@@ -1026,9 +1026,9 @@ void PermuTools::combine_permus(int** permu_list, double* coef_list, int* res){
 
     // normalize positive weights
     double sum_of_pos_w = sum_slice_vec(coef_list, 0, positive);
-    double *coef_list_copy = new double[NEAT::N_COEF];
+    double *coef_list_copy = new double[NEAT::N_PERMU_REFS];
 
-    std::copy(coef_list, coef_list+NEAT::N_COEF, coef_list_copy);
+    std::copy(coef_list, coef_list+NEAT::N_PERMU_REFS, coef_list_copy);
 
     //honarte ondo
     for (int i = 0; i < positive; i++)
@@ -1207,18 +1207,18 @@ int PermuTools::choose_permu_index_to_move(double* coef_list){
 
 int PermuTools::choose_permu_index_to_move(double* coef_list, RandomNumberGenerator* input_rng){
 
-    assert(TEMP_double_ARRAY_SIZE >= NEAT::N_COEF);
+    assert(TEMP_double_ARRAY_SIZE >= PERMU::N_PERMU_REFS);
     
-    for (int i = 0; i < NEAT::N_COEF; i++)
+    for (int i = 0; i < PERMU::N_PERMU_REFS; i++)
     {
         temp_array_double[i] = abs(coef_list[i]);
     }
 
-    if(sum_abs_val_slice_vec(temp_array_double, 0, NEAT::N_COEF) == 0.0){
+    if(sum_abs_val_slice_vec(temp_array_double, 0, PERMU::N_PERMU_REFS) == 0.0){
         return -1;
     }
 
-    return choose_index_given_weights(temp_array_double, NEAT::N_COEF, input_rng);
+    return choose_index_given_weights(temp_array_double, PERMU::N_PERMU_REFS, input_rng);
 }
 
 
@@ -1620,10 +1620,7 @@ double from_u_statistic_to_z(double u, double length, double* array_of_values){
 
 
 
-
-
-
-#define Z_THRESH 1.65
+#define Z_THRESH 1.65 
 #define ALPHA 0.05
 
 //Unpaired test
@@ -1762,7 +1759,6 @@ bool is_A_larger_than_B_Signed_Willcoxon(double* A, double* B, int length){
 
 
 
-
 std::string from_path_to_filename(std::string file_path)
 {
     std::string filename = file_path;
@@ -1783,4 +1779,31 @@ std::string from_path_to_filename(std::string file_path)
     }
 
     return filename;
+}
+
+
+
+double euclid_dist(double* array_1, double* array_2, int len) // equiv to l2 distance
+{
+    double res = 0.0;
+
+    for (int i = 0; i < len; i++)
+    {
+        res += (array_1 - array_2) * (array_1 - array_2);
+    }
+
+    return sqrt(res);
+
+}
+
+double l1_distance(double* array_1, double* array_2, int len)
+{
+    double res = 0.0;
+
+    for (int i = 0; i < len; i++)
+    {
+        res += abs(array_1 - array_2);
+    }
+
+    return res;
 }

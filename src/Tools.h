@@ -16,6 +16,8 @@
 #include <vector>
 #include <cmath>
 #include <algorithm>
+#include <fstream>
+
 
 using std::istream;
 using std::ostream;
@@ -55,28 +57,15 @@ bool isPermutation(int *permutation, int size);
  */
 bool strContains(const string inputStr, const string searchStr);
 
-/*
- * Prints in standard output 'length' integer elements of a given array.
- */
-void PrintArray(int *array, int length);
-
-/*
- * Prints in standard output 'length' long double elements of a given array.
- */
-void PrintArray(long double *array, int length);
-
-/*
- * Prints the given doubles array in the standard output.
- */
-void PrintArray(double *array, int length);
-
-
-/*
- * Prints the given double array in the standard output.
- */
-void PrintArray(float *array, int length);
-
-
+template <class T>
+void PrintArray(T *array, int length)
+{
+    for (int i = 0; i < length; i++)
+    {
+        cout << array[i] << " ";
+    }
+    cout << " " << endl;
+}
 
 /*
  * Applies the random keys sorting strategy to the vector of doubles
@@ -346,6 +335,9 @@ A scalar_multiplication(A* array_1, B* array_2, int len){
 
 
 
+double euclid_dist(double* array_1, double* array_2, int len);
+
+double l1_distance(double* array_1, double* array_2, int len);
 
 // compute the average value of the elements on the array dropping the best and worst quarter
 template <class T>
@@ -540,6 +532,11 @@ class RandomNumberGenerator{
 // Generate Random Permutation
 void GenerateRandomPermutation(int *permutation, int n);
 void GenerateRandomPermutation(int *permutation, int n, RandomNumberGenerator* rng);
+
+
+// Generate real array of length n with numbers between 0 and 1
+void GenerateRandomRealvec_0_1(double *real_vec, int n);
+void GenerateRandomRealvec_0_1(double *real_vec, int n, RandomNumberGenerator* rng);
 
 
 // Choose an index given the probabilities
@@ -738,6 +735,8 @@ bool is_A_larger_than_B_Mann_Whitney(double* A, double* B, int length);
 //Paired test
 bool is_A_larger_than_B_Signed_Willcoxon(double* A, double* B, int length);
 
+
+
 #define TOL 0.00001
 template <class T>
 int sign(T value)
@@ -796,3 +795,36 @@ std::string array_to_string(T* array, int len){
 
 std::string from_path_to_filename(std::string file_path);
 
+//https://stackoverflow.com/questions/52206675/template-print-function-c
+template <typename TType>
+void print_vector(const std::vector<TType>& vec)
+{
+    typename  std::vector<TType>::const_iterator it;
+    std::cout << "{";
+    for(it = vec.begin(); it != vec.end(); it++)
+    {
+        if(it!= vec.begin()) std::cout << ", ";
+        std::cout << (*it);
+    }
+    std::cout << "}";
+}
+
+//https://stackoverflow.com/questions/52206675/template-print-function-c
+template <typename T2>
+void print_vector(const std::vector< std::vector<T2> >& vec)
+{
+    for( auto it= vec.begin(); it!= vec.end(); it++)
+    {
+        print_vector(*it);
+    }
+}
+
+
+template <typename TType>
+bool vector_contains_item(const std::vector<TType>& vec, TType item)
+{
+	if (std::count(vec.begin(), vec.end(), item))
+		{return true;}
+	else
+		{return false;}
+}

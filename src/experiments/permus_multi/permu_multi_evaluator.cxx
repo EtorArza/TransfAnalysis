@@ -24,14 +24,12 @@
 #include "PERMU_MULTI_params.h"
 
 using namespace std;
-using namespace PERMU;
-using namespace PERMU_MULTI;
 
 //#define COUNTER
 //#define PRINT
 //#define RANDOM_SEARCH
 
-namespace NEAT
+namespace PERMU_MULTI
 {
 
 struct Evaluator
@@ -42,7 +40,7 @@ struct Evaluator
     __net_eval_decl Evaluator(){};
 
     // fitness function in sequential order
-    __net_eval_decl double FitnessFunction(CpuNetwork *net, int n_evals, int initial_seed, int instance_index)
+    __net_eval_decl double FitnessFunction(NEAT::CpuNetwork *net, int n_evals, int initial_seed, int instance_index)
     {
         int seed_seq = initial_seed;
         params_multi parameters_tmp = params_multi(*parameters);
@@ -54,7 +52,7 @@ struct Evaluator
     }
 
     // parallelize over the same network
-    __net_eval_decl void FitnessFunction_parallel(CpuNetwork *net, int n_evals, double *res, int initial_seed, int instance_index)
+    __net_eval_decl void FitnessFunction_parallel(NEAT::CpuNetwork *net, int n_evals, double *res, int initial_seed, int instance_index)
     {
         int seed_parallel = initial_seed;
         params_multi parameters_tmp = params_multi(*parameters);
@@ -69,9 +67,9 @@ struct Evaluator
     }
 
     // compute the fitness value of all networks at training time.
-    __net_eval_decl void execute(class Network **nets_, OrganismEvaluation *results, size_t nnets)
+    __net_eval_decl void execute(class NEAT::Network **nets_, NEAT::OrganismEvaluation *results, size_t nnets)
     {
-        CpuNetwork **nets = (CpuNetwork **)nets_;
+        NEAT::CpuNetwork **nets = (NEAT::CpuNetwork **)nets_;
         double progress_print_decider = 0.0;
         double **f_values = new double *[parameters->N_OF_INSTANCES]; //[instance_index][network_index]
         for (int i = 0; i < parameters->N_OF_INSTANCES; i++)
@@ -86,8 +84,8 @@ struct Evaluator
         #pragma omp parallel for num_threads(N_OF_THREADS)
         for (size_t inet = 0; inet < nnets; inet++)
         {
-            CpuNetwork *net = nets[inet];
-            OrganismEvaluation eval;
+            NEAT::CpuNetwork *net = nets[inet];
+            NEAT::OrganismEvaluation eval;
             int seed = initial_seed;
             
             for (int i = 0; i < parameters->N_OF_INSTANCES; i++)
@@ -159,7 +157,7 @@ struct Evaluator
             else
             {
                 f_value_rankings[inet] = 0.0;
-                CpuNetwork *net = nets[inet];
+                NEAT::CpuNetwork *net = nets[inet];
 
                 double *res = new double[actual_n_reevals];
                 int seed = initial_seed;
@@ -191,7 +189,7 @@ struct Evaluator
         cout << "Reevaluating best indiv of generation: ";
         int index_most_fit = argmax(f_values, nnets);
         f_value_rankings[index_most_fit] += 1.0;
-        CpuNetwork *net = nets[index_most_fit];
+        NEAT::CpuNetwork *net = nets[index_most_fit];
         Evaluator *ev = new Evaluator();
 
         // apply a discount to all but the best individual
@@ -284,15 +282,19 @@ struct Evaluator
     }
 };
 
+} //namespace PERMU_MULTI
+
+namespace NEAT{
+
 class Permu_multiEvaluator : public NetworkEvaluator
 {
-    NetworkExecutor<Evaluator> *executor;
+    NetworkExecutor<PERMU_MULTI::Evaluator> *executor;
     PERMU_MULTI::params_multi *parameters;
 
 public:
     Permu_multiEvaluator()
     {
-        executor = NetworkExecutor<Evaluator>::create();
+        executor = NEAT::NetworkExecutor<PERMU_MULTI::Evaluator>::create();
         parameters = new PERMU_MULTI::params_multi();
     }
 
@@ -301,12 +303,12 @@ public:
         delete executor;
     }
 
-    virtual void execute(class Network **nets_,
-                         class OrganismEvaluation *results,
+    virtual void execute(class NEAT::Network **nets_,
+                         class NEAT::OrganismEvaluation *results,
                          size_t nnets)
     {
-        env->pop_size = POPSIZE_NEAT;
-        Evaluator *ev = new Evaluator();
+        NEAT::env->pop_size = POPSIZE_NEAT;
+        PERMU_MULTI::Evaluator *ev = new PERMU_MULTI::Evaluator();
         ev->parameters = this->parameters;
         ev->execute(nets_, results, nnets);
     }
@@ -315,7 +317,7 @@ public:
     {
         using namespace std;
         using namespace NEAT;
-        using namespace PERMU;
+        using namespace PERMU_MULTI;
 
         INIReader reader(conf_file_path);
 
@@ -327,6 +329,8 @@ public:
         }
 
         string MODE = reader.Get("Global", "MODE", "UNKNOWN");
+        string prob_name = reader.Get("Global", "PROBLEM_NAME", "UNKNOWN");
+
 
         if (MODE == "train")
         {
@@ -379,11 +383,7 @@ public:
                 cout << "please specify a valid number of threads on the conf. file" << endl;
                 exit(1);
             }
-
-            else if (exists(EXPERIMENT_FOLDER_NAME))
-            {
-                error("Already exists: " + EXPERIMENT_FOLDER_NAME + ".\nMove your experiment directories or use -f to delete them automatically. If -f is used, all previous experiments will be deleted.")
-            }
+            delete_prev_exp_folder();
 
             omp_set_num_threads(N_OF_THREADS);
 
@@ -431,7 +431,7 @@ public:
             {
                 double max_optimization_time;
                 int instance_size;
-                PBP* tmp_problem = GetProblemInfo(parameters->PROBLEM_TYPE, parameters->INSTANCE_PATHS[i]);
+                PERMU::PBP* tmp_problem = PERMU::GetProblemInfo(parameters->PROBLEM_TYPE, parameters->INSTANCE_PATHS[i]);
                 instance_size = tmp_problem->GetProblemSize();
                 delete tmp_problem;
 
@@ -445,8 +445,7 @@ public:
                 }
                 parameters->MAX_TIME_PSO_FOR_EACH_INSTANCE[i] = max_optimization_time;
             }
-            const char *prob_name = "permu_multi";
-            Experiment *exp = Experiment::get(prob_name);
+            Experiment *exp = Experiment::get(prob_name.c_str());
             int rng_seed = 2;
             rng_t rng{rng_seed};
             global_timer.tic();
@@ -471,6 +470,8 @@ public:
         }
     }
 };
+
+
 
 class NetworkEvaluator *create_permu_multi_evaluator()
 {

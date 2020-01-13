@@ -49,9 +49,9 @@ class PBP
 	 * The use of this functions requires the fitness value of the individual to be previously computed.
 	 * No need to define them in the problem class.
 	 */
-	void local_search_iteration(CIndividual *indiv, NEAT::operator_t operator_id);
-	void move_indiv_towards_reference(CIndividual* indiv, int* ref_permu, NEAT::operator_t operator_id, double accept_or_reject_worse=1.0);
-	void move_indiv_away_reference(CIndividual* indiv, int* ref_permu, NEAT::operator_t operator_id, double accept_or_reject_worse=1.0);
+	void local_search_iteration(CIndividual *indiv, PERMU::operator_t operator_id);
+	void move_indiv_towards_reference(CIndividual* indiv, int* ref_permu, PERMU::operator_t operator_id, double accept_or_reject_worse=1.0);
+	void move_indiv_away_reference(CIndividual* indiv, int* ref_permu, PERMU::operator_t operator_id, double accept_or_reject_worse=1.0);
 	void Evaluate(CIndividual *indiv); // update the f_value of the individuals.
 	double Evaluate(int *genome); // update the f_value of the individuals.
 	int Read_with_mutex(string filename);
@@ -62,12 +62,12 @@ class PBP
 
   protected:
 
-	void apply_operator_with_fitness_update(CIndividual *indiv, double delta, int i, int j, NEAT::operator_t operator_id, double accept_or_reject_worse=1.0);
-	void apply_operator_with_fitness_update(CIndividual *indiv, int i, int j, NEAT::operator_t operator_id, double accept_or_reject_worse=1.0);
+	void apply_operator_with_fitness_update(CIndividual *indiv, double delta, int i, int j, PERMU::operator_t operator_id, double accept_or_reject_worse=1.0);
+	void apply_operator_with_fitness_update(CIndividual *indiv, int i, int j, PERMU::operator_t operator_id, double accept_or_reject_worse=1.0);
 
 
 	// This function needs to be executed on problem read.
-	int item_i_after_operator(int *permu, int idx, NEAT::operator_t operator_id, int i, int j);
+	int item_i_after_operator(int *permu, int idx, PERMU::operator_t operator_id, int i, int j);
 	void initialize_variables_PBP(int problem_size);
 	int *_random_permu1;
 	int *_random_permu2;
@@ -88,8 +88,8 @@ class PBP
 
 
   private:
-	void obtain_indexes_step_towards(int *permu, int *ref_permu, int* i, int* j, NEAT::operator_t operator_id);
-	void obtain_indexes_step_away(int *permu, int *ref_permu, int* i, int* j, NEAT::operator_t operator_id);
+	void obtain_indexes_step_towards(int *permu, int *ref_permu, int* i, int* j, PERMU::operator_t operator_id);
+	void obtain_indexes_step_away(int *permu, int *ref_permu, int* i, int* j, PERMU::operator_t operator_id);
 	bool rng_deleted = false;
 
 };

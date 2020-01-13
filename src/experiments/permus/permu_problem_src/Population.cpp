@@ -57,7 +57,7 @@ void CPopulation::init_class(PBP *problem, RandomNumberGenerator* rng, PERMU::pa
 
     for (int i = 0; i < popsize; i++)
     {
-        pop_info[i] = new double[NEAT::__sensor_N];
+        pop_info[i] = new double[PERMU::__sensor_N];
     }
     pt = new PermuTools(n, rng);
     timer = new stopwatch();
@@ -166,24 +166,24 @@ void CPopulation::Print()
 
 
 void CPopulation::apply_neat_output_to_individual_i(double* output_neat, int i){
-    double accept_or_reject_worse = output_neat[NEAT::accept_or_reject_worse];
-    tab->tabu_coef_neat = output_neat[(int) NEAT::TABU];
+    double accept_or_reject_worse = output_neat[PERMU::accept_or_reject_worse];
+    tab->tabu_coef_neat = output_neat[(int) PERMU::TABU];
 
     if
     (
         (-CUTOFF_0 < output_neat[0] && output_neat[0] < CUTOFF_0) ||
-        (sum_abs_val_slice_vec(output_neat, 1, 1+NEAT::N_OPERATORS) == 0) 
+        (sum_abs_val_slice_vec(output_neat, 1, 1+PERMU::N_OPERATORS) == 0) 
     )
     {return;}
 
 
     else if(output_neat[0] < -CUTOFF_0){ // Local-search iteration.
         //#TODO check if unconnected output is 0.
-        NEAT::operator_t operator_id = (NEAT::operator_t) argmax(output_neat + 1, NEAT::N_OPERATORS);
+        PERMU::operator_t operator_id = (PERMU::operator_t) argmax(output_neat + 1, PERMU::N_OPERATORS);
         this->problem->local_search_iteration(m_individuals[i], operator_id);
     }else if(output_neat[0] > CUTOFF_0){ // Move-with coeficients.
-        NEAT::operator_t operator_id = (NEAT::operator_t) argmax(output_neat + 1, NEAT::N_OPERATORS);
-        double* coef = output_neat + (NEAT::__output_N - NEAT::N_COEF);
+        PERMU::operator_t operator_id = (PERMU::operator_t) argmax(output_neat + 1, PERMU::N_OPERATORS);
+        double* coef = output_neat + (PERMU::__output_N - PERMU::N_PERMU_REFS);
         this->move_individual_i_based_on_coefs(coef, i, operator_id, accept_or_reject_worse);
         assert(isPermutation(this->m_individuals[i]->genome, this->n));
 
@@ -236,7 +236,7 @@ void CPopulation::comp_relative_position()
     {
         double res =  (double)i / (double)this->popsize;
         this->m_individuals[i]->relative_pos = res;
-        pop_info[i][NEAT::RELATIVE_POSITION] = res;
+        pop_info[i][PERMU::RELATIVE_POSITION] = res;
     }
 }
 
@@ -246,7 +246,7 @@ void CPopulation::comp_relative_time()
     {
         double res = this->iteration_geom; // timer->toc() / MAX_TIME_PSO;
         this->m_individuals[i]->relative_time = res;
-        pop_info[i][NEAT::RELATIVE_TIME] = res;
+        pop_info[i][PERMU::RELATIVE_TIME] = res;
     }
     return ;
 }
@@ -270,7 +270,7 @@ void CPopulation::comp_distance()
     {   
         double val = templ_double_array2[i] / (double) this->popsize;
         m_individuals[i]->distance = val;
-        pop_info[i][NEAT::DISTANCE] = val;
+        pop_info[i][PERMU::DISTANCE] = val;
     }
 
 //region old_implementation_hamming_distance
@@ -315,7 +315,7 @@ void CPopulation::comp_sparsity(){
     for (int i = 0; i < this->popsize; i++)
     {
         m_individuals[i]->sparsity = 1.0 - pt->compute_normalized_hamming_distance_to_consensus(permus[i]);
-        pop_info[i][NEAT::SPARSITY] = m_individuals[i]->sparsity;
+        pop_info[i][PERMU::SPARSITY] = m_individuals[i]->sparsity;
     }
 }
 
@@ -325,7 +325,7 @@ void CPopulation::comp_order_sparsity(){
     for (int i = 0; i < this->popsize; i++)
     {
         m_individuals[i]->order_sparsity = 1.0 - pt->compute_normalized_kendall_distance_to_consensus(permus[i]);
-        pop_info[i][NEAT::ORDER_SPARSITY] = m_individuals[i]->order_sparsity;
+        pop_info[i][PERMU::ORDER_SPARSITY] = m_individuals[i]->order_sparsity;
     }
 }
 
@@ -342,9 +342,9 @@ void CPopulation::comp_order_sparsity(){
 void CPopulation::load_local_opt(){
 for (int i = 0; i < this->popsize; i++)
 {
-    pop_info[i][NEAT::OPT_SWAP] = (double) m_individuals[i]->is_local_optimum[NEAT::SWAP];
-    pop_info[i][NEAT::OPT_EXCH] = (double) m_individuals[i]->is_local_optimum[NEAT::EXCH];
-    pop_info[i][NEAT::OPT_INSERT] = (double) m_individuals[i]->is_local_optimum[NEAT::INSERT];
+    pop_info[i][PERMU::OPT_SWAP] = (double) m_individuals[i]->is_local_optimum[PERMU::SWAP];
+    pop_info[i][PERMU::OPT_EXCH] = (double) m_individuals[i]->is_local_optimum[PERMU::EXCH];
+    pop_info[i][PERMU::OPT_INSERT] = (double) m_individuals[i]->is_local_optimum[PERMU::INSERT];
 }
 }
 
@@ -389,7 +389,7 @@ void CPopulation::copy_references_of_genomes_from_individuals_to_permus(){
 }
  
 
-void CPopulation::move_individual_i_based_on_coefs(double* coef_list, int i, NEAT::operator_t operator_id, double accept_or_reject_worse){
+void CPopulation::move_individual_i_based_on_coefs(double* coef_list, int i, PERMU::operator_t operator_id, double accept_or_reject_worse){
 
     int idx = pt->choose_permu_index_to_move(coef_list, rng);
     if (idx == -1){
@@ -400,7 +400,7 @@ void CPopulation::move_individual_i_based_on_coefs(double* coef_list, int i, NEA
     assert(isPermutation(this->m_individuals[i]->genome, this->n)) ;
 
     bool towards = coef_list[idx] > 0;
-    idx += (NEAT::__output_N - NEAT::N_COEF);
+    idx += (PERMU::__output_N - PERMU::N_PERMU_REFS);
 
     int* ref_permu;
     
@@ -409,19 +409,19 @@ void CPopulation::move_individual_i_based_on_coefs(double* coef_list, int i, NEA
 
     switch (idx)
     {
-    case NEAT::c_hamming_consensus:
+    case PERMU::c_hamming_consensus:
         ref_permu = pt->hamming_mm_consensus;
         break;
-    case NEAT::c_kendall_consensus:
+    case PERMU::c_kendall_consensus:
         ref_permu = pt->kendall_mm_consensus;
         break;
-    case NEAT::c_pers_best:
+    case PERMU::c_pers_best:
         ref_permu = m_individuals[i]->genome_best;
         break;
-    case NEAT::c_best_known:
+    case PERMU::c_best_known:
         ref_permu = this->genome_best;
         break;
-    case NEAT::c_above:
+    case PERMU::c_above:
         if (i == 0)
         {
             ref_permu = this->m_individuals[1]->genome;

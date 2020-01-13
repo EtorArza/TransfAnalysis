@@ -2,7 +2,8 @@
 
 
 
-namespace NEAT {
+
+namespace PERMU{
 
     enum operator_t{
     SWAP = 0,
@@ -24,7 +25,7 @@ namespace NEAT {
 
     };
 
-    const int N_COEF = 5;
+    const int N_PERMU_REFS = 5;
     enum output_t {
         ls_nothing_move = 0,
         O_ID_SWAP = SWAP + 1,
@@ -39,6 +40,10 @@ namespace NEAT {
         c_above = 10,
         __output_N = 11,
     };
+}
 
-    class NetworkEvaluator *create_permu_evaluator();
+namespace NEAT{
+
+class NetworkEvaluator *create_permu_evaluator();
+
 }

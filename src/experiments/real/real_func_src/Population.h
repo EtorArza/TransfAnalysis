@@ -1,25 +1,11 @@
-//
-//  Population.h
-//  RankingEDAsCEC
-//
-//  Created by Josu Ceberio Uribe on 11/19/13.
-//  Copyright (c) 2013 Josu Ceberio Uribe. All rights reserved.
-//
-
 #pragma once
 
 
 #include <string.h>
 #include "Individual.h"
-#include "PERMU_params.h"
-
+#include "../REAL_FUNC_params.h"
+class MultidimBenchmarkFF;
 class RandomNumberGenerator;
-
-
-namespace PERMU{
-
-class PBP;
-class PermuTools;
 class Tabu;
 
 
@@ -28,9 +14,9 @@ class CPopulation
 
 public:
   // if no rng object is provided, a new one is generated
-  CPopulation(PBP *problem, PERMU::params* parameters);
-  CPopulation(PBP *problem, RandomNumberGenerator* rng, PERMU::params* parameters);
-  void init_class(PBP *problem, RandomNumberGenerator* rng, PERMU::params* parameters);
+  CPopulation(MultidimBenchmarkFF *problem, REAL_FUNC::params* parameters);
+  CPopulation(MultidimBenchmarkFF *problem, RandomNumberGenerator* rng, REAL_FUNC::params* parameters);
+  void init_class(MultidimBenchmarkFF *problem, RandomNumberGenerator* rng, REAL_FUNC::params* parameters);
 
 
   virtual ~CPopulation();
@@ -47,12 +33,13 @@ public:
   vector<CIndividual *> m_individuals;
   int n;
   int popsize;
+  int max_evals;
 
  	double f_best;
-	int* genome_best;
-  Tabu* tab;
+	double* genome_best;
 
   void Print();
+  void print_positions(std::string filename);
   void end_iteration(); // sort the population, check if the best solution was improved, and coompute neat imputs.
   void Reset();
 
@@ -70,7 +57,8 @@ public:
 
 private:
 
-  double max_time_pso;
+
+
   // evaluate the whole population. Only used to initialize the population.
   void evaluate_population();
 
@@ -79,23 +67,25 @@ private:
   void get_population_info();
 
 
-  void comp_relative_position();
+  void comp_relative_score();
   void comp_relative_time();
-  void comp_distance();
-  void comp_sparsity();
-  void comp_r_number();
-  void load_local_opt();
-  void comp_order_sparsity();
+  void comp_distance_to_closest();
+  void comp_dist_to_average();
+  void comp_relative_dist_to_best();
+  void  load_INDIVIDUAL_BEST_WAS_IMPROVED();
+  void  load_GLOBAL_BEST_WAS_IMPROVED();
+  void load_RANDOM_NUMBER();
 
 
-  PBP * problem;
-  PermuTools *pt;
-  double *templ_double_array;
-  double *templ_double_array2;
+  MultidimBenchmarkFF * problem;
+  double *templ_double_array1_of_size_n;
+  double *templ_double_array2_of_size_n;
+  double *templ_double_array1_of_size_POPSIZE;
+  double *templ_double_array2_of_size_POPSIZE;
   double relative_time();
 
-  double iteration_geom;
-  double iteration_geom_coef;
+  int n_evals;
+  bool global_best_was_improved = false;
 
   /* 
   * In this case, 0 means highly cramped, 1 means highly sparse.
@@ -103,19 +93,8 @@ private:
   * For example, if permutations on position 5 and 6 are the same, then result_vector[5] = result_vector[6] = 0
   */
   void get_info_Hamming_distance_from_adjacent_permus(double *result_vector);
-  int **permus; //this is only intended to temporally store the permutations for computations.
 
   // copy the reference of the permutations in the individuals to a matrix of permutations for analisys in sparsity and distances.
   void copy_references_of_genomes_from_individuals_to_permus();
-
-  // move permutation based on coefs. and other permus.
-  // first choose a permu proportionally to its weight. 
-  // Then if weight is positive move towards, otherwise, move away from.
-  // to permuevaluator.h contains which permutations are considered.
-  void move_individual_i_based_on_coefs(double* coef_list, int i, PERMU::operator_t operator_id, double accept_or_reject_worse);
-
-
- 
 };
 
-}

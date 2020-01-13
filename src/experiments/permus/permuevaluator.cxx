@@ -28,7 +28,6 @@
 #include "PERMU_params.h"
 
 using namespace std;
-using namespace PERMU;
 
 //#define COUNTER
 //#define PRINT
@@ -36,8 +35,7 @@ using namespace PERMU;
 
 
 
-namespace NEAT
-{
+namespace PERMU{
 
 struct Evaluator
 {
@@ -49,7 +47,7 @@ struct Evaluator
 
 
     // fitness function in sequential order
-    __net_eval_decl double FitnessFunction(CpuNetwork *net, int n_evals, int initial_seed)
+    __net_eval_decl double FitnessFunction(NEAT::CpuNetwork *net, int n_evals, int initial_seed)
     {
         int seed_seq = initial_seed;
         double res = FitnessFunction_permu(net, n_evals, seed_seq, parameters);
@@ -58,7 +56,7 @@ struct Evaluator
     }
 
     // parallelize over the same network
-    __net_eval_decl void FitnessFunction_parallel(CpuNetwork *net, int n_evals, double *res, int initial_seed)
+    __net_eval_decl void FitnessFunction_parallel(NEAT::CpuNetwork *net, int n_evals, double *res, int initial_seed)
     {
         using namespace PERMU;
         int seed_parallel = initial_seed;
@@ -72,9 +70,9 @@ struct Evaluator
     }
 
     // compute the fitness value of all networks at training time.
-    __net_eval_decl void execute(class Network **nets_, OrganismEvaluation *results, size_t nnets){
+    __net_eval_decl void execute(class NEAT::Network **nets_, NEAT::OrganismEvaluation *results, size_t nnets){
         using namespace PERMU;
-        CpuNetwork **nets = (CpuNetwork **)nets_;
+        NEAT::CpuNetwork **nets = (NEAT::CpuNetwork **)nets_;
         double progress_print_decider = 0.0;
         double *f_values = new double[nnets];
         bool printed_bracket = false;
@@ -85,8 +83,8 @@ struct Evaluator
         #pragma omp parallel for num_threads(N_OF_THREADS)
         for (size_t inet = 0; inet < nnets; inet++)
         {
-            CpuNetwork *net = nets[inet];
-            OrganismEvaluation eval;
+            NEAT::CpuNetwork *net = nets[inet];
+            NEAT::OrganismEvaluation eval;
             int seed = initial_seed;
             f_values[inet] = this->FitnessFunction(net, parameters->N_EVALS, seed);
             results[inet] = eval;
@@ -134,7 +132,7 @@ struct Evaluator
             }
             else
             {
-                CpuNetwork *net = nets[inet];
+                NEAT::CpuNetwork *net = nets[inet];
                 double *res = new double[actual_n_reevals];
                 int seed = initial_seed;
                 this->FitnessFunction_parallel(net, actual_n_reevals, res, seed);
@@ -146,7 +144,7 @@ struct Evaluator
 
         cout << "Reevaluating best indiv of generation: ";
         int index_most_fit = argmax(f_values, nnets);
-        CpuNetwork *net = nets[index_most_fit];
+        NEAT::CpuNetwork *net = nets[index_most_fit];
 
         // apply a discount to all but the best individual
         for (int i = 0; i < (int) nnets; i++)
@@ -212,20 +210,22 @@ struct Evaluator
     }
 };
 
+} // namespace PERMU
 
 
-
+namespace NEAT
+{
 
 
 class PermuEvaluator : public NetworkEvaluator
 {   
-    NetworkExecutor<Evaluator> *executor;
+    NetworkExecutor<PERMU::Evaluator> *executor;
     PERMU::params* parameters;
 
 public:
     PermuEvaluator()
     {   
-        executor = NetworkExecutor<Evaluator>::create();
+        executor = NEAT::NetworkExecutor<PERMU::Evaluator>::create();
         parameters = new PERMU::params();
     }
 
@@ -234,12 +234,13 @@ public:
         delete executor;
     }
 
-    virtual void execute(class Network **nets_,
-                         class OrganismEvaluation *results,
+    virtual void execute(class NEAT::Network **nets_,
+                         class NEAT::OrganismEvaluation *results,
                          size_t nnets)
     {
+        using namespace NEAT;
         env->pop_size = POPSIZE_NEAT;
-        Evaluator *ev = new Evaluator();
+        PERMU::Evaluator *ev = new PERMU::Evaluator();
         ev->parameters = this->parameters;
         ev->execute(nets_, results, nnets);
     }
@@ -247,7 +248,6 @@ public:
     virtual void run_given_conf_file(std::string conf_file_path){
     using namespace std;
     using namespace NEAT;
-    using namespace PERMU;
 
 
     INIReader reader(conf_file_path);
@@ -258,6 +258,7 @@ public:
     }
 
     string MODE = reader.Get("Global", "MODE", "UNKNOWN");
+    std::string prob_name = reader.Get("Global", "PROBLEM_NAME", "UNKNOWN");
 
 
     if (MODE == "train")
@@ -309,11 +310,8 @@ public:
             exit(1);
         }
 
+        delete_prev_exp_folder();
 
-        else if (exists(EXPERIMENT_FOLDER_NAME))
-        {
-            error("Already exists: " + EXPERIMENT_FOLDER_NAME + ".\nMove your experiment directories or use -f to delete them automatically. If -f is used, all previous experiments will be deleted.")
-        }
 
         omp_set_num_threads(N_OF_THREADS);
 
@@ -343,8 +341,7 @@ public:
 
 
 
-        const char * prob_name = "permu";
-        Experiment *exp = Experiment::get(prob_name);
+        Experiment *exp = Experiment::get(prob_name.c_str());
         rng_t rng{rng_seed};
         global_timer.tic();
         exp->run(rng);

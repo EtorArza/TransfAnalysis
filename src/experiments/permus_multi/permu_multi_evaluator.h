@@ -24,7 +24,7 @@ namespace NEAT {
 
     };
 
-    const int N_COEF = 5;
+    const int N_PERMU_REFS = 5;
     enum output_t {
         ls_nothing_move = 0,
         O_ID_SWAP = SWAP + 1,

@@ -129,7 +129,7 @@ double FitnessFunction_permu(NEAT::CpuNetwork *net_original, int n_evals, int se
             {
 
                 std::swap(net->activations, pop->m_individuals[i]->activation);
-                for (int sns_idx = 0; sns_idx < NEAT::__sensor_N; sns_idx++)
+                for (int sns_idx = 0; sns_idx < PERMU::__sensor_N; sns_idx++)
                 {
                     net->load_sensor(sns_idx, pop->get_neat_input_individual_i(i)[sns_idx]);
                 }

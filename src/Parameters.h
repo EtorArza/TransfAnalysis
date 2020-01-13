@@ -7,7 +7,7 @@
 
 
 void load_global_params(std::string conf_file_path);
-
+void delete_prev_exp_folder();
 
 
 // PARAMS TO BE SPECIFIED IN CONFIG FILE//
@@ -23,7 +23,7 @@ EXTERN double BEST_FITNESS_TRAIN;
 EXTERN double N_TIMES_BEST_FITNESS_IMPROVED_TRAIN;
 EXTERN double* F_VALUES_OBTAINED_BY_BEST_INDIV;
 EXTERN std::string EXPERIMENT_FOLDER_NAME;
-
+EXTERN bool DELETE_PREV_EXPERIMENT_FOLDER;
 
 
 

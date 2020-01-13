@@ -1,6 +1,5 @@
 #define SAME_SIZE_EXPERIMENT
 
-
 /*
   Copyright 2001 The University of Texas at Austin
 
@@ -23,78 +22,125 @@
 #include "experiment.h"
 #include "rng.h"
 #include "evaluatorexperiment.h"
+#include "INIReader.h"
 
 #define EXTERN // this gives the global parameters defined in Parameters.h a global scoope.
 #include "Parameters.h"
 
-
-
-
-
-
 void usage()
 {
     using namespace std;
-    cerr << "usage: \n ./neat path_of_config_file" << endl;
+    cerr << endl;
+    cerr << "Usage: \n ./neat path_of_config_file" << endl;
     cerr << "for example, \n ./neat \"config_files/test.ini\"" << endl;
+    cerr << "to delete experiment folder with the same name, use: \n";
+    cerr << "\n ./neat -f \"config_files/test.ini\"" << endl;
     cerr << endl;
     exit(1);
 }
 
-
-
-
 int main(int argc, char *argv[])
-{   
+{
     using namespace std;
     using namespace NEAT;
 
     cout << "\n---------- BEGIN LICENCE DISCLAIMER----------\n";
     cout << "This code is based on accneat. Although some small changes \n";
-    cout << "have been made, most of the NEAT algorithm remains unchanged.\n" << endl;
-	cout <<	"Accneat is a fork of Stanley et al.'s implementation with some \n";
+    cout << "have been made, most of the NEAT algorithm remains unchanged.\n"
+         << endl;
+    cout << "Accneat is a fork of Stanley et al.'s implementation with some \n";
     cout << "improvements such as delete mutations and speed improvements, available at \n";
-    cout << "https://github.com/sean-dougherty/accneat\n" << endl << endl;
+    cout << "https://github.com/sean-dougherty/accneat\n"
+         << endl
+         << endl;
     cout << "This code also uses a configuration file parser inih, available at https://github.com/jtilly/inih" << endl;
     cout << "The authors of the modified software distributed here are in NO way affiliated with accneat or INIH. Please, " << endl;
-    cout << "understand that the use of this software requires reading and accepting the licences of both accneat and INIH." << endl << endl;
+    cout << "understand that the use of this software requires reading and accepting the licences of both accneat and INIH." << endl
+         << endl;
     cout << "INIH is distributed with BSD licence, and accneat with APACHE LICENCE 2.0\n";
     cout << "The source code provided here (excluding accneat and INIH) was made by Etor Arza.\n";
     cout << "To keep the licence stuff as painless as possible, the software part writen by \n";
     cout << "Etor Arza is distributed with APACHE LICENCE 2.0 too.\n\n";
     cout << "This modified software contains some parts of the PerMallows package \n"
-    << "by Ekhiñe Irurozki available at https://cran.r-project.org/web/packages/PerMallows/index.html" << endl;
+         << "by Ekhiñe Irurozki available at https://cran.r-project.org/web/packages/PerMallows/index.html" << endl;
     cout << "----------END LICENCE DISCLAIMER----------\n\n\n\n\n\n";
 
-
-
-
-    #ifndef NDEBUG
+#ifndef NDEBUG
     cout << "WARNING: Debug mode. Assertions enabled." << endl;
-    #endif
+#endif
 
-
-    system("rm -r controllers*");
-
+    //system("rm -r controllers*");
 
     if (argc < 2)
     {
         cout << "Error, no configuration file provided.\n";
         exit(1);
-    }else if (argc > 2)
+    }
+    else if (argc > 3)
     {
-        cout << "Error, too many arguments provided. Provide only path to configuration file.";
+        cout << "Error, too many arguments provided."
+             << "Provide only path to configuration file and optionally "
+             << "use -f command to delete previous experiment.";
         exit(1);
-
     }
 
+    std::string conf_file_path;
+    INIReader reader;
+    DELETE_PREV_EXPERIMENT_FOLDER = false;
 
+
+    if (std::string(argv[1]) == "-f" && argc == 2)
+    {
+        cout << "Error, no configuration file provided.\n";
+        exit(1);
+    }else if(argc == 2){
+        conf_file_path = argv[1];
+        reader = INIReader(argv[1]);
+    }
+    else if (std::string(argv[1]) == "-f" && argc == 3)
+    {
+        conf_file_path = argv[2];
+        reader = INIReader(argv[2]);
+        DELETE_PREV_EXPERIMENT_FOLDER = true;
+    }
+    else if (std::string(argv[2]) == "-f" && argc == 3)
+    {
+        conf_file_path = argv[1];
+        reader = INIReader(argv[1]);
+        DELETE_PREV_EXPERIMENT_FOLDER = true;
+    }
+    else
+    {
+        cout << "Error, more than one argument provided, and one of the arguments was not -f.";
+        usage();
+        exit(1);
+    }
 
     int rng_seed = 2;
-    const char * prob_name = "permu_multi";
-    Experiment *exp = Experiment::get(prob_name);
+
+    if (reader.ParseError() != 0)
+    {
+        std::cout << "Can't load configuration file: " << argv[1] << "\n";
+        exit(1);
+    }
+
+    std::string prob_name = reader.Get("Global", "PROBLEM_NAME", "UNKNOWN");
+    if (!vector_contains_item(Experiment::get_names(), prob_name))
+    {
+        cout << "problem: " << prob_name << " not defined.\n";
+        cout << "available experiments are: ";
+        print_vector(Experiment::get_names());
+        cout << "\nExiting..." << endl;
+        exit(1);
+    }
+    else
+    {
+        cout << "Working on problem: " << prob_name << endl;
+    }
+
+    Experiment *exp = Experiment::get(prob_name.c_str());
     rng_t rng{rng_seed};
-    exp->run_given_conf_file(argv[1]);
+    exp->run_given_conf_file(conf_file_path);
 
     return 0;
 }

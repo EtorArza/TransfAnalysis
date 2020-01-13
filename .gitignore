@@ -21,3 +21,4 @@ experimentation_res*
 fittest_*
 *.zip
 experiments/transfer_qap_with_cut_instances/obtained_controllers/*
+*.mp4

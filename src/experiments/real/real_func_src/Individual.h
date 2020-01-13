@@ -15,7 +15,7 @@
 #include <limits.h>
 #include <iostream>
 #include "Tools.h"
-#include "../permuevaluator.h"
+#include "../real_func_evaluator.h"
 
 
 using namespace std;
@@ -25,9 +25,6 @@ using std::ostream;
 namespace NEAT{
 class CpuNetwork;
 }
-
-namespace PERMU{
-
 class CIndividual
 {
 public:
@@ -36,7 +33,7 @@ public:
 	CIndividual(int length, RandomNumberGenerator* rng);
 	void reset(RandomNumberGenerator* rng);
 	~CIndividual();
-	void SetGenome(int *genes);
+	void SetGenome(double *genes);
 	void PrintGenome();
 	CIndividual *Clone();
 
@@ -51,12 +48,13 @@ public:
 	friend istream &operator>>(istream &is, CIndividual *&individual);
 
 	int n;
-	int *genome; //The genes of the individual, or the permutation.
+	double *genome; //The genes of the individual, or the permutation.
 	int id;		 // a unique identifier for each individual in the pop.
 	double f_value;
-	bool is_local_optimum[PERMU::N_OPERATORS] = {false, false, false}; // is_local_optimum[OPERATOR_ID] contains if it is optimum or not.
 	double f_best;
-	int* genome_best;
+	double* genome_best;
+	double* momentum;
+	double amount_clipped_last_it = 0;
 
 	// pop_info
 	double relative_pos = 0;
@@ -67,11 +65,10 @@ public:
 	
 	std::vector<double> activation;
 
-
+	bool bk_was_improved = false;
 
 private:
 	static int n_indivs_created;
 };
 
-}
 
