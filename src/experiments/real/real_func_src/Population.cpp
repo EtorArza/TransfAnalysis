@@ -168,10 +168,10 @@ void CPopulation::apply_neat_output_to_individual_i(double *output_neat, int i)
     // clip values between 0 and 1
     for (int j = 0; j < n; j++)
     {   
-        double non_clipped_value = m_individuals[i]->genome[j];
+        // double non_clipped_value = m_individuals[i]->genome[j];
         m_individuals[i]->genome[j] = max(m_individuals[i]->genome[j], 0.0);
         m_individuals[i]->genome[j] = min(m_individuals[i]->genome[j], 1.0);
-        m_individuals[i]->amount_clipped_last_it += abs(non_clipped_value - m_individuals[i]->genome[j]);
+        // m_individuals[i]->amount_clipped_last_it += abs(non_clipped_value - m_individuals[i]->genome[j]);
     }
 
     //cout << m_individuals[i]->amount_clipped_last_it << endl;

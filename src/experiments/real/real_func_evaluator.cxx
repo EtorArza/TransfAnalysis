@@ -23,7 +23,6 @@
 
 using namespace std;
 // #define COUNTER
-// #define PRINT_POSITIONS
 
 MultidimBenchmarkFF *load_problem(int problem_index, int dim)
 {
@@ -65,9 +64,7 @@ MultidimBenchmarkFF *load_problem(int problem_index, int dim)
 double FitnessFunction_real_func(class NEAT::CpuNetwork *net_original, int problem_index, int dim, int n_evals, int seed, REAL_FUNC::params *parameters)
 {
 
-#define CLIPPING_DISCOUNT_FACTOR 0.000001
 
-    double total_discount_clipping = 0.0;
 
     double *v_of_fitness;
     MultidimBenchmarkFF *problem = load_problem(problem_index, dim);
@@ -103,7 +100,6 @@ double FitnessFunction_real_func(class NEAT::CpuNetwork *net_original, int probl
         pop->rng->seed(seed + n_of_repetitions_completed);
         pop->Reset();
         best_first_it = pop->f_best;
-        total_discount_clipping = 0.0;
         //std::cout << "|" << n_of_repetitions_completed << "|" << std::endl;
         for (int i = 0; i < pop->popsize; i++)
         {
@@ -121,12 +117,10 @@ double FitnessFunction_real_func(class NEAT::CpuNetwork *net_original, int probl
 // }
 #endif
 
-#ifdef PRINT_POSITIONS
-            if (MODE == "test")
+            if (parameters->PRINT_POSITIONS = true)
             {
                 pop->print_positions("positions.txt");
             }
-#endif
 
             for (int i = 0; i < pop->popsize; i++)
             {
@@ -139,7 +133,6 @@ double FitnessFunction_real_func(class NEAT::CpuNetwork *net_original, int probl
                 net->activate();
                 pop->apply_neat_output_to_individual_i(net->get_outputs(), i);
                 std::swap(net->activations, pop->m_individuals[i]->activation);
-                total_discount_clipping += CLIPPING_DISCOUNT_FACTOR * pop->m_individuals[i]->amount_clipped_last_it;
             }
             pop->end_iteration();
             //pop->Print();
@@ -399,7 +392,6 @@ public:
 
         if (MODE == "train")
         {
-
             int rng_seed = reader.GetInteger("NEAT", "SEED", -1);
             env->pop_size = reader.GetInteger("NEAT", "POPSIZE", -1);
             int max_time = reader.GetInteger("NEAT", "MAX_TRAIN_TIME", -1);
@@ -414,7 +406,7 @@ public:
             parameters->POPSIZE = reader.GetInteger("Controller", "POPSIZE", -1);
             parameters->TABU_LENGTH = reader.GetInteger("Controller", "TABU_LENGTH", -1);
             EXPERIMENT_FOLDER_NAME = "controllers_trained_with_F" + std::to_string(parameters->PROBLEM_INDEX);
-
+            parameters->PRINT_POSITIONS = false;
             F_VALUES_OBTAINED_BY_BEST_INDIV = new double[parameters->N_EVALS_TO_UPDATE_BK];
             for (int i = 0; i < parameters->N_EVALS_TO_UPDATE_BK; i++)
             {
@@ -498,6 +490,8 @@ public:
             parameters->N_EVALS = reader.GetInteger("TestSettings", "N_EVALS", -1);
             N_OF_THREADS = reader.GetInteger("TestSettings", "THREADS", 1);
             N_OF_THREADS = min(N_OF_THREADS, parameters->N_EVALS);
+            parameters->PRINT_POSITIONS = reader.GetBoolean("TestSettings", "PRINT_POSITIONS", false);
+
 
             if (parameters->CONTROLLER_PATH == "UNKNOWN")
             {

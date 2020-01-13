@@ -22,6 +22,7 @@ namespace REAL_FUNC{
         // TEST PARAMS TO BE SPECIFIED IN CONFIG FILE//
         std::string CONTROLLER_PATH;
         int N_REPS;
+        bool PRINT_POSITIONS;
         /////////////////////////////////////////////
 
     };
