@@ -25,10 +25,10 @@
 
 
 
-if [[ "$#" -ne 2  ]] ; then
-    echo 'Please provide the name of the problem and the name of the instance. $# parameters where provided. Two are needed. Example: '
+if [[ "$#" -ne 3  ]] ; then
+    echo 'Please provide the name of the problem, the path of the instance and and max_pso_time. $# parameters where provided. 3 are needed. Example: '
     echo ""
-    echo 'script.sh qap tai35a.dat.dat'
+    echo 'script.sh qap tai35a.dat.dat 0.5'
     echo ""
     echo 'Exitting...'
     exit 1
@@ -66,6 +66,7 @@ cat > tmp.ini <<EOF
 
 [Global] 
 MODE = train
+PROBLEM_NAME = permu
 
 
 [NEAT]
@@ -79,14 +80,12 @@ N_EVALS_TO_UPDATE_BK = 1280
 
 
 SEARCH_TYPE = phased
-DELETE_PREVIOUS_EXPERIMENT = true
 SEED = 2
-START_WITHOUT_HIDDEN = false
 
 
 
 [Controller]
-MAX_TIME_PSO = 100000.5
+MAX_TIME_PSO = $3
 POPSIZE = 20
 TABU_LENGTH = 40
 

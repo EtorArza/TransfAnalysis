@@ -60,6 +60,7 @@ cat > tmp.ini <<EOF
 
 [Global] 
 mode = train
+PROBLEM_NAME = permu_multi
 
 
 [NEAT]
@@ -73,22 +74,26 @@ N_EVALS_TO_UPDATE_BK = 1280
 
 
 SEARCH_TYPE = phased
-DELETE_PREVIOUS_EXPERIMENT = true
 SEED = 2
-START_WITHOUT_HIDDEN = false
 
 
 
 [Controller]
-MAX_TIME_PSO = -1.0 ; this will be set based on instance size.
 POPSIZE = 20
 TABU_LENGTH = 40
 
 PROBLEM_TYPE = $1
 N_PROBLEMS = $2
+
 PROBLEM_PATH_0 = $3
-PROBLEM_PATH_1 = $4
-PROBLEM_PATH_2 = $5
+MAX_TIME_PSO_FOR_EACH_INSTANCE_0 = $4
+
+PROBLEM_PATH_1 = $5
+MAX_TIME_PSO_FOR_EACH_INSTANCE_1 = $6
+
+PROBLEM_PATH_2 = $7
+MAX_TIME_PSO_FOR_EACH_INSTANCE_2 = $8
+
 
 EOF
 
@@ -109,7 +114,7 @@ instancename="${filename%%.*}"
 
 
 
-cp "controllers_trained_with_${instancename}"* -v -r $SRCDIR
+cp "controllers_trained_with_${instancename}"* -v -r $SRCDIR/src/experiments/permus_multi/results/controllers/
 
 
 

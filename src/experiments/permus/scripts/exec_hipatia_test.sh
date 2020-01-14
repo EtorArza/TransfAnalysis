@@ -27,10 +27,10 @@
 
 
 
-if [[ "$#" -ne 3  ]] ; then
-    echo 'Please provide the name of the problem, the name of the instance and the path to the controller. $# parameters where provided. 3 are needed. Example: '
+if [[ "$#" -ne 4  ]] ; then
+    echo 'Please provide the name of the problem, the name of the instance and the path to the controller and max_pso_time. $# parameters where provided. 4 are needed. Example: '
     echo ""
-    echo 'script.sh qap tai35a.dat.dat experiment_results/inter_instance_transfer/qap_tai35a/experiment_1/fittest_1'
+    echo 'script.sh qap tai35a.dat.dat experiment_results/inter_instance_transfer/qap_tai35a/experiment_1/fittest_1 0.5'
     echo ""
     echo 'Exitting...'
     exit 1
@@ -77,7 +77,7 @@ CONTROLLER_PATH = $3 ;
 
 
 [Controller]
-MAX_TIME_PSO = 0.5 ; 
+MAX_TIME_PSO = $4 ; 
 POPSIZE = 20 ;
 TABU_LENGTH = 40 ;
 N_EVALS = 500 ;

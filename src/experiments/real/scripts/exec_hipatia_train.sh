@@ -64,6 +64,7 @@ cat > tmp.ini <<EOF
 
 [Global] 
 mode = train
+PROBLEM_NAME = real_func
 
 [NEAT]
 MAX_TRAIN_TIME = 86400
@@ -74,9 +75,7 @@ N_REEVALS_TOP_5_PERCENT = 1
 N_EVALS_TO_UPDATE_BK = 200
 
 SEARCH_TYPE = phased
-DELETE_PREVIOUS_EXPERIMENT = true
 SEED = 2
-START_WITHOUT_HIDDEN = false
 
 
 

@@ -343,10 +343,17 @@ public:
             parameters->N_OF_INSTANCES = reader.GetInteger("Controller", "N_PROBLEMS", -1);
             parameters->INSTANCE_PATHS = new std::string[parameters->N_OF_INSTANCES];
             parameters->BEST_FITNESS_TRAIN_FOR_EACH_INSTANCE = new double[parameters->N_OF_INSTANCES];
+            parameters->MAX_TIME_PSO_FOR_EACH_INSTANCE = new double[parameters->N_OF_INSTANCES];
+
+
+
+
+
 
             for (int i = 0; i < parameters->N_OF_INSTANCES; i++)
             {
                 parameters->INSTANCE_PATHS[i] = reader.Get("Controller", "PROBLEM_PATH_" + to_string(i), "UNKOWN");
+                parameters->MAX_TIME_PSO_FOR_EACH_INSTANCE[i] = reader.GetReal("Controller", "MAX_TIME_PSO_FOR_EACH_INSTANCE_" + to_string(i), -1);
             }
 
             parameters->POPSIZE = reader.GetInteger("Controller", "POPSIZE", -1);
@@ -423,28 +430,7 @@ public:
                 parameters->BEST_FITNESS_TRAIN_FOR_EACH_INSTANCE[i] = -DBL_MAX;
             }
 
-            parameters->MAX_TIME_PSO_FOR_EACH_INSTANCE = new double[parameters->N_OF_INSTANCES];
-
-            #define TIME_INSTANCE_SIZE_30 0.1
-            #define TIME_INSTANCE_SIZE_60 0.3
-            for (int i = 0; i < parameters->N_OF_INSTANCES; i++)
-            {
-                double max_optimization_time;
-                int instance_size;
-                PERMU::PBP* tmp_problem = PERMU::GetProblemInfo(parameters->PROBLEM_TYPE, parameters->INSTANCE_PATHS[i]);
-                instance_size = tmp_problem->GetProblemSize();
-                delete tmp_problem;
-
-                if (instance_size <= 30)
-                {
-                    max_optimization_time = 0.1;
-                }
-                else
-                {
-                    max_optimization_time = 0.1 + ((0.3 - 0.1) * ((double)instance_size - 30.0) / (60.0 - 30.0) );
-                }
-                parameters->MAX_TIME_PSO_FOR_EACH_INSTANCE[i] = max_optimization_time;
-            }
+            
             Experiment *exp = Experiment::get(prob_name.c_str());
             int rng_seed = 2;
             rng_t rng{rng_seed};
