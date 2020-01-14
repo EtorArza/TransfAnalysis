@@ -1656,7 +1656,7 @@ bool is_A_larger_than_B_Mann_Whitney(double* A, double* B, int length){
         return false;
     }
 
- 
+
 
 
     //double u_A = length * length + (length * (length+ 1) / 2) - r_A;
@@ -1664,7 +1664,9 @@ bool is_A_larger_than_B_Mann_Whitney(double* A, double* B, int length){
 
     double z = from_u_statistic_to_z(u_B, length, array_of_values);
 
-
+    
+    delete[] array_of_values;
+    delete[] ranks;
 
     cout << "Unpaired rank hypotesis testing at alpha =  "<< ALPHA <<  endl;
 

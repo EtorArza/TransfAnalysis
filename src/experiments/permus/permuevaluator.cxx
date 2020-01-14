@@ -243,6 +243,7 @@ public:
         PERMU::Evaluator *ev = new PERMU::Evaluator();
         ev->parameters = this->parameters;
         ev->execute(nets_, results, nnets);
+        delete ev;
     }
 
     virtual void run_given_conf_file(std::string conf_file_path){
