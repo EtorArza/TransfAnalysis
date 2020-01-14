@@ -118,7 +118,7 @@ struct Evaluator
         int n_of_networks_to_reevaluate = MAX(1, static_cast<int>(nnets) * 5 / 100);
         cout << "reevaluating top 5% (" << n_of_networks_to_reevaluate << " nets out of " << static_cast<int>(nnets) << ") each " << actual_n_reevals << " times." << endl;
 
-        double cut_value = obtain_kth_largest_value(f_values, n_of_networks_to_reevaluate, static_cast<int>(nnets));
+        double cut_value = obtain_kth_largest_value(f_values, n_of_networks_to_reevaluate+1, static_cast<int>(nnets));
 
         rng.seed();
         initial_seed = rng.random_integer_fast(20050000,30000000);
@@ -142,7 +142,7 @@ struct Evaluator
             }
         }
 
-        cout << "Reevaluating best indiv of generation: ";
+        cout << "Reevaluating best indiv of generation: "<< std::flush;
         int index_most_fit = argmax(f_values, nnets);
         NEAT::CpuNetwork *net = nets[index_most_fit];
 

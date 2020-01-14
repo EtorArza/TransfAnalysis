@@ -117,7 +117,7 @@ double FitnessFunction_real_func(class NEAT::CpuNetwork *net_original, int probl
 // }
 #endif
 
-            if (parameters->PRINT_POSITIONS = true)
+            if (parameters->PRINT_POSITIONS)
             {
                 pop->print_positions("positions.txt");
             }
@@ -190,12 +190,10 @@ namespace REAL_FUNC
         __net_eval_decl void FitnessFunction_parallel(NEAT::CpuNetwork *net, int n_evals, double *res, int initial_seed)
         {
             int seed_parallel = initial_seed;
-
 #pragma omp parallel for num_threads(N_OF_THREADS)
             for (int i = 0; i < n_evals; i++)
             {
                 res[i] = FitnessFunction_real_func(net, seed_parallel + i, n_evals, parameters);
-                ;
             }
             seed_parallel += n_evals;
             //PrintArray(res, n_evals);
@@ -211,7 +209,7 @@ namespace REAL_FUNC
             rng.seed();
             int initial_seed = rng.random_integer_fast(10000000);
 // evaluate the individuals
-//#pragma omp parallel for num_threads(N_OF_THREADS)
+#pragma omp parallel for num_threads(N_OF_THREADS)
             for (size_t inet = 0; inet < nnets; inet++)
             {
                 NEAT::CpuNetwork *net = nets[inet];
@@ -252,14 +250,15 @@ namespace REAL_FUNC
             int n_of_networks_to_reevaluate = max(1, static_cast<int>(nnets) * 5 / 100);
             cout << "reevaluating top 5% (" << n_of_networks_to_reevaluate << " nets out of " << static_cast<int>(nnets) << ") each " << actual_n_reevals << " times." << endl;
 
-            cut_value = obtain_kth_largest_value(f_values, n_of_networks_to_reevaluate, static_cast<int>(nnets));
+            cut_value = obtain_kth_largest_value(f_values, n_of_networks_to_reevaluate+1, static_cast<int>(nnets));
 
             rng.seed();
             initial_seed = rng.random_integer_fast(10000000);
 
             for (size_t inet = 0; inet < nnets; inet++)
-            {
-                if (f_values[inet] < cut_value)
+            {   
+
+                if (f_values[inet] <= cut_value)
                 {
                     f_values[inet] -= 1000000000.0; // apply a discount to the individuals that are not reevaluated
                     continue;
@@ -276,7 +275,7 @@ namespace REAL_FUNC
                 }
             }
 
-            cout << "Reevaluating best indiv of generation: ";
+            cout << "Reevaluating best indiv of generation: " << std::flush;
             int index_most_fit = argmax(f_values, nnets);
             NEAT::CpuNetwork *net = nets[index_most_fit];
 

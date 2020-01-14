@@ -141,7 +141,7 @@ struct Evaluator
             sum_arrays(f_value_rankings, f_value_rankings, f_values[i], nnets);
         }
 
-        double cut_value = obtain_kth_largest_value(f_value_rankings, n_of_networks_to_reevaluate, static_cast<int>(nnets));
+        double cut_value = obtain_kth_largest_value(f_value_rankings, n_of_networks_to_reevaluate+1, static_cast<int>(nnets));
         rng.seed();
         initial_seed = rng.random_integer_fast(20050000, 30000000);
 
@@ -186,11 +186,10 @@ struct Evaluator
             sum_arrays(f_value_rankings, f_value_rankings, f_values[i], nnets);
         }
 
-        cout << "Reevaluating best indiv of generation: ";
-        int index_most_fit = argmax(f_values, nnets);
+        cout << "Reevaluating best indiv of generation: "<< std::flush;
+        int index_most_fit = argmax(f_value_rankings, nnets);
         f_value_rankings[index_most_fit] += 1.0;
         NEAT::CpuNetwork *net = nets[index_most_fit];
-        Evaluator *ev = new Evaluator();
 
         // apply a discount to all but the best individual
         for (int inet = 0; inet < (int)nnets; inet++)
@@ -251,7 +250,12 @@ struct Evaluator
             }
         }
 
+        for (int i = 0; i < parameters->N_OF_INSTANCES; i++)
+        {
+            delete[] res[i];
+        }
         delete[] res;
+
 
         double *tmp_order = new double[nnets];
 
