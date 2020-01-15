@@ -187,7 +187,10 @@ def save_fig(d, fig_title, fig_path,size_relevant=True, class_relevant=True):
     #plt.title("(average - RS) / (BK - RS)")
     #plt.title("normalized, gaussian smoothing, sigma = 0.7")
     #plt.title("rankings on test instances")
-    plt.title(fig_title)
+    plt.title(" ")
+    #plt.title(fig_title)
+    plt.colorbar()
+
     plt.tight_layout()
     plt.savefig(fig_path)
     plt.close()
