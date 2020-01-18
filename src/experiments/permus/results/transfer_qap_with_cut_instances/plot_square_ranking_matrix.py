@@ -49,7 +49,45 @@ def xor(a, b):
 
 
 
+def rename_name(case_name, size_relevant=True, class_relevant=True):
+
+
+    new_name = ""
+
+
+    if fnmatch.fnmatch(case_name, "*tai*a"):
+        new_name += "Taixxa"
+    elif fnmatch.fnmatch(case_name, "*sko*"):
+        new_name += "Sko"
+    elif fnmatch.fnmatch(case_name, "*tai*b"):
+        new_name += "Taixxb"
+    else:
+        raise Warning("tai*a, sko or tai*b not found in case name "+str(case_name))
+
+    if "cut30" in case_name:
+        new_name += "30"
+    elif "cut60" in case_name:
+        new_name += "60"
+    else:
+        raise Warning("cut30 or cut60 not found in case name "+str(case_name))
+
+
+    if "tai60" in case_name or "72" in case_name:
+        new_name+= "_1"
+    elif "tai80" in case_name or "81" in case_name:
+        new_name+= "_2"
+    elif "tai100" in case_name or "90" in case_name:
+        new_name+= "_3"
+    else:
+        raise Warning("Check the naming part, rename_name() func, case_name="+ case_name)
+
+
+    return new_name
+
+
 def order(x):
+    return rename_name(x)
+
     if "0a" in x:
         return x.split("_")[0] + "_A_" + x.split("_")[1]
     elif "sko" in x:
@@ -145,28 +183,7 @@ for i in range(15):
 """
 
 
-def rename_name(case_name, size_relevant=True, class_relevant=True):
-    new_name = ""
 
-    if class_relevant:
-        if fnmatch.fnmatch(case_name, "*tai*a"):
-            new_name += "Taixxa"
-        elif fnmatch.fnmatch(case_name, "*sko*"):
-            new_name += "Sko"
-        elif fnmatch.fnmatch(case_name, "*tai*b"):
-            new_name += "Taixxb"
-        else:
-            raise Warning("tai*a, sko or tai*b not found in case name "+str(case_name))
-
-    if size_relevant:
-        if "cut30" in case_name:
-            new_name += "size=30"
-        elif "cut60" in case_name:
-            new_name += "size=60"
-        else:
-            raise Warning("cut30 or cut60 not found in case name "+str(case_name))
-
-    return new_name
 
 
 def save_fig(d, fig_title, fig_path,size_relevant=True, class_relevant=True):
@@ -178,12 +195,11 @@ def save_fig(d, fig_title, fig_path,size_relevant=True, class_relevant=True):
     xticks = [rename_name(el,size_relevant, class_relevant) for el in data.columns]
 
 
-
-
-    plt.yticks(np.arange(0.5, len(data.index), 1), yticks)
-    plt.xticks(np.arange(0.5, len(data.columns), 1), xticks, rotation = 90)
-    plt.ylabel("trained on")
-    plt.xlabel("tested on")
+    FONTSIZE = 15
+    plt.yticks(np.arange(0.5, len(data.index), 1), yticks, fontsize=FONTSIZE)
+    plt.xticks(np.arange(0.5, len(data.columns), 1), xticks, rotation = 90,  fontsize=FONTSIZE)
+    plt.ylabel("trained on", fontsize=FONTSIZE*1.2)
+    plt.xlabel("tested on", fontsize=FONTSIZE*1.2)
     #plt.title("(average - RS) / (BK - RS)")
     #plt.title("normalized, gaussian smoothing, sigma = 0.7")
     #plt.title("rankings on test instances")
@@ -220,6 +236,8 @@ all_instances = [
 "cut60_sko90"
 ]
 
+
+all_instances.sort(key=order, reverse=True)
 
 small_instances = [ins for ins in all_instances if "cut30" in ins]
 big_instances = [ins for ins in all_instances if "cut60" in ins]

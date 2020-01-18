@@ -24,10 +24,12 @@ def save_fig(d, fig_title, fig_path, scale_between_1_and_0 = False):
         plt.pcolor(data, vmin=0, vmax=1)
     else:
         plt.pcolor(data)
-    plt.yticks(np.arange(0.5, len(data.index), 1), data.index)
-    plt.xticks(np.arange(0.5, len(data.columns), 1), data.columns, rotation = 90)
-    plt.ylabel("trained on")
-    plt.xlabel("tested on")
+
+    FONTSIZE = 15
+    plt.yticks(np.arange(0.5, len(data.index), 1), data.index, fontsize=FONTSIZE)
+    plt.xticks(np.arange(0.5, len(data.columns), 1), data.columns, rotation = 90,  fontsize=FONTSIZE)
+    plt.ylabel("trained on", fontsize=FONTSIZE*1.2)
+    plt.xlabel("tested on", fontsize=FONTSIZE*1.2)
     plt.colorbar()
     plt.title(" ")
     #plt.title(fig_title)
