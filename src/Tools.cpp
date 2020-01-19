@@ -732,6 +732,28 @@ void GenerateRandomRealvec_0_1(double *real_vec, int n, RandomNumberGenerator* r
 }
 
 
+int count_n_dif_array_items_double(double* array1, double* array2, int n){
+    int res = 0;
+    for (int i = 0; i < n; i++)
+    {
+        if (abs(array1[i]- array2[i]) > SMALLEST_POSITIVE_DOUBLE)
+        {
+            res++;
+        }
+    }
+    return res;
+}
+
+int count_n_dif_matrix_items_double(double** matrix1, double** matrix2, int n, int m){
+    int res = 0;
+    for (int i = 0; i < m; i++)
+    {
+        res += count_n_dif_array_items_double(matrix1[i], matrix2[i], n);
+    }
+    return res;
+}
+
+
 
 
 

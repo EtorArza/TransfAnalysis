@@ -30,9 +30,9 @@ EXTERN bool DELETE_PREV_EXPERIMENT_FOLDER;
 
 
 
-# define CUTOFF_0 0.25 // NN consider value near 0
+#define CUTOFF_0 0.25 // NN consider value near 0
 
-
+#define SMALLEST_POSITIVE_DOUBLE 0.0000001
 
 // MACROS // 
 #define MAX(A,B) ( (A > B) ? A : B)

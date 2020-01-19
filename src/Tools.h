@@ -229,6 +229,12 @@ bool compare_vectors(T *vec1, T *vec2, int len)
     return true;
 }
 
+int count_n_dif_array_items_double(double* array1, double* array2, int n);
+int count_n_dif_matrix_items_double(double** matrix1, double** matrix2, int n, int m);
+
+
+
+
 /*
 Function to find all the repeated rows on a matrix
 Writes in  bool *is_ith_position_repeated (true --> vector is a repetition, false--> vector is not a repetition)
