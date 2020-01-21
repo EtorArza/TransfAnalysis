@@ -190,6 +190,7 @@ struct Evaluator
         initial_seed = rng.random_integer_fast(20050000,30000000);
 
         bar.restart(nnets);
+        #pragma omp parallel for num_threads(N_OF_THREADS)
         for (size_t inet = 0; inet < nnets; inet++)
         {
             if (f_values[inet] <= cut_value)
@@ -199,12 +200,7 @@ struct Evaluator
             else
             {
                 NEAT::CpuNetwork *net = nets[inet];
-                double *res = new double[actual_n_reevals];
-                int seed = initial_seed;
-                this->FitnessFunction_parallel(net, actual_n_reevals, res, seed);
-                int index_value = arg_element_in_centile_specified_by_percentage(res, actual_n_reevals, 0.50);
-                f_values[inet] = res[index_value];
-                delete[] res;
+                f_values[inet] = this->FitnessFunction(net, parameters->N_EVALS, initial_seed);
             }
             bar.step();
         }
@@ -224,7 +220,7 @@ struct Evaluator
 
         double *res = new double[parameters->N_EVALS_TO_UPDATE_BK];
         bar.restart(1);
-        this->FitnessFunction_parallel(net, parameters->N_EVALS_TO_UPDATE_BK, res, 30050000);
+        this->FitnessFunction_parallel(net, parameters->N_EVALS_TO_UPDATE_BK, res, 40500000);
         bar.end();
 
         // double median = res[arg_element_in_centile_specified_by_percentage(res, N_EVALS_TO_UPDATE_BK, 0.5)];

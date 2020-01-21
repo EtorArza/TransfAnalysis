@@ -207,7 +207,7 @@ namespace REAL_FUNC
             bool printed_bracket = false;
             RandomNumberGenerator rng;
             rng.seed();
-            int initial_seed = rng.random_integer_fast(10000000);
+            int initial_seed = rng.random_integer_fast(10000000, 20000000);
             cout << "Evaluating -> ";
             progress_bar bar = progress_bar(nnets);
             // evaluate the individuals
@@ -241,7 +241,7 @@ namespace REAL_FUNC
             }
 
             rng.seed();
-            initial_seed = rng.random_integer_fast(10000000);
+            initial_seed = rng.random_integer_fast(20000000, 30000000);
             bar.restart(nnets);
             for (size_t inet = 0; inet < nnets; inet++)
             {   
@@ -279,7 +279,7 @@ namespace REAL_FUNC
 
             double *res = new double[parameters->N_EVALS_TO_UPDATE_BK];
             bar.restart(1);
-            this->FitnessFunction_parallel(net, parameters->N_EVALS_TO_UPDATE_BK, res, 1);
+            this->FitnessFunction_parallel(net, parameters->N_EVALS_TO_UPDATE_BK, res, 40000000);
             bar.step();
             bar.end();
             //PrintArray(res, N_EVALS_TO_UPDATE_BK);
@@ -501,7 +501,7 @@ public:
             cout << std::setprecision(15);
             RandomNumberGenerator *rng;
             rng = new RandomNumberGenerator();
-            rng->seed();
+            rng->seed(2);
 
             int initial_seed = rng->random_integer_uniform(1000, 10000);
 

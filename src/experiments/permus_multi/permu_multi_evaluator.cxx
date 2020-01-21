@@ -89,11 +89,10 @@ struct Evaluator
             bar.step();
             NEAT::CpuNetwork *net = nets[inet];
             NEAT::OrganismEvaluation eval;
-            int seed = initial_seed;
-            
+           
             for (int i = 0; i < parameters->N_OF_INSTANCES; i++)
             {
-                f_values[i][inet] = this->FitnessFunction(net, parameters->N_EVALS, seed, i);
+                f_values[i][inet] = this->FitnessFunction(net, parameters->N_EVALS, initial_seed, i);
             }
             results[inet] = eval;
         }
@@ -144,16 +143,10 @@ struct Evaluator
             {
                 f_value_rankings[inet] = 0.0;
                 NEAT::CpuNetwork *net = nets[inet];
-
-                double *res = new double[actual_n_reevals];
-                int seed = initial_seed;
-
                 for (int i = 0; i < parameters->N_OF_INSTANCES; i++)
                 {
-                    this->FitnessFunction_parallel(net, actual_n_reevals, res, seed, i);
-                    f_values[i][inet] = Average(res, actual_n_reevals);
+                    f_values[i][inet] = this->FitnessFunction(net, parameters->N_EVALS * parameters->N_REEVALS_TOP_5_PERCENT, initial_seed, i);
                 }
-                delete[] res;
             }
         }
         bar.end();
