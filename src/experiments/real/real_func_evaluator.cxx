@@ -193,7 +193,7 @@ namespace REAL_FUNC
 #pragma omp parallel for num_threads(N_OF_THREADS)
             for (int i = 0; i < n_evals; i++)
             {
-                res[i] = FitnessFunction_real_func(net, seed_parallel + i, n_evals, parameters);
+                res[i] = FitnessFunction_real_func(net, seed_parallel + i, parameters->N_EVALS, parameters);
             }
             seed_parallel += n_evals;
             //PrintArray(res, n_evals);
@@ -227,8 +227,6 @@ namespace REAL_FUNC
             // reevaluate top n_of_threads_omp, with a minimum of 5 and a maximum of nnets.
             double cut_value = obtain_kth_largest_value(f_values, min(max(N_OF_THREADS, 5), static_cast<int>(nnets)), nnets);
 
-            // add epsilon so that if many networks have the same score, they are not all evaluated.
-            cut_value += 0.000000000001;
 
             // reevaluate top 5% at least N_REEVAL times
             int actual_n_reevals = (((parameters->N_REEVALS_TOP_5_PERCENT - 1) / N_OF_THREADS) + 1) * N_OF_THREADS;
@@ -236,6 +234,11 @@ namespace REAL_FUNC
             cout << "reevaluating top 5% (" << n_of_networks_to_reevaluate << " nets out of " << static_cast<int>(nnets) << ") each " << actual_n_reevals << " times -> ";
 
             cut_value = obtain_kth_largest_value(f_values, n_of_networks_to_reevaluate+1, static_cast<int>(nnets));
+
+            if (cut_value == 0.0){
+                cout << "Warning, 0 reached in top 5%, no more learning can be done."
+                << "Increasing problem dimensionality or n_evals might solve this." << endl;
+            }
 
             rng.seed();
             initial_seed = rng.random_integer_fast(10000000);
@@ -249,7 +252,7 @@ namespace REAL_FUNC
                     continue;
                 }
                 else
-                {
+                {   
                     NEAT::CpuNetwork *net = nets[inet];
                     double *res = new double[actual_n_reevals];
                     int seed = initial_seed;
