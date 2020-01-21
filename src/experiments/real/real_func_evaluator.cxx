@@ -224,16 +224,12 @@ namespace REAL_FUNC
             }
             bar.end();
 
-            // reevaluate top n_of_threads_omp, with a minimum of 5 and a maximum of nnets.
-            double cut_value = obtain_kth_largest_value(f_values, min(max(N_OF_THREADS, 5), static_cast<int>(nnets)), nnets);
-
-
             // reevaluate top 5% at least N_REEVAL times
-            int actual_n_reevals = (((parameters->N_REEVALS_TOP_5_PERCENT - 1) / N_OF_THREADS) + 1) * N_OF_THREADS;
-            int n_of_networks_to_reevaluate = max(1, static_cast<int>(nnets) * 5 / 100);
-            cout << "reevaluating top 5% (" << n_of_networks_to_reevaluate << " nets out of " << static_cast<int>(nnets) << ") each " << actual_n_reevals << " times -> ";
+            int n_of_networks_to_reevaluate = parameters->POPSIZE / 20 + 1;
+            int n_of_reevals_top_5percent = parameters->N_EVALS * parameters->N_REEVALS_TOP_5_PERCENT;
+            cout << "reevaluating top 5% (" << n_of_networks_to_reevaluate << " nets out of " << static_cast<int>(nnets) << ") each " << n_of_reevals_top_5percent << " times -> ";
 
-            cut_value = obtain_kth_largest_value(f_values, n_of_networks_to_reevaluate+1, static_cast<int>(nnets));
+            double cut_value = obtain_kth_largest_value(f_values, n_of_networks_to_reevaluate+1, static_cast<int>(nnets));
 
             if (cut_value == 0.0){
                 cout << "Warning, 0 reached in top 5%, no more learning can be done."
@@ -242,25 +238,27 @@ namespace REAL_FUNC
 
             rng.seed();
             initial_seed = rng.random_integer_fast(20000000, 30000000);
-            bar.restart(nnets);
+
+            std::vector<int> reeval_indexes; 
             for (size_t inet = 0; inet < nnets; inet++)
-            {   
-                bar.step();
+            {
                 if (f_values[inet] <= cut_value)
                 {
                     f_values[inet] -= 1000000000.0; // apply a discount to the individuals that are not reevaluated
-                    continue;
                 }
                 else
-                {   
-                    NEAT::CpuNetwork *net = nets[inet];
-                    double *res = new double[actual_n_reevals];
-                    int seed = initial_seed;
-                    this->FitnessFunction_parallel(net, actual_n_reevals, res, seed);
-                    int average_res = Average(res, actual_n_reevals);
-                    f_values[inet] = average_res;
-                    delete[] res;
+                {
+                    reeval_indexes.push_back(inet);
                 }
+            }
+
+            bar.restart(reeval_indexes.size());
+            #pragma omp parallel for num_threads(N_OF_THREADS)
+            for (std::size_t i = 0; i < reeval_indexes.size(); ++i)
+            {
+                bar.step();
+                NEAT::CpuNetwork *net = nets[reeval_indexes[i]];
+                f_values[reeval_indexes[i]] = this->FitnessFunction(net, n_of_reevals_top_5percent, initial_seed);
             }
             bar.end();
 

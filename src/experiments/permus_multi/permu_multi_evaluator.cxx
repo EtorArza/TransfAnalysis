@@ -102,9 +102,9 @@ struct Evaluator
         // double cut_value = obtain_kth_largest_value(f_values, min(max(n_of_threads_omp, 5), static_cast<int>(nnets)), nnets);
 
         // reevaluate top 5% at least N_REEVAL times
-        int actual_n_reevals = (((parameters->N_REEVALS_TOP_5_PERCENT - 1) / N_OF_THREADS) + 1) * N_OF_THREADS;
-        int n_of_networks_to_reevaluate = MAX(1, static_cast<int>(nnets) * 5 / 100);
-        cout << "reevaluating top 5% (" << n_of_networks_to_reevaluate << " nets out of " << static_cast<int>(nnets) << ") each " << actual_n_reevals << " times -> ";
+        int n_of_networks_to_reevaluate = parameters->POPSIZE / 20 + 1;
+        int n_of_reevals_top_5percent = parameters->N_EVALS * parameters->N_REEVALS_TOP_5_PERCENT;
+        cout << "reevaluating top 5% (" << n_of_networks_to_reevaluate << " nets out of " << static_cast<int>(nnets) << ") each " << n_of_reevals_top_5percent << " times -> ";
 
         double *f_value_rankings = new double[nnets];
 
@@ -128,10 +128,9 @@ struct Evaluator
         rng.seed();
         initial_seed = rng.random_integer_fast(20050000, 30000000);
 
-        bar.restart( nnets);
+        std::vector<int> reeval_indexes; 
         for (size_t inet = 0; inet < nnets; inet++)
         {   
-            bar.step();
             if (f_value_rankings[inet] <= cut_value)
             {
                 for (int i = 0; i < parameters->N_OF_INSTANCES; i++)
@@ -141,12 +140,20 @@ struct Evaluator
             }
             else
             {
-                f_value_rankings[inet] = 0.0;
-                NEAT::CpuNetwork *net = nets[inet];
-                for (int i = 0; i < parameters->N_OF_INSTANCES; i++)
-                {
-                    f_values[i][inet] = this->FitnessFunction(net, parameters->N_EVALS * parameters->N_REEVALS_TOP_5_PERCENT, initial_seed, i);
-                }
+                reeval_indexes.push_back(inet);
+            }
+        }
+        
+        bar.restart(reeval_indexes.size());
+        #pragma omp parallel for num_threads(N_OF_THREADS)
+        for (std::size_t i = 0; i < reeval_indexes.size(); ++i)
+        {
+            bar.step();
+            f_value_rankings[reeval_indexes[i]] = 0.0;
+            NEAT::CpuNetwork *net = nets[reeval_indexes[i]];
+            for (int j = 0; j < parameters->N_OF_INSTANCES; j++)
+            {
+                f_values[j][i] = this->FitnessFunction(net, n_of_reevals_top_5percent, initial_seed, j);
             }
         }
         bar.end();

@@ -27,6 +27,8 @@
 #include "Parameters.h"
 #include "PERMU_params.h"
 #include <functional>
+#include <vector>
+
 
 using namespace std;
 
@@ -153,7 +155,6 @@ struct Evaluator
             NEAT::OrganismEvaluation eval;
             int seed = initial_seed;
             results[inet] = eval;
-
             // if (classes_array[inet] == inet) // copy fitness
             // { // copy fitness
                 f_values[inet] = this->FitnessFunction(net, parameters->N_EVALS, seed);
@@ -176,21 +177,18 @@ struct Evaluator
         // }
 
 
-        // // reevaluate top n_of_threads_omp, with a minimum of 5 and a maximum of nnets.
-        // double cut_value = obtain_kth_largest_value(f_values, min(max(n_of_threads_omp, 5), static_cast<int>(nnets)), nnets);
 
         // reevaluate top 5% at least N_REEVAL times
-        int actual_n_reevals = (((parameters->N_REEVALS_TOP_5_PERCENT - 1) / N_OF_THREADS) + 1) * N_OF_THREADS;
-        int n_of_networks_to_reevaluate = MAX(1, static_cast<int>(nnets) * 5 / 100);
-        cout << "reevaluating top 5% (" << n_of_networks_to_reevaluate << " nets out of " << static_cast<int>(nnets) << ") each " << actual_n_reevals << " times -> " << std::flush;
+        int n_of_networks_to_reevaluate = parameters->POPSIZE / 20 + 1;
+        int n_of_reevals_top_5percent = parameters->N_EVALS * parameters->N_REEVALS_TOP_5_PERCENT;
+        cout << "reevaluating top 5% (" << n_of_networks_to_reevaluate << " nets out of " << static_cast<int>(nnets) << ") each " << n_of_reevals_top_5percent << " times -> ";
 
         double cut_value = obtain_kth_largest_value(f_values, n_of_networks_to_reevaluate+1, static_cast<int>(nnets));
 
         rng.seed();
         initial_seed = rng.random_integer_fast(20050000,30000000);
 
-        bar.restart(nnets);
-        #pragma omp parallel for num_threads(N_OF_THREADS)
+        std::vector<int> reeval_indexes; 
         for (size_t inet = 0; inet < nnets; inet++)
         {
             if (f_values[inet] <= cut_value)
@@ -199,11 +197,19 @@ struct Evaluator
             }
             else
             {
-                NEAT::CpuNetwork *net = nets[inet];
-                f_values[inet] = this->FitnessFunction(net, parameters->N_EVALS, initial_seed);
+                reeval_indexes.push_back(inet);
             }
-            bar.step();
         }
+
+        bar.restart(reeval_indexes.size());
+        #pragma omp parallel for num_threads(N_OF_THREADS)
+        for (std::size_t i = 0; i < reeval_indexes.size(); ++i)
+        {
+            bar.step();
+            NEAT::CpuNetwork *net = nets[reeval_indexes[i]];
+            f_values[reeval_indexes[i]] = this->FitnessFunction(net, n_of_reevals_top_5percent, initial_seed);
+        }
+
         bar.end();
         cout << "Reevaluating best of gen: "<< std::flush;
         int index_most_fit = argmax(f_values, nnets);
