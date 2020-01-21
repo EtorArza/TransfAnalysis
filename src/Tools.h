@@ -17,7 +17,9 @@
 #include <cmath>
 #include <algorithm>
 #include <fstream>
-
+#include <functional>
+#include "Parameters.h"
+#include <mutex>
 
 using std::istream;
 using std::ostream;
@@ -467,6 +469,22 @@ int argmax(T *v, int len){
     return res;
 }
 
+template <class T>
+int move_to_0_minusone_or_one(T value)
+{
+    if ((double)value < -CUTOFF_0)
+    {
+        return -1;
+    }
+    else if ((double)value > CUTOFF_0)
+    {
+        return 1;
+    }
+    else
+    {
+        return 0;
+    }
+}
 
 template <class T>
 int argmin(T *v, int len){
@@ -834,3 +852,64 @@ bool vector_contains_item(const std::vector<TType>& vec, TType item)
 	else
 		{return false;}
 }
+
+template <class T>
+void find_classes_in_array_of_objects(T *array_of_objects, std::function<bool(T, T)> are_equal, int len, int* classes_array)
+{
+    for (int i = 0; i < len; i++)
+    {
+        classes_array[i] = -1;
+    }
+    for (int i = 0; i < len - 1; i++)
+    {
+        if (classes_array[i] != -1)
+        {
+            continue;
+        }
+        for (int j = i + 1; j < len; j++)
+        {
+            if (classes_array[j] != -1)
+            {
+                continue;
+            }
+            if (are_equal(array_of_objects[i], array_of_objects[j]))
+            {
+                classes_array[j] = i;
+            }
+        }
+    }
+
+    int repetitions = 0;
+    for (int i = 0; i < len; i++)
+    {
+        if (classes_array[i] == -1)
+        {
+            classes_array[i] = i;
+        }else{
+            repetitions += 1;
+        }
+
+    }
+    
+    cout << "Repeated: " << repetitions;
+    //PrintArray(classes_array, len);
+}
+
+class progress_bar
+{
+
+public:
+
+int max_steps;
+int current_steps;
+bool printed_bracket = false;
+stopwatch timer;
+
+progress_bar(int n);
+~progress_bar();
+void step();
+void end();
+void restart(int n);
+
+
+};

@@ -1,6 +1,5 @@
 
 #include <string>
-#include "Tools.h"
 #ifndef EXTERN
 #define EXTERN extern
 #endif
@@ -14,7 +13,7 @@ void delete_prev_exp_folder();
 EXTERN int N_OF_THREADS;
 EXTERN double MAX_TRAIN_TIME;
 EXTERN int POPSIZE_NEAT;
-EXTERN stopwatch global_timer;
+EXTERN class stopwatch global_timer;
 
 
 
@@ -33,6 +32,7 @@ EXTERN bool DELETE_PREV_EXPERIMENT_FOLDER;
 #define CUTOFF_0 0.25 // NN consider value near 0
 
 #define SMALLEST_POSITIVE_DOUBLE 0.0000001
+#define NETWORK_SIGNATURE_SIZE 10
 
 // MACROS // 
 #define MAX(A,B) ( (A > B) ? A : B)

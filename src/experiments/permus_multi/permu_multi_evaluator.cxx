@@ -81,9 +81,12 @@ struct Evaluator
         RandomNumberGenerator rng;
         rng.seed();
         int initial_seed = rng.random_integer_fast(10050000, 20000000);
+        cout << "Evaluating -> ";
+        progress_bar bar = progress_bar(nnets);
         #pragma omp parallel for num_threads(N_OF_THREADS)
         for (size_t inet = 0; inet < nnets; inet++)
         {
+            bar.step();
             NEAT::CpuNetwork *net = nets[inet];
             NEAT::OrganismEvaluation eval;
             int seed = initial_seed;
@@ -93,27 +96,8 @@ struct Evaluator
                 f_values[i][inet] = this->FitnessFunction(net, parameters->N_EVALS, seed, i);
             }
             results[inet] = eval;
-
-            // print progress.
-            std::mutex mutx;
-            mutx.lock();
-            if (!printed_bracket)
-            {
-                std::cout << "[" << std::flush;
-                printed_bracket = true;
-            }
-            progress_print_decider += 15.0 / (double)nnets;
-            if (inet == 0)
-            {
-            }
-            while (progress_print_decider >= 1.0)
-            {
-                std::cout << "." << std::flush;
-                progress_print_decider--;
-            }
-            mutx.unlock();
         }
-        std::cout << "]" << std::endl;
+        bar.end();
 
         // // reevaluate top n_of_threads_omp, with a minimum of 5 and a maximum of nnets.
         // double cut_value = obtain_kth_largest_value(f_values, min(max(n_of_threads_omp, 5), static_cast<int>(nnets)), nnets);
@@ -121,7 +105,7 @@ struct Evaluator
         // reevaluate top 5% at least N_REEVAL times
         int actual_n_reevals = (((parameters->N_REEVALS_TOP_5_PERCENT - 1) / N_OF_THREADS) + 1) * N_OF_THREADS;
         int n_of_networks_to_reevaluate = MAX(1, static_cast<int>(nnets) * 5 / 100);
-        cout << "reevaluating top 5% (" << n_of_networks_to_reevaluate << " nets out of " << static_cast<int>(nnets) << ") each " << actual_n_reevals << " times." << endl;
+        cout << "reevaluating top 5% (" << n_of_networks_to_reevaluate << " nets out of " << static_cast<int>(nnets) << ") each " << actual_n_reevals << " times -> ";
 
         double *f_value_rankings = new double[nnets];
 
@@ -145,8 +129,10 @@ struct Evaluator
         rng.seed();
         initial_seed = rng.random_integer_fast(20050000, 30000000);
 
+        bar.restart( nnets);
         for (size_t inet = 0; inet < nnets; inet++)
-        {
+        {   
+            bar.step();
             if (f_value_rankings[inet] <= cut_value)
             {
                 for (int i = 0; i < parameters->N_OF_INSTANCES; i++)
@@ -170,6 +156,7 @@ struct Evaluator
                 delete[] res;
             }
         }
+        bar.end();
 
         for (int i = 0; i < (int)nnets; i++)
         {
@@ -186,7 +173,7 @@ struct Evaluator
             sum_arrays(f_value_rankings, f_value_rankings, f_values[i], nnets);
         }
 
-        cout << "Reevaluating best indiv of generation: "<< std::flush;
+        cout << "Reevaluating best indiv of generation -> "<< std::flush;
         int index_most_fit = argmax(f_value_rankings, nnets);
         f_value_rankings[index_most_fit] += 1.0;
         NEAT::CpuNetwork *net = nets[index_most_fit];
@@ -204,11 +191,14 @@ struct Evaluator
         }
 
         double **res = new double *[parameters->N_OF_INSTANCES];
+        bar.restart(parameters->N_OF_INSTANCES);
         for (int i = 0; i < parameters->N_OF_INSTANCES; i++)
         {
+            bar.step();
             res[i] = new double[parameters->N_EVALS_TO_UPDATE_BK];
             this->FitnessFunction_parallel(net, parameters->N_EVALS_TO_UPDATE_BK, res[i], 30050000, i);
         }
+        bar.end();
 
         // double median = res[arg_element_in_centile_specified_by_percentage(res, N_EVALS_TO_UPDATE_BK, 0.5)];
 

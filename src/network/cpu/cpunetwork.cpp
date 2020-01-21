@@ -21,9 +21,12 @@
 #include "util.h"
 #include <assert.h>
 #include "networkexecutor.h"
+#include "Parameters.h"
+#include "Tools.h"
 
 using namespace NEAT;
 using namespace std;
+
 
 
 Network *Network::create() {
@@ -40,7 +43,63 @@ CpuNetwork::CpuNetwork(const CpuNetwork&  other){
 
 }
 
+CpuNetwork::~CpuNetwork()
+{
+    if (signature_initialized)
+    {
+        for (int i = 0; i < NETWORK_SIGNATURE_SIZE; i++)
+        {
+            delete[] this->signature[i];
+        }
+        delete[] this->signature;
+        signature_initialized=false;
+    }
+}
 
+void CpuNetwork::apply_function_to_signature(void (*f)(double* )){
+    for (int i = 0; i < NETWORK_SIGNATURE_SIZE; i++)
+    {
+        f(signature[i]);
+    }
+}
+
+void CpuNetwork::compute_signature(){
+    if(!signature_initialized)
+    {
+        signature_initialized = true;
+        signature = new double*[NETWORK_SIGNATURE_SIZE];
+        for (int i = 0; i < NETWORK_SIGNATURE_SIZE; i++)
+        {
+            signature[i] = new double[this->dims.nnodes.output];
+        }
+    }
+
+    RandomNumberGenerator rng = RandomNumberGenerator();
+    rng.seed(2);
+    clear_noninput();
+
+    for (int i = 0; i < NETWORK_SIGNATURE_SIZE; i++)
+    {
+        for (int j = 0; j < dims.nnodes.input; j++)
+        {
+            load_sensor(j, rng.random_0_1_double() * 2.0 - 1.0);
+        }
+        this->activate();
+        copy_vector(signature[i], this->get_outputs(), dims.nnodes.output);
+    }
+    clear_noninput();
+}
+
+bool CpuNetwork::are_signatures_equal(CpuNetwork* other){
+    
+    if(!(this->signature_initialized && other->signature_initialized))
+    {
+        cout << "Error, signature comparison without signature initialization" << endl;
+        exit(1);
+    }
+    //cout << count_n_dif_matrix_items_double(this->signature, other->signature, this->dims.nnodes.output, NETWORK_SIGNATURE_SIZE) << " ";
+    return count_n_dif_matrix_items_double(this->signature, other->signature, this->dims.nnodes.output, NETWORK_SIGNATURE_SIZE) == 0;
+}
 
 
 // Requires nodes to be sorted by type: BIAS, SENSOR, OUTPUT, HIDDEN

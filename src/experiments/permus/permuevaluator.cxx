@@ -26,6 +26,7 @@
 #include <iomanip>
 #include "Parameters.h"
 #include "PERMU_params.h"
+#include <functional>
 
 using namespace std;
 
@@ -36,6 +37,53 @@ using namespace std;
 
 
 namespace PERMU{
+void make_output_behaviour_mapping_more_injective(double *output)
+{
+#define POS_FIRS_OPERATOR 1
+    if (output[0] < -CUTOFF_0 || output[0] > CUTOFF_0)
+    {
+        output[0] = (double) move_to_0_minusone_or_one(output[0]);
+    }
+    else
+    {
+        for (int i = 0; i < PERMU::__output_N; i++)
+        {
+            output[i] = 0.0;
+        }
+        return;
+    }
+
+    if (sum_abs_val_slice_vec(output, 1, 1 + PERMU::N_OPERATORS) == 0)
+    {
+        for (int i = 0; i < PERMU::__output_N; i++)
+        {
+            output[i] = 0.0;
+        }
+        return;
+    }
+
+    output[PERMU::TABU] = (double) move_to_0_minusone_or_one(output[PERMU::TABU]);
+
+
+    int nonzero_index = argmax(output + POS_FIRS_OPERATOR, PERMU::N_OPERATORS) + POS_FIRS_OPERATOR;
+    for (int i = POS_FIRS_OPERATOR; i < POS_FIRS_OPERATOR + PERMU::N_OPERATORS; i++)
+    {
+        output[i] = 0.0;
+    }
+    output[nonzero_index + POS_FIRS_OPERATOR] = 1.0;
+
+    if (output[0] < -CUTOFF_0) // local search
+    {
+        for (int i = 0; i < PERMU::N_PERMU_REFS; i++)
+        {
+            output[PERMU::__output_N - 1 - i] = 0.0;
+        }
+        output[accept_or_reject_worse] = 0.0;
+    }
+
+
+
+}
 
 struct Evaluator
 {
@@ -80,35 +128,53 @@ struct Evaluator
         rng.seed();
         int initial_seed = rng.random_integer_fast(10050000,20000000);
         // evaluate the individuals
+
+
         #pragma omp parallel for num_threads(N_OF_THREADS)
         for (size_t inet = 0; inet < nnets; inet++)
         {
             NEAT::CpuNetwork *net = nets[inet];
+            net->compute_signature();
+            net->apply_function_to_signature(make_output_behaviour_mapping_more_injective);
+        }
+        
+        int* classes_array = new int[nnets];
+        std::function<bool (NEAT::CpuNetwork*, NEAT::CpuNetwork*)>  are_signatures_equal = [](NEAT::CpuNetwork* net1, NEAT::CpuNetwork* net2) { return net1->are_signatures_equal(net2); };
+        find_classes_in_array_of_objects(nets, are_signatures_equal, nnets, classes_array);
+
+        cout << " Evaluating -> ";
+
+
+        progress_bar bar(nnets);
+        #pragma omp parallel for num_threads(N_OF_THREADS)
+        for (int inet = 0; inet < nnets; inet++)
+        {
+            NEAT::CpuNetwork *net = nets[inet];
             NEAT::OrganismEvaluation eval;
             int seed = initial_seed;
-            f_values[inet] = this->FitnessFunction(net, parameters->N_EVALS, seed);
             results[inet] = eval;
 
-            // print progress.
-            std::mutex mutx;
-            mutx.lock();
-            if (!printed_bracket)
-            {
-                std::cout << "[" << std::flush;
-                printed_bracket = true;
-            }
-            progress_print_decider += 15.0 / (double)nnets;
-            if (inet == 0)
-            {
-            }
-            while (progress_print_decider >= 1.0)
-            {
-                std::cout << "." << std::flush;
-                progress_print_decider--;
-            }
-            mutx.unlock();
+            // if (classes_array[inet] == inet) // copy fitness
+            // { // copy fitness
+                f_values[inet] = this->FitnessFunction(net, parameters->N_EVALS, seed);
+            // } copy  fitness
+            bar.step();
         }
-        std::cout << "]" << std::endl;
+        bar.end();
+
+        // // Copy fitness value from repeated networks.
+        // #pragma omp parallel for num_threads(N_OF_THREADS)
+        // for (int inet = 0; inet < nnets; inet++)
+        // {
+        //     NEAT::CpuNetwork *net = nets[inet];
+        //     NEAT::OrganismEvaluation eval;
+        //     int seed = initial_seed;
+        //     if (classes_array[inet] != inet)
+        //     {
+        //         f_values[inet] = f_values[classes_array[inet]];
+        //     }
+        // }
+
 
         // // reevaluate top n_of_threads_omp, with a minimum of 5 and a maximum of nnets.
         // double cut_value = obtain_kth_largest_value(f_values, min(max(n_of_threads_omp, 5), static_cast<int>(nnets)), nnets);
@@ -116,19 +182,19 @@ struct Evaluator
         // reevaluate top 5% at least N_REEVAL times
         int actual_n_reevals = (((parameters->N_REEVALS_TOP_5_PERCENT - 1) / N_OF_THREADS) + 1) * N_OF_THREADS;
         int n_of_networks_to_reevaluate = MAX(1, static_cast<int>(nnets) * 5 / 100);
-        cout << "reevaluating top 5% (" << n_of_networks_to_reevaluate << " nets out of " << static_cast<int>(nnets) << ") each " << actual_n_reevals << " times." << endl;
+        cout << "reevaluating top 5% (" << n_of_networks_to_reevaluate << " nets out of " << static_cast<int>(nnets) << ") each " << actual_n_reevals << " times -> " << std::flush;
 
         double cut_value = obtain_kth_largest_value(f_values, n_of_networks_to_reevaluate+1, static_cast<int>(nnets));
 
         rng.seed();
         initial_seed = rng.random_integer_fast(20050000,30000000);
 
+        bar.restart(nnets);
         for (size_t inet = 0; inet < nnets; inet++)
         {
             if (f_values[inet] <= cut_value)
             {
                 f_values[inet] -= 1000000000.0; // apply a discount to the individuals that are not reevaluated
-                continue;
             }
             else
             {
@@ -140,9 +206,10 @@ struct Evaluator
                 f_values[inet] = res[index_value];
                 delete[] res;
             }
+            bar.step();
         }
-
-        cout << "Reevaluating best indiv of generation: "<< std::flush;
+        bar.end();
+        cout << "Reevaluating best of gen: "<< std::flush;
         int index_most_fit = argmax(f_values, nnets);
         NEAT::CpuNetwork *net = nets[index_most_fit];
 
@@ -156,8 +223,9 @@ struct Evaluator
         }
 
         double *res = new double[parameters->N_EVALS_TO_UPDATE_BK];
+        bar.restart(1);
         this->FitnessFunction_parallel(net, parameters->N_EVALS_TO_UPDATE_BK, res, 30050000);
-
+        bar.end();
 
         // double median = res[arg_element_in_centile_specified_by_percentage(res, N_EVALS_TO_UPDATE_BK, 0.5)];
         double average = Average(res,parameters->N_EVALS_TO_UPDATE_BK);
@@ -206,6 +274,7 @@ struct Evaluator
         }
         delete[] tmp_order;
         delete[] f_values;
+        delete[] classes_array;
     
     }
 };

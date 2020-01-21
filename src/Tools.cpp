@@ -21,8 +21,6 @@
 #include "Lap.h"
 #include <float.h>
 #include <vector>
-
-
 #define TEMP_double_ARRAY_SIZE 30
 
 
@@ -592,7 +590,7 @@ int RandomNumberGenerator::xorshf96(void)
     this->y = this->z;
     this->z = t ^ this->x ^ this->y;
 
-    return z & INT_MAX;
+    return this->z & INT_MAX;
 }
 
 
@@ -605,6 +603,7 @@ void RandomNumberGenerator::seed(void){
     this->z = 521288629UL;
     int seed =  ts.tv_nsec; // modulus with a big number, but not too big
     this->x = (unsigned long) seed;
+    xorshf96();
 }
 
 void RandomNumberGenerator::seed(int seed){
@@ -1830,4 +1829,50 @@ double l1_distance(double* array_1, double* array_2, int len)
     }
 
     return res;
+}
+
+
+
+
+progress_bar::progress_bar(int n){
+    this->timer = stopwatch();
+    this->timer.tic();
+    this->max_steps = n;
+    this->current_steps = 0;
+    std::cout << "[" << std::flush;
+}
+
+progress_bar::~progress_bar(){
+}
+
+double float_reminder(double x, double divisor){
+    double res = x / divisor;
+    return res - (double) (int) res;
+}
+
+void progress_bar::step(){
+    #define NUMBER_OF_PROGRESS_DOTS 15
+    
+    //int NUMBER_OF_PROGRESS_DOTS = min(MAX_NUMBER_OF_PROGRESS_DOTS, max_steps / 10);
+
+    double last_reminder = float_reminder((double) current_steps-1, (double) NUMBER_OF_PROGRESS_DOTS);
+    double current_reminder = float_reminder((double) current_steps, (double) NUMBER_OF_PROGRESS_DOTS);
+    double next_reminder = float_reminder((double) current_steps+1, (double) NUMBER_OF_PROGRESS_DOTS);
+
+    if ( (int) (NUMBER_OF_PROGRESS_DOTS * current_steps) / max_steps > (int) (NUMBER_OF_PROGRESS_DOTS * (current_steps-1)) / max_steps )
+    {
+        std::cout << "." << std::flush;
+    }
+    this->current_steps++;
+}
+
+void progress_bar::end(){
+    std::cout << "]" << " " << this->timer.toc() << "(s)" << std::endl;
+}
+
+void progress_bar::restart(int n){
+    this->timer.tic();
+    this->max_steps = n;
+    this->current_steps = 0;
+    std::cout << "[" << std::flush;
 }
