@@ -22,8 +22,6 @@ using std::endl;
 using std::istream;
 using std::ostream;
 
-#define TARGET_N_ITERATIONS_iteration_geom 10000
-#define TARGET_VALUE_iteration_geom 0.5
 
 
 namespace PERMU{
@@ -33,8 +31,6 @@ void CPopulation::init_class(PBP *problem, RandomNumberGenerator* rng, PERMU::pa
     this->problem = problem;
     this->popsize = parameters-> POPSIZE;
     this->max_time_pso = parameters-> MAX_TIME_PSO;
-    this->iteration_geom = 1.0;
-    this->iteration_geom_coef = pow(TARGET_VALUE_iteration_geom, 1.0/ ((double) TARGET_N_ITERATIONS_iteration_geom * parameters-> MAX_TIME_PSO));
     this->n = problem->GetProblemSize();
     tab = new Tabu(rng, n, parameters-> TABU_LENGTH);
     problem->tab = this->tab;
@@ -92,7 +88,6 @@ void CPopulation::Reset(){
     tab->reset();
     timer->tic();
     evaluate_population();
-    this->iteration_geom = 1.0;
     end_iteration();
 }
 
@@ -137,7 +132,6 @@ CPopulation::~CPopulation()
 void CPopulation::end_iteration(){
     SortPopulation();
     get_population_info();
-    iteration_geom *= iteration_geom_coef; // substitute of time, that way we do not depend on randomness
     if(timer->toc() > this->max_time_pso)
     {
         terminated = true;
@@ -244,7 +238,7 @@ void CPopulation::comp_relative_time()
 {
     for (int i = 0; i < this->popsize; i++)
     {
-        double res = this->iteration_geom; // timer->toc() / MAX_TIME_PSO;
+        double res = timer->toc() / this->max_time_pso;
         this->m_individuals[i]->relative_time = res;
         pop_info[i][PERMU::RELATIVE_TIME] = res;
     }
