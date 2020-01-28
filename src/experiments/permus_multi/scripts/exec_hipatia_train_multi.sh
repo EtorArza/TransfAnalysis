@@ -6,8 +6,8 @@
 #SBATCH --ntasks-per-node=1 #number of tasks per node
 #SBATCH --mem=32G
 #SBATCH --cpus-per-task=32 # number of CPUs
-#SBATCH --time=2-01:30:00 #Walltime
-#SBATCH -p large
+#SBATCH --time=0-05:30:00 #Walltime
+#SBATCH -p medium
 #SBATCH --exclude=n[001-004,017-018]
 
 
@@ -104,17 +104,20 @@ date
 ./neat "tmp.ini"
 date
 
-instance_path=$3
+instance_path_0=$3
+instance_path_1=$3
 
 
 echo "$2"
 
-filename="${instance_path##*/}"
-instancename="${filename%%.*}"
+filename_0="${instance_path_0##*/}"
+instancename_0="${filename_0%%.*}"
+filename_1="${instance_path_1##*/}"
+instancename_1="${filename_1%%.*}"
 
 
 
-cp "controllers_trained_with_${instancename}"* -v -r $SRCDIR/src/experiments/permus_multi/results/controllers/
+cp "controllers_trained_with_${instancename_0}_${instancename_1}"* -v -r $SRCDIR/src/experiments/permus_multi/results/controllers/
 
 
 

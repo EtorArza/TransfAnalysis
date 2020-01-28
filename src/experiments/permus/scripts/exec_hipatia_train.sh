@@ -112,7 +112,7 @@ instancename="${filename%%.*}"
 echo "$instancename"
 
 
-cp "controllers_trained_with_$instancename" -v -r $SRCDIR
+cp "controllers_trained_with_$instancename" -v -r "$SRCDIR/src/experiments/permus/results/controllers"
 
 
 
