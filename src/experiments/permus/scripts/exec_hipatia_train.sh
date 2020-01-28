@@ -6,8 +6,8 @@
 #SBATCH --ntasks-per-node=1 #number of tasks per node
 #SBATCH --mem=32G
 #SBATCH --cpus-per-task=32 # number of CPUs
-#SBATCH --time=2-01:30:00 #Walltime
-#SBATCH -p large
+#SBATCH --time=0-06:00:00 #Walltime
+#SBATCH -p medium
 #SBATCH --exclude=n[001-004,017-018]
 
 
@@ -61,7 +61,7 @@ make
 echo "-compiled-"
 
 cat > tmp.ini <<EOF
-; config file for train in hpc hipatia
+; temporal config file for train in hpc hipatia
 
 
 [Global] 
@@ -70,12 +70,12 @@ PROBLEM_NAME = permu
 
 
 [NEAT]
-MAX_TRAIN_TIME = 172800
-POPSIZE = 640
+MAX_TRAIN_TIME = 19800
+POPSIZE = 512
 THREADS = 32
-N_EVALS = 30
+N_EVALS = 15
 N_REEVALS_TOP_5_PERCENT = 20
-N_EVALS_TO_UPDATE_BK = 1280
+N_EVALS_TO_UPDATE_BK = 512
 
 
 

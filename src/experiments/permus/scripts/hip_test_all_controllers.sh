@@ -1,7 +1,7 @@
 #!/bin/bash
 
 for controller in src/experiments/permus/results/transfer_qap_with_cut_instances/top_controllers/*; do
-    for instance in src/experiments/permus/results/transfer_qap_with_cut_instances/instances/cut_instances/*; do
+    for instance in src/experiments/permus/instances/qap/cut_instances/*; do
         first_line=$(head -n 1 ${instance})
         if [ ${first_line} == "60" ]
         then

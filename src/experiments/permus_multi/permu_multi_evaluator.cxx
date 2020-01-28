@@ -102,7 +102,7 @@ struct Evaluator
         // double cut_value = obtain_kth_largest_value(f_values, min(max(n_of_threads_omp, 5), static_cast<int>(nnets)), nnets);
 
         // reevaluate top 5% at least N_REEVAL times
-        int n_of_networks_to_reevaluate = parameters->POPSIZE / 20 + 1;
+        int n_of_networks_to_reevaluate = nnets / 20 + 1;
         int n_of_reevals_top_5percent = parameters->N_EVALS * parameters->N_REEVALS_TOP_5_PERCENT;
         cout << "reevaluating top 5% (" << n_of_networks_to_reevaluate << " nets out of " << static_cast<int>(nnets) << ") each " << n_of_reevals_top_5percent << " times -> ";
 

@@ -1,23 +1,16 @@
 #!/bin/bash
 
-for instance in src/experiments/permus/results/transfer_qap_with_cut_instances/instances/cut_instances/*; do
-    first_line=$(head -n 1 ${instance})
-    if [ ${first_line} == "60" ]
-    then
-    pso_time=0.3
-    elif [ ${first_line} == "30" ]
-    then 
-    pso_time=0.1
-    else
-    echo "ERROR, only instances of size 30 or 60 should be trained. The instance"
-    echo $instance
-    echo " was attempted to be used as test instance."
-    fi
-    sbatch scripts/exec_hipatia_train.sh "qap" "$instance" "$pso_time"
+
+for problem in "qap" "tsp" "lop" "pfsp"
+for instance in src/experiments/permus/instances/${problem}/*; do
+    sbatch scripts/exec_hipatia_train.sh "$problem" "$instance" 0.25
+done
 done
 
 
-
+for instance in src/experiments/permus/instances/qap/cut_instances/*; do
+    sbatch scripts/exec_hipatia_train.sh "qap" "$instance" 0.25
+done
 
 
 

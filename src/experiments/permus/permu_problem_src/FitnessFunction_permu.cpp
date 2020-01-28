@@ -53,7 +53,7 @@ PBP *GetProblemInfo(std::string problemType, std::string filename)
 }
 
 
-
+//#define COUNTER
 double FitnessFunction_permu(NEAT::CpuNetwork *net_original, int n_evals, int seed, PERMU::params* parameters)
 {   using namespace PERMU;
 
