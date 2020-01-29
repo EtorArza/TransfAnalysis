@@ -1,5 +1,7 @@
 #!/bin/bash
 
+srun bash scripts/make_hip.sh
+
 
 for problem in "qap" "tsp" "lop" "pfsp"; do
 for instance in src/experiments/permus/instances/${problem}/*; do

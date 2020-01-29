@@ -1,6 +1,8 @@
 
 # https://stackoverflow.com/questions/17403498/iterate-over-two-arrays-simultaneously-in-bash
 
+srun bash scripts/make_hip.sh
+
 array1=($(ls src/experiments/permus/instances/qap/cut_instances/cut30*0b)) # 0.1s 
 array2=($(ls src/experiments/permus/instances/qap/cut_instances/cut30*0a)) # 0.1
 array3=($(ls src/experiments/permus/instances/qap/cut_instances/cut30*sko*)) # 0.1

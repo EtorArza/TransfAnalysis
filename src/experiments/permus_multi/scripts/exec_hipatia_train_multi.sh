@@ -33,26 +33,14 @@ SRCDIR=`pwd`
 
 
 
-cp ./* -v -r $SCRATCH_JOB
+cp ./src/experiments -v -r $SCRATCH_JOB/src/experiments
+cp neat -v -r $SCRATCH_JOB
+
+
+
 # mkdir $SCRATCH_JOB/data
 # cp $dsname -v $SCRATCH_JOB/data
 cd $SCRATCH_JOB
-
-# echo `pwd`
-# echo `ls`
-# echo `ls data`
-cat > Makefile.conf <<EOF
-ENABLE_CUDA=false
-DEVMODE=false
-CFLAGS=-fopenmp -std=c++11 -pthread
-
-PFM_LD_FLAGS=
-PFM_NVCC_CCBIN=
-EOF
-
-make
-
-echo "-compiled-"
 
 cat > tmp.ini <<EOF
 ; config file for train in hpc hipatia
@@ -64,7 +52,7 @@ PROBLEM_NAME = permu_multi
 
 
 [NEAT]
-MAX_TRAIN_TIME = 19800
+MAX_TRAIN_TIME = 18000
 POPSIZE = 512
 THREADS = 32
 N_EVALS = 5
@@ -104,20 +92,17 @@ date
 ./neat "tmp.ini"
 date
 
-instance_path_0=$3
-instance_path_1=$3
-
-
 echo "$2"
 
-filename_0="${instance_path_0##*/}"
-instancename_0="${filename_0%%.*}"
-filename_1="${instance_path_1##*/}"
-instancename_1="${filename_1%%.*}"
+filename="${instance_path##*/}"
+instancename="${filename%%.*}"
+
+echo "$instancename"
 
 
+cp "controllers_trained_with_${instancename}"* -v -r $SRCDIR/src/experiments/permus_multi/results/controllers/
 
-cp "controllers_trained_with_${instancename_0}_${instancename_1}"* -v -r $SRCDIR/src/experiments/permus_multi/results/controllers/
+
 
 
 

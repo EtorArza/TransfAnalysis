@@ -39,26 +39,11 @@ SRCDIR=`pwd`
 
 
 
-cp ./* -v -r $SCRATCH_JOB
-# mkdir $SCRATCH_JOB/data
-# cp $dsname -v $SCRATCH_JOB/data
+cp ./src/experiments -v -r $SCRATCH_JOB/src/experiments
+cp neat -v $SCRATCH_JOB
 cd $SCRATCH_JOB
 
-# echo `pwd`
-# echo `ls`
-# echo `ls data`
-cat > Makefile.conf <<EOF
-ENABLE_CUDA=false
-DEVMODE=false
-CFLAGS=-fopenmp -std=c++11 -pthread
 
-PFM_LD_FLAGS=
-PFM_NVCC_CCBIN=
-EOF
-
-make
-
-echo "-compiled-"
 
 cat > tmp.ini <<EOF
 ; temporal config file for train in hpc hipatia
@@ -70,7 +55,7 @@ PROBLEM_NAME = permu
 
 
 [NEAT]
-MAX_TRAIN_TIME = 19800
+MAX_TRAIN_TIME = 18000
 POPSIZE = 512
 THREADS = 32
 N_EVALS = 15
