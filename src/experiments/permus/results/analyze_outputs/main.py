@@ -15,7 +15,7 @@ save_fig_path = "/home/paran/Dropbox/BCAM/02_NEAT_permus/paper/images/analyze_ou
 #save_fig_path = ""
 
 
-def save_fig(d, fig_title, fig_path, scale_between_1_and_0 = False):
+def save_fig(d, fig_title, fig_path, scale_between_1_and_0 = False, size_fixed=False):
 
     data = d.copy(deep=True)
     print(data)
@@ -25,11 +25,20 @@ def save_fig(d, fig_title, fig_path, scale_between_1_and_0 = False):
     else:
         plt.pcolor(data)
 
+    print(size_fixed)
+
+    if size_fixed:
+        test_label = r"type of test instances $(t_b)$"
+        train_label = r"type of train instances $(t_a)$"
+    else:
+        test_label = r"size of test instances $(s_b)$"
+        train_label = r"size of train instances $(s_a)$"
+
     FONTSIZE = 15
     plt.yticks(np.arange(0.5, len(data.index), 1), data.index, fontsize=FONTSIZE)
     plt.xticks(np.arange(0.5, len(data.columns), 1), data.columns, rotation = 90,  fontsize=FONTSIZE)
-    plt.ylabel("trained on", fontsize=FONTSIZE*1.2)
-    plt.xlabel("tested on", fontsize=FONTSIZE*1.2)
+    plt.ylabel(train_label, fontsize=FONTSIZE*1.2)
+    plt.xlabel(test_label, fontsize=FONTSIZE*1.2)
     plt.colorbar()
     plt.title(" ")
     #plt.title(fig_title)
@@ -61,8 +70,8 @@ with open("output_values.txt", "r") as f:
             i = 1
             j+=1
             controller, instance = line.strip("\n").split("|")
-            cont_size = "size=30" if "cut30" in controller else "size=60"
-            inst_size = "size=30" if "cut30" in instance else "size=60"
+            cont_size = "30" if "cut30" in controller else "60"
+            inst_size = "30" if "cut30" in instance else "60"
             cont_class = "Sko" if "sko" in controller else "Taixxa" if "0a" in controller else "Taixxb"
             inst_class = "Sko" if "sko" in instance else "Taixxa" if "0a" in instance else "Taixxb"
             indexes.append(cont_size + "_" + cont_class + " - " + inst_size + "_" + inst_class+"_"+str(j))
@@ -82,7 +91,7 @@ df = pd.DataFrame(data=data, columns=["cont_size", "cont_class", "inst_size", "i
 
 
 
-size_classes = ["size=30", "size=60"]
+size_classes = ["30", "60"]
 type_classes = ["Taixxa", "Sko", "Taixxb"]
 
 
@@ -113,7 +122,7 @@ for size in size_classes:
     avg_distance_matrix_by_type_and_size_set.loc["all","all"] = np.nan
     avg_distance_matrix_by_type_and_size_set = avg_distance_matrix_by_type_and_size_set.iloc[::-1]
 
-    save_fig(avg_distance_matrix_by_type_and_size_set, "Average L1 distance to the mean behaviour", save_fig_path+"avg_L1_dist_to_mean_behaviour_with_size_fixed_at"+ str(size) +".pdf")
+    save_fig(avg_distance_matrix_by_type_and_size_set, "Average L1 distance to the mean behaviour", save_fig_path+"avg_L1_dist_to_mean_behaviour_with_size_fixed_at"+ str(size) +".pdf", size_fixed=True)
 
 
 
@@ -142,4 +151,4 @@ for each_type in type_classes:
     avg_distance_matrix_by_type_and_size_set.loc["all","all"] = np.nan
     avg_distance_matrix_by_type_and_size_set = avg_distance_matrix_by_type_and_size_set.iloc[::-1]
 
-    save_fig(avg_distance_matrix_by_type_and_size_set, "Average L1 distance to the mean behaviour", save_fig_path+"avg_L1_dist_to_mean_behaviour_with_type_fixed_at_"+ str(each_type) +".pdf")
+    save_fig(avg_distance_matrix_by_type_and_size_set, "Average L1 distance to the mean behaviour", save_fig_path+"avg_L1_dist_to_mean_behaviour_with_type_fixed_at_"+ str(each_type) +".pdf", size_fixed=False)
