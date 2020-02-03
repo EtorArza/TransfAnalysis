@@ -31,15 +31,15 @@
 
 SRCDIR=`pwd`
 
+cd $SCRATCH_JOB
+mkdir "src"
+cd "src"
+mkdir "experiments"
+cd $SRCDIR
 
 
-cp ./src/experiments -v -r $SCRATCH_JOB/src/experiments
-cp neat -v -r $SCRATCH_JOB
-
-
-
-# mkdir $SCRATCH_JOB/data
-# cp $dsname -v $SCRATCH_JOB/data
+cp src/experiments -v -r $SCRATCH_JOB/src
+cp neat -v $SCRATCH_JOB
 cd $SCRATCH_JOB
 
 cat > tmp.ini <<EOF
