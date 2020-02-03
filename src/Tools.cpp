@@ -1665,9 +1665,10 @@ bool is_A_larger_than_B_Mann_Whitney(double* A, double* B, int length){
     }
 
     compute_order_from_double_to_double(array_of_values, length*2, ranks, false, true);
+    sum_value_to_array(ranks, 1.0, length*2);
 
-    double r_A = sum_slice_vec(array_of_values, 0, length);
-    double r_B = sum_slice_vec(array_of_values, length, length*2);
+    double r_A = sum_slice_vec(ranks, 0, length);
+    double r_B = sum_slice_vec(ranks, length, length*2);
 
 
 
