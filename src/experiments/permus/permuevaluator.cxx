@@ -28,6 +28,7 @@
 #include "PERMU_params.h"
 #include <functional>
 #include <vector>
+#include <sstream>
 
 
 using namespace std;
@@ -460,7 +461,9 @@ public:
         rng->seed();
         int initial_seed = rng->random_integer_uniform(40000000, 50000000);
         delete rng;
-        cout << "[[";
+        ostringstream result_string_stream;
+
+        result_string_stream << "[[";
         for (int j = 0; j < parameters->N_REPS; j++)
         {
             #pragma omp parallel for num_threads(N_OF_THREADS)
@@ -470,23 +473,23 @@ public:
             }
             initial_seed += parameters->N_EVALS;
             double res = Average(v_of_f_values, parameters->N_EVALS);
-            cout << res;
+            result_string_stream << res;
             if (j < parameters->N_REPS-1)
             {
-                cout << ",";
+                result_string_stream << ",";
             }
             
         }
-        cout << "]," << std::flush;
+        result_string_stream << "]," << std::flush;
 ;
         delete[] v_of_f_values;
 
 
         
 
-        cout << std::setprecision(15);
-        cout << std::flush;
-        cout << parameters->INSTANCE_PATH   << ","
+        result_string_stream << std::setprecision(15);
+        result_string_stream << std::flush;
+        result_string_stream << parameters->INSTANCE_PATH   << ","
              << parameters->CONTROLLER_PATH << ","
              << parameters->PROBLEM_TYPE    << ","
              << parameters->N_EVALS
@@ -495,7 +498,11 @@ public:
 
 
         // cout << res << std::endl;;
-        cout << std::flush;
+        result_string_stream << std::flush;
+
+        string result_string = result_string_stream.str();
+
+        append_line_to_file("result.txt", result_string);
 
         return;
     }

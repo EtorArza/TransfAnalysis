@@ -27,40 +27,29 @@
 
 
 
-if [[ "$#" -ne 4  ]] ; then
-    echo 'Please provide the name of the problem, the name of the instance and the path to the controller and max_pso_time. $# parameters where provided. 4 are needed. Example: '
+if [[ "$#" -ne 5  ]] ; then
+    echo 'Please provide the name of the problem, the name of the instance and the path to the controller, max_pso_time, and the location of output. $# parameters where provided. 4 are needed. Example: '
     echo ""
-    echo 'script.sh qap tai35a.dat.dat experiment_results/inter_instance_transfer/qap_tai35a/experiment_1/fittest_1 0.5'
+    echo 'script.sh qap tai35a.dat.dat experiment_results/inter_instance_transfer/qap_tai35a/experiment_1/fittest_1 0.5 results.txt'
     echo ""
     echo 'Exitting...'
     exit 1
 fi
 
-
 SRCDIR=`pwd`
 
+cd $SCRATCH_JOB
+mkdir "src"
+cd "src"
+mkdir "experiments"
+cd $SRCDIR
 
 
-cp ./* -v -r $SCRATCH_JOB
-# mkdir $SCRATCH_JOB/data
-# cp $dsname -v $SCRATCH_JOB/data
+cp src/experiments -v -r $SCRATCH_JOB/src
+cp neat -v $SCRATCH_JOB
 cd $SCRATCH_JOB
 
-# echo `pwd`
-# echo `ls`
-# echo `ls data`
-cat > Makefile.conf <<EOF
-ENABLE_CUDA=false
-DEVMODE=false
-CFLAGS=-fopenmp -std=c++11 -pthread
 
-PFM_LD_FLAGS=
-PFM_NVCC_CCBIN=
-EOF
-
-make
-
-echo "-compiled-"
 
 cat > tmp.ini <<EOF
 ; config file for test in hpc hipatia
@@ -68,6 +57,8 @@ cat > tmp.ini <<EOF
 
 [Global] 
 MODE = test ;
+PROBLEM_NAME = permu
+
 
 [TestSettings]
 THREADS = 32 ;
@@ -90,8 +81,8 @@ EOF
 
 
 date
-./neat "tmp.ini" >> res.txt
-cat res.txt >> $SRCDIR/result_controllers.txt
+./neat "tmp.ini"
+cat "result.txt" >> "$SRCDIR/$5"
 date
 
 

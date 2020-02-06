@@ -28,11 +28,11 @@ def save_fig(d, fig_title, fig_path, scale_between_1_and_0 = False, size_fixed=F
     print(size_fixed)
 
     if size_fixed:
-        test_label = r"type of test instances $(t_b)$"
-        train_label = r"type of train instances $(t_a)$"
+        test_label = r"type of test instances $(t_2)$"
+        train_label = r"type of train instances $(t_1)$"
     else:
-        test_label = r"size of test instances $(s_b)$"
-        train_label = r"size of train instances $(s_a)$"
+        test_label = r"size of test instances $(s_2)$"
+        train_label = r"size of train instances $(s_1)$"
 
     FONTSIZE = 15
     plt.yticks(np.arange(0.5, len(data.index), 1), data.index, fontsize=FONTSIZE)
