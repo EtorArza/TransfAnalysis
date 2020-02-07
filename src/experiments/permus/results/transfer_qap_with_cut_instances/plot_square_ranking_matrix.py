@@ -276,7 +276,6 @@ def save_fig(d, fig_title, fig_path,size_relevant=True, class_relevant=True):
     data = d.copy(deep=True)
 
     for column in data:
-        data[column] = inverse(np.argsort(data[column]))
         data[column] -= mean(data[column])
         data[column] /= stdev(data[column]) # max(d[column])
 
