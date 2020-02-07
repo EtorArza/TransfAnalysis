@@ -10,25 +10,32 @@ import fnmatch
 
 
 # save in figures local folder
-#save_fig_path = "figures/"
+save_fig_path = "figures/"
+#save_fig_path = "/home/paran/Dropbox/BCAM/02_NEAT_permus/paper/images/qap_transfer_cut/"
+
+
+#input_txt = "result_controllers_GECCO2020_version.txt"
+input_txt = "result_controllers_journal_version.txt"
+
+
 
 # save in GECCO article dir
 import matplotlib
 matplotlib.rcParams['pdf.fonttype'] = 42
 matplotlib.rcParams['ps.fonttype'] = 42
-save_fig_path = "/home/paran/Dropbox/BCAM/02_NEAT_permus/paper/images/qap_transfer_cut/"
 
 
 
 
 scores = []
 
-with open("result_controllers.txt") as f:
+
+with open(input_txt) as f:
     for line in f:
         values = [float(el) for el in line.split("]")[0].strip("[").split(",")]
         n = len(values)
         instance = line.split(",")[n].split(".")[0].split("/")[-1]
-        controller = line.split(",")[n+1].split("/")[-1].split("_gen_")[0]
+        controller = line.split(",")[n+1].split("/")[-1].split("_gen_")[0].split("with_")[1]
         scores.append([values, instance, controller])
 
 
@@ -39,6 +46,7 @@ for el in scores:
     if el[1] not in test_instances:
         test_instances.append(el[1])
     #inst_contr_dict[(el[1],el[2])] = (mean(el[0]) - RS_res) / (BK - RS_res)
+    print((el[1],el[2]))
     inst_contr_dict[(el[1],el[2])] = mean(el[0])
 
 
@@ -56,11 +64,11 @@ def rename_name(case_name, size_relevant=True, class_relevant=True):
 
 
     if fnmatch.fnmatch(case_name, "*tai*a"):
-        new_name += "Taixxa"
+        new_name += "A"
     elif fnmatch.fnmatch(case_name, "*sko*"):
-        new_name += "Sko"
+        new_name += "C"
     elif fnmatch.fnmatch(case_name, "*tai*b"):
-        new_name += "Taixxb"
+        new_name += "B"
     else:
         raise Warning("tai*a, sko or tai*b not found in case name "+str(case_name))
 
@@ -109,7 +117,7 @@ train_instances = test_instances[:]
 zero_data = np.zeros(shape=(len(train_instances),len(test_instances)))
 d = pd.DataFrame(zero_data, columns=test_instances, index=train_instances)
 
-
+print(inst_contr_dict)
 
 for inst in test_instances:
     for contr in train_instances:
@@ -123,11 +131,8 @@ def inverse(iterable):
         res[iterable[i]] = i
     return res
 
+print(d)
 
-for column in d:
-    d[column] = inverse(np.argsort(d[column]))
-    d[column] -= mean(d[column])
-    d[column] /= stdev(d[column]) # max(d[column])
 
 
 
@@ -183,21 +188,133 @@ for i in range(15):
 """
 
 
+# https://stackoverflow.com/Questions/7404116/defining-the-midpoint-of-a-colormap-in-matplotlib
+def shiftedColorMap(cmap, start=0, midpoint=0.5, stop=1.0, name='shiftedcmap'):
+    '''
+    Function to offset the "center" of a colormap. Useful for
+    data with a negative min and positive max and you want the
+    middle of the colormap's dynamic range to be at zero.
 
+    Input
+    -----
+      cmap : The matplotlib colormap to be altered
+      start : Offset from lowest point in the colormap's range.
+          Defaults to 0.0 (no lower offset). Should be between
+          0.0 and `midpoint`.
+      midpoint : The new center of the colormap. Defaults to
+          0.5 (no shift). Should be between 0.0 and 1.0. In
+          general, this should be  1 - vmax / (vmax + abs(vmin))
+          For example if your data range from -15.0 to +5.0 and
+          you want the center of the colormap at 0.0, `midpoint`
+          should be set to  1 - 5/(5 + 15)) or 0.75
+      stop : Offset from highest point in the colormap's range.
+          Defaults to 1.0 (no upper offset). Should be between
+          `midpoint` and 1.0.
+    '''
+    cdict = {
+        'red': [],
+        'green': [],
+        'blue': [],
+        'alpha': []
+    }
+
+    # regular index to compute the colors
+    reg_index = np.linspace(start, stop, 257)
+
+    # shifted index to match the data
+    shift_index = np.hstack([
+        np.linspace(0.0, midpoint, 128, endpoint=False),
+        np.linspace(midpoint, 1.0, 129, endpoint=True)
+    ])
+
+    for ri, si in zip(reg_index, shift_index):
+        r, g, b, a = cmap(ri)
+
+        cdict['red'].append((si, r, r))
+        cdict['green'].append((si, g, g))
+        cdict['blue'].append((si, b, b))
+        cdict['alpha'].append((si, a, a))
+
+    newcmap = matplotlib.colors.LinearSegmentedColormap(name, cdict)
+    plt.register_cmap(cmap=newcmap)
+
+    return newcmap
+
+
+def transform_name_to_global(name_string):
+    return name_string.split("_")[0]
+
+def average_results(dataframe):
+    classes_index = []
+    classes_columns = []
+
+    for label in dataframe.index:
+        if transform_name_to_global(label) not in classes_index:
+            classes_index.append(transform_name_to_global(label))
+
+    for label in dataframe.columns:
+        if transform_name_to_global(label) not in classes_columns:
+            classes_columns.append(transform_name_to_global(label))
+
+
+    result = pd.DataFrame(index=classes_index, columns=classes_columns)
+    for index_label in classes_index:
+        for column_label in classes_columns:
+            result.loc[index_label, column_label] = list()
+
+    for index_label in dataframe.index:
+        for column_label in dataframe.index:
+            result.loc[transform_name_to_global(index_label),
+                       transform_name_to_global(column_label)].append(dataframe.loc[index_label, column_label])
+    result = result.applymap(mean)
+
+    return result
 
 
 def save_fig(d, fig_title, fig_path,size_relevant=True, class_relevant=True):
 
     data = d.copy(deep=True)
 
-    plt.pcolor(data, )
+    for column in data:
+        data[column] = inverse(np.argsort(data[column]))
+        data[column] -= mean(data[column])
+        data[column] /= stdev(data[column]) # max(d[column])
+
+
+    # for i in range(d.shape[0]):
+    #    d.iloc[i,:] -= mean(d.iloc[i,:])
+    #    d.iloc[i,:] /= stdev(d.iloc[i,:])
+
+
     yticks = [rename_name(el,size_relevant, class_relevant) for el in data.index]
     xticks = [rename_name(el,size_relevant, class_relevant) for el in data.columns]
+    data.index = yticks
+    data.columns = xticks
+
+    data = average_results(data)
+
+
+
+    max_val = data.max().max()
+    min_val = data.min().min()
+
+    max_reference = 1.3
+    min_reference = -1.3
+
+    start = abs(data.min().min() - (min_reference) ) / (abs(min_reference) + max_reference)
+    stop = 1 - abs(data.max().max() - (max_reference) ) / (abs(min_reference) + max_reference)
+
+    print(start, stop)
+
+    adjusted_cmap = shiftedColorMap(matplotlib.cm.bwr, midpoint=(1 - max_val / (max_val + abs(min_val))), start=start, stop=stop)
+
+    plt.pcolor(data, cmap=adjusted_cmap)
+
 
 
     FONTSIZE = 15
-    plt.yticks(np.arange(0.5, len(data.index), 1), yticks, fontsize=FONTSIZE)
-    plt.xticks(np.arange(0.5, len(data.columns), 1), xticks, rotation = 90,  fontsize=FONTSIZE)
+    plt.yticks(np.arange(0.5, len(data.index), 1), data.index, fontsize=FONTSIZE)
+    plt.xticks(np.arange(0.5, len(data.columns), 1), data.columns, rotation = 90,  fontsize=FONTSIZE)
     plt.ylabel("trained on", fontsize=FONTSIZE*1.2)
     plt.xlabel("tested on", fontsize=FONTSIZE*1.2)
     #plt.title("(average - RS) / (BK - RS)")
@@ -251,7 +368,7 @@ sko_instances = [ins for ins in all_instances if "sko" in ins]
 
 
 
-save_fig(d, "All normalized scores", save_fig_path+"all_norm.pdf", True, True) #all
+#save_fig(d, "All normalized scores", save_fig_path+"all_norm.pdf", True, True) #all
 save_fig(d.loc[small_instances,small_instances], "Small instances", save_fig_path+"small.pdf", False, True) # small instances
 save_fig(d.loc[big_instances,big_instances], "Large instances", save_fig_path+"large.pdf", False, True) # small instances
 save_fig(d.loc[taia_instances,taia_instances], "taia_instances", save_fig_path+"taia_instances.pdf", True, False) # taia instances
