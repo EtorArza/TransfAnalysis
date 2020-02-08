@@ -56,7 +56,7 @@ void MultidimBenchmarkFF::Evaluate(CIndividual *indiv)
     {
         indiv->bk_was_improved = true;
         indiv->f_best = fitness;
-        copy_vector(indiv->genome_best, indiv->genome, indiv->n);
+        copy_array(indiv->genome_best, indiv->genome, indiv->n);
     }
 }
 

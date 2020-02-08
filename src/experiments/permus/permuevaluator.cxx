@@ -123,9 +123,7 @@ struct Evaluator
     __net_eval_decl void execute(class NEAT::Network **nets_, NEAT::OrganismEvaluation *results, size_t nnets){
         using namespace PERMU;
         NEAT::CpuNetwork **nets = (NEAT::CpuNetwork **)nets_;
-        double progress_print_decider = 0.0;
         double *f_values = new double[nnets];
-        bool printed_bracket = false;
         RandomNumberGenerator rng;
         rng.seed();
         int initial_seed = rng.random_integer_fast(10050000,20000000);
@@ -245,7 +243,7 @@ struct Evaluator
                 N_TIMES_BEST_FITNESS_IMPROVED_TRAIN++;
                 cout << "[BEST_FITNESS_IMPROVED] --> " << average << endl;
                 BEST_FITNESS_TRAIN = average;
-                copy_vector(F_VALUES_OBTAINED_BY_BEST_INDIV, res, parameters->N_EVALS_TO_UPDATE_BK);
+                copy_array(F_VALUES_OBTAINED_BY_BEST_INDIV, res, parameters->N_EVALS_TO_UPDATE_BK);
             }
         }
 
@@ -437,6 +435,7 @@ public:
         parameters->CONTROLLER_PATH = reader.Get("TestSettings", "CONTROLLER_PATH", "UNKNOWN");
         parameters->N_REPS = reader.GetInteger("TestSettings", "N_REPS", -1);
         parameters->N_EVALS = reader.GetInteger("TestSettings", "N_EVALS", -1);
+        parameters->compute_response = reader.GetBoolean("TestSettings", "compute_response", false);
         N_OF_THREADS = MIN(N_OF_THREADS, parameters->N_EVALS);
 
 
@@ -452,6 +451,11 @@ public:
         
         
         CpuNetwork net = load_network(parameters->CONTROLLER_PATH);
+
+        if (parameters->compute_response)
+        {
+            net.start_recording_response();
+        }
 
         double *v_of_f_values = new double[parameters->N_EVALS];
 
@@ -481,11 +485,8 @@ public:
             
         }
         result_string_stream << "]," << std::flush;
-;
         delete[] v_of_f_values;
 
-
-        
 
         result_string_stream << std::setprecision(15);
         result_string_stream << std::flush;
@@ -496,6 +497,17 @@ public:
              << "]"
              << endl;
 
+        if (parameters->compute_response)
+        {
+            double* res = new double[PERMU::__output_N];
+            net.return_average_response_and_stop_recording(res);
+            append_line_to_file(
+                "responses.txt",
+                "['" + parameters->CONTROLLER_PATH + "', '" +
+                    parameters->INSTANCE_PATH + "', " +
+                    array_to_python_list_string(res, PERMU::__output_N) + "]\n");
+            delete[] res;
+        }
 
         // cout << res << std::endl;;
         result_string_stream << std::flush;

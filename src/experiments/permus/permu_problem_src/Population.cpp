@@ -198,7 +198,7 @@ void CPopulation::SortPopulation()
     if (m_individuals[0]->f_value > this->f_best)
     {
         this->f_best = m_individuals[0]->f_value;
-        copy_vector(this->genome_best, m_individuals[0]->genome, n);
+        copy_array(this->genome_best, m_individuals[0]->genome, n);
     }
     
 }

@@ -297,7 +297,7 @@ namespace REAL_FUNC
                     N_TIMES_BEST_FITNESS_IMPROVED_TRAIN++;
                     cout << "[BEST_FITNESS_IMPROVED] --> " << average << endl;
                     BEST_FITNESS_TRAIN = average;
-                    copy_vector(F_VALUES_OBTAINED_BY_BEST_INDIV, res, parameters->N_EVALS_TO_UPDATE_BK);
+                    copy_array(F_VALUES_OBTAINED_BY_BEST_INDIV, res, parameters->N_EVALS_TO_UPDATE_BK);
                 }
             }
 
@@ -308,7 +308,7 @@ namespace REAL_FUNC
             //cout << "fitness_array: " << std::flush;
             //PrintArray(f_values, nnets);
 
-            copy_vector(tmp_order, f_values, nnets);
+            copy_array(tmp_order, f_values, nnets);
             compute_order_from_double_to_double(f_values, nnets, tmp_order, false, true);
 
             std::swap(f_values, tmp_order);

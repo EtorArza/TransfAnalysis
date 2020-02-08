@@ -69,6 +69,24 @@ void PrintArray(T *array, int length)
     cout << " " << endl;
 }
 
+template <class T>
+string array_to_python_list_string(T* array, int len)
+{   
+    if(len == 0)
+    {
+        return "[]";
+    }
+
+    stringstream res_ss;
+    res_ss << "[" << array[0];
+    for (size_t i = 1; i < len; i++)
+    {
+        res_ss << ", " << array[i];
+    }
+    res_ss << "]";
+    return res_ss.str();
+}
+
 /*
  * Applies the random keys sorting strategy to the vector of doubles
  */
@@ -340,8 +358,13 @@ A scalar_multiplication(A* array_1, B* array_2, int len){
     }
     return res;
 }
-
-
+template<class T>
+inline void set_array_to_value(T* array, T value, int length){
+    for (int i = 0; i < length; i++)
+    {
+        array[i] = value;
+    }
+}
 
 double euclid_dist(double* array_1, double* array_2, int len);
 
@@ -503,7 +526,7 @@ int argmin(T *v, int len){
 
 
 template <class T>
-void copy_vector(T *v_res, T*v_ref, int len){
+void copy_array(T *v_res, T*v_ref, int len){
 
     for (int i = 0; i < len; i++)
     {

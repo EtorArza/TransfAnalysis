@@ -234,7 +234,7 @@ struct Evaluator
                 {
                     cout << " " << Average(res[i], parameters->N_EVALS_TO_UPDATE_BK);
                     parameters->BEST_FITNESS_TRAIN_FOR_EACH_INSTANCE[i] = Average(res[i], parameters->N_EVALS_TO_UPDATE_BK);
-                    copy_vector(parameters->F_VALUES_OBTAINED_BY_BEST_INDIV_FOR_EACH_INSTANCE[i], res[i], parameters->N_EVALS_TO_UPDATE_BK);
+                    copy_array(parameters->F_VALUES_OBTAINED_BY_BEST_INDIV_FOR_EACH_INSTANCE[i], res[i], parameters->N_EVALS_TO_UPDATE_BK);
                 }
                 cout << endl;
             }

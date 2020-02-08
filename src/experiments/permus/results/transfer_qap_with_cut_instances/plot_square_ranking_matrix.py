@@ -10,8 +10,8 @@ import fnmatch
 
 
 # save in figures local folder
-save_fig_path = "figures/"
-#save_fig_path = "/home/paran/Dropbox/BCAM/02_NEAT_permus/paper/images/qap_transfer_cut/"
+#save_fig_path = "figures/"
+save_fig_path = "/home/paran/Dropbox/BCAM/02_NEAT_permus/paper/images/qap_transfer_cut/"
 
 
 #input_txt = "result_controllers_GECCO2020_version.txt"
@@ -64,11 +64,11 @@ def rename_name(case_name, size_relevant=True, class_relevant=True):
 
 
     if fnmatch.fnmatch(case_name, "*tai*a"):
-        new_name += "A"
+        new_name += "Taixxa_"
     elif fnmatch.fnmatch(case_name, "*sko*"):
-        new_name += "C"
+        new_name += "Sko_"
     elif fnmatch.fnmatch(case_name, "*tai*b"):
-        new_name += "B"
+        new_name += "Taixxb_"
     else:
         raise Warning("tai*a, sko or tai*b not found in case name "+str(case_name))
 
@@ -241,20 +241,27 @@ def shiftedColorMap(cmap, start=0, midpoint=0.5, stop=1.0, name='shiftedcmap'):
     return newcmap
 
 
-def transform_name_to_global(name_string):
-    return name_string.split("_")[0]
+def transform_name_to_global(name_string, type_relevant, size_relevant):
+    
+    if size_relevant and not type_relevant:
+        return name_string.split("_")[1]
+    elif type_relevant and not size_relevant:
+        return name_string.split("_")[0]
+    else:
+        raise ValueError("error, (type_relevant XOR size_relevant) == false")
 
-def average_results(dataframe):
+
+def average_results(dataframe, type_relevant, size_relevant):
     classes_index = []
     classes_columns = []
 
     for label in dataframe.index:
-        if transform_name_to_global(label) not in classes_index:
-            classes_index.append(transform_name_to_global(label))
+        if transform_name_to_global(label, type_relevant, size_relevant) not in classes_index:
+            classes_index.append(transform_name_to_global(label, type_relevant, size_relevant))
 
     for label in dataframe.columns:
-        if transform_name_to_global(label) not in classes_columns:
-            classes_columns.append(transform_name_to_global(label))
+        if transform_name_to_global(label, type_relevant, size_relevant) not in classes_columns:
+            classes_columns.append(transform_name_to_global(label, type_relevant, size_relevant))
 
 
     result = pd.DataFrame(index=classes_index, columns=classes_columns)
@@ -264,14 +271,16 @@ def average_results(dataframe):
 
     for index_label in dataframe.index:
         for column_label in dataframe.index:
-            result.loc[transform_name_to_global(index_label),
-                       transform_name_to_global(column_label)].append(dataframe.loc[index_label, column_label])
+            if index_label == column_label:
+                print("Skipped: ", index_label)
+                continue
+            result.loc[transform_name_to_global(index_label, type_relevant, size_relevant), transform_name_to_global(column_label, type_relevant, size_relevant)].append(dataframe.loc[index_label, column_label])
     result = result.applymap(mean)
 
     return result
 
 
-def save_fig(d, fig_title, fig_path,size_relevant=True, class_relevant=True):
+def save_fig(d, fig_title, fig_path, class_relevant, size_relevant):
 
     data = d.copy(deep=True)
 
@@ -290,7 +299,7 @@ def save_fig(d, fig_title, fig_path,size_relevant=True, class_relevant=True):
     data.index = yticks
     data.columns = xticks
 
-    data = average_results(data)
+    data = average_results(data, class_relevant, size_relevant)
 
 
 
@@ -368,8 +377,8 @@ sko_instances = [ins for ins in all_instances if "sko" in ins]
 
 
 #save_fig(d, "All normalized scores", save_fig_path+"all_norm.pdf", True, True) #all
-save_fig(d.loc[small_instances,small_instances], "Small instances", save_fig_path+"small.pdf", False, True) # small instances
-save_fig(d.loc[big_instances,big_instances], "Large instances", save_fig_path+"large.pdf", False, True) # small instances
-save_fig(d.loc[taia_instances,taia_instances], "taia_instances", save_fig_path+"taia_instances.pdf", True, False) # taia instances
-save_fig(d.loc[taib_instances,taib_instances], "taib_instances", save_fig_path+"taib_instances.pdf", True, False) # taib instances
-save_fig(d.loc[sko_instances,sko_instances], "sko_instances", save_fig_path+"sko_instances.pdf", True, False) # sko instances
+save_fig(d.loc[small_instances,small_instances], "Small instances", save_fig_path+"small.pdf", True, False) # small instances
+save_fig(d.loc[big_instances,big_instances], "Large instances", save_fig_path+"large.pdf", True, False) # large instances
+save_fig(d.loc[taia_instances,taia_instances], "taia_instances", save_fig_path+"taia_instances.pdf", False, True) # taia instances
+save_fig(d.loc[taib_instances,taib_instances], "taib_instances", save_fig_path+"taib_instances.pdf", False, True) # taib instances
+save_fig(d.loc[sko_instances,sko_instances], "sko_instances", save_fig_path+"sko_instances.pdf", False, True) # sko instances

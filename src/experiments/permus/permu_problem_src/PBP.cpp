@@ -165,7 +165,7 @@ void PBP::apply_operator_with_fitness_update(CIndividual *indiv, double delta, i
     if (indiv->f_value > indiv->f_best)
     {
         indiv->f_best = indiv->f_value;
-        copy_vector(indiv->genome_best, indiv->genome, this->GetProblemSize());
+        copy_array(indiv->genome_best, indiv->genome, this->GetProblemSize());
     }
 
     if (moved)
@@ -266,7 +266,7 @@ void PBP::local_search_iteration(CIndividual *indiv, PERMU::operator_t operator_
 
                         assert(abs(indiv->f_value - Evaluate(indiv->genome)) < 0.0001);
 
-                        copy_vector(_random_permu3, indiv->genome, problem_size_PBP);
+                        copy_array(_random_permu3, indiv->genome, problem_size_PBP);
                         InsertAt(_random_permu3, _random_permu1[i], _random_permu2[j], problem_size_PBP);
 
                         assert(isPermutation(_random_permu1, problem_size_PBP));

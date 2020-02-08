@@ -13,6 +13,9 @@ namespace NEAT {
 		std::vector<NetNode> nodes;
 		std::vector<NetLink> links;
         double** signature;
+        double* response=NULL;
+        bool response_is_being_recorded=false;
+        int *samples_response=NULL;
         bool signature_initialized=false;
 
         std::vector<real_t> activations;
@@ -34,6 +37,10 @@ namespace NEAT {
         void set_noninput(std::vector<real_t> activations){this->activations = activations;};
         void load_sensor(size_t isensor, real_t activation);
         real_t *get_outputs();
+
+
+        void start_recording_response();
+        void return_average_response_and_stop_recording(double* res);
 
         virtual void configure(const NetDims &dims,
                                NetNode *nodes,

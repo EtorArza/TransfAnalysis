@@ -10,8 +10,8 @@ import fnmatch
 import matplotlib
 
 # save in figures local folder
-save_fig_path = "figures/"
-#save_fig_path = "/home/paran/Dropbox/BCAM/02_NEAT_permus/paper/images/qap_transfer_cut/"
+#save_fig_path = "figures/"
+save_fig_path = "/home/paran/Dropbox/BCAM/02_NEAT_permus/paper/images/permu_problems_transfer/"
 
 
 #input_txt = "result_controllers_GECCO2020_version.txt"
@@ -237,6 +237,9 @@ def average_results(dataframe):
 
     for index_label in dataframe.index:
         for column_label in dataframe.index:
+            if index_label == column_label:
+                print("Skipped: ", index_label)
+                continue
             result.loc[transform_name_to_global(index_label),
                        transform_name_to_global(column_label)].append(dataframe.loc[index_label, column_label])
     result = result.applymap(mean)
@@ -258,6 +261,7 @@ def save_fig(d, fig_title, fig_path,size_relevant=True, class_relevant=True):
 
     data = average_results(data)
 
+    print(data)
 
     yticks =  data.index
     xticks =  data.columns

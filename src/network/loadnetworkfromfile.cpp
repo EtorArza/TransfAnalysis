@@ -230,6 +230,9 @@ CpuNetwork load_network(string filename)
     // org = new Organism(g);
     CpuNetwork net;
     g.init_phenotype(&net);
+    net.response=NULL;
+    net.samples_response=NULL;
+    net.response_is_being_recorded=false;
     return net;
     // org->population_index = 10000;
     //org->write(cout);

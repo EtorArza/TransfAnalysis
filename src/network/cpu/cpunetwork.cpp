@@ -40,7 +40,9 @@ CpuNetwork::CpuNetwork(const CpuNetwork&  other){
     this->dims = other.dims;
     this->links = other.links;
     this->nodes = other.nodes;
-
+    this->response = other.response;
+    this->response_is_being_recorded = other.response_is_being_recorded;
+    this->samples_response = other.samples_response;
 }
 
 CpuNetwork::~CpuNetwork()
@@ -85,7 +87,7 @@ void CpuNetwork::compute_signature(){
             load_sensor(j, rng.random_0_1_double() * 2.0 - 1.0);
         }
         this->activate();
-        copy_vector(signature[i], this->get_outputs(), dims.nnodes.output);
+        copy_array(signature[i], this->get_outputs(), dims.nnodes.output);
     }
     clear_noninput();
 }
@@ -179,6 +181,11 @@ void CpuNetwork::activate() {
                act_other + dims.nnodes.input,
                sizeof(real_t) * (dims.nnodes.all - dims.nnodes.input));
     }
+
+    if(response_is_being_recorded){
+        samples_response[0]++;
+        sum_arrays(response, response, this->get_outputs(), dims.nnodes.output);
+    }
 }
 
 vector<real_t> &CpuNetwork::get_activations(__out vector<real_t> &result) {
@@ -188,5 +195,34 @@ vector<real_t> &CpuNetwork::get_activations(__out vector<real_t> &result) {
 void CpuNetwork::set_activations(__in vector<real_t> &newacts) {
     activations = newacts;
 }
+
+void CpuNetwork::start_recording_response()
+{
+    if (response==NULL)
+    {
+        response = new double[this->dims.nnodes.output];
+        samples_response = new int[1];
+        samples_response[0] = 0.0;
+    }
+    response_is_being_recorded = true;
+    set_array_to_value(response, 0.0, dims.nnodes.output);
+}
+
+void CpuNetwork::return_average_response_and_stop_recording(double* result)
+{
+    if (response==NULL)
+    {
+        cout << "ERROR: return response was requested while response not initialized." << endl;
+        exit(1);
+    }
+    
+    multiply_array_with_value(response, 1.0 / (double) samples_response[0], dims.nnodes.output);
+    copy_array(result, response, dims.nnodes.output);
+    delete[] response;
+    delete[] samples_response;
+    response=NULL;
+    samples_response=NULL;
+}
+
 
 #endif // ENABLE_CUDA

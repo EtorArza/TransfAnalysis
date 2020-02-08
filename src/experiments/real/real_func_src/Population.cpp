@@ -148,7 +148,7 @@ void CPopulation::apply_neat_output_to_individual_i(double *output_neat, int i)
     }
 
 
-    copy_vector(m_individuals[i]->momentum, templ_double_array1_of_size_n, n);
+    copy_array(m_individuals[i]->momentum, templ_double_array1_of_size_n, n);
 
 
     // clip momentum  between -0.5 and 0.5
@@ -184,7 +184,7 @@ void CPopulation::apply_neat_output_to_individual_i(double *output_neat, int i)
     if (new_f > this->f_best)
     {
         this->f_best = new_f;
-        copy_vector(this->genome_best, m_individuals[i]->genome, n);
+        copy_array(this->genome_best, m_individuals[i]->genome, n);
     }
     global_best_was_improved = true;
 }
@@ -201,7 +201,7 @@ void CPopulation::SortPopulation()
     {
         this->global_best_was_improved = true;
         this->f_best = m_individuals[0]->f_value;
-        copy_vector(this->genome_best, m_individuals[0]->genome, n);
+        copy_array(this->genome_best, m_individuals[0]->genome, n);
     }
 
 }
