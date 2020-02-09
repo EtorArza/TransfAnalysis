@@ -435,7 +435,7 @@ public:
         parameters->CONTROLLER_PATH = reader.Get("TestSettings", "CONTROLLER_PATH", "UNKNOWN");
         parameters->N_REPS = reader.GetInteger("TestSettings", "N_REPS", -1);
         parameters->N_EVALS = reader.GetInteger("TestSettings", "N_EVALS", -1);
-        parameters->compute_response = reader.GetBoolean("TestSettings", "compute_response", false);
+        parameters->COMPUTE_RESPONSE = reader.GetBoolean("TestSettings", "COMPUTE_RESPONSE", false);
         N_OF_THREADS = MIN(N_OF_THREADS, parameters->N_EVALS);
 
 
@@ -452,7 +452,7 @@ public:
         
         CpuNetwork net = load_network(parameters->CONTROLLER_PATH);
 
-        if (parameters->compute_response)
+        if (parameters->COMPUTE_RESPONSE)
         {
             net.start_recording_response();
         }
@@ -497,7 +497,7 @@ public:
              << "]"
              << endl;
 
-        if (parameters->compute_response)
+        if (parameters->COMPUTE_RESPONSE)
         {
             double* res = new double[PERMU::__output_N];
             net.return_average_response_and_stop_recording(res);

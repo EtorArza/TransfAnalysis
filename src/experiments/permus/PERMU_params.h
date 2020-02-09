@@ -22,7 +22,7 @@ namespace PERMU{
         // TEST PARAMS TO BE SPECIFIED IN CONFIG FILE//
         std::string CONTROLLER_PATH;
         int N_REPS;
-        bool compute_response = false;
+        bool COMPUTE_RESPONSE = false;
         /////////////////////////////////////////////
 
     };

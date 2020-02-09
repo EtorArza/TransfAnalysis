@@ -198,7 +198,7 @@ void CpuNetwork::set_activations(__in vector<real_t> &newacts) {
 
 void CpuNetwork::start_recording_response()
 {
-    if (response==NULL)
+    if (response==NULL && !response_is_being_recorded)
     {
         response = new double[this->dims.nnodes.output];
         samples_response = new int[1];
@@ -210,7 +210,7 @@ void CpuNetwork::start_recording_response()
 
 void CpuNetwork::return_average_response_and_stop_recording(double* result)
 {
-    if (response==NULL)
+    if (response==NULL || response_is_being_recorded==false)
     {
         cout << "ERROR: return response was requested while response not initialized." << endl;
         exit(1);
