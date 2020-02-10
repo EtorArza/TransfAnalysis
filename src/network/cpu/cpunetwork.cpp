@@ -43,6 +43,8 @@ CpuNetwork::CpuNetwork(const CpuNetwork&  other){
     this->response = other.response;
     this->response_is_being_recorded = other.response_is_being_recorded;
     this->samples_response = other.samples_response;
+    this->output_copy = other.output_copy;
+    this->function_to_injectivize_output = other.function_to_injectivize_output;
 }
 
 CpuNetwork::~CpuNetwork()
@@ -184,7 +186,9 @@ void CpuNetwork::activate() {
 
     if(response_is_being_recorded){
         samples_response[0]++;
-        sum_arrays(response, response, this->get_outputs(), dims.nnodes.output);
+        copy_array(output_copy, this->get_outputs(), dims.nnodes.output);
+        this->function_to_injectivize_output(output_copy);
+        sum_arrays(response, response, output_copy, dims.nnodes.output);
     }
 }
 
@@ -196,16 +200,20 @@ void CpuNetwork::set_activations(__in vector<real_t> &newacts) {
     activations = newacts;
 }
 
-void CpuNetwork::start_recording_response()
+void CpuNetwork::start_recording_response(void (*function_to_injectivize_output)(double* ))
 {
+    this->function_to_injectivize_output = function_to_injectivize_output;
     if (response==NULL && !response_is_being_recorded)
     {
-        response = new double[this->dims.nnodes.output];
+        response = new double[dims.nnodes.output];
+        output_copy = new double[dims.nnodes.output];
         samples_response = new int[1];
         samples_response[0] = 0.0;
     }
     response_is_being_recorded = true;
     set_array_to_value(response, 0.0, dims.nnodes.output);
+    set_array_to_value(output_copy, 0.0, dims.nnodes.output);
+
 }
 
 void CpuNetwork::return_average_response_and_stop_recording(double* result)
@@ -220,6 +228,7 @@ void CpuNetwork::return_average_response_and_stop_recording(double* result)
     copy_array(result, response, dims.nnodes.output);
     delete[] response;
     delete[] samples_response;
+    delete[] output_copy;
     response=NULL;
     samples_response=NULL;
 }

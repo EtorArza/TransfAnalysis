@@ -81,6 +81,11 @@ void make_output_behaviour_mapping_more_injective(double *output)
             output[PERMU::__output_N - 1 - i] = 0.0;
         }
         output[accept_or_reject_worse] = 0.0;
+    }else // movement
+    {
+        int pos_first_coef = PERMU::__output_N - PERMU::N_PERMU_REFS;
+        double sum_of_coef = sum_abs_val_slice_vec(output, pos_first_coef, PERMU::__output_N);
+        multiply_array_with_value(output+pos_first_coef, 1.0 / sum_of_coef, PERMU::N_PERMU_REFS);
     }
 
 
@@ -454,7 +459,7 @@ public:
 
         if (parameters->COMPUTE_RESPONSE)
         {
-            net.start_recording_response();
+            net.start_recording_response(PERMU::make_output_behaviour_mapping_more_injective);
         }
 
         double *v_of_f_values = new double[parameters->N_EVALS];

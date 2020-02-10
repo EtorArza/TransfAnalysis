@@ -2,6 +2,9 @@
 
 #include "network.h"
 
+template <class T>
+void pass(T arg1){return;}
+
 namespace NEAT {
 
     //---
@@ -14,9 +17,12 @@ namespace NEAT {
 		std::vector<NetLink> links;
         double** signature;
         double* response=NULL;
+        double *output_copy;
         bool response_is_being_recorded=false;
         int *samples_response=NULL;
         bool signature_initialized=false;
+        void (*function_to_injectivize_output)(double* );
+
 
         std::vector<real_t> activations;
         CpuNetwork() {}
@@ -39,7 +45,7 @@ namespace NEAT {
         real_t *get_outputs();
 
 
-        void start_recording_response();
+        void start_recording_response(void (*function_to_injectivize_output)(double* )=pass);
         void return_average_response_and_stop_recording(double* res);
 
         virtual void configure(const NetDims &dims,
