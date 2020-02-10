@@ -83,8 +83,7 @@ EOF
 date
 ./neat "tmp.ini"
 cat "result.txt" >> "$SRCDIR/$5"
-cat "responses.txt" >> "$SRCDIR/responses.txt"
-
+cat "responses.txt" >> "$SRCDIR/src/experiments/permus/results/analyze_outputs/responses_journal.txt"
 
 
 date
