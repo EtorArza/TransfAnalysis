@@ -44,6 +44,7 @@ cd "src"
 mkdir "experiments"
 cd $SRCDIR
 
+sleep "$((${RANDOM} % 5)).$((${RANDOM} % 999))"
 
 cp src/experiments -v -r $SCRATCH_JOB/src
 cp neat -v $SCRATCH_JOB
@@ -82,6 +83,9 @@ EOF
 
 date
 ./neat "tmp.ini"
+
+sleep "$((${RANDOM} % 5)).$((${RANDOM} % 999))"
+
 cat "result.txt" >> "$SRCDIR/$5"
 cat "responses.txt" >> "$SRCDIR/src/experiments/permus/results/analyze_outputs/responses_journal.txt"
 
