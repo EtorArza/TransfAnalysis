@@ -73,6 +73,7 @@ class PBP
 	int *_random_permu2;
 	int *_random_permu3;
 	int problem_size_PBP;
+	string filename;
 
 
 

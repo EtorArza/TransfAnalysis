@@ -46,7 +46,7 @@ void PBP::initialize_variables_PBP(int problem_size)
 {   
     if (problem_size < 2)
     {
-        std::cout << "error, problem size < 2. Instance file not read correctly." << std::flush;
+        std::cout << "error, problem size < 2. Instance file: " << filename << " not read correctly." << std::flush;
         exit(1);
     }
     
@@ -73,6 +73,7 @@ double PBP::Evaluate(int *genome)
 
 std::mutex PBP::mut;
 int PBP::Read_with_mutex(string filename){
+    this->filename = filename;
     PBP::mut.lock();
     int res = this->Read(filename);
     PBP::mut.unlock();
