@@ -23,7 +23,7 @@ done
 for controller in "src/experiments/permus_multi/results/top_controllers/"*; do
     for problem in "qap"; do
         for instance in "src/experiments/permus/instances/qap/cut_instances/"*; do
-            sbatch src/experiments/permus/scripts/exec_hipatia_test.sh "${problem}" "$instance" "$controller" "0.25" "/dev/null" "true"
+            sbatch src/experiments/permus/scripts/exec_hipatia_test.sh "${problem}" "$instance" "$controller" "0.25" "./" "true"
             sleep 0.1
         done
     done
