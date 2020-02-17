@@ -139,18 +139,6 @@ struct Evaluator
         // evaluate the individuals
 
 
-        #pragma omp parallel for num_threads(N_OF_THREADS)
-        for (size_t inet = 0; inet < nnets; inet++)
-        {
-            NEAT::CpuNetwork *net = nets[inet];
-            net->compute_signature();
-            net->apply_function_to_signature(make_output_behaviour_mapping_more_injective);
-        }
-        
-        int* classes_array = new int[nnets];
-        std::function<bool (NEAT::CpuNetwork*, NEAT::CpuNetwork*)>  are_signatures_equal = [](NEAT::CpuNetwork* net1, NEAT::CpuNetwork* net2) { return net1->are_signatures_equal(net2); };
-        find_classes_in_array_of_objects(nets, are_signatures_equal, nnets, classes_array);
-
         cout << " Evaluating -> ";
 
 
