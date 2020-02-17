@@ -150,26 +150,11 @@ struct Evaluator
             NEAT::OrganismEvaluation eval;
             int seed = initial_seed;
             results[inet] = eval;
-            // if (classes_array[inet] == inet) // copy fitness
-            // { // copy fitness
-                f_values[inet] = this->FitnessFunction(net, parameters->N_EVALS, seed);
-            // } copy  fitness
+            f_values[inet] = this->FitnessFunction(net, parameters->N_EVALS, seed);
             bar.step();
         }
         bar.end();
 
-        // // Copy fitness value from repeated networks.
-        // #pragma omp parallel for num_threads(N_OF_THREADS)
-        // for (int inet = 0; inet < nnets; inet++)
-        // {
-        //     NEAT::CpuNetwork *net = nets[inet];
-        //     NEAT::OrganismEvaluation eval;
-        //     int seed = initial_seed;
-        //     if (classes_array[inet] != inet)
-        //     {
-        //         f_values[inet] = f_values[classes_array[inet]];
-        //     }
-        // }
 
 
 
@@ -271,8 +256,6 @@ struct Evaluator
         }
         delete[] tmp_order;
         delete[] f_values;
-        delete[] classes_array;
-    
     }
 };
 
