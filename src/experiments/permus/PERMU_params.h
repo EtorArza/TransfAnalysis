@@ -13,8 +13,10 @@ namespace PERMU{
         int POPSIZE;
         int N_EVALS;
         int N_REEVALS_TOP_5_PERCENT;
-        int N_EVALS_TO_UPDATE_BK;
-
+        int SAMPLE_SIZE_UPDATE_BK;
+        int N_SAMPLES_UPDATE_BK;
+        int UPDATE_BK_EVERY_K_ITERATIONS;
+        
         int TABU_LENGTH;
         std::string INSTANCE_PATH;
         std::string PROBLEM_TYPE;
@@ -24,6 +26,8 @@ namespace PERMU{
         int N_REPS;
         bool COMPUTE_RESPONSE = false;
         /////////////////////////////////////////////
+
+        double* bk_f_average_sample;
 
     };
 

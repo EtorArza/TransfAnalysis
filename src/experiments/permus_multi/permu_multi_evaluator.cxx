@@ -195,8 +195,8 @@ struct Evaluator
         for (int i = 0; i < parameters->N_OF_INSTANCES; i++)
         {
             bar.step();
-            res[i] = new double[parameters->N_EVALS_TO_UPDATE_BK];
-            this->FitnessFunction_parallel(net, parameters->N_EVALS_TO_UPDATE_BK, res[i], 30050000, i);
+            res[i] = new double[parameters->SAMPLE_SIZE_UPDATE_BK];
+            this->FitnessFunction_parallel(net, parameters->SAMPLE_SIZE_UPDATE_BK, res[i], 30050000, i);
         }
         bar.end();
 
@@ -206,13 +206,13 @@ struct Evaluator
         for (int i = 0; i < parameters->N_OF_INSTANCES; i++)
         {
             is_it_better_in_all_cases = is_it_better_in_all_cases &&
-                                        Average(res[i], parameters->N_EVALS_TO_UPDATE_BK) >= parameters->BEST_FITNESS_TRAIN_FOR_EACH_INSTANCE[i];
+                                        Average(res[i], parameters->SAMPLE_SIZE_UPDATE_BK) >= parameters->BEST_FITNESS_TRAIN_FOR_EACH_INSTANCE[i];
         }
 
         cout << "best this gen:";
         for (int i = 0; i < parameters->N_OF_INSTANCES; i++)
         {
-            cout << " " << Average(res[i], parameters->N_EVALS_TO_UPDATE_BK);
+            cout << " " << Average(res[i], parameters->SAMPLE_SIZE_UPDATE_BK);
         }
         cout << endl;
 
@@ -223,7 +223,7 @@ struct Evaluator
 
             for (int i = 0; i < parameters->N_OF_INSTANCES; i++)
             {
-                update_needed = update_needed || is_A_larger_than_B_Mann_Whitney(res[i], parameters->F_VALUES_OBTAINED_BY_BEST_INDIV_FOR_EACH_INSTANCE[i], parameters->N_EVALS_TO_UPDATE_BK);
+                update_needed = update_needed || is_A_larger_than_B_Mann_Whitney(res[i], parameters->F_VALUES_OBTAINED_BY_BEST_INDIV_FOR_EACH_INSTANCE[i], parameters->SAMPLE_SIZE_UPDATE_BK);
             }
 
             if (update_needed)
@@ -232,9 +232,9 @@ struct Evaluator
                 cout << "[BEST_FITNESS_IMPROVED] --> ";
                 for (int i = 0; i < parameters->N_OF_INSTANCES; i++)
                 {
-                    cout << " " << Average(res[i], parameters->N_EVALS_TO_UPDATE_BK);
-                    parameters->BEST_FITNESS_TRAIN_FOR_EACH_INSTANCE[i] = Average(res[i], parameters->N_EVALS_TO_UPDATE_BK);
-                    copy_array(parameters->F_VALUES_OBTAINED_BY_BEST_INDIV_FOR_EACH_INSTANCE[i], res[i], parameters->N_EVALS_TO_UPDATE_BK);
+                    cout << " " << Average(res[i], parameters->SAMPLE_SIZE_UPDATE_BK);
+                    parameters->BEST_FITNESS_TRAIN_FOR_EACH_INSTANCE[i] = Average(res[i], parameters->SAMPLE_SIZE_UPDATE_BK);
+                    copy_array(parameters->F_VALUES_OBTAINED_BY_BEST_INDIV_FOR_EACH_INSTANCE[i], res[i], parameters->SAMPLE_SIZE_UPDATE_BK);
                 }
                 cout << endl;
             }
@@ -332,13 +332,16 @@ public:
 
             parameters->N_EVALS = reader.GetInteger("NEAT", "N_EVALS", -1);
             parameters->N_REEVALS_TOP_5_PERCENT = reader.GetInteger("NEAT", "N_REEVALS_TOP_5_PERCENT", -1);
-            parameters->N_EVALS_TO_UPDATE_BK = reader.GetInteger("NEAT", "N_EVALS_TO_UPDATE_BK", -1);
+            parameters->UPDATE_BK_EVERY_K_ITERATIONS = reader.GetInteger("NEAT", "UPDATE_BK_EVERY_K_ITERATIONS", -1);
+            parameters->SAMPLE_SIZE_UPDATE_BK = reader.GetInteger("NEAT", "SAMPLE_SIZE_UPDATE_BK", -1);
+            parameters->N_SAMPLES_UPDATE_BK = reader.GetInteger("NEAT", "N_SAMPLES_UPDATE_BK", -1);
             string search_type = reader.Get("NEAT", "SEARCH_TYPE", "UNKOWN");
             parameters->PROBLEM_TYPE = reader.Get("Controller", "PROBLEM_TYPE", "UNKOWN");
             parameters->N_OF_INSTANCES = reader.GetInteger("Controller", "N_PROBLEMS", -1);
             parameters->INSTANCE_PATHS = new std::string[parameters->N_OF_INSTANCES];
             parameters->BEST_FITNESS_TRAIN_FOR_EACH_INSTANCE = new double[parameters->N_OF_INSTANCES];
             parameters->MAX_TIME_PSO_FOR_EACH_INSTANCE = new double[parameters->N_OF_INSTANCES];
+            parameters-> UPDATE_BK_EVERY_K_ITERATIONS = reader.GetInteger("NEAT", "UPDATE_BK_EVERY_K_ITERATIONS", -1);
 
 
 
@@ -413,8 +416,8 @@ public:
             parameters->F_VALUES_OBTAINED_BY_BEST_INDIV_FOR_EACH_INSTANCE = new double *[parameters->N_OF_INSTANCES];
             for (int i = 0; i < parameters->N_OF_INSTANCES; i++)
             {
-                parameters->F_VALUES_OBTAINED_BY_BEST_INDIV_FOR_EACH_INSTANCE[i] = new double[parameters->N_EVALS_TO_UPDATE_BK];
-                for (int j = 0; j < parameters->N_EVALS_TO_UPDATE_BK; j++)
+                parameters->F_VALUES_OBTAINED_BY_BEST_INDIV_FOR_EACH_INSTANCE[i] = new double[parameters->SAMPLE_SIZE_UPDATE_BK];
+                for (int j = 0; j < parameters->SAMPLE_SIZE_UPDATE_BK; j++)
                 {
                     parameters->F_VALUES_OBTAINED_BY_BEST_INDIV_FOR_EACH_INSTANCE[i][j] = -DBL_MAX;
                 }
@@ -439,7 +442,6 @@ public:
             delete[] parameters->F_VALUES_OBTAINED_BY_BEST_INDIV_FOR_EACH_INSTANCE;
             delete[] parameters->INSTANCE_PATHS;
             delete[] parameters->BEST_FITNESS_TRAIN_FOR_EACH_INSTANCE;
-            delete[] F_VALUES_OBTAINED_BY_BEST_INDIV;
             delete[] parameters->MAX_TIME_PSO_FOR_EACH_INSTANCE;
 
             return;

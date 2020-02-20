@@ -65,8 +65,9 @@ POPSIZE = 512
 THREADS = 32
 N_EVALS = 5
 N_REEVALS_TOP_5_PERCENT = 40
-N_EVALS_TO_UPDATE_BK = 2024
-
+UPDATE_BK_EVERY_K_ITERATIONS = 30
+SAMPLE_SIZE_UPDATE_BK = 500
+N_SAMPLES_UPDATE_BK = 64
 
 
 SEARCH_TYPE = phased
@@ -102,7 +103,11 @@ instancename="${filename%%.*}"
 echo "$instancename"
 
 
-cp "controllers_trained_with_$instancename" -v -r "$SRCDIR/src/experiments/permus/results/controllers"
+DESTINATION_FOLDER="$SRCDIR/src/experiments/permus/results/controllers/sample_size50"
+
+
+mkdir -p ${DESTINATION_FOLDER}
+cp "controllers_trained_with_$instancename"* -v -r "${DESTINATION_FOLDER}"
 
 
 

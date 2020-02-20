@@ -224,109 +224,7 @@ namespace REAL_FUNC
             }
             bar.end();
 
-            // reevaluate top 5% at least N_REEVAL times
-        int n_of_networks_to_reevaluate = nnets / 20 + 1;
-            int n_of_reevals_top_5percent = parameters->N_EVALS * parameters->N_REEVALS_TOP_5_PERCENT;
-            cout << "reevaluating top 5% (" << n_of_networks_to_reevaluate << " nets out of " << static_cast<int>(nnets) << ") each " << n_of_reevals_top_5percent << " times -> ";
 
-            double cut_value = obtain_kth_largest_value(f_values, n_of_networks_to_reevaluate+1, static_cast<int>(nnets));
-
-            if (cut_value == 0.0){
-                cout << "Warning, 0 reached in top 5%, no more learning can be done."
-                << "Increasing problem dimensionality or n_evals might solve this." << endl;
-            }
-
-            rng.seed();
-            initial_seed = rng.random_integer_fast(20000000, 30000000);
-
-            std::vector<int> reeval_indexes; 
-            for (size_t inet = 0; inet < nnets; inet++)
-            {
-                if (f_values[inet] <= cut_value)
-                {
-                    f_values[inet] -= 1000000000.0; // apply a discount to the individuals that are not reevaluated
-                }
-                else
-                {
-                    reeval_indexes.push_back(inet);
-                }
-            }
-
-            bar.restart(reeval_indexes.size());
-            #pragma omp parallel for num_threads(N_OF_THREADS)
-            for (std::size_t i = 0; i < reeval_indexes.size(); ++i)
-            {
-                bar.step();
-                NEAT::CpuNetwork *net = nets[reeval_indexes[i]];
-                f_values[reeval_indexes[i]] = this->FitnessFunction(net, n_of_reevals_top_5percent, initial_seed);
-            }
-            bar.end();
-
-            cout << "Reevaluating best indiv of generation: " << std::flush;
-            int index_most_fit = argmax(f_values, nnets);
-            NEAT::CpuNetwork *net = nets[index_most_fit];
-
-            // apply a discount to all but the best individual
-            for (int i = 0; i < (int)nnets; i++)
-            {
-                if (i != index_most_fit)
-                {
-                    f_values[i] -= 1000000000.0;
-                }
-            }
-
-            double *res = new double[parameters->N_EVALS_TO_UPDATE_BK];
-            bar.restart(1);
-            this->FitnessFunction_parallel(net, parameters->N_EVALS_TO_UPDATE_BK, res, 40000000);
-            bar.step();
-            bar.end();
-            //PrintArray(res, N_EVALS_TO_UPDATE_BK);
-
-            //double median = res[arg_element_in_centile_specified_by_percentage(res, N_EVALS_TO_UPDATE_BK, 0.5)];
-            double average = Average(res, parameters->N_EVALS_TO_UPDATE_BK);
-
-            cout << "best this gen: " << average << endl;
-
-            if (average > BEST_FITNESS_TRAIN)
-            {
-
-                bool update_needed = is_A_larger_than_B_Mann_Whitney(res, F_VALUES_OBTAINED_BY_BEST_INDIV, parameters->N_EVALS_TO_UPDATE_BK);
-
-                if (update_needed)
-                {
-                    N_TIMES_BEST_FITNESS_IMPROVED_TRAIN++;
-                    cout << "[BEST_FITNESS_IMPROVED] --> " << average << endl;
-                    BEST_FITNESS_TRAIN = average;
-                    copy_array(F_VALUES_OBTAINED_BY_BEST_INDIV, res, parameters->N_EVALS_TO_UPDATE_BK);
-                }
-            }
-
-            delete[] res;
-
-            double *tmp_order = new double[nnets];
-
-            //cout << "fitness_array: " << std::flush;
-            //PrintArray(f_values, nnets);
-
-            copy_array(tmp_order, f_values, nnets);
-            compute_order_from_double_to_double(f_values, nnets, tmp_order, false, true);
-
-            std::swap(f_values, tmp_order);
-
-            multiply_array_with_value(f_values, 1.0 / (double)(nnets - 1), nnets);
-            multiply_array_with_value(f_values, 1.0 + ((double)N_TIMES_BEST_FITNESS_IMPROVED_TRAIN / 1000.0), nnets);
-
-            //cout << "fitness_array: " << std::flush;
-            //PrintArray(f_values, nnets);
-
-            // save scaled fitness
-            for (size_t inet = 0; inet < nnets; inet++)
-            {
-                results[inet].fitness = f_values[inet];
-                results[inet].error = 2 - f_values[inet];
-            }
-            delete[] tmp_order;
-            delete[] f_values;
         }
     };
 }
@@ -387,7 +285,6 @@ public:
             N_OF_THREADS = reader.GetInteger("NEAT", "THREADS", -1);
             parameters->N_EVALS = reader.GetInteger("NEAT", "N_EVALS", -1);
             parameters->N_REEVALS_TOP_5_PERCENT = reader.GetInteger("NEAT", "N_REEVALS_TOP_5_PERCENT", -1);
-            parameters->N_EVALS_TO_UPDATE_BK = reader.GetInteger("NEAT", "N_EVALS_TO_UPDATE_BK", -1);
             string search_type = reader.Get("NEAT", "SEARCH_TYPE", "UNKOWN");
             parameters->PROBLEM_INDEX = reader.GetInteger("Controller", "PROBLEM_INDEX", -1);
             parameters->PROBLEM_DIMENSIONS = reader.GetInteger("Controller", "PROBLEM_DIMENSIONS", -1);
@@ -396,10 +293,15 @@ public:
             parameters->TABU_LENGTH = reader.GetInteger("Controller", "TABU_LENGTH", -1);
             EXPERIMENT_FOLDER_NAME = "controllers_trained_with_F" + std::to_string(parameters->PROBLEM_INDEX);
             parameters->PRINT_POSITIONS = false;
-            F_VALUES_OBTAINED_BY_BEST_INDIV = new double[parameters->N_EVALS_TO_UPDATE_BK];
-            for (int i = 0; i < parameters->N_EVALS_TO_UPDATE_BK; i++)
+            parameters->UPDATE_BK_EVERY_K_ITERATIONS = reader.GetInteger("NEAT", "UPDATE_BK_EVERY_K_ITERATIONS", -1);
+            parameters->SAMPLE_SIZE_UPDATE_BK = reader.GetInteger("NEAT", "SAMPLE_SIZE_UPDATE_BK", -1);
+            parameters->N_SAMPLES_UPDATE_BK = reader.GetInteger("NEAT", "N_SAMPLES_UPDATE_BK", -1);
+
+            assert(parameters->N_SAMPLES_UPDATE_BK > 0);
+            parameters->bk_f_average_sample = new double[parameters->N_SAMPLES_UPDATE_BK];
+            for (int i = 0; i < parameters->N_SAMPLES_UPDATE_BK; i++)
             {
-                F_VALUES_OBTAINED_BY_BEST_INDIV[i] = -DBL_MAX;
+                parameters->bk_f_average_sample[i] = -DBL_MAX;
             }
 
             load_global_params(conf_file_path);
@@ -459,7 +361,7 @@ public:
             global_timer.tic();
             exp->run(rng);
 
-            delete[] F_VALUES_OBTAINED_BY_BEST_INDIV;
+            delete[] parameters->bk_f_average_sample;
 
             exit(0);
         }

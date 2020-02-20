@@ -10,12 +10,13 @@ import fnmatch
 
 
 # save in figures local folder
-#save_fig_path = "figures/"
-save_fig_path = "/home/paran/Dropbox/BCAM/02_NEAT_permus/paper/images/qap_transfer_cut/"
+save_fig_path = "figures/"
+#save_fig_path = "/home/paran/Dropbox/BCAM/02_NEAT_permus/paper/images/qap_transfer_cut/"
 
 
 #input_txt = "result_controllers_GECCO2020_version.txt"
-input_txt = "result_controllers_journal_version.txt"
+#input_txt = "result_controllers_journal_version.txt"
+input_txt = "result_controllers_journal_version_local.txt"
 
 
 
@@ -299,9 +300,9 @@ def save_fig(d, fig_title, fig_path, class_relevant, size_relevant):
     data.index = yticks
     data.columns = xticks
 
-    data = average_results(data, class_relevant, size_relevant)
+    #data = average_results(data, class_relevant, size_relevant)
 
-
+    print(data)
 
     max_val = data.max().max()
     min_val = data.min().min()
