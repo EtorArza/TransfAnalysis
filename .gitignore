@@ -22,6 +22,6 @@ fittest_*
 *.zip
 *.mp4
 /scripts/copy_files_to_hipatia.sh
-/scripts/copy_files_to_dipc.sh
+/scripts/connet_hip.sh
 all_controllers/
 result.txt
