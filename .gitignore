@@ -21,7 +21,6 @@ experimentation_res*
 fittest_*
 *.zip
 *.mp4
-/scripts/copy_files_to_hipatia.sh
-/scripts/connet_hip.sh
 all_controllers/
-result.txt
+copy_files_to_*
+connet_hip.sh

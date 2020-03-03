@@ -17,40 +17,32 @@
 # # # #SBATCH --error=err/slurm_err_%j.txt
 # # # #SBATCH --ntasks=1 # number of tasks
 # # # #SBATCH --ntasks-per-node=1 #number of tasks per node
-# # # #SBATCH --mem=12G
-# # # #SBATCH --cpus-per-task=12 # number of CPUs
+# # # #SBATCH --mem=4G
+# # # #SBATCH --cpus-per-task=4 # number of CPUs
 # # # #SBATCH --time=0-00:30:00 #Walltime
 # # # #SBATCH -p short
 
 
 
 
-if [[ "$#" -ne 3  ]] ; then
-    echo 'Please provide the name of the problem, the path of the instance and and max_pso_time. $# parameters where provided. 3 are needed. Example: '
-    echo ""
-    echo 'script.sh qap tai35a.dat.dat 0.5'
-    echo ""
-    echo 'Exitting...'
-    exit 1
-fi
+
+
 
 
 SRCDIR=`pwd`
-
-cd $SCRATCH_JOB
-mkdir "src"
-cd "src"
-mkdir "experiments"
-cd $SRCDIR
+INSTANCES=($(ls -1 $INSTANCES))
+INSTANCE=${INSTANCES[$SLURM_ARRAY_TASK_ID]}
 
 
-cp src/experiments -v -r $SCRATCH_JOB/src
+instance_path=dirname $INSTANCE
+
+mkdir -p "$SCRATCH_JOB/$instance_path" && cp $INSTANCE "$SCRATCH_JOB/$instance_path" -v
 cp neat -v $SCRATCH_JOB
+
 cd $SCRATCH_JOB
 
 
-N_EVALS=10
-SAMPLE_SIZE_UPDATE_BK=3000
+
 
 cat > tmp.ini <<EOF
 ; temporal config file for train in hpc hipatia
@@ -62,7 +54,7 @@ PROBLEM_NAME = permu
 
 
 [NEAT]
-MAX_TRAIN_TIME = 43200
+MAX_TRAIN_TIME = 43200 ; 300
 POPSIZE = 640
 THREADS = 32
 N_EVALS = $N_EVALS
@@ -78,12 +70,12 @@ SEED = 2
 
 
 [Controller]
-MAX_TIME_PSO = $3
+MAX_TIME_PSO = $MAX_TIME_PSO
 POPSIZE = 20
 TABU_LENGTH = 40
 
-PROBLEM_TYPE = $1
-PROBLEM_PATH = $2
+PROBLEM_TYPE = $PROBLEM_TYPE
+PROBLEM_PATH = $INSTANCE
 
 EOF
 
@@ -94,10 +86,10 @@ date
 ./neat "tmp.ini"
 date
 
-instance_path=$2
+instance_path=$INSTANCE
 
 
-echo "$2"
+
 
 filename="${instance_path##*/}"
 instancename="${filename%%.*}"
@@ -105,7 +97,7 @@ instancename="${filename%%.*}"
 echo "$instancename"
 
 
-DESTINATION_FOLDER="$SRCDIR/src/experiments/permus/results/controllers/n_evals_${N_EVALS}_sample_size_${SAMPLE_SIZE_UPDATE_BK}"
+DESTINATION_FOLDER="$SRCDIR/$DESTINATION_FOLDER"
 
 
 mkdir -p ${DESTINATION_FOLDER}
