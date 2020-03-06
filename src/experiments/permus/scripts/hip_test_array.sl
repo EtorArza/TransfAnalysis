@@ -4,9 +4,9 @@
 #SBATCH --error=err/slurm_err_%j.txt
 #SBATCH --ntasks=1 # number of tasks
 #SBATCH --ntasks-per-node=1 #number of tasks per node
-#SBATCH --mem=2G
-#SBATCH --cpus-per-task=2 # number of CPUs
-#SBATCH --time=0-00:05:00 #Walltime
+#SBATCH --mem=32G
+#SBATCH --cpus-per-task=32 # number of CPUs
+#SBATCH --time=0-00:30:00 #Walltime
 #SBATCH -p short
 #SBATCH --exclude=n[001-004,017-018]
 
@@ -67,8 +67,8 @@ PROBLEM_NAME = permu
 
 
 [TestSettings]
-THREADS = 2 ;
-N_EVALS = 2 ;
+THREADS = 32 ;
+N_EVALS = 2000 ;
 N_REPS = 20 ;
 CONTROLLER_PATH = $CONTROLLER ; 
 COMPUTE_RESPONSE = $MEASURE_RESPONSES

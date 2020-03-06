@@ -4,10 +4,10 @@
 #SBATCH --error=err/slurm_err_%j.txt
 #SBATCH --ntasks=1 # number of tasks
 #SBATCH --ntasks-per-node=1 #number of tasks per node
-#SBATCH --mem=4G
-#SBATCH --cpus-per-task=4 # number of CPUs
-#SBATCH --time=0-00:30:00 #Walltime
-#SBATCH -p short
+#SBATCH --mem=32G
+#SBATCH --cpus-per-task=32 # number of CPUs
+#SBATCH --time=0-13:00:00 #Walltime
+#SBATCH -p large
 #SBATCH --exclude=n[001-004,017-018]
 
 
@@ -72,13 +72,13 @@ PROBLEM_NAME = permu
 
 
 [NEAT]
-MAX_TRAIN_TIME =  100; 43200
-POPSIZE = 64; 640
-THREADS = 4; 32
-N_EVALS = 1; $N_EVALS
+MAX_TRAIN_TIME = 43200
+POPSIZE = 640
+THREADS = 32
+N_EVALS = $N_EVALS
 N_REEVALS_TOP_5_PERCENT = 100
 UPDATE_BK_EVERY_K_ITERATIONS = 40
-SAMPLE_SIZE_UPDATE_BK = 4; $SAMPLE_SIZE_UPDATE_BK
+SAMPLE_SIZE_UPDATE_BK = $SAMPLE_SIZE_UPDATE_BK
 N_SAMPLES_UPDATE_BK = 64
 
 
