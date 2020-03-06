@@ -35,13 +35,24 @@
 
 
 SRCDIR=`pwd`
+echo -n "INSTANCES: "
+echo $INSTANCES
+
 INSTANCES=($(ls -1 $INSTANCES))
 INSTANCE=${INSTANCES[$SLURM_ARRAY_TASK_ID]}
 
-echo "INSTANCE: " -n
+echo -n "INSTANCE: " 
 echo $INSTANCE
 
-instance_path=dirname $INSTANCE
+echo -n "SLURM_ARRAY_TASK_ID: "
+echo $SLURM_ARRAY_TASK_ID
+
+echo -n "instance_path: "
+echo $instance_path
+
+instance_path=`dirname $INSTANCE`
+
+
 
 mkdir -p "$SCRATCH_JOB/$instance_path" && cp $INSTANCE "$SCRATCH_JOB/$instance_path" -v
 cp neat -v $SCRATCH_JOB
@@ -61,7 +72,7 @@ PROBLEM_NAME = permu
 
 
 [NEAT]
-MAX_TRAIN_TIME =  300; 43200
+MAX_TRAIN_TIME =  100; 43200
 POPSIZE = 64; 640
 THREADS = 4; 32
 N_EVALS = 1; $N_EVALS

@@ -4,8 +4,8 @@
 #SBATCH --error=err/slurm_err_%j.txt
 #SBATCH --ntasks=1 # number of tasks
 #SBATCH --ntasks-per-node=1 #number of tasks per node
-#SBATCH --mem=32G
-#SBATCH --cpus-per-task=32 # number of CPUs
+#SBATCH --mem=3G
+#SBATCH --cpus-per-task=3 # number of CPUs
 #SBATCH --time=0-00:30:00 #Walltime
 #SBATCH -p short
 #SBATCH --exclude=n[001-004,017-018]
@@ -27,17 +27,12 @@
 
 
 
-if [[ "$#" -ne 6  ]] ; then
-    echo 'Please provide the name of the problem, the name of the instance and the path to the controller, max_pso_time, and the location of output and wether to record response or not. $# parameters where provided. 4 are needed. Example: '
-    echo ""
-    echo 'script.sh qap tai35a.dat.dat experiment_results/inter_instance_transfer/qap_tai35a/experiment_1/fittest_1 0.5 results.txt false'
-    echo ""
-    echo 'Exitting...'
-    exit 1
-fi
-
 SRCDIR=`pwd`
 
+
+TMP_PATH=${SRCDIR}/"tmp"/$(dirname $5)
+
+mkdir -p ${TMP_PATH}
 cd $SCRATCH_JOB
 mkdir "src"
 cd "src"
@@ -63,7 +58,7 @@ PROBLEM_NAME = permu
 
 [TestSettings]
 THREADS = 32 ;
-N_EVALS = 500 ;
+N_EVALS = 5 ;
 N_REPS = 20 ;
 CONTROLLER_PATH = $3 ; 
 COMPUTE_RESPONSE = $6
@@ -86,9 +81,15 @@ date
 
 sleep "$((${RANDOM} % 5)).$((${RANDOM} % 999))"
 
-cat "result.txt" >> "$SRCDIR/$5"
-cat "responses.txt" >> "$SRCDIR/src/experiments/permus/results/analyze_outputs/responses_journal.txt"
 
+#cat "result.txt" >> "$SRCDIR/$5"
+cat "result.txt" >> "${TMP_PATH}/score_journal_out_${SLURM_JOB_ID}.txt"
+
+#cat "responses.txt" >> "$SRCDIR/src/experiments/permus/results/analyze_outputs/responses_journal.txt"
+cat "responses.txt" >> "${TMP_PATH}/responses_journal_${SLURM_JOB_ID}.txt"
+
+cd ..
+rm ${SLURM_JOB_ID} -r
 
 date
 

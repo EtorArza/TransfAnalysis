@@ -42,7 +42,7 @@ PBP *GetProblemInfo(std::string problemType, std::string filename)
     //     problem = new API();
     else
     {
-         cout << "Wrong problem type was specified." << endl;
+         cout << "Wrong problem type was specified. Problem type \"" << problemType << "\" not recognized."  << endl;
          exit(1);
      }
 

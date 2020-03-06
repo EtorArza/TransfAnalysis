@@ -10,8 +10,8 @@ import fnmatch
 import matplotlib
 
 # save in figures local folder
-#save_fig_path = "figures/"
-save_fig_path = "/home/paran/Dropbox/BCAM/02_NEAT_permus/paper/images/permu_problems_transfer/"
+save_fig_path = "figures/"
+#save_fig_path = "/home/paran/Dropbox/BCAM/02_NEAT_permus/paper/images/permu_problems_transfer/"
 
 
 #input_txt = "result_controllers_GECCO2020_version.txt"
@@ -30,7 +30,7 @@ with open(input_txt) as f:
         values = [float(el) for el in line.split("]")[0].strip("[").split(",")]
         print(values)
         n = len(values)
-        instance = line.split(",")[n].split(".")[0].split("/")[-1]
+        instance = line.split(",")[n].split(".")[0].split("/")[-1].strip("\"")
         controller = line.split(",")[n+1].split("/")[-1].split("_gen_")[0].split("with_")[1]
         scores.append([values, instance, controller])
 

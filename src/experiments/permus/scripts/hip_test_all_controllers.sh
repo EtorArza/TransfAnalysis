@@ -1,27 +1,103 @@
 #!/bin/bash
 
-bash scripts/make_hip.sh
+#bash scripts/make_hip.sh
 
-RES_DIR_1="src/experiments/permus/results/4by4_permu_problems/result_controllers_journal_version.txt"
+source scripts/array_to_string_functions.sh
 
+MEASURE_RESPONSES="false"
+
+
+### 4by4 peremuproblems
+CONTROLLERS=()
+PROBLEMS=()
+INSTANCES=()
+SRCDIR=`pwd`
+SCORE_PATH="src/experiments/permus/results/4by4_permu_problems/result_controllers_journal_version.txt"
+RESPONSE_PATH="src/experiments/permus/results/analyze_outputs/responses_journal.txt"
+TMP_RES_PATH=${SRCDIR}/"tmp"/$(dirname $SCORE_PATH)
+NUM_JOBS=-1
 for controller in "src/experiments/permus/results/4by4_permu_problems/top_controllers/"*; do
     for problem in "qap" "tsp" "pfsp" "lop"; do
         for instance in "src/experiments/permus/instances/${problem}/"*".${problem}"; do
-            sbatch src/experiments/permus/scripts/exec_hipatia_test.sh "${problem}" "$instance" "$controller" "0.25" "${RES_DIR_1}" "false"
-            sleep 0.1
+            CONTROLLERS+=($controller)
+            PROBLEMS+=($problem)
+            INSTANCES+=($instance)
+            NUM_JOBS=$((NUM_JOBS + 1))
         done
     done
 done
 
 
+cat > script_527cff9ed08e301393afd8d723ce0182.sh <<EOF
+#!/bin/bash
+###   s b a t c h --array=1-$runs:1 $SL_FILE_NAME
+#SBATCH --output=out/slurm_%j.txt
+#SBATCH --error=err/slurm_err_%j.txt
+#SBATCH --ntasks=1 # number of tasks
+#SBATCH --ntasks-per-node=1 #number of tasks per node
+#SBATCH --mem=2G
+#SBATCH --cpus-per-task=2 # number of CPUs
+#SBATCH --time=0-00:05:00 #Walltime
+#SBATCH -p short
 
-RES_DIR_2="src/experiments/permus/results/transfer_qap_with_cut_instances/result_controllers_journal_version.txt"
+cat ${TMP_RES_PATH}/score_* > ${SCORE_PATH} && ${TMP_RES_PATH}/response_* > ${RESPONSE_PATH}
+rm script_527cff9ed08e301393afd8d723ce0182.sh
+EOF
 
+
+CONTROLLERS=$(to_list "${CONTROLLERS[@]}")
+PROBLEMS=$(to_list "${PROBLEMS[@]}")
+INSTANCES=$(to_list "${INSTANCES[@]}")
+
+
+
+ID=`sbatch --parsable --export=CONTROLLERS=${CONTROLLERS},PROBLEMS=${PROBLEMS},INSTANCES=${INSTANCES},MAX_TIME_PSO=0.25,MEASURE_RESPONSES=${MEASURE_RESPONSES},TMP_RES_PATH=${TMP_RES_PATH} --array=0-$NUM_JOBS src/experiments/permus/scripts/hip_test_array.sl`
+sbatch --dependency=afterok:$ID script_527cff9ed08e301393afd8d723ce0182.sh
+
+
+
+
+### QAP cut transfer
+CONTROLLERS=()
+PROBLEMS=()
+INSTANCES=()
+SCORE_PATH="src/experiments/permus/results/transfer_qap_with_cut_instances/result_controllers_journal_version.txt"
+RESPONSE_PATH="src/experiments/permus/results/analyze_outputs/responses_journal.txt"
+TMP_RES_PATH=${SRCDIR}/"tmp"/$(dirname $SCORE_PATH)
+NUM_JOBS=-1
 for controller in "src/experiments/permus/results/transfer_qap_with_cut_instances/top_controllers/"*; do
     for problem in "qap"; do
         for instance in "src/experiments/permus/instances/qap/cut_instances/"*; do
-            sbatch src/experiments/permus/scripts/exec_hipatia_test.sh "${problem}" "$instance" "$controller" "0.25" "${RES_DIR_2}" "false"
-            sleep 0.1
+            CONTROLLERS+=($controller)
+            PROBLEMS+=($problem)
+            INSTANCES+=($instance)
+            NUM_JOBS=$((NUM_JOBS + 1))
         done
     done
 done
+
+
+cat > script_2828a8741ae82e71b77975df5ec94c25.sh <<EOF
+#!/bin/bash
+###   s b a t c h --array=1-$runs:1 $SL_FILE_NAME
+#SBATCH --output=out/slurm_%j.txt
+#SBATCH --error=err/slurm_err_%j.txt
+#SBATCH --ntasks=1 # number of tasks
+#SBATCH --ntasks-per-node=1 #number of tasks per node
+#SBATCH --mem=2G
+#SBATCH --cpus-per-task=2 # number of CPUs
+#SBATCH --time=0-00:05:00 #Walltime
+#SBATCH -p short
+
+cat ${TMP_RES_PATH}/score_* > ${SCORE_PATH} && ${TMP_RES_PATH}/response_* > ${RESPONSE_PATH}
+rm script_2828a8741ae82e71b77975df5ec94c25.sh
+EOF
+
+CONTROLLERS=$(to_list "${CONTROLLERS[@]}")
+PROBLEMS=$(to_list "${PROBLEMS[@]}")
+INSTANCES=$(to_list "${INSTANCES[@]}")
+
+
+ID=`sbatch --parsable --export=CONTROLLERS=${CONTROLLERS},PROBLEMS=${PROBLEMS},INSTANCES=${INSTANCES},MAX_TIME_PSO=0.25,MEASURE_RESPONSES=${MEASURE_RESPONSES},TMP_RES_PATH=${TMP_RES_PATH} --array=0-$NUM_JOBS src/experiments/permus/scripts/hip_test_array.sl`
+sbatch --dependency=afterok:$ID script_2828a8741ae82e71b77975df5ec94c25.sh
+

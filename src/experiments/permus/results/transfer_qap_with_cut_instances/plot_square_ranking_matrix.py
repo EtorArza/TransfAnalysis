@@ -15,8 +15,8 @@ save_fig_path = "figures/"
 
 
 #input_txt = "result_controllers_GECCO2020_version.txt"
-#input_txt = "result_controllers_journal_version.txt"
-input_txt = "result_controllers_journal_version_local.txt"
+input_txt = "result_controllers_journal_version.txt"
+#input_txt = "result_controllers_journal_version_local.txt"
 
 
 
@@ -35,7 +35,7 @@ with open(input_txt) as f:
     for line in f:
         values = [float(el) for el in line.split("]")[0].strip("[").split(",")]
         n = len(values)
-        instance = line.split(",")[n].split(".")[0].split("/")[-1]
+        instance = line.split(",")[n].split(".")[0].split("/")[-1].strip("\"")
         controller = line.split(",")[n+1].split("/")[-1].split("_gen_")[0].split("with_")[1]
         scores.append([values, instance, controller])
 

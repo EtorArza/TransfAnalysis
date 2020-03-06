@@ -23,9 +23,9 @@ PROBLEM_NAME = permu
 
 
 [TestSettings]
-THREADS = 6 ;
-N_EVALS = 500 ;
-N_REPS = 2 ;
+THREADS = 3 ;
+N_EVALS = 2 ;
+N_REPS = 20 ;
 CONTROLLER_PATH = $3 ; 
 COMPUTE_RESPONSE = $6
 
