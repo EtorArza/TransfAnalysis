@@ -10,8 +10,8 @@ import fnmatch
 
 
 # save in figures local folder
-save_fig_path = "figures/"
-#save_fig_path = "/home/paran/Dropbox/BCAM/02_NEAT_permus/paper/images/qap_transfer_cut/"
+#save_fig_path = "figures/"
+save_fig_path = "/home/paran/Dropbox/BCAM/02_NEAT_permus/paper/images/qap_transfer_cut/"
 
 
 #input_txt = "result_controllers_GECCO2020_version.txt"
@@ -146,47 +146,7 @@ m = d.shape[1]
 
 
 
-# plt.show()
 
-def get_loss(df):
-    return sum([sum(abs(df.iloc[:,i] - df.iloc[:,i+1])) for i in range(m-1)])
-
-def swap_three_cols(df):
-    df = df.copy(deep=True)
-    i,j,k = np.random.randint(m,size = 3)
-    while i == j or j == k or k == i:
-        i,j,k = np.random.randint(m,size = 3)
-    #print(df)
-
-    new_order = list(range(m))
-    new_order[i], new_order[j], new_order[k] = j,i,k
-    return df[df.columns[new_order]]
-
-def ls(df):
-    best_loss = 100000000000
-    for _ in range(3000):
-        df_copy = swap_three_cols(df)
-        if get_loss(df_copy) < best_loss:
-            df = df_copy
-            best_loss = get_loss(df)
-        print(get_loss(df))
-    return df
-
-"""
-cur_loss = 10000000000000
-best_loss = 100000000000
-df_copy = d.copy(deep = True)
-for i in range(15):
-    print("..i..")
-    df_copy = ls(df_copy)
-    cur_loss = get_loss(df_copy)
-    if cur_loss < best_loss:
-        best_loss = cur_loss
-        d = df_copy.copy(deep=True)
-    new_order = list(range(m))
-    random.shuffle(new_order)
-    df_copy[df_copy.columns[new_order]]
-"""
 
 
 # https://stackoverflow.com/Questions/7404116/defining-the-midpoint-of-a-colormap-in-matplotlib
@@ -307,18 +267,19 @@ def save_fig(d, fig_title, fig_path, class_relevant, size_relevant):
     max_val = data.max().max()
     min_val = data.min().min()
 
-    max_reference = 1.3
-    min_reference = -1.3
+    max_reference = 1.32
+    min_reference = -1.32
 
     start = abs(data.min().min() - (min_reference) ) / (abs(min_reference) + max_reference)
     stop = 1 - abs(data.max().max() - (max_reference) ) / (abs(min_reference) + max_reference)
 
     print(start, stop)
 
-    adjusted_cmap = shiftedColorMap(matplotlib.cm.bwr, midpoint=(1 - max_val / (max_val + abs(min_val))), start=start, stop=stop)
+    adjusted_cmap = shiftedColorMap(matplotlib.cm.Spectral, midpoint=(1 - max_val / (max_val + abs(min_val))), start=start, stop=stop)
 
     plt.pcolor(data, cmap=adjusted_cmap)
 
+    data.to_csv(fig_path.split(".pdf")[0] + ".csv", float_format="%.3f")
 
 
     FONTSIZE = 15

@@ -4,7 +4,12 @@
 
 source scripts/array_to_string_functions.sh
 
-MEASURE_RESPONSES="false"
+if [ "$#" -ne 1 ]; then
+    echo "You must enter exactly 1 command line argument"
+    exit 1
+fi
+
+MEASURE_RESPONSES=$1
 
 
 ### 4by4 peremuproblems
@@ -13,7 +18,7 @@ PROBLEMS=()
 INSTANCES=()
 SRCDIR=`pwd`
 SCORE_PATH="src/experiments/permus/results/4by4_permu_problems/result_controllers_journal_version.txt"
-RESPONSE_PATH="src/experiments/permus/results/analyze_outputs/responses_journal.txt"
+RESPONSE_PATH="src/experiments/permus/results/analyze_outputs/responses_journal_4by4_permuproblems.txt"
 TMP_RES_PATH=${SRCDIR}/"tmp"/$(dirname $SCORE_PATH)
 NUM_JOBS=-1
 for controller in "src/experiments/permus/results/4by4_permu_problems/top_controllers/"*; do
@@ -37,10 +42,20 @@ cat > script_527cff9ed08e301393afd8d723ce0182.sh <<EOF
 #SBATCH --ntasks-per-node=1 #number of tasks per node
 #SBATCH --mem=2G
 #SBATCH --cpus-per-task=2 # number of CPUs
-#SBATCH --time=0-00:05:00 #Walltime
+#SBATCH --time=0-00:15:00 #Walltime
 #SBATCH -p short
 
-cat ${TMP_RES_PATH}/score_* > ${SCORE_PATH} && ${TMP_RES_PATH}/response_* > ${RESPONSE_PATH}
+
+if [ $MEASURE_RESPONSES == "true" ]; then
+    cat ${TMP_RES_PATH}/response_* > ${RESPONSE_PATH}
+elif [ $MEASURE_RESPONSES == "false" ]; then
+    cat ${TMP_RES_PATH}/score_* > ${SCORE_PATH}
+else
+    echo "MEASURE_RESPONSES = $MEASURE_RESPONSES not set correctly"
+    exit(1)
+fi
+
+
 rm script_527cff9ed08e301393afd8d723ce0182.sh
 EOF
 
@@ -62,7 +77,7 @@ CONTROLLERS=()
 PROBLEMS=()
 INSTANCES=()
 SCORE_PATH="src/experiments/permus/results/transfer_qap_with_cut_instances/result_controllers_journal_version.txt"
-RESPONSE_PATH="src/experiments/permus/results/analyze_outputs/responses_journal.txt"
+RESPONSE_PATH="src/experiments/permus/results/analyze_outputs/responses_journal_qap_cut.txt"
 TMP_RES_PATH=${SRCDIR}/"tmp"/$(dirname $SCORE_PATH)
 NUM_JOBS=-1
 for controller in "src/experiments/permus/results/transfer_qap_with_cut_instances/top_controllers/"*; do
@@ -86,10 +101,18 @@ cat > script_2828a8741ae82e71b77975df5ec94c25.sh <<EOF
 #SBATCH --ntasks-per-node=1 #number of tasks per node
 #SBATCH --mem=2G
 #SBATCH --cpus-per-task=2 # number of CPUs
-#SBATCH --time=0-00:05:00 #Walltime
+#SBATCH --time=0-00:15:00 #Walltime
 #SBATCH -p short
 
-cat ${TMP_RES_PATH}/score_* > ${SCORE_PATH} && ${TMP_RES_PATH}/response_* > ${RESPONSE_PATH}
+if [ $MEASURE_RESPONSES == "true" ]; then
+    cat ${TMP_RES_PATH}/response_* > ${RESPONSE_PATH}
+elif [ $MEASURE_RESPONSES == "false" ]; then
+    cat ${TMP_RES_PATH}/score_* > ${SCORE_PATH}
+else
+    echo "MEASURE_RESPONSES = $MEASURE_RESPONSES not set correctly"
+    exit(1)
+fi
+
 rm script_2828a8741ae82e71b77975df5ec94c25.sh
 EOF
 

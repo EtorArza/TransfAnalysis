@@ -2,7 +2,7 @@ import os
 from matplotlib import pyplot as plt
 
 directory_of_controller_directories = "src/experiments/permus/results/overfitting/test_controllers/"
-instance = "src/experiments/permus/instances/qap/cut_instances/cut60_tai60b"
+instance = "src/experiments/permus/instances/qap/cut_instances/cut60_tai80b"
 cwd = "/home/paran/Dropbox/BCAM/NEAT_code"
 exp_dir = "src/experiments/permus/results/overfitting/"
 
@@ -14,8 +14,8 @@ PROBLEM_NAME = permu ;
 
 
 [TestSettings]
-THREADS = 2 ;
-N_EVALS = 1000 ;
+THREADS = 7 ;
+N_EVALS = 10 ;
 N_REPS = 1 ;
 CONTROLLER_PATH = $3 ; 
 COMPUTE_RESPONSE = false ;
