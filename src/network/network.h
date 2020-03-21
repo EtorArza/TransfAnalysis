@@ -15,6 +15,7 @@
 */
 #pragma once
 
+#include <std.h>
 #include "neattypes.h"
 
 namespace NEAT {
