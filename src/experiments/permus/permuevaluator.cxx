@@ -252,30 +252,24 @@ struct Evaluator
 
 } // namespace PERMU
 
+
 namespace NEAT
 {
 
-class PermuEvaluator : public NetworkEvaluator
-{
-    NetworkExecutor<PERMU::Evaluator> *executor;
-    PERMU::params *parameters;
-    int iteration_number;
-    double *average_f_values_obtained_by_bk;
 
-public:
-    PermuEvaluator()
+    PermuEvaluator::PermuEvaluator()
     {
         executor = NEAT::NetworkExecutor<PERMU::Evaluator>::create();
         parameters = new PERMU::params();
         iteration_number = 0;
     }
 
-    ~PermuEvaluator()
+    PermuEvaluator::~PermuEvaluator()
     {
         delete executor;
     }
 
-    void read_conf_file(std::string conf_file_path)
+    void PermuEvaluator::read_conf_file(std::string conf_file_path)
     {
         using namespace std;
         using namespace NEAT;
@@ -404,9 +398,7 @@ public:
         }
     }
 
-    virtual void execute(class NEAT::Network **nets_,
-                         class NEAT::OrganismEvaluation *results,
-                         size_t nnets)
+    void PermuEvaluator::execute(class NEAT::Network **nets_, class NEAT::OrganismEvaluation *results, size_t nnets)
     {
         using namespace NEAT;
         env->pop_size = POPSIZE_NEAT;
@@ -418,7 +410,7 @@ public:
         delete ev;
     }
 
-    virtual void run_given_conf_file(std::string conf_file_path)
+    void PermuEvaluator::run_given_conf_file(std::string conf_file_path)
     {
         using namespace std;
         using namespace NEAT;
@@ -460,7 +452,7 @@ public:
             result_string_stream << "[[";
             for (int j = 0; j < parameters->N_REPS; j++)
             {
-#pragma omp parallel for num_threads(N_OF_THREADS)
+                #pragma omp parallel for num_threads(N_OF_THREADS)
                 for (int i = 0; i < parameters->N_EVALS; i++)
                 {
                     v_of_f_values[i] = FitnessFunction_permu(&net, 1, initial_seed + i, parameters);
@@ -512,11 +504,10 @@ public:
             exit(1);
         }
     }
-};
 
-class NetworkEvaluator *create_permu_evaluator()
-{
-    return new PermuEvaluator();
-}
+    class NetworkEvaluator *create_permu_evaluator()
+    {
+        return new PermuEvaluator();
+    }
 
 } // namespace NEAT

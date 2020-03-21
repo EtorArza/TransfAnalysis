@@ -1,5 +1,8 @@
 #pragma once
-
+#include "network.h"
+#include "networkexecutor.h"
+#include "PERMU_params.h"
+#include "evaluatorexperiment.h"
 
 
 
@@ -42,8 +45,38 @@ namespace PERMU{
     };
 }
 
-namespace NEAT{
+
+namespace PERMU
+{
+    struct Evaluator;
+}
+
+
+namespace NEAT
+{
+
+
+
+class PermuEvaluator : public NetworkEvaluator
+{   
+    NetworkExecutor<PERMU::Evaluator> *executor;
+    PERMU::params *parameters;
+    int iteration_number;
+    double *average_f_values_obtained_by_bk;
+
+public:
+    PermuEvaluator();
+
+    ~PermuEvaluator();
+
+    void read_conf_file(std::string conf_file_path);
+
+    void execute(class NEAT::Network **nets_, class NEAT::OrganismEvaluation *results, size_t nnets);
+
+    void run_given_conf_file(std::string conf_file_path);
+
+};
 
 class NetworkEvaluator *create_permu_evaluator();
 
-}
+} // namespace NEAT

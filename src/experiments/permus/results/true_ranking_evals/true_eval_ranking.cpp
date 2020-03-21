@@ -14,7 +14,7 @@
 // #include <float.h>
 // #include "evaluatorexperiment.h"
 // #include "rng.h"
-// #include "permuevaluator.cxx"
+#include "permuevaluator.h"
 
 
 void get_algorithm_ranking(NEAT::CpuNetwork **array_of_networks, int n_of_evals, int seed, int array_size, int *ranking)
@@ -24,25 +24,13 @@ void get_algorithm_ranking(NEAT::CpuNetwork **array_of_networks, int n_of_evals,
 void true_eval_ranking_experiment()
 {
 
-    using namespace NEAT;
-    #define seed 4
+    // using namespace NEAT;
+    // #define seed 4
 
-    // rng_t rng_exp(seed);
-    // class Population *pop;
+    // class PermuEvaluator;
+    // void PermuEvaluator::read_conf_file(std::string conf_file);
 
-    // auto ev = PermuEvaluator();
-
-    // PERMU::params *parameters;
-    // NetworkExecutor<PERMU::Evaluator> *executor;
-
-    // executor = NEAT::NetworkExecutor<PERMU::Evaluator>::create();
-    // parameters = new PERMU::params();
-
-
-    // EvaluatorExperiment ev_ = ;
-    
-    // EvaluatorExperiment("permu", create_evaluator, create_seeds);
-    // PermuEvaluator *ev = (PermuEvaluator *) & ev_;
+    // PermuEvaluator *ev = (PermuEvaluator* ) NEAT::create_permu_evaluator();
 
     // ev->read_conf_file("src/experiments/permus/results/true_ranking_evals/test.ini");
 
