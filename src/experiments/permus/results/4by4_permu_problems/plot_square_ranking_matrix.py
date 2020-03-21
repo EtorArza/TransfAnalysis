@@ -208,9 +208,11 @@ def save_fig(d, fig_title, fig_path,size_relevant=True, class_relevant=True):
 
     print(data)
 
-    for column in data:
-        data[column] -= mean(data[column])
-        data[column] /= stdev(data[column]) # max(d[column])
+    for index in range(data.shape[1]):
+        data.iloc[:, index] -= mean(data.iloc[[i for i in range(data.shape[0]) if i != index], index])
+        data.iloc[:, index] /= stdev(data.iloc[[i for i in range(data.shape[0]) if i != index], index]) # max(d[column])
+        print(data)
+
 
     print(data)
 

@@ -245,9 +245,10 @@ def save_fig(d, fig_title, fig_path, class_relevant, size_relevant):
 
     data = d.copy(deep=True)
 
-    for column in data:
-        data[column] -= mean(data[column])
-        data[column] /= stdev(data[column]) # max(d[column])
+    for index in range(data.shape[1]):
+        data.iloc[:, index] -= mean(data.iloc[[i for i in range(data.shape[0]) if i != index], index])
+        data.iloc[:, index] /= stdev(data.iloc[[i for i in range(data.shape[0]) if i != index], index]) # max(d[column])
+        print(data)
 
 
     # for i in range(d.shape[0]):
@@ -260,7 +261,7 @@ def save_fig(d, fig_title, fig_path, class_relevant, size_relevant):
     data.index = yticks
     data.columns = xticks
 
-    #data = average_results(data, class_relevant, size_relevant)
+    data = average_results(data, class_relevant, size_relevant)
 
     print(data)
 
