@@ -20,6 +20,7 @@
 #include <functional>
 #include "Parameters.h"
 #include <mutex>
+#include <iomanip>
 
 using std::istream;
 using std::ostream;
@@ -64,6 +65,7 @@ void PrintArray(T *array, int length)
 {
     for (int i = 0; i < length; i++)
     {
+        cout << std::setprecision(10);
         cout << array[i] << " ";
     }
     cout << " " << endl;
@@ -809,6 +811,8 @@ void append_line_to_file(std::string filename, T data_to_append ) {
   std::ofstream outfile;
   outfile.open(filename, std::ios_base::app); // append instead of overwrite
   outfile << data_to_append;
+  outfile.flush();
+  outfile.close();
 }
 
 
@@ -917,6 +921,8 @@ void find_classes_in_array_of_objects(T *array_of_objects, std::function<bool(T,
     cout << "Repeated: " << repetitions;
     //PrintArray(classes_array, len);
 }
+
+int n_choose_k(int n, int k);
 
 class progress_bar
 {

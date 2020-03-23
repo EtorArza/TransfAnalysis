@@ -1877,3 +1877,8 @@ void progress_bar::restart(int n){
     this->current_steps = 0;
     std::cout << "[" << std::flush;
 }
+
+
+int n_choose_k(int n, int k){
+    return n*(n-1) / k;
+}
