@@ -1878,7 +1878,15 @@ void progress_bar::restart(int n){
     std::cout << "[" << std::flush;
 }
 
-
+// https://en.wikipedia.org/wiki/Binomial_coefficient#Computing_the_value_of_binomial_coefficients
 int n_choose_k(int n, int k){
-    return n*(n-1) / k;
+
+    int res = 1;
+    for (int i = 1; i <= k; i++)
+    {
+        res *= (n + 1 - i);
+        res /= i;
+    }
+    
+    return res;
 }
