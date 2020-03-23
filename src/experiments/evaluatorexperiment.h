@@ -159,8 +159,9 @@ namespace NEAT {
                 nets[i] = pop->get(i)->net.get();
             }
             OrganismEvaluation evaluations[norgs];
-            //auto tmp_params = network_evaluator->
-            network_evaluator->execute(nets, evaluations, norgs);
+            nets[norgs -1] = fittest->net.get(); // reevaluate fittest
+            network_evaluator->execute(nets, evaluations, norgs); // evaluate all nets
+            fittest->eval.fitness; // get fitness of reevaluation
             Organism *best = nullptr;
             for(size_t i = 0; i < norgs; i++) {
                 Organism *org = pop->get(i);
@@ -172,7 +173,7 @@ namespace NEAT {
 
             timer.stop();
 
-            // Fittest is not evaluated.
+            // Fittest is updated, taking into account that it has already been reevaluated.
             if(!fittest || (best->eval.fitness > fittest->eval.fitness)) {
                 save_best_network = true;
                 fittest = pop->make_copy(best->population_index);
