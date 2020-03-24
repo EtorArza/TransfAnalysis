@@ -116,7 +116,7 @@ namespace NEAT {
 
 
 
-                if (save_best_network)
+                if (save_best_network || is_last_gen)
                 {
                     save_best_network = false;
                     print(1, gen);

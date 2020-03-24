@@ -128,9 +128,9 @@ struct Evaluator
             #pragma omp parallel for num_threads(N_OF_THREADS)
             for (int inet = 0; inet < current_number_of_controllers; inet++)
             {
-                NEAT::CpuNetwork *net = nets[inet];
+                NEAT::CpuNetwork *net = nets[indexes[inet]];
                 int seed = initial_seed + inet;
-                f_values[inet] = (total_n_evals*f_values[inet] + n_evals*this->FitnessFunction(net, n_evals, seed)) / (total_n_evals + n_evals);
+                f_values[indexes[inet]] = (total_n_evals*f_values[indexes[inet]] + n_evals*this->FitnessFunction(net, n_evals, seed)) / (total_n_evals + n_evals);
             }
             
             sort(indexes, indexes+current_number_of_controllers, [f_values](int a, int b) {return f_values[a] > f_values[b]; });
@@ -185,14 +185,13 @@ struct Evaluator
         if (best_network == nullptr)
         {
             best_network = new NEAT::CpuNetwork(*nets[0]);
-            cout << "nets[0] copied to best_network" << endl;
         }
         else
         {
             BEST_FITNESS_TRAIN = this->FitnessFunction(best_network, parameters->N_EVALS, rng.random_integer_fast((int) 1e9));
         }
 
-        cout << " Evaluating -> ";
+        cout << "Evaluating -> ";
 
         progress_bar bar(nnets);
 #pragma omp parallel for num_threads(N_OF_THREADS)
@@ -208,16 +207,18 @@ struct Evaluator
         bar.end();
 
         double best_f_gen = f_values[argmax(f_values, (int)nnets)];
-        cout << "(best this gen, best overall) -> (" << best_f_gen << ", " << BEST_FITNESS_TRAIN << ")" << endl;
+        cout << "(best this gen, best last gen) -> (" << best_f_gen << ", " << BEST_FITNESS_TRAIN << ")" << endl;
 
         if (best_f_gen > BEST_FITNESS_TRAIN)
         {
             N_TIMES_BEST_FITNESS_IMPROVED_TRAIN++;
-            cout << "[BEST_FITNESS_IMPROVED] --> " << best_f_gen << endl;
+            cout << ", best replaced" << endl;
             BEST_FITNESS_TRAIN = best_f_gen;
             delete best_network;
             best_network = new NEAT::CpuNetwork(*nets[argmax(f_values, (int)nnets)]);
         }
+
+        cout << endl;
 
 
         //cout << "fitness_array: " << std::flush;
@@ -235,11 +236,11 @@ struct Evaluator
 
 
 
-        if (*is_last_gen)
-        {
-            int argbest = argbest_net(nets_, nnets, 0.8);
-            f_values[argbest] += 1.0;
-        }
+        // if (*is_last_gen)
+        // {
+        //     int argbest = argbest_net(nets_, nnets, 0.8);
+        //     f_values[argbest] += 1.0;
+        // }
         
 
         // save scaled fitness
