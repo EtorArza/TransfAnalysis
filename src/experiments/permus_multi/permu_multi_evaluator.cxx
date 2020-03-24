@@ -101,11 +101,6 @@ struct Evaluator
         // // reevaluate top n_of_threads_omp, with a minimum of 5 and a maximum of nnets.
         // double cut_value = obtain_kth_largest_value(f_values, min(max(n_of_threads_omp, 5), static_cast<int>(nnets)), nnets);
 
-        // reevaluate top 5% at least N_REEVAL times
-        int n_of_networks_to_reevaluate = nnets / 20 + 1;
-        int n_of_reevals_top_5percent = parameters->N_EVALS * parameters->N_REEVALS_TOP_5_PERCENT;
-        cout << "reevaluating top 5% (" << n_of_networks_to_reevaluate << " nets out of " << static_cast<int>(nnets) << ") each " << n_of_reevals_top_5percent << " times -> ";
-
         double *f_value_rankings = new double[nnets];
 
         for (int i = 0; i < (int)nnets; i++)
@@ -123,128 +118,6 @@ struct Evaluator
                 true);
             sum_arrays(f_value_rankings, f_value_rankings, f_values[i], nnets);
         }
-
-        double cut_value = obtain_kth_largest_value(f_value_rankings, n_of_networks_to_reevaluate+1, static_cast<int>(nnets));
-        rng.seed();
-        initial_seed = rng.random_integer_fast(20050000, 30000000);
-
-        std::vector<int> reeval_indexes; 
-        for (size_t inet = 0; inet < nnets; inet++)
-        {   
-            if (f_value_rankings[inet] <= cut_value)
-            {
-                for (int i = 0; i < parameters->N_OF_INSTANCES; i++)
-                {
-                    f_values[i][inet] -= 1000000000.0;
-                }
-            }
-            else
-            {
-                reeval_indexes.push_back(inet);
-            }
-        }
-        
-        bar.restart(reeval_indexes.size());
-        #pragma omp parallel for num_threads(N_OF_THREADS)
-        for (std::size_t i = 0; i < reeval_indexes.size(); ++i)
-        {
-            bar.step();
-            f_value_rankings[reeval_indexes[i]] = 0.0;
-            NEAT::CpuNetwork *net = nets[reeval_indexes[i]];
-            for (int j = 0; j < parameters->N_OF_INSTANCES; j++)
-            {
-                f_values[j][i] = this->FitnessFunction(net, n_of_reevals_top_5percent, initial_seed, j);
-            }
-        }
-        bar.end();
-
-        for (int i = 0; i < (int)nnets; i++)
-        {
-            f_value_rankings[i] = 0.0;
-        }
-        for (int i = 0; i < parameters->N_OF_INSTANCES; i++)
-        {
-            compute_order_from_double_to_double(
-                f_values[i],
-                nnets,
-                f_values[i],
-                false,
-                true);
-            sum_arrays(f_value_rankings, f_value_rankings, f_values[i], nnets);
-        }
-
-        cout << "Reevaluating best indiv of generation -> "<< std::flush;
-        int index_most_fit = argmax(f_value_rankings, nnets);
-        f_value_rankings[index_most_fit] += 1.0;
-        NEAT::CpuNetwork *net = nets[index_most_fit];
-
-        // apply a discount to all but the best individual
-        for (int inet = 0; inet < (int)nnets; inet++)
-        {
-            if (inet != index_most_fit)
-            {
-                for (int i = 0; i < parameters->N_OF_INSTANCES; i++)
-                {
-                    f_values[i][inet] -= 1000000000.0;
-                }
-            }
-        }
-
-        double **res = new double *[parameters->N_OF_INSTANCES];
-        bar.restart(parameters->N_OF_INSTANCES);
-        for (int i = 0; i < parameters->N_OF_INSTANCES; i++)
-        {
-            bar.step();
-            res[i] = new double[parameters->SAMPLE_SIZE_UPDATE_BK];
-            this->FitnessFunction_parallel(net, parameters->SAMPLE_SIZE_UPDATE_BK, res[i], 30050000, i);
-        }
-        bar.end();
-
-        // double median = res[arg_element_in_centile_specified_by_percentage(res, N_EVALS_TO_UPDATE_BK, 0.5)];
-
-        bool is_it_better_in_all_cases = true;
-        for (int i = 0; i < parameters->N_OF_INSTANCES; i++)
-        {
-            is_it_better_in_all_cases = is_it_better_in_all_cases &&
-                                        Average(res[i], parameters->SAMPLE_SIZE_UPDATE_BK) >= parameters->BEST_FITNESS_TRAIN_FOR_EACH_INSTANCE[i];
-        }
-
-        cout << "best this gen:";
-        for (int i = 0; i < parameters->N_OF_INSTANCES; i++)
-        {
-            cout << " " << Average(res[i], parameters->SAMPLE_SIZE_UPDATE_BK);
-        }
-        cout << endl;
-
-        if (is_it_better_in_all_cases)
-        {
-
-            bool update_needed = false;
-
-            for (int i = 0; i < parameters->N_OF_INSTANCES; i++)
-            {
-                update_needed = update_needed || is_A_larger_than_B_Mann_Whitney(res[i], parameters->F_VALUES_OBTAINED_BY_BEST_INDIV_FOR_EACH_INSTANCE[i], parameters->SAMPLE_SIZE_UPDATE_BK);
-            }
-
-            if (update_needed)
-            {
-                N_TIMES_BEST_FITNESS_IMPROVED_TRAIN++;
-                cout << "[BEST_FITNESS_IMPROVED] --> ";
-                for (int i = 0; i < parameters->N_OF_INSTANCES; i++)
-                {
-                    cout << " " << Average(res[i], parameters->SAMPLE_SIZE_UPDATE_BK);
-                    parameters->BEST_FITNESS_TRAIN_FOR_EACH_INSTANCE[i] = Average(res[i], parameters->SAMPLE_SIZE_UPDATE_BK);
-                    copy_array(parameters->F_VALUES_OBTAINED_BY_BEST_INDIV_FOR_EACH_INSTANCE[i], res[i], parameters->SAMPLE_SIZE_UPDATE_BK);
-                }
-                cout << endl;
-            }
-        }
-
-        for (int i = 0; i < parameters->N_OF_INSTANCES; i++)
-        {
-            delete[] res[i];
-        }
-        delete[] res;
 
 
         double *tmp_order = new double[nnets];
@@ -331,17 +204,12 @@ public:
         {
 
             parameters->N_EVALS = reader.GetInteger("NEAT", "N_EVALS", -1);
-            parameters->N_REEVALS_TOP_5_PERCENT = reader.GetInteger("NEAT", "N_REEVALS_TOP_5_PERCENT", -1);
-            parameters->UPDATE_BK_EVERY_K_ITERATIONS = reader.GetInteger("NEAT", "UPDATE_BK_EVERY_K_ITERATIONS", -1);
-            parameters->SAMPLE_SIZE_UPDATE_BK = reader.GetInteger("NEAT", "SAMPLE_SIZE_UPDATE_BK", -1);
-            parameters->N_SAMPLES_UPDATE_BK = reader.GetInteger("NEAT", "N_SAMPLES_UPDATE_BK", -1);
             string search_type = reader.Get("NEAT", "SEARCH_TYPE", "UNKOWN");
             parameters->PROBLEM_TYPE = reader.Get("Controller", "PROBLEM_TYPE", "UNKOWN");
             parameters->N_OF_INSTANCES = reader.GetInteger("Controller", "N_PROBLEMS", -1);
             parameters->INSTANCE_PATHS = new std::string[parameters->N_OF_INSTANCES];
             parameters->BEST_FITNESS_TRAIN_FOR_EACH_INSTANCE = new double[parameters->N_OF_INSTANCES];
             parameters->MAX_TIME_PSO_FOR_EACH_INSTANCE = new double[parameters->N_OF_INSTANCES];
-            parameters-> UPDATE_BK_EVERY_K_ITERATIONS = reader.GetInteger("NEAT", "UPDATE_BK_EVERY_K_ITERATIONS", -1);
 
 
 
@@ -413,15 +281,7 @@ public:
                 env->mutate_delete_link_prob *= 0.1;
             }
 
-            parameters->F_VALUES_OBTAINED_BY_BEST_INDIV_FOR_EACH_INSTANCE = new double *[parameters->N_OF_INSTANCES];
-            for (int i = 0; i < parameters->N_OF_INSTANCES; i++)
-            {
-                parameters->F_VALUES_OBTAINED_BY_BEST_INDIV_FOR_EACH_INSTANCE[i] = new double[parameters->SAMPLE_SIZE_UPDATE_BK];
-                for (int j = 0; j < parameters->SAMPLE_SIZE_UPDATE_BK; j++)
-                {
-                    parameters->F_VALUES_OBTAINED_BY_BEST_INDIV_FOR_EACH_INSTANCE[i][j] = -DBL_MAX;
-                }
-            }
+
 
             for (int i = 0; i < parameters->N_OF_INSTANCES; i++)
             {

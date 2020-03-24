@@ -198,7 +198,8 @@ string toString(const T &t, bool *ok = NULL)
 /*
  * Convert to string.
  * https://stackoverflow.com/questions/3909272/sorting-two-corresponding-arrays
- * sort 2 arrays simultaneously. The values used as keys are placed in A. If reverse == false, the order is ascending.
+ * sort 2 arrays simultaneously. The values used as keys are placed in A. If ascending == false, the order is descending.
+ * default is descending.
  */
 template <class A, class B>
 void QuickSort2Desc(A a[], B b[], int l, int r, bool ascending=false)
@@ -556,7 +557,7 @@ class RandomNumberGenerator{
 
         unsigned long x, y, z;
 
-        RandomNumberGenerator(){x=123456789, y=362436069, z=521288629;}
+        RandomNumberGenerator(){x=123456789, y=362436069, z=521288629;seed();}
         ~RandomNumberGenerator(){};
         void seed(void);
         void seed(int seed);

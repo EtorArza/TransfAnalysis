@@ -38,6 +38,7 @@ CpuNetwork::CpuNetwork(const CpuNetwork&  other){
     this->activations = std::vector<real_t>(other.activations);
 
     this->dims = other.dims;
+    this->dims.nnodes = other.dims.nnodes;
     this->links = other.links;
     this->nodes = other.nodes;
     this->response = other.response;

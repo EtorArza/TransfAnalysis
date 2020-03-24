@@ -51,6 +51,7 @@ struct Evaluator
 
     void get_net_ranking(NEAT::CpuNetwork **nets, size_t nnets, int n_evals, PERMU::params *parameters, int* ranking){
         RandomNumberGenerator *rng = new RandomNumberGenerator();
+        rng->seed();
         int SEED = rng->random_integer_fast((int) 10e7);
         double av_fitnesses[nnets];
 

@@ -65,8 +65,10 @@ public:
 
     PERMU::params *parameters;
     NetworkExecutor<PERMU::Evaluator> *executor;
+    CpuNetwork* best_network = nullptr;
     int iteration_number;
     double *average_f_values_obtained_by_bk;
+    bool *is_last_gen;
 
     PermuEvaluator();
     ~PermuEvaluator();

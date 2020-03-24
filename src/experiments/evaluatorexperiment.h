@@ -88,7 +88,14 @@ namespace NEAT {
             BEST_FITNESS_TRAIN = -DBL_MAX;
             N_TIMES_BEST_FITNESS_IMPROVED_TRAIN = 0;
 
-            for(double progress = 0; progress < 1.0; progress = ((double) global_timer.toc() / (double) MAX_TRAIN_TIME)) {
+
+            is_last_gen = false;
+            for(double progress = 0; !is_last_gen; progress = ((double) global_timer.toc() / (double) MAX_TRAIN_TIME)) {
+
+                if (progress >= 1.0){
+                    is_last_gen = true;
+                }
+                
                 gen++;
                 cout << "\n ---------------------------------------------------- \n\n";
                 cout << "Gen " << gen-1 << ", progress: " << progress << endl;	
@@ -159,9 +166,8 @@ namespace NEAT {
                 nets[i] = pop->get(i)->net.get();
             }
             OrganismEvaluation evaluations[norgs];
-            nets[norgs -1] = fittest->net.get(); // reevaluate fittest
-            network_evaluator->execute(nets, evaluations, norgs); // evaluate all nets
-            fittest->eval.fitness; // get fitness of reevaluation
+            //auto tmp_params = network_evaluator->
+            network_evaluator->execute(nets, evaluations, norgs);
             Organism *best = nullptr;
             for(size_t i = 0; i < norgs; i++) {
                 Organism *org = pop->get(i);
@@ -173,7 +179,7 @@ namespace NEAT {
 
             timer.stop();
 
-            // Fittest is updated, taking into account that it has already been reevaluated.
+            // Fittest is not evaluated.
             if(!fittest || (best->eval.fitness > fittest->eval.fitness)) {
                 save_best_network = true;
                 fittest = pop->make_copy(best->population_index);
