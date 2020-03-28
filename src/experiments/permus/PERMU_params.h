@@ -1,5 +1,6 @@
 
 #include <string>
+#include "Parameters.h"
 #pragma once
 
 
@@ -8,6 +9,8 @@ namespace PERMU{
     class params{
 
     public:
+        neat_parameters *neat_params;
+
         // PARAMETERS TO BE SPECIFIED IN CONFIG FILE//
         double MAX_TIME_PSO;
         int POPSIZE;

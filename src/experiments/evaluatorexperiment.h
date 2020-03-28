@@ -21,14 +21,14 @@ namespace NEAT {
     class EvaluatorExperiment : public Experiment {
     private:
         std::string get_dir_path(int experiment_num) {
-            return "./" + EXPERIMENT_FOLDER_NAME;
+            return "./" + neat_params->EXPERIMENT_FOLDER_NAME;
         }
 
         std::string get_fittest_path(int experiment_num, int generation) {
             char buf[1024];
             sprintf(buf, "%s/%s_gen_%04d",
-                    EXPERIMENT_FOLDER_NAME.c_str(),
-                    EXPERIMENT_FOLDER_NAME.c_str(),
+                    neat_params->EXPERIMENT_FOLDER_NAME.c_str(),
+                    neat_params->EXPERIMENT_FOLDER_NAME.c_str(),
                     generation
                     );
             return buf;
@@ -85,12 +85,12 @@ namespace NEAT {
             
             
             int gen = 0;
-            BEST_FITNESS_TRAIN = -DBL_MAX;
-            N_TIMES_BEST_FITNESS_IMPROVED_TRAIN = 0;
+            neat_params->BEST_FITNESS_TRAIN = -DBL_MAX;
+            neat_params->N_TIMES_BEST_FITNESS_IMPROVED_TRAIN = 0;
 
 
             is_last_gen = false;
-            for(double progress = 0; !is_last_gen; progress = ((double) global_timer.toc() / (double) MAX_TRAIN_TIME)) {
+            for(double progress = 0; !is_last_gen; progress = ((double) neat_params->global_timer.toc() / (double) neat_params->MAX_TRAIN_TIME)) {
 
                 if (progress >= 1.0){
                     is_last_gen = true;
@@ -99,7 +99,7 @@ namespace NEAT {
                 gen++;
                 cout << "\n ---------------------------------------------------- \n\n";
                 cout << "Gen " << gen-1 << ", progress: " << progress << endl;	
-                cout << "Time left:" << ((double) MAX_TRAIN_TIME - global_timer.toc()) / 60.0 / 60.0 << "h" << endl;
+                cout << "Time left:" << ((double) neat_params->MAX_TRAIN_TIME - neat_params->global_timer.toc()) / 60.0 / 60.0 << "h" << endl;
                 
 
                 static Timer timer("epoch");
@@ -139,8 +139,9 @@ namespace NEAT {
         }
 
         virtual void run_given_conf_file(std::string conf_file_path) override{
-            load_global_params(conf_file_path);
+            neat_params->load_global_params(conf_file_path);
             network_evaluator = unique_ptr<NetworkEvaluator>(create_evaluator());
+            network_evaluator->neat_params = neat_params;
             network_evaluator->run_given_conf_file(conf_file_path);
         }
 
@@ -187,7 +188,7 @@ namespace NEAT {
 
             Genome::Stats gstats = fittest->genome->get_stats();
             cout << "fittest [" << fittest->population_index << "]"
-                 << ": fitness=" << BEST_FITNESS_TRAIN
+                 << ": fitness=" << neat_params->BEST_FITNESS_TRAIN
                  << ", error=" << fittest->eval.error
                  << ", nnodes=" << gstats.nnodes
                  << ", nlinks=" << gstats.nlinks

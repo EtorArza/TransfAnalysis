@@ -1,10 +1,11 @@
 #pragma once
-
+#include "Parameters.h"
 namespace NEAT {
 
     class Experiment {
     public:
         bool is_last_gen = false;
+        neat_parameters *neat_params;
         static std::vector<std::string> get_names();
         static Experiment *get(const char *name);
 

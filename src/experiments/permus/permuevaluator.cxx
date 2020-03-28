@@ -37,6 +37,8 @@ using namespace std;
 
 namespace PERMU
 {
+
+#define SMALLEST_POSITIVE_DOUBLE  0.0000001
 void make_output_behaviour_mapping_more_injective(double *output)
 {
 #define POS_FIRS_OPERATOR 1
@@ -125,7 +127,7 @@ struct Evaluator
 
         while (current_number_of_controllers > 1)
         {
-            #pragma omp parallel for num_threads(N_OF_THREADS)
+            #pragma omp parallel for num_threads(parameters->neat_params->N_OF_THREADS)
             for (int inet = 0; inet < current_number_of_controllers; inet++)
             {
                 NEAT::CpuNetwork *net = nets[indexes[inet]];
@@ -188,13 +190,13 @@ struct Evaluator
         }
         else
         {
-            BEST_FITNESS_TRAIN = this->FitnessFunction(best_network, parameters->N_EVALS, rng.random_integer_fast((int) 1e9));
+            parameters->neat_params->BEST_FITNESS_TRAIN = this->FitnessFunction(best_network, parameters->N_EVALS, rng.random_integer_fast((int) 1e9));
         }
 
         cout << "Evaluating -> ";
 
         progress_bar bar(nnets);
-#pragma omp parallel for num_threads(N_OF_THREADS)
+#pragma omp parallel for num_threads(parameters->neat_params->N_OF_THREADS)
         for (int inet = 0; inet < nnets; inet++)
         {
             NEAT::CpuNetwork *net = nets[inet];
@@ -207,13 +209,13 @@ struct Evaluator
         bar.end();
 
         double best_f_gen = f_values[argmax(f_values, (int)nnets)];
-        cout << "(best this gen, best last gen) -> (" << best_f_gen << ", " << BEST_FITNESS_TRAIN << ")" << endl;
+        cout << "(best this gen, best last gen) -> (" << best_f_gen << ", " << parameters->neat_params->BEST_FITNESS_TRAIN << ")";
 
-        if (best_f_gen > BEST_FITNESS_TRAIN)
+        if (best_f_gen > parameters->neat_params->BEST_FITNESS_TRAIN)
         {
-            N_TIMES_BEST_FITNESS_IMPROVED_TRAIN++;
-            cout << ", best replaced" << endl;
-            BEST_FITNESS_TRAIN = best_f_gen;
+            parameters->neat_params->N_TIMES_BEST_FITNESS_IMPROVED_TRAIN++;
+            cout << ", best replaced";
+            parameters->neat_params->BEST_FITNESS_TRAIN = best_f_gen;
             delete best_network;
             best_network = new NEAT::CpuNetwork(*nets[argmax(f_values, (int)nnets)]);
         }
@@ -229,7 +231,7 @@ struct Evaluator
         std::swap(f_values, tmp_order);
 
         multiply_array_with_value(f_values, 1.0 / (double)(nnets - 1), (int) nnets);
-        multiply_array_with_value(f_values, 1.0 + ((double)N_TIMES_BEST_FITNESS_IMPROVED_TRAIN / 1000.0), (int) nnets);
+        multiply_array_with_value(f_values, 1.0 + ((double)parameters->neat_params->N_TIMES_BEST_FITNESS_IMPROVED_TRAIN / 1000.0), (int) nnets);
 
         //cout << "fitness_array: " << std::flush;
         //PrintArray(f_values, nnets);
@@ -301,7 +303,7 @@ void PermuEvaluator::read_conf_file(std::string conf_file_path)
         parameters->MAX_TIME_PSO = reader.GetReal("Controller", "MAX_TIME_PSO", -1.0);
         parameters->POPSIZE = reader.GetInteger("Controller", "POPSIZE", -1);
         parameters->TABU_LENGTH = reader.GetInteger("Controller", "TABU_LENGTH", -1);
-        EXPERIMENT_FOLDER_NAME = "controllers_trained_with_" + from_path_to_filename(parameters->INSTANCE_PATH);
+        neat_params->EXPERIMENT_FOLDER_NAME = "controllers_trained_with_" + from_path_to_filename(parameters->INSTANCE_PATH);
 
         cout << "Learning from instance: " << from_path_to_filename(parameters->INSTANCE_PATH) << endl;
 
@@ -324,17 +326,17 @@ void PermuEvaluator::read_conf_file(std::string conf_file_path)
             cout << "Error, no search type specified." << endl;
         }
 
-        if (N_OF_THREADS < 0)
+        if (neat_params->N_OF_THREADS < 0)
         {
             cout << "please specify a valid number of threads on the conf. file" << endl;
             exit(1);
         }
 
-        delete_prev_exp_folder();
+        neat_params->delete_prev_exp_folder();
 
-        omp_set_num_threads(N_OF_THREADS);
+        omp_set_num_threads(neat_params->N_OF_THREADS);
 
-        if (N_OF_THREADS < 7)
+        if (neat_params->N_OF_THREADS < 7)
         {
             cout << "Warning: a minimum of 7 cores (specified by the THREADS parameter)"
                  << "is recommended for this implementation of NEAT to function correctly in a reasonable time." << endl;
@@ -372,7 +374,7 @@ void PermuEvaluator::read_conf_file(std::string conf_file_path)
         parameters->N_REPS = reader.GetInteger("TestSettings", "N_REPS", -1);
         parameters->N_EVALS = reader.GetInteger("TestSettings", "N_EVALS", -1);
         parameters->COMPUTE_RESPONSE = reader.GetBoolean("TestSettings", "COMPUTE_RESPONSE", false);
-        N_OF_THREADS = MIN(N_OF_THREADS, parameters->N_EVALS);
+        neat_params->N_OF_THREADS = std::min(neat_params->N_OF_THREADS, parameters->N_EVALS);
 
         if (parameters->CONTROLLER_PATH == "UNKNOWN")
         {
@@ -397,8 +399,9 @@ void PermuEvaluator::read_conf_file(std::string conf_file_path)
 void PermuEvaluator::execute(class NEAT::Network **nets_, class NEAT::OrganismEvaluation *results, size_t nnets)
 {
     using namespace NEAT;
-    env->pop_size = POPSIZE_NEAT;
+    env->pop_size = this->neat_params->POPSIZE_NEAT;
     PERMU::Evaluator *ev = new PERMU::Evaluator();
+    this->parameters->neat_params = this->neat_params;
     ev->parameters = this->parameters;
     ev->iteration_number = this->iteration_number;
     ev->is_last_gen = this->is_last_gen;
@@ -416,13 +419,14 @@ void PermuEvaluator::run_given_conf_file(std::string conf_file_path)
     using namespace NEAT;
 
     read_conf_file(conf_file_path);
+    parameters->neat_params = this->neat_params;
 
     if (parameters->MODE == "train")
     {
 
         Experiment *exp = Experiment::get(parameters->prob_name.c_str());
         rng_t rng{parameters->SEED};
-        global_timer.tic();
+        exp->neat_params->global_timer.tic();
         is_last_gen = &exp->is_last_gen;
         exp->run(rng);
         return;
@@ -450,7 +454,7 @@ void PermuEvaluator::run_given_conf_file(std::string conf_file_path)
         result_string_stream << "[[";
         for (int j = 0; j < parameters->N_REPS; j++)
         {
-#pragma omp parallel for num_threads(N_OF_THREADS)
+#pragma omp parallel for num_threads(parameters->neat_params->N_OF_THREADS)
             for (int i = 0; i < parameters->N_EVALS; i++)
             {
                 v_of_f_values[i] = FitnessFunction_permu(&net, 1, initial_seed + i, parameters);

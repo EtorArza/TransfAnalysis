@@ -2,7 +2,7 @@
 
 PROBLEM_TYPE="qap"
 PROBLEM_PATH="src/experiments/true_ranking_eval/tai75e01.qap"
-POPSIZE=640
+POPSIZE=1024
 MAX_TIME_PSO=0.25
 
 

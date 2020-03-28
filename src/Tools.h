@@ -18,7 +18,6 @@
 #include <algorithm>
 #include <fstream>
 #include <functional>
-#include "Parameters.h"
 #include <mutex>
 #include <iomanip>
 
@@ -31,6 +30,8 @@ using std::endl;
 using std::ifstream;
 using std::string;
 using std::stringstream;
+
+#define CUTOFF_0 0.25
 
 /*
  * Returs the first position at which value appears in array. If it does not appear, then it returns -1;
@@ -923,6 +924,18 @@ void find_classes_in_array_of_objects(T *array_of_objects, std::function<bool(T,
     //PrintArray(classes_array, len);
 }
 
+template< class T>
+int index(const T* array, const T item, int len){
+    for (int i = 0; i < len; i++)
+    {
+        if (array[i] == item)
+        {
+            return i;
+        }
+    }
+    return -1;
+    
+}
 int n_choose_k(int n, int k);
 
 class progress_bar

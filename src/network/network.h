@@ -17,6 +17,7 @@
 
 #include <std.h>
 #include "neattypes.h"
+#include "Parameters.h"
 
 namespace NEAT {
 
@@ -78,6 +79,7 @@ namespace NEAT {
     //---
     class NetworkEvaluator {
     public:
+        neat_parameters *neat_params;
         virtual ~NetworkEvaluator() {}
         virtual void execute(class Network **nets_, class OrganismEvaluation *results, size_t nnets) = 0;
         virtual void run_given_conf_file(std::string conf_file_path) = 0;

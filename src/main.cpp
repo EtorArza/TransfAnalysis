@@ -23,8 +23,6 @@
 #include "rng.h"
 #include "evaluatorexperiment.h"
 #include "INIReader.h"
-
-#define EXTERN // this gives the global parameters defined in Parameters.h a global scoope.
 #include "Parameters.h"
 
 void usage()
@@ -85,8 +83,8 @@ int main(int argc, char *argv[])
     }
 
     std::string conf_file_path;
+    neat_parameters* neat_params = new neat_parameters();
     INIReader reader;
-    DELETE_PREV_EXPERIMENT_FOLDER = false;
 
 
     if (std::string(argv[1]) == "-f" && argc == 2)
@@ -101,13 +99,13 @@ int main(int argc, char *argv[])
     {
         conf_file_path = argv[2];
         reader = INIReader(argv[2]);
-        DELETE_PREV_EXPERIMENT_FOLDER = true;
+        neat_params->DELETE_PREV_EXPERIMENT_FOLDER = true;
     }
     else if (std::string(argv[2]) == "-f" && argc == 3)
     {
         conf_file_path = argv[1];
         reader = INIReader(argv[1]);
-        DELETE_PREV_EXPERIMENT_FOLDER = true;
+        neat_params->DELETE_PREV_EXPERIMENT_FOLDER = true;
     }
     else
     {
@@ -139,8 +137,9 @@ int main(int argc, char *argv[])
     }
 
     Experiment *exp = Experiment::get(prob_name.c_str());
+    exp->neat_params = neat_params;
     rng_t rng{rng_seed};
     exp->run_given_conf_file(conf_file_path);
-
+    delete neat_params;
     return 0;
 }

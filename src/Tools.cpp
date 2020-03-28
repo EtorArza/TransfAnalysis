@@ -730,6 +730,7 @@ void GenerateRandomRealvec_0_1(double *real_vec, int n, RandomNumberGenerator* r
     }
 }
 
+#define SMALLEST_POSITIVE_DOUBLE  0.0000001
 
 int count_n_dif_array_items_double(double* array1, double* array2, int n){
     int res = 0;

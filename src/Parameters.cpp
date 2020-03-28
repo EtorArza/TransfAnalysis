@@ -7,7 +7,15 @@
 #include "neat.h"
 #include <stdio.h>
 
-void load_global_params(std::string conf_file_path)
+// MACROS //
+#define MAX(A, B) ((A > B) ? A : B)
+#define MIN(A, B) ((A < B) ? A : B)
+///////////
+
+neat_parameters::neat_parameters(){};
+neat_parameters::~neat_parameters(){};
+
+void neat_parameters::load_global_params(std::string conf_file_path)
 {
     INIReader reader(conf_file_path);
     N_OF_THREADS = reader.GetInteger("NEAT", "THREADS", -1);
@@ -18,7 +26,7 @@ void load_global_params(std::string conf_file_path)
     NEAT::env->pop_size = POPSIZE_NEAT;
 }
 
-void delete_prev_exp_folder()
+void neat_parameters::delete_prev_exp_folder()
 {
     if (exists(EXPERIMENT_FOLDER_NAME))
     {
