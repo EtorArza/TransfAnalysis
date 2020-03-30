@@ -205,7 +205,12 @@ int Kendall(int *permutationA, int *permutationB, int size)
     delete[] invertedB;
     delete[] v;
     delete[] m_aux;
-
+    if (dist < 0)
+    {
+        cerr << "Kendall distance should be positive.";
+        exit(1);
+    }
+    
     return dist;
 }
 
@@ -1887,6 +1892,11 @@ int n_choose_k(int n, int k){
     {
         res *= (n + 1 - i);
         res /= i;
+    }
+    if (res < 0)
+    {
+        cerr << n << " choose " << k << "was negative -> " << res;
+        exit(1);
     }
     
     return res;

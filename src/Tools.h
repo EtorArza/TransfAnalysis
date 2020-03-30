@@ -565,6 +565,7 @@ class RandomNumberGenerator{
 
         std::vector<unsigned long> get_state();
         void set_state(std::vector<unsigned long> seed_state);
+        int random_integer_fast(){return xorshf96();}
         int random_integer_fast(int max){return xorshf96() % max;}
         int random_integer_fast(int min, int max){return min + (xorshf96() % (max - min));}
         int random_integer_uniform(int max);

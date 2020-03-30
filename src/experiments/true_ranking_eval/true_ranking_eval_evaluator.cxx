@@ -56,16 +56,16 @@ struct Evaluator
     void get_net_ranking(NEAT::CpuNetwork **nets, size_t nnets, int n_evals, PERMU::params *parameters, int* ranking){
         RandomNumberGenerator *rng = new RandomNumberGenerator();
         rng->seed();
-        int SEED = rng->random_integer_fast((int) 10e7);
+        int SEED = rng->random_integer_fast();
         double av_fitnesses[nnets];
 
         #pragma omp parallel for num_threads(parameters->neat_params->N_OF_THREADS)
-        for (size_t i = 0; i < nnets; i++)
+        for (int i = 0; i < nnets; i++)
         {
-            shuffle(f_values[i],f_values[i]+true_ranking_samples,std::default_random_engine(SEED + i));
-            av_fitnesses[i] = Average(f_values[i], n_evals);
+            av_fitnesses[i] = FitnessFunction_permu(nets[i], n_evals, SEED + i*n_evals, parameters);
         }
         compute_order_from_double_to_int(av_fitnesses, (int) nnets, ranking, true);
+        delete rng;
     }
 
     void reduce_size_true_ranking(const int* true_ranking, int small_popsize, int* small_true_ranking)
@@ -93,32 +93,10 @@ struct Evaluator
         set_array_to_value(avg_distances, 0.0, 99);
         set_array_to_value(required_evals, 0, 99);
 
-        int approx_ranking_samples = 5000;
-        true_ranking_samples = 10000;
+        int approx_ranking_samples = 5;
+        true_ranking_samples = 500;
         double desired_percentage_threshold = 0.05;
-        vector<int> popsizes{128, 256, 513, 1024};//8634
-
-        f_values = new double*[nnets];
-        progress_bar bar(nnets);
-        for (int i = 0; i < nnets; i++)
-        {   
-            bar.step();
-            f_values[i] = new double[true_ranking_samples];
-            RandomNumberGenerator *rng = new RandomNumberGenerator();
-            rng->seed();
-            int SEED = rng->random_integer_fast((int) 10e7);
-            double av_fitnesses[nnets];
-            #pragma omp parallel for num_threads(parameters->neat_params->N_OF_THREADS)
-            for (size_t j = 0; j < true_ranking_samples; j++)
-            {
-                f_values[i][j] = FitnessFunction_permu(nets[i], 1, SEED + j, parameters);
-            }
-            delete rng;
-        }
-        bar.end();
-        
-
-
+        vector<int> popsizes{128, 256, 513, 1024};
 
         get_net_ranking(nets, nnets, true_ranking_samples, parameters, true_ranking);
 
@@ -127,7 +105,7 @@ struct Evaluator
         int instance_size = problem->GetProblemSize();
         delete problem;
 
-        cout << "Kendall_dist: ";
+        cout << "Kendall_dist: \n";
         for (size_t i = 0; i < popsizes.size(); i++)
         {   
             int current_samplesize = 2;
@@ -135,28 +113,32 @@ struct Evaluator
             reduce_size_true_ranking(true_ranking, popsizes[i], small_true_ranking);
 
             while (percentage_kendal > desired_percentage_threshold)
-            {
+            {   
+                current_samplesize += 2;
+
                 if (current_samplesize > 200)
                 {
                     exit(1);
                 }
                 avg_distances[i] = 0.0;
+                percentage_kendal = 0.0;
                 for (size_t k = 0; k < approx_ranking_samples; k++)
                 {
                     get_net_ranking(nets, popsizes[i], current_samplesize, parameters, ranking);
-                    avg_distances[i] += (double) Kendall(ranking, small_true_ranking, popsizes[i]);
+                    int d = (double) Kendall(ranking, small_true_ranking, popsizes[i]);
+                    avg_distances[i] += d;
                     // PrintArray(ranking, popsizes[i]);
                     // PrintArray(true_ranking, popsizes[i]);
                     // PrintArray(small_true_ranking, popsizes[i]);
+                    cout << d << ", " << popsizes[i] << ", " << current_samplesize << ", " << percentage_kendal << ", " << avg_distances[i] << endl;
 
                     // cout << "---" << endl;
                 }
-                avg_distances[i] /= (double) (approx_ranking_samples * n_choose_k((int) popsizes[i],2));
-                percentage_kendal = avg_distances[i];
-                current_samplesize += 2;
+                avg_distances[i] /= (double) (approx_ranking_samples);
+                percentage_kendal = avg_distances[i] / (double) n_choose_k(popsizes[i],2);
             }
             required_evals[i] = current_samplesize;
-            cout << popsizes[i] << ", " << current_samplesize << ", " << percentage_kendal << endl;
+            cout << popsizes[i] << ", " << current_samplesize << ", " << percentage_kendal << "|" << endl;
 
 
         }
