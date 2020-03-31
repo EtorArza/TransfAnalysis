@@ -100,6 +100,13 @@ void RandomKeys(int *a, double *criteriaValues, int size);
  */
 int Kendall(int *permutationA, int *permutationB, int size);
 
+
+double Average_Kendall_distance_between_random_permus(int n);
+
+void generate_samples_kendall_distance_between_random_permus(int n);
+
+
+
 /*
  * Calculates the Kendall tau distance between 2 permutations.
  */

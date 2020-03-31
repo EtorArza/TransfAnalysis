@@ -214,6 +214,53 @@ int Kendall(int *permutationA, int *permutationB, int size)
     return dist;
 }
 
+
+double Average_Kendall_distance_between_random_permus(int n)
+{
+    double res = 0.0;
+    int REPETITIONS = 100000;
+    int* permu1 = new int[n];
+    int* permu2 = new int[n];
+
+    for (int i = 0; i < REPETITIONS; i++)
+    {
+        GenerateRandomPermutation(permu1, n);
+        GenerateRandomPermutation(permu2, n);
+        res += (double) Kendall(permu1, permu2, n);
+    }
+    res /= (double) REPETITIONS;
+    return res;
+}
+
+
+void generate_samples_kendall_distance_between_random_permus(int n)
+{
+    double res = 0.0;
+    int REPETITIONS = 100000;
+    int* permu1 = new int[n];
+    int* permu2 = new int[n];
+    double max_kendall_dist = (double) n_choose_k(n,2);
+    string res_str = "";
+
+    for (int i = 0; i < REPETITIONS; i++)
+    {
+        GenerateRandomPermutation(permu1, n);
+        GenerateRandomPermutation(permu2, n);
+        res_str += to_string((double) Kendall(permu1, permu2, n) / max_kendall_dist);
+        if (i == REPETITIONS -1)
+        {
+            break;
+        }
+        res_str += ", ";
+    }
+    res_str += "\n";
+    append_line_to_file("random_permus_kendall_distance.txt", res_str);
+    exit(1);
+    res /= (double) REPETITIONS;
+}
+
+
+
 /*
  * Calculates the tau Kendall distance between 2 permutations.
  */
