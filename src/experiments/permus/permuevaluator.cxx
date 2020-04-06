@@ -96,7 +96,6 @@ struct Evaluator
 {
 
     params *parameters;
-    bool *is_last_gen;
     NEAT::CpuNetwork* best_network;
     int iteration_number = 0;
 
@@ -301,8 +300,6 @@ void PermuEvaluator::read_conf_file(std::string conf_file_path)
         parameters->PROBLEM_TYPE = reader.Get("Controller", "PROBLEM_TYPE", "UNKOWN");
         parameters->INSTANCE_PATH = reader.Get("Controller", "PROBLEM_PATH", "UNKOWN");
         parameters->MAX_TIME_PSO = reader.GetReal("Controller", "MAX_TIME_PSO", -1.0);
-        parameters->POPSIZE = reader.GetInteger("Controller", "POPSIZE", -1);
-        parameters->TABU_LENGTH = reader.GetInteger("Controller", "TABU_LENGTH", -1);
         neat_params->EXPERIMENT_FOLDER_NAME = "controllers_trained_with_" + from_path_to_filename(parameters->INSTANCE_PATH);
 
         cout << "Learning from instance: " << from_path_to_filename(parameters->INSTANCE_PATH) << endl;
@@ -368,8 +365,6 @@ void PermuEvaluator::read_conf_file(std::string conf_file_path)
         parameters->PROBLEM_TYPE = reader.Get("Controller", "PROBLEM_TYPE", "UNKOWN");
         parameters->INSTANCE_PATH = reader.Get("Controller", "PROBLEM_PATH", "UNKOWN");
         parameters->MAX_TIME_PSO = reader.GetReal("Controller", "MAX_TIME_PSO", -1.0);
-        parameters->POPSIZE = reader.GetInteger("Controller", "POPSIZE", -1);
-        parameters->TABU_LENGTH = reader.GetInteger("Controller", "TABU_LENGTH", -1);
         parameters->CONTROLLER_PATH = reader.Get("TestSettings", "CONTROLLER_PATH", "UNKNOWN");
         parameters->N_REPS = reader.GetInteger("TestSettings", "N_REPS", -1);
         parameters->N_EVALS = reader.GetInteger("TestSettings", "N_EVALS", -1);
@@ -404,7 +399,6 @@ void PermuEvaluator::execute(class NEAT::Network **nets_, class NEAT::OrganismEv
     this->parameters->neat_params = this->neat_params;
     ev->parameters = this->parameters;
     ev->iteration_number = this->iteration_number;
-    ev->is_last_gen = this->is_last_gen;
     ev->best_network = this->best_network;
     ev->execute(nets_, results, nnets);    
     
@@ -427,7 +421,6 @@ void PermuEvaluator::run_given_conf_file(std::string conf_file_path)
         Experiment *exp = Experiment::get(parameters->prob_name.c_str());
         rng_t rng{parameters->SEED};
         exp->neat_params->global_timer.tic();
-        is_last_gen = &exp->is_last_gen;
         exp->run(rng);
         return;
     }

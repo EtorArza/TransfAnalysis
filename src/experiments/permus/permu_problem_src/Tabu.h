@@ -9,15 +9,21 @@ class Tabu
 {
 public:
 
-	Tabu(RandomNumberGenerator* rng, int n, int tabu_length);
+	Tabu(RandomNumberGenerator* rng, int n);
 	~Tabu();
 
 	void set_tabu(int i, int j);
 	bool is_tabu(int i, int j);
 	void reset();
+	void increase_tabu_size();
+	void decrease_tabu_size();
+	void resize(int new_size);
+	double return_current_relative_tabu_size();
+
 	double tabu_coef_neat = 0.0;
 
 private:
+	int MAX_TABU_LENGTH;
 	int tabu_length;
 	RandomNumberGenerator* rng;
 	static int n_indivs_created;

@@ -84,6 +84,7 @@ int PBP::Read_with_mutex(string filename){
 void PBP::apply_operator_with_fitness_update(CIndividual *indiv, int i, int j, PERMU::operator_t operator_id, double accept_or_reject_worse)
 {   
 
+    this->tab = indiv->tab;
     if(i==j || j==-1){
         return;
     }
@@ -116,6 +117,7 @@ void PBP::apply_operator_with_fitness_update(CIndividual *indiv, int i, int j, P
 
 void PBP::apply_operator_with_fitness_update(CIndividual *indiv, double delta, int i, int j, PERMU::operator_t operator_id, double accept_or_reject_worse)
 {
+    this->tab = indiv->tab;
 
     using namespace PERMU;
 
@@ -183,6 +185,8 @@ void PBP::apply_operator_with_fitness_update(CIndividual *indiv, double delta, i
 
 void PBP::local_search_iteration(CIndividual *indiv, PERMU::operator_t operator_id)
 {
+    this->tab = indiv->tab;
+
     if (indiv->is_local_optimum[operator_id])
     {
         return;
@@ -296,6 +300,7 @@ void PBP::local_search_iteration(CIndividual *indiv, PERMU::operator_t operator_
         break;
     }
 
+    cout << "LO detected." << endl;
     indiv->is_local_optimum[operator_id] = true;
     if (operator_id == PERMU::EXCH)
     {
@@ -662,6 +667,7 @@ void PBP::obtain_indexes_step_away(int *permu, int *ref_permu, int* i, int* j, P
 
 
 void PBP::move_indiv_towards_reference(CIndividual* indiv, int* ref_permu, PERMU::operator_t operator_id, double accept_or_reject_worse){
+    this->tab = indiv->tab;
     int i,j;
     obtain_indexes_step_towards(indiv->genome, ref_permu, &i, &j, operator_id);
     if (tab->is_tabu(i,j))
@@ -679,6 +685,7 @@ void PBP::move_indiv_towards_reference(CIndividual* indiv, int* ref_permu, PERMU
 
 
 void PBP::move_indiv_away_reference(CIndividual* indiv, int* ref_permu, PERMU::operator_t operator_id, double accept_or_reject_worse){
+    this->tab = indiv->tab;
     int i,j;
     obtain_indexes_step_away(indiv->genome, ref_permu, &i, &j, operator_id);
     // std::cout << "(" << i << "," << j << ")" << endl;

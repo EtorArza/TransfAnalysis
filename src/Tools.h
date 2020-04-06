@@ -794,6 +794,9 @@ bool is_A_larger_than_B_Mann_Whitney(double* A, double* B, int length);
 //Paired test
 bool is_A_larger_than_B_Signed_Willcoxon(double* A, double* B, int length);
 
+//Paired test
+bool Friedman_test(double** f_values, int n_candidates, int sample_length);
+
 
 
 #define TOL 0.00001

@@ -89,11 +89,11 @@ namespace NEAT {
             neat_params->N_TIMES_BEST_FITNESS_IMPROVED_TRAIN = 0;
 
 
-            is_last_gen = false;
-            for(double progress = 0; !is_last_gen; progress = ((double) neat_params->global_timer.toc() / (double) neat_params->MAX_TRAIN_TIME)) {
+            neat_params->IS_LAST_ITERATION = false;
+            for(double progress = 0; !neat_params->IS_LAST_ITERATION; progress = ((double) neat_params->global_timer.toc() / (double) neat_params->MAX_TRAIN_TIME)) {
 
                 if (progress >= 1.0){
-                    is_last_gen = true;
+                    neat_params->IS_LAST_ITERATION = true;
                 }
                 
                 gen++;
@@ -116,7 +116,7 @@ namespace NEAT {
 
 
 
-                if (save_best_network || is_last_gen)
+                if (save_best_network || neat_params->IS_LAST_ITERATION)
                 {
                     save_best_network = false;
                     print(1, gen);

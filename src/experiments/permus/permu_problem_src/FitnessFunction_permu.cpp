@@ -16,6 +16,10 @@
 #include "../permus/permu_problem_src/PFSP.h"
 #include "../permus/permu_problem_src/TSP.h"
 
+
+// #define COUNTER 1
+// #define PRINT 1
+
 namespace PERMU{
 
 
@@ -74,7 +78,7 @@ double FitnessFunction_permu(NEAT::CpuNetwork *net_original, int n_evals, int se
 
     v_of_fitness = new double[n_evals];
 
-    for (int i = 0; i < pop->popsize; i++)
+    for (int i = 0; i < MAX_POPSIZE; i++)
     {
         pop->m_individuals[i]->activation = std::vector<double>(net->activations);
     }
@@ -94,7 +98,7 @@ double FitnessFunction_permu(NEAT::CpuNetwork *net_original, int n_evals, int se
         pop->rng->seed(seed + n_of_repetitions_completed);
         pop->Reset();
         //std::cout << "|" << n_of_repetitions_completed << "|" << std::endl;
-        for (int i = 0; i < pop->popsize; i++)
+        for (int i = 0; i < MAX_POPSIZE; i++)
         {
             std::swap(net->activations, pop->m_individuals[i]->activation);
             net->clear_noninput();
@@ -139,7 +143,6 @@ double FitnessFunction_permu(NEAT::CpuNetwork *net_original, int n_evals, int se
                 std::swap(net->activations, pop->m_individuals[i]->activation);
             }
             pop->end_iteration();
-            //pop->Print();
         }
         if (!isPermutation(pop->genome_best, pop->n))
         {

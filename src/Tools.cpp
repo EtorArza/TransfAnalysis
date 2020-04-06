@@ -641,8 +641,8 @@ int RandomNumberGenerator::xorshf96(void)
     this->x = this->y;
     this->y = this->z;
     this->z = t ^ this->x ^ this->y;
-
-    return this->z & INT_MAX;
+    int res = abs((int) this->z % INT_MAX);
+    return res;
 }
 
 
@@ -714,7 +714,7 @@ int RandomNumberGenerator::random_integer_uniform(int min, int max)
         int range = max - min;
         while (true)
         {
-            int value = rand();
+            int value = xorshf96();
             if (value < RAND_MAX - RAND_MAX % range)
             {   
                 int res = min + (value % range);
@@ -1833,6 +1833,49 @@ bool is_A_larger_than_B_Signed_Willcoxon(double* A, double* B, int length){
         return false;
     }
 }
+
+
+
+bool Friedman_test(double** f_values, int n_candidates, int sample_length)
+{
+
+    // value_1 of controller_1, value_2 of controller_1, ..., value_sample_length of controller_1
+    // value_1 of controller_2, value_2 of controller_2, ..., value_sample_length of controller_2
+    // ...
+    // value_1 of controller_n_candidates, value_2 of controller_n_candidates, ..., value_sample_length of controller_n_candidates
+
+    static vector<vector<double>> ranks;
+    static vector<double> scores;
+
+    scores.reserve(n_candidates);
+    ranks.reserve(n_candidates);
+
+    for (int i = 0; i < ranks.size(); i++)
+    {
+        ranks[i].clear();
+    }
+    
+
+
+
+    for (int i = 0; i < sample_length; i++)
+    {
+        for (int j = 0; j < n_candidates; j++)
+        {
+            scores.push_back(f_values[j][i]);
+        }
+        compute_order_from_double_to_double()
+    }
+
+
+
+    ranks.clear();
+
+    
+
+}
+
+
 
 
 

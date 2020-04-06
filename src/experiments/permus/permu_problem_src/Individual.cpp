@@ -7,6 +7,7 @@
 //
 
 #include "Individual.h"
+#include "Tabu.h"
 #include "Tools.h"
 #include <limits>
 #include "Parameters.h"
@@ -29,6 +30,7 @@ CIndividual::CIndividual(int length, RandomNumberGenerator* rng)
 	n = length;
 	genome = new int[n];
 	genome_best = new int[n];
+	tab = new Tabu(rng, n);
 	GenerateRandomPermutation(this->genome, n, rng); 
 	GenerateRandomPermutation(this->genome_best, n, rng);
 	f_value=std::numeric_limits<double>::lowest();
@@ -47,6 +49,7 @@ void CIndividual::reset(RandomNumberGenerator* rng){
 	{
 		this->is_local_optimum[i] = false;
 	}
+	tab->reset();
 }
 
 CIndividual::~CIndividual()
@@ -54,6 +57,9 @@ CIndividual::~CIndividual()
 	delete[] this->genome;
 	delete[] this->genome_best;
 	genome=NULL;
+	genome_best=NULL;
+	delete tab;
+    tab=NULL;
 }
 
 

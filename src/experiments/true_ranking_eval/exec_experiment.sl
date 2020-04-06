@@ -32,10 +32,10 @@ PROBLEM_NAME = true_ranking_eval
 
 
 [NEAT]
-MAX_TRAIN_TIME = 164160
+MAX_TRAIN_TIME = $MAX_TRAIN_TIME
 POPSIZE = $POPSIZE
 THREADS = 32
-N_EVALS = 1
+N_EVALS = $N_EVALS
 
 
 
@@ -64,3 +64,4 @@ date
 date
 
 cp true_ranking_res.csv $SRCDIR -v
+cp samples_to_estimate_prob_of_selecting_best.csv $SRCDIR -v

@@ -23,8 +23,12 @@ class PermuTools;
 class Tabu;
 
 
+#define MAX_POPSIZE 40
+#define MIN_POPSIZE 4
+
 class CPopulation
 {
+
 
 public:
   // if no rng object is provided, a new one is generated
@@ -50,14 +54,18 @@ public:
 
  	double f_best;
 	int* genome_best;
-  Tabu* tab;
 
   void Print();
   void end_iteration(); // sort the population, check if the best solution was improved, and coompute neat imputs.
   void Reset();
+  void change_params(PERMU::params* new_parameters);
+
+
 
   double* get_neat_input_individual_i(int i);
   void apply_neat_output_to_individual_i(double* output_neat, int i);
+  void copy_individual_i_into_indiv_j(int i, int j);
+
   bool terminated;
 
    /*
@@ -86,8 +94,16 @@ private:
   void comp_r_number();
   void load_local_opt();
   void comp_order_sparsity();
+  
+  // Individual i is duplicated only if there is enough space. Additionally, the popsize is updated consecuently.
+  void duplicate_individual_i(int i);
+  
+  // Individual only removed if there is enough space.
+  void remove_individual_i(int i);
 
+  void random_reinitialize_individual_i(int i);
 
+  
   PBP * problem;
   PermuTools *pt;
   double *templ_double_array;
@@ -96,6 +112,10 @@ private:
 
   double iteration_geom;
   double iteration_geom_coef;
+
+  vector<int> indexes_to_be_removed;
+  vector<int> indexes_to_be_duplicated;
+
 
   /* 
   * In this case, 0 means highly cramped, 1 means highly sparse.

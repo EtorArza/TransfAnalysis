@@ -32,26 +32,34 @@ void CPopulation::init_class(PBP *problem, RandomNumberGenerator* rng, PERMU::pa
     this->popsize = parameters-> POPSIZE;
     this->max_time_pso = parameters-> MAX_TIME_PSO;
     this->n = problem->GetProblemSize();
-    tab = new Tabu(rng, n, parameters-> TABU_LENGTH);
-    problem->tab = this->tab;
     genome_best = new int[n];
     f_best = -DBL_MAX;
+
+    indexes_to_be_removed.reserve(MAX_POPSIZE);
+    indexes_to_be_duplicated.reserve(MAX_POPSIZE);
+
     GenerateRandomPermutation(this->genome_best, n, this->rng);
-    templ_double_array = new double[this->popsize];
-    templ_double_array2 = new double[this->popsize];
+    templ_double_array = new double[MAX_POPSIZE];
+    templ_double_array2 = new double[MAX_POPSIZE];
 
-    m_individuals.resize(popsize);
+    for (int i = 0; i < MAX_POPSIZE; i++)
+    {
+        indexes_to_be_removed[i] = -1;
+        indexes_to_be_duplicated[i] = -1;
+    }
 
-    pop_info = new double *[popsize];
-    permus = new int *[popsize]; // this contains the references to te permus in the individuals, so no initialization/destruction.
+    m_individuals.resize(MAX_POPSIZE);
+
+    pop_info = new double *[MAX_POPSIZE];
+    permus = new int *[MAX_POPSIZE]; // this contains the references to te permus in the individuals, so no initialization/destruction.
 
     //Initialize population with random solutions
-    for (int i = 0; i < popsize; i++)
+    for (int i = 0; i < MAX_POPSIZE; i++)
     {
         m_individuals[i] = new CIndividual(n, this->rng);
     }
 
-    for (int i = 0; i < popsize; i++)
+    for (int i = 0; i < MAX_POPSIZE; i++)
     {
         pop_info[i] = new double[PERMU::__sensor_N];
     }
@@ -77,20 +85,56 @@ CPopulation::CPopulation(PBP *problem, RandomNumberGenerator* rng, PERMU::params
 void CPopulation::Reset(){
     f_best = -DBL_MAX;
     GenerateRandomPermutation(this->genome_best, n, rng);
-    for (int i = 0; i < popsize; i++)
+    for (int i = 0; i < MAX_POPSIZE; i++)
     {   
         auto tmp = std::vector<double>();
         std::swap(tmp, m_individuals[i]->activation);
         m_individuals[i]->reset(rng);
         std::swap(tmp, m_individuals[i]->activation);
     }
+    this->popsize = MIN_POPSIZE;
     terminated = false;
-    tab->reset();
     timer->tic();
     evaluate_population();
     end_iteration();
 }
 
+void CPopulation::copy_individual_i_into_indiv_j(int i, int j)
+{
+    m_individuals[j]->reset(rng);
+    memcpy(m_individuals[j]->is_local_optimum, m_individuals[i]->is_local_optimum, sizeof(m_individuals[i]->is_local_optimum));
+    memcpy(m_individuals[j]->genome, m_individuals[i]->genome, sizeof(int) * m_individuals[i]->n);
+    memcpy(m_individuals[j]->genome_best, m_individuals[i]->genome_best, sizeof(int) * m_individuals[i]->n);
+    m_individuals[j]->f_best =  m_individuals[i]->f_best;
+    m_individuals[j]->f_value =  m_individuals[i]->f_value;
+}
+
+void CPopulation::duplicate_individual_i(int i)
+{
+    if (popsize < MAX_POPSIZE)
+    {
+        copy_individual_i_into_indiv_j(i,popsize);
+        popsize++;
+    }
+}
+
+void CPopulation::remove_individual_i(int i)
+{
+    if (popsize < MIN_POPSIZE)
+    {
+        for (int k = i; k < popsize; k++)
+        {
+            swap(m_individuals[k], m_individuals[i]);
+        }
+        popsize--;
+    }
+}
+
+void CPopulation::random_reinitialize_individual_i(int i)
+{
+    m_individuals[i]->reset(rng);
+    problem->Evaluate(m_individuals[i]);
+}
 
 /*
  * Destructor function.
@@ -113,8 +157,6 @@ CPopulation::~CPopulation()
     pt=NULL;
     delete rng;
     rng=NULL;    
-    delete tab;
-    tab=NULL;
     delete[] pop_info;
     pop_info=NULL;
     delete[] permus;
@@ -130,6 +172,18 @@ CPopulation::~CPopulation()
 
 
 void CPopulation::end_iteration(){
+    for (int i = 0; i < indexes_to_be_duplicated.size(); i++)
+    {
+        duplicate_individual_i(indexes_to_be_duplicated[i]);
+    }
+    indexes_to_be_duplicated.clear();
+    
+    for (int i = indexes_to_be_duplicated.size() -1 ; i >= 0; i--)
+    {
+        remove_individual_i(indexes_to_be_removed[i]);
+    }
+    indexes_to_be_removed.clear();
+
     SortPopulation();
     get_population_info();
     if(timer->toc() > this->max_time_pso)
@@ -146,22 +200,37 @@ void CPopulation::end_iteration(){
 void CPopulation::Print()
 {   cout << "---" << endl;
     for (int i = 0; i < popsize; i++)
-        cout << m_individuals[i] << endl;
+        PrintArray(pop_info[i], PERMU::__sensor_N);
     cout << "---" << endl;
 }
 
+double *CPopulation::get_neat_input_individual_i(int i)
+{
+    return pop_info[i];
+}
 
-
-
-  double* CPopulation::get_neat_input_individual_i(int i){
-      return pop_info[i];
-  }
-
-
-
+// Apply modifications to solution i stored in m_individuals[i] based on the oputput from the controller.
 void CPopulation::apply_neat_output_to_individual_i(double* output_neat, int i){
+
+    if (output_neat[PERMU::REMOVE_OR_CLONE] > CUTOFF_0)
+    {
+        indexes_to_be_duplicated.push_back(i);
+    }
+    else if (output_neat[PERMU::REMOVE_OR_CLONE] < - CUTOFF_0)
+    {
+        indexes_to_be_removed.push_back(i);
+        return;
+    }
+
+    if (RANDOM_REINITIALIZE > CUTOFF_0)
+    {
+        random_reinitialize_individual_i(i);
+        return;
+    }
+
+
     double accept_or_reject_worse = output_neat[PERMU::accept_or_reject_worse];
-    tab->tabu_coef_neat = output_neat[(int) PERMU::TABU];
+    m_individuals[i]->tab->tabu_coef_neat = output_neat[(int) PERMU::TABU];
 
     if
     (
@@ -183,6 +252,14 @@ void CPopulation::apply_neat_output_to_individual_i(double* output_neat, int i){
 
     }
 
+    if (CHANGE_TABU_SIZE > CUTOFF_0)
+    {
+        m_individuals[i]->tab->increase_tabu_size();
+    }
+    else if (CHANGE_TABU_SIZE < -CUTOFF_0)
+    {
+        m_individuals[i]->tab->decrease_tabu_size();
+    }
 
 }
 
@@ -219,8 +296,12 @@ void CPopulation::get_population_info(){
     comp_distance();
     comp_sparsity();
     comp_order_sparsity();
-    //comp_r_number();
     load_local_opt();
+    for (int i = 0; i < popsize; i++)
+    {
+        pop_info[i][PERMU::RELATIVE_POPSIZE] = (double) (this->popsize - MIN_POPSIZE) / (double) MAX_POPSIZE ;
+        pop_info[i][PERMU::RELATIVE_TABU_SIZE] = m_individuals[i]->tab->return_current_relative_tabu_size();
+    }
 }
 
 

@@ -3,24 +3,28 @@
 #include <limits>
 #include "Parameters.h"
 
-namespace PERMU{
+#define MAX_TABU_LENGTH 100
+#define MIN_TABU_LENGTH 5
+#define LENGTH_CHANGE_STEP 5
 
-
-Tabu::Tabu(RandomNumberGenerator* rng, int n, int tabu_length)
+namespace PERMU
 {
+
+Tabu::Tabu(RandomNumberGenerator *rng, int n)
+{
+	this->tabu_length = MIN_TABU_LENGTH;
 	this->rng = rng;
 	this->n = n;
-	this->tabu_length = tabu_length;
-	tabu_indices_i = new int[tabu_length];
-	tabu_indices_j = new int[tabu_length];
+	tabu_indices_i = new int[MAX_TABU_LENGTH];
+	tabu_indices_j = new int[MAX_TABU_LENGTH];
 
-	for (int k = 0; k < tabu_length; k++)
+	for (int k = 0; k < MAX_TABU_LENGTH; k++)
 	{
 		tabu_indices_i[k] = -1;
 		tabu_indices_j[k] = -1;
 	}
 
-	tabu_table = new bool*[n];
+	tabu_table = new bool *[n];
 	for (int i = 0; i < n; i++)
 	{
 		tabu_table[i] = new bool[n];
@@ -31,7 +35,6 @@ Tabu::Tabu(RandomNumberGenerator* rng, int n, int tabu_length)
 	}
 	index_pos = 0;
 }
-
 
 Tabu::~Tabu()
 {
@@ -44,23 +47,24 @@ Tabu::~Tabu()
 	delete[] tabu_table;
 }
 
-
-int Tabu::next_index_pos(){
+int Tabu::next_index_pos()
+{
 	index_pos++;
 	index_pos = index_pos % tabu_length;
 	return index_pos;
 }
 
-
-void Tabu::set_tabu(int i, int j){
-	if (this->tabu_coef_neat < CUTOFF_0){ // if tabu coef not high enough, do not add to tabu
+void Tabu::set_tabu(int i, int j)
+{
+	if (this->tabu_coef_neat < CUTOFF_0)
+	{ // if tabu coef not high enough, do not add to tabu
 		return;
 	}
-	if (i==-1 || j==-1)
+	if (i == -1 || j == -1)
 	{
 		return;
 	}
-	
+
 	if (!(tabu_indices_i[index_pos] == -1))
 	{
 		tabu_table[tabu_indices_i[index_pos]][tabu_indices_j[index_pos]] = false;
@@ -79,7 +83,7 @@ bool Tabu::is_tabu(int i, int j)
 		return false;
 	}
 
-	if (i==-1 || j==-1)
+	if (i == -1 || j == -1)
 	{
 		return false;
 	}
@@ -103,6 +107,37 @@ void Tabu::reset()
 	}
 	index_pos = 0;
 	this->tabu_coef_neat = 0;
-	}
-
+	this->tabu_length = MIN_TABU_LENGTH;
 }
+
+void Tabu::resize(int new_size)
+{
+	new_size = max(MIN_TABU_LENGTH, new_size);
+	new_size = min(MAX_TABU_LENGTH, new_size);
+
+	if (this->tabu_length != new_size)
+	{
+		this->tabu_length = new_size;
+		double tmp_coef = this->tabu_coef_neat;
+		reset();
+	}
+}
+
+
+double Tabu::return_current_relative_tabu_size()
+{
+	return (double) (tabu_length - MIN_TABU_LENGTH) / (double) MAX_TABU_LENGTH;
+}
+
+
+void Tabu::increase_tabu_size()
+{
+	this->resize(this->tabu_length + LENGTH_CHANGE_STEP);
+}
+void Tabu::decrease_tabu_size()
+{
+	this->resize(this->tabu_length - LENGTH_CHANGE_STEP);
+}
+
+
+} // Namespace PERMU
