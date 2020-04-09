@@ -1560,6 +1560,9 @@ void compute_order_from_double_to_double(double* v, int len, double* order_res, 
             }
         }
     }
+    PrintArray(v, len);
+    PrintArray(order_res, len);
+    cout << endl;
     delete[] temp;
 }
 
@@ -1593,6 +1596,7 @@ void transform_from_values_to_geometric_ranking_probs(double* reference_and_resu
 
     delete[] indexes;
 }
+#undef p
 
 double tools_round_two_decimals(double x)
 {
@@ -1835,42 +1839,125 @@ bool is_A_larger_than_B_Signed_Willcoxon(double* A, double* B, int length){
 }
 
 
+#include "asa032.hpp"
 
-bool Friedman_test(double** f_values, int n_candidates, int sample_length)
+
+double p_value_chisquared(double x, double df)
 {
+    int* error_code = new int(0);
+    double res = gamain(x/2.0, df/2.0, error_code);
+    if (*error_code != 0)
+    {
+        cout << "Error in gmain. res = " << res << ",  Error code: " << *error_code << endl;
+        exit(1);
+    }
+    // res /= tgamma(df/2.0);
+    delete error_code;
+    return 1.0 - res;
+}
 
+
+
+bool Friedman_test_are_there_critical_diferences(double** f_values, int n_candidates, int sample_length)
+{
+    #define PRERESIZE_RANKINGS 10
     // value_1 of controller_1, value_2 of controller_1, ..., value_sample_length of controller_1
     // value_1 of controller_2, value_2 of controller_2, ..., value_sample_length of controller_2
     // ...
     // value_1 of controller_n_candidates, value_2 of controller_n_candidates, ..., value_sample_length of controller_n_candidates
 
+
+
     static vector<vector<double>> ranks;
     static vector<double> scores;
 
-    scores.reserve(n_candidates);
-    ranks.reserve(n_candidates);
+    int k = sample_length;
+    int m = n_candidates;
+
+    if (ranks.size() < n_candidates)
+    {
+        ranks.resize(n_candidates);
+    }
 
     for (int i = 0; i < ranks.size(); i++)
-    {
-        ranks[i].clear();
+    {   
+        if (ranks[i].size() < sample_length)
+        {
+            ranks[i].resize(sample_length);
+            // ranks[i].resize(max(sample_length, PRERESIZE_RANKINGS));
+        }
     }
     
 
 
 
+
     for (int i = 0; i < sample_length; i++)
-    {
+    {   
+        scores.clear();
         for (int j = 0; j < n_candidates; j++)
         {
             scores.push_back(f_values[j][i]);
         }
-        compute_order_from_double_to_double()
+        // conover practical statistics page 381 -> rank 1 assigned to the lowest value
+        compute_order_from_double_to_double(scores.data(), n_candidates, scores.data(), false, true);
+        sum_value_to_array(scores.data(), 1.0, n_candidates);
+        for (int j = 0; j < n_candidates; j++)
+        {
+            ranks[j][i] = scores[j];
+        }
+    }
+
+
+    double numerator = 0.0;
+
+    for (int j = 0; j < m; j++)
+    {
+        double sumand = (sum_slice_vec(ranks[j].data(), 0, sample_length) - ((double)k * ((double)m + 1.0) * 0.5));
+        sumand *= sumand;
+        numerator += sumand;
+    }
+
+    numerator *= (double) (m - 1);
+    
+    double denominator = 0.0;
+    for (int l = 0; l < k; l++)
+    {
+        for (int j = 0; j < m; j++)
+        {
+            denominator += ranks[j][l] * ranks[j][l];
+        }
+    }
+    
+    for (int j = 0; j < n_candidates; j++)
+    {
+        print_vector(ranks[j]);
+        cout << endl;
     }
 
 
 
-    ranks.clear();
+    denominator -= (double)(k*m*(m+1)*(m+1)) / 4.0;
 
+    cout << numerator << " / " << denominator << endl;
+
+    double T = numerator / denominator;
+
+    cout << "T = " << T << endl;
+
+    int df = m - 1;
+    double p = p_value_chisquared(T, (double) df);
+
+    cout << "p-value: " << p << endl;
+
+    if (p > 0.05)
+    {
+        return false;
+    }else
+    {
+        return true;
+    }
+    
     
 
 }

@@ -39,6 +39,36 @@ void usage()
 
 int main(int argc, char *argv[])
 {
+
+    int n_candidates = 3;
+    int n_samples = 4;
+
+    double **f_values = new double*[n_candidates];
+
+    for (int i = 0; i < n_candidates; i++)
+    {
+        f_values[i] = new double[n_samples];
+    }
+    
+    RandomNumberGenerator rang = RandomNumberGenerator();
+
+    int index = 0;
+    for (int j = 0; j < n_samples; j++)
+    {
+        for (int i = 0; i < n_candidates; i++)
+        {
+            index++;
+            f_values[i][j] = (double)index;
+        }
+    }
+
+    f_values[0][0] = 10.5;
+    PrintMatrix(f_values, n_candidates, n_samples);
+
+    Friedman_test_are_there_critical_diferences(f_values, n_candidates, n_samples);
+    exit(0);
+
+
     using namespace std;
     using namespace NEAT;
 
@@ -54,11 +84,13 @@ int main(int argc, char *argv[])
     cout << "This modified software uses a configuration file parser inih, available at https://github.com/jtilly/inih" << endl;
     cout << "This modified software contains some parts of the PerMallows package \n"
          << "by Ekhiñe Irurozki available at https://cran.r-project.org/web/packages/PerMallows/index.html" << endl;
-    cout << "The author of the modified software distributed here is in NO way affiliated with accneat or INIH. Please, " << endl;
-    cout << "understand that the use of this software requires reading and accepting the licences of accneat, INIH and PerMallows." << endl
+    cout << "The author of the modified software distributed here is in NO way affiliated with the authors of the other projects. Please, " << endl;
+    cout << "understand that the use of this software requires reading and accepting the licences of the rest of the projects." << endl
          << endl;
+    cout << "The incomplete gamma function (asa032.cpp and asa032.hpp) originally written by John Burkardt, \n";
+    cout << "c++ version by G Bhattacharjee, distributed under the GNU LGPL license.\n" ;
     cout << "INIH is distributed with BSD licence, and accneat with APACHE LICENCE 2.0\n";
-    cout << "The source code provided here (excluding accneat, INIH and PerMallows) was made by Etor Arza.\n";
+    cout << "The original part of the source code provided here was made by Etor Arza.\n";
     cout << "To keep the licence stuff as painless as possible, the software part writen by \n";
     cout << "Etor Arza is distributed with APACHE LICENCE 2.0 too.\n\n";
      cout << "----------END LICENCE DISCLAIMER----------\n\n\n\n\n\n";
