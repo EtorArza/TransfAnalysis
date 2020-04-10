@@ -62,10 +62,17 @@ int main(int argc, char *argv[])
         }
     }
 
-    f_values[0][0] = 10.5;
+    f_values[0][0] = 2.5;
     PrintMatrix(f_values, n_candidates, n_samples);
 
     Friedman_test_are_there_critical_diferences(f_values, n_candidates, n_samples);
+
+    for (int i = 0; i < n_candidates; i++)
+    {
+        friedman_post_hoc(i, n_candidates, n_samples);
+    }
+    
+
     exit(0);
 
 
@@ -78,22 +85,21 @@ int main(int argc, char *argv[])
          << endl;
     cout << "Accneat is a fork of Stanley et al.'s implementation with some \n";
     cout << "improvements such as delete mutations and speed improvements, available at \n";
-    cout << "https://github.com/sean-dougherty/accneat\n"
+    cout << "https://github.com/sean-dougherty/accneat (APACHE LICENCE 2.0)\n"
          << endl
          << endl;
-    cout << "This modified software uses a configuration file parser inih, available at https://github.com/jtilly/inih" << endl;
-    cout << "This modified software contains some parts of the PerMallows package \n"
-         << "by Ekhiñe Irurozki available at https://cran.r-project.org/web/packages/PerMallows/index.html" << endl;
-    cout << "The author of the modified software distributed here is in NO way affiliated with the authors of the other projects. Please, " << endl;
-    cout << "understand that the use of this software requires reading and accepting the licences of the rest of the projects." << endl
-         << endl;
-    cout << "The incomplete gamma function (asa032.cpp and asa032.hpp) originally written by John Burkardt, \n";
-    cout << "c++ version by G Bhattacharjee, distributed under the GNU LGPL license.\n" ;
-    cout << "INIH is distributed with BSD licence, and accneat with APACHE LICENCE 2.0\n";
+    cout << "This software also uses some other software projects or parts of them." << endl;
+    cout << "***\n";
+    cout << "Configuration file parser inih, available at \nhttps://github.com/jtilly/inih (BSD licence)" << endl;
+    cout << "Some parts of the PerMallows package by Ekhiñe Irurozki available at \nhttps://cran.r-project.org/web/packages/PerMallows/index.html (GLP licence)" << endl;
+    cout << "The incomplete gamma function (asa032.cpp and asa032.hpp),\n by G Bhattacharjee, originally written by John Burkardt, (GNU LGPL license).\n";
+    cout << "The incomplete Beta function (asa063.cpp and asa063.hpp),\n by KL Majumder and G Bhattacharjee (GNU LGPL license).\n"; 
+    cout << "***\n";
+
     cout << "The original part of the source code provided here was made by Etor Arza.\n";
     cout << "To keep the licence stuff as painless as possible, the software part writen by \n";
     cout << "Etor Arza is distributed with APACHE LICENCE 2.0 too.\n\n";
-     cout << "----------END LICENCE DISCLAIMER----------\n\n\n\n\n\n";
+    cout << "----------END LICENCE DISCLAIMER----------\n\n\n\n\n\n";
 
 #ifndef NDEBUG
     cout << "WARNING: Debug mode. Assertions enabled." << endl;

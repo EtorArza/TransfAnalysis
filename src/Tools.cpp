@@ -21,6 +21,8 @@
 #include "Lap.h"
 #include <float.h>
 #include <vector>
+#include "asa063.hpp"
+#include "asa032.hpp"
 #define TEMP_double_ARRAY_SIZE 30
 
 
@@ -1505,7 +1507,7 @@ bool are_doubles_equal(double x1, double x2)
 
 void compute_order_from_double_to_double(double* v, int len, double* order_res, bool reverse, bool respect_ties){
     int* temp = new int[len];
-
+    // PrintArray(v, len);
     if (reverse)
     {
         multiply_array_with_value(v, -1, len);
@@ -1560,8 +1562,7 @@ void compute_order_from_double_to_double(double* v, int len, double* order_res, 
             }
         }
     }
-    PrintArray(v, len);
-    PrintArray(order_res, len);
+    // PrintArray(order_res, len);
     cout << endl;
     delete[] temp;
 }
@@ -1839,7 +1840,6 @@ bool is_A_larger_than_B_Signed_Willcoxon(double* A, double* B, int length){
 }
 
 
-#include "asa032.hpp"
 
 
 double p_value_chisquared(double x, double df)
@@ -1857,7 +1857,8 @@ double p_value_chisquared(double x, double df)
 }
 
 
-
+double post_hoc_denominator;
+vector<vector<double>>* shared_ranks;
 bool Friedman_test_are_there_critical_diferences(double** f_values, int n_candidates, int sample_length)
 {
     #define PRERESIZE_RANKINGS 10
@@ -1900,7 +1901,7 @@ bool Friedman_test_are_there_critical_diferences(double** f_values, int n_candid
             scores.push_back(f_values[j][i]);
         }
         // conover practical statistics page 381 -> rank 1 assigned to the lowest value
-        compute_order_from_double_to_double(scores.data(), n_candidates, scores.data(), false, true);
+        compute_order_from_double_to_double(scores.data(), n_candidates, scores.data(), true, true);
         sum_value_to_array(scores.data(), 1.0, n_candidates);
         for (int j = 0; j < n_candidates; j++)
         {
@@ -1941,6 +1942,7 @@ bool Friedman_test_are_there_critical_diferences(double** f_values, int n_candid
 
     cout << numerator << " / " << denominator << endl;
 
+
     double T = numerator / denominator;
 
     cout << "T = " << T << endl;
@@ -1948,20 +1950,77 @@ bool Friedman_test_are_there_critical_diferences(double** f_values, int n_candid
     int df = m - 1;
     double p = p_value_chisquared(T, (double) df);
 
-    cout << "p-value: " << p << endl;
+    cout << "Friedman p-value: " << p << endl;
 
-    if (p > 0.05)
+    if (p > ALPHA)
     {
         return false;
-    }else
+    }
+    else
+    {
+        post_hoc_denominator = denominator;
+        post_hoc_denominator *= 2 * k * (1.0 - T / k / (m-1));
+        post_hoc_denominator /= (k-1) * (m-1);
+        post_hoc_denominator = sqrt(post_hoc_denominator);
+        shared_ranks = &ranks;
+        return true;
+    }
+}
+
+
+double p_value_from_t_statistic(double t, double df)
+{
+    int error_code = 0;
+    double x = df / (t * t + df);
+
+    double a = df / 2.0;
+    double b = 0.5;
+    double beta_log = lgamma ( a )
+             + lgamma ( b )
+             - lgamma ( a + b );
+
+    double res = betain(x, a, b, beta_log, error_code);
+    if (error_code != 0)
+    {
+        cout << "Error in betain(), errir code " << error_code << endl; 
+    }
+    return res;
+}
+
+
+
+
+// In order to call this function, Friedman_test_are_there_critical_diferences needs to be called first.
+bool friedman_post_hoc(int j, int n_candidates, int n_samples)
+{
+    int best_index;
+    double best_rank = 100000000.0;
+    for (int i = 0; i < n_candidates; i++)
+    {
+        if (sum_slice_vec((*shared_ranks)[i].data(), 0, n_samples) < best_rank)
+        {
+            best_index = i;
+            best_rank = sum_slice_vec((*shared_ranks)[i].data(), 0, n_samples);
+        }
+    }
+    
+    double t_1_minus_half_alpha = abs(best_rank - sum_slice_vec((*shared_ranks)[j].data(), 0, n_samples)) / post_hoc_denominator;
+
+
+    double p_value = p_value_from_t_statistic(t_1_minus_half_alpha, (n_candidates-1) * (n_samples - 1)); // Conover page 383
+
+    if (p_value < ALPHA)
     {
         return true;
+    }
+    else
+    {
+        return false;
     }
     
     
 
 }
-
 
 
 
