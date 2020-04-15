@@ -119,10 +119,21 @@ void Tabu::resize(int new_size)
 	{
 		this->tabu_length = new_size;
 		double tmp_coef = this->tabu_coef_neat;
-		reset();
+		index_pos = 0;
+		for (int k = 0; k < tabu_length; k++)
+		{
+			tabu_indices_i[k] = -1;
+			tabu_indices_j[k] = -1;
+		}
+		for (int i = 0; i < n; i++)
+		{
+			for (int j = 0; j < n; j++)
+			{
+				tabu_table[i][j] = false;
+			}
+		}
 	}
 }
-
 
 double Tabu::return_current_relative_tabu_size()
 {

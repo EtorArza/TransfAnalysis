@@ -29,7 +29,7 @@ namespace PERMU{
 void CPopulation::init_class(PBP *problem, RandomNumberGenerator* rng, PERMU::params* parameters){
     this->rng = rng;
     this->problem = problem;
-    this->popsize = parameters-> POPSIZE;
+    this->popsize = MIN_POPSIZE;
     this->max_time_pso = parameters-> MAX_TIME_PSO;
     this->n = problem->GetProblemSize();
     genome_best = new int[n];
@@ -141,11 +141,11 @@ void CPopulation::random_reinitialize_individual_i(int i)
  */
 CPopulation::~CPopulation()
 {
-    for (int i = 0; i < this->popsize; i++)
+    for (int i = 0; i < MAX_POPSIZE; i++)
     {
         delete[] pop_info[i];
     }
-    for (int i = 0; i < this->popsize; i++)
+    for (int i = 0; i < MAX_POPSIZE; i++)
     {
         delete m_individuals[i];
     }

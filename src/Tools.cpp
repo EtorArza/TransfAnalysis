@@ -21,7 +21,6 @@
 #include "Lap.h"
 #include <float.h>
 #include <vector>
-#include "asa063.hpp"
 #include "asa032.hpp"
 #define TEMP_double_ARRAY_SIZE 30
 
@@ -1507,6 +1506,10 @@ bool are_doubles_equal(double x1, double x2)
 
 void compute_order_from_double_to_double(double* v, int len, double* order_res, bool reverse, bool respect_ties){
     int* temp = new int[len];
+
+    double* copy_of_v = new double[len];
+    memcpy(copy_of_v, v, sizeof(double)*len);
+
     // PrintArray(v, len);
     if (reverse)
     {
@@ -1519,33 +1522,46 @@ void compute_order_from_double_to_double(double* v, int len, double* order_res, 
     }
 
     std::sort(temp, temp+len, _sort_indices_double(v));
+
+    if (reverse)
+    {
+        multiply_array_with_value(v, -1, len);
+    }
+
     for (int i = 0; i < len; i++)
     {
         order_res[temp[i]] = (double) i;
     }
 
+
+    
     
     if (respect_ties)
     {
-        assert(len > 3);
+        if (len == 1)
+        {
+            v[0] = 0.0;
+            return;
+        }
+        assert(len  >= 2);
         int n_equal = 0;
         double last;
 
 
         for (int i = 1; i < len; i++)
         {
-            last = v[temp[i-1]];
+            last = copy_of_v[temp[i-1]];
 
-            if (are_doubles_equal(last, v[temp[i]]))
+            if (are_doubles_equal(last, copy_of_v[temp[i]]))
             {
                 n_equal++;
             }
 
-            if (!are_doubles_equal(last, v[temp[i]]) || i == len - 1)
+            if (!are_doubles_equal(last, copy_of_v[temp[i]]) || i == len - 1)
             {
                 int last_eq_idx = i-1;
 
-                if(are_doubles_equal(last, v[temp[i]])){
+                if(are_doubles_equal(last, copy_of_v[temp[i]])){
                     last_eq_idx = i;
                 }
 
@@ -1562,8 +1578,12 @@ void compute_order_from_double_to_double(double* v, int len, double* order_res, 
             }
         }
     }
+
     // PrintArray(order_res, len);
-    cout << endl;
+    // cout << endl;
+    // cout << "---\n";
+        
+    delete[] copy_of_v;
     delete[] temp;
 }
 
@@ -1768,8 +1788,8 @@ bool is_A_larger_than_B_Mann_Whitney(double* A, double* B, int length){
 bool is_A_larger_than_B_Signed_Willcoxon(double* A, double* B, int length){
 
 
-    if(length < 80){
-        cout << "A larger sample size than 80 is required to correctly estimate p-value. " << endl;
+    if(length < 4){
+        cout << "A larger sample size than 4 is required to correctly estimate p-value. " << endl;
         exit(1);
     }
 
@@ -1811,8 +1831,8 @@ bool is_A_larger_than_B_Signed_Willcoxon(double* A, double* B, int length){
 
     if (N_r < length / 4) // if the observations are the same in more than 75% of the cases, accept H0
     {
-        cout << "One sided test not performed, sequences are too simmilar." << endl;
-        return false;
+        //cout << "One sided test not performed, sequences are too simmilar." << endl;
+        // return false;
     }
     
     
@@ -1821,20 +1841,22 @@ bool is_A_larger_than_B_Signed_Willcoxon(double* A, double* B, int length){
  
     double sigma_w = sqrt(d_N_r * (d_N_r + 1.0) * (2.0*d_N_r + 1.0) / 6.0);
 
+    // cout << "sigma_w: " << sigma_w << endl;
+
     double z = W / sigma_w;
 
 
 
-    cout << "Paired rank hypothesis testing at alpha =  "<< ALPHA <<  endl;
+    //cout << "Paired rank hypothesis testing at alpha =  "<< ALPHA <<  endl;
 
-    cout << "z = " << z << " ";
+    //cout << "z = " << z << " ";
 
     if (z > Z_THRESH)
     {   
-        cout << " > z_thresh = " << Z_THRESH << ", critical diff. found." << endl;
+        //cout << " > z_thresh = " << Z_THRESH << ", critical diff. found." << endl;
         return true;
     }else{
-        cout << " < z_thresh = " << Z_THRESH << ", no crit. diff." << endl;
+        //cout << " < z_thresh = " << Z_THRESH << ", no crit. diff." << endl;
         return false;
     }
 }
@@ -1846,10 +1868,28 @@ double p_value_chisquared(double x, double df)
 {
     int* error_code = new int(0);
     double res = gamain(x/2.0, df/2.0, error_code);
+
+    if(x - 300.0 > df)
+    {
+        delete error_code;
+        return 0.0;
+    }
+
+    if (x / 4.0 > df)
+    {
+        delete error_code;
+        return 0.0;
+    }
+    
+    if (x / 2.0 > df && df > 10.0)
+    {
+        delete error_code;
+        return 0.0;
+    }
+
     if (*error_code != 0)
     {
-        cout << "Error in gmain. res = " << res << ",  Error code: " << *error_code << endl;
-        exit(1);
+        cout << "Error in gmain. x = " << x << ", df = " << df << ", res = " << res << ",  Error code: " << *error_code << endl;
     }
     // res /= tgamma(df/2.0);
     delete error_code;
@@ -1857,43 +1897,10 @@ double p_value_chisquared(double x, double df)
 }
 
 
-double post_hoc_denominator;
-vector<vector<double>>* shared_ranks;
-bool Friedman_test_are_there_critical_diferences(double** f_values, int n_candidates, int sample_length)
+void get_ranks_from_f_values(vector<vector<double>>& ranks, double** f_values, int n_candidates, int n_samples)
 {
-    #define PRERESIZE_RANKINGS 10
-    // value_1 of controller_1, value_2 of controller_1, ..., value_sample_length of controller_1
-    // value_1 of controller_2, value_2 of controller_2, ..., value_sample_length of controller_2
-    // ...
-    // value_1 of controller_n_candidates, value_2 of controller_n_candidates, ..., value_sample_length of controller_n_candidates
-
-
-
-    static vector<vector<double>> ranks;
     static vector<double> scores;
-
-    int k = sample_length;
-    int m = n_candidates;
-
-    if (ranks.size() < n_candidates)
-    {
-        ranks.resize(n_candidates);
-    }
-
-    for (int i = 0; i < ranks.size(); i++)
-    {   
-        if (ranks[i].size() < sample_length)
-        {
-            ranks[i].resize(sample_length);
-            // ranks[i].resize(max(sample_length, PRERESIZE_RANKINGS));
-        }
-    }
-    
-
-
-
-
-    for (int i = 0; i < sample_length; i++)
+    for (int i = 0; i < n_samples; i++)
     {   
         scores.clear();
         for (int j = 0; j < n_candidates; j++)
@@ -1908,13 +1915,36 @@ bool Friedman_test_are_there_critical_diferences(double** f_values, int n_candid
             ranks[j][i] = scores[j];
         }
     }
+}
+
+
+bool Friedman_test_are_there_critical_diferences(double** f_values, int n_candidates, int n_samples)
+{
+    // value_1 of controller_1, value_2 of controller_1, ..., value_sample_length of controller_1
+    // value_1 of controller_2, value_2 of controller_2, ..., value_sample_length of controller_2
+    // ...
+    // value_1 of controller_n_candidates, value_2 of controller_n_candidates, ..., value_sample_length of controller_n_candidates
+
+    static vector<vector<double>> ranks;
+
+    ranks.resize(n_candidates);
+    for (int i = 0; i < ranks.size(); i++)
+    {
+        ranks[i].resize(n_samples);
+    }
+
+    int k = n_samples;
+    int m = n_candidates;
+
+
+    get_ranks_from_f_values(ranks, f_values, n_candidates, n_samples);
 
 
     double numerator = 0.0;
 
     for (int j = 0; j < m; j++)
     {
-        double sumand = (sum_slice_vec(ranks[j].data(), 0, sample_length) - ((double)k * ((double)m + 1.0) * 0.5));
+        double sumand = (sum_slice_vec(ranks[j].data(), 0, n_samples) - ((double)k * ((double)m + 1.0) * 0.5));
         sumand *= sumand;
         numerator += sumand;
     }
@@ -1930,99 +1960,124 @@ bool Friedman_test_are_there_critical_diferences(double** f_values, int n_candid
         }
     }
     
-    for (int j = 0; j < n_candidates; j++)
-    {
-        print_vector(ranks[j]);
-        cout << endl;
-    }
+    // for (int j = 0; j < n_candidates; j++)
+    // {
+    //     print_vector(ranks[j]);
+    //     cout << endl;
+    // }
 
 
 
     denominator -= (double)(k*m*(m+1)*(m+1)) / 4.0;
 
-    cout << numerator << " / " << denominator << endl;
+    // cout << numerator << " / " << denominator << endl;
 
 
     double T = numerator / denominator;
 
-    cout << "T = " << T << endl;
+    // cout << "T = " << T << endl;
+
+    if(T < 0)
+    {
+        cout << "T is negative\n" << std::flush;
+    }
 
     int df = m - 1;
     double p = p_value_chisquared(T, (double) df);
 
-    cout << "Friedman p-value: " << p << endl;
+
+
 
     if (p > ALPHA)
     {
+        cout << "Friedman H0 ";
+        cout << "T: " << T << ", df: " << df << ", Friedman p-value: " << p << std::flush;
         return false;
     }
     else
     {
-        post_hoc_denominator = denominator;
-        post_hoc_denominator *= 2 * k * (1.0 - T / k / (m-1));
-        post_hoc_denominator /= (k-1) * (m-1);
-        post_hoc_denominator = sqrt(post_hoc_denominator);
-        shared_ranks = &ranks;
+        cout << "Friedman H1 ";
+        cout << "T: " << T << ", df: " << df << ", Friedman p-value: " << p << std::flush;
         return true;
     }
 }
 
 
-double p_value_from_t_statistic(double t, double df)
-{
-    int error_code = 0;
-    double x = df / (t * t + df);
 
-    double a = df / 2.0;
-    double b = 0.5;
-    double beta_log = lgamma ( a )
-             + lgamma ( b )
-             - lgamma ( a + b );
-
-    double res = betain(x, a, b, beta_log, error_code);
-    if (error_code != 0)
-    {
-        cout << "Error in betain(), errir code " << error_code << endl; 
-    }
-    return res;
-}
 
 
 
 
 // In order to call this function, Friedman_test_are_there_critical_diferences needs to be called first.
-bool friedman_post_hoc(int j, int n_candidates, int n_samples)
+bool friedman_post_hoc(double** f_values, int i, int best_index, int n_samples)
 {
-    int best_index;
-    double best_rank = 100000000.0;
-    for (int i = 0; i < n_candidates; i++)
-    {
-        if (sum_slice_vec((*shared_ranks)[i].data(), 0, n_samples) < best_rank)
-        {
-            best_index = i;
-            best_rank = sum_slice_vec((*shared_ranks)[i].data(), 0, n_samples);
-        }
-    }
-    
-    double t_1_minus_half_alpha = abs(best_rank - sum_slice_vec((*shared_ranks)[j].data(), 0, n_samples)) / post_hoc_denominator;
-
-
-    double p_value = p_value_from_t_statistic(t_1_minus_half_alpha, (n_candidates-1) * (n_samples - 1)); // Conover page 383
-
-    if (p_value < ALPHA)
-    {
-        return true;
-    }
-    else
-    {
-        return false;
-    }
-    
-    
-
+    return is_A_larger_than_B_Signed_Willcoxon(f_values[best_index], f_values[i], n_samples);
 }
 
+void F_race_iteration(double** f_values, vector<int> &surviving_candidates, int n_samples)
+{
+    double** reduced_f_values = new double*[surviving_candidates.size()];
+    static vector<vector<double>> ranks;
 
+    ranks.resize(surviving_candidates.size());
+    for (int i = 0; i < ranks.size(); i++)
+    {
+        ranks[i].resize(n_samples);
+    }
+    vector<int> surviving_candidates_next_iteration;
+    for (int i = 0; i < surviving_candidates.size(); i++)
+    {
+        reduced_f_values[i] = f_values[surviving_candidates[i]];
+    }
+
+    get_ranks_from_f_values(ranks, reduced_f_values, surviving_candidates.size(), n_samples);
+
+    // PrintMatrix(reduced_f_values, surviving_candidates.size(), n_samples);
+    // cout << "\n ---- \n";
+    // PrintMatrix(reduced_f_values, surviving_candidates.size(), n_samples);
+
+
+    if (Friedman_test_are_there_critical_diferences(reduced_f_values, surviving_candidates.size(), n_samples))
+    {
+        int best_reduced_index = 0;
+        double* avg_ranks = new double[surviving_candidates.size()];
+        for (int i = 0; i < surviving_candidates.size(); i++)
+        {
+            avg_ranks[i] = Average(ranks[i].data(), n_samples);
+        }
+        best_reduced_index = argmin(avg_ranks, surviving_candidates.size());
+
+        // cout << endl;
+        // cout << "avg_raks: ";
+        // PrintArray(avg_ranks, surviving_candidates.size());
+        // cout << endl;
+        // cout << endl;
+        // cout << "best_reduced_index: " << best_reduced_index << endl;
+        delete[] avg_ranks;
+
+        for (int i = 0; i < surviving_candidates.size(); i++)
+        {
+            // PrintArray(reduced_f_values[i], n_samples);
+            // cout << endl;
+            // PrintArray(reduced_f_values[best_reduced_index], n_samples);
+            // cout << endl;
+            // cout << "---\n";
+            bool pos_hoc_test_result = is_A_larger_than_B_Signed_Willcoxon(reduced_f_values[best_reduced_index], reduced_f_values[i], n_samples);
+
+            if (pos_hoc_test_result)
+            {
+
+
+            }
+            else
+            {
+                surviving_candidates_next_iteration.push_back(surviving_candidates[i]);
+            }
+        }
+        surviving_candidates = surviving_candidates_next_iteration;
+    }
+    delete[] reduced_f_values;
+}
 
 
 std::string from_path_to_filename(std::string file_path)

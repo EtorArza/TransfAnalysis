@@ -38,7 +38,7 @@ using namespace std;
 namespace PERMU
 {
 
-#define SMALLEST_POSITIVE_DOUBLE  0.0000001
+#define SMALLEST_POSITIVE_DOUBLE 0.0000001
 void make_output_behaviour_mapping_more_injective(double *output)
 {
 #define POS_FIRS_OPERATOR 1
@@ -96,7 +96,7 @@ struct Evaluator
 {
 
     params *parameters;
-    NEAT::CpuNetwork* best_network;
+    NEAT::CpuNetwork *best_network;
     int iteration_number = 0;
 
     __net_eval_decl Evaluator(){};
@@ -105,7 +105,6 @@ struct Evaluator
     {
         using namespace PERMU;
         NEAT::CpuNetwork **nets = (NEAT::CpuNetwork **)nets_;
-
 
         int *indexes = new int[nnets];
         for (int i = 0; i < nnets; i++)
@@ -118,7 +117,7 @@ struct Evaluator
         cout << "selecting_best_controller: " << endl;
 
         RandomNumberGenerator rng;
-        int initial_seed = rng.random_integer_fast((int) 10e7);
+        int initial_seed = rng.random_integer_fast((int)10e7);
 
         int current_number_of_controllers = nnets;
         int total_n_evals = 0;
@@ -126,35 +125,31 @@ struct Evaluator
 
         while (current_number_of_controllers > 1)
         {
-            #pragma omp parallel for num_threads(parameters->neat_params->N_OF_THREADS)
+#pragma omp parallel for num_threads(parameters->neat_params->N_OF_THREADS)
             for (int inet = 0; inet < current_number_of_controllers; inet++)
             {
                 NEAT::CpuNetwork *net = nets[indexes[inet]];
                 int seed = initial_seed + inet;
-                f_values[indexes[inet]] = (total_n_evals*f_values[indexes[inet]] + n_evals*this->FitnessFunction(net, n_evals, seed)) / (total_n_evals + n_evals);
+                f_values[indexes[inet]] = (total_n_evals * f_values[indexes[inet]] + n_evals * this->FitnessFunction(net, n_evals, seed)) / (total_n_evals + n_evals);
             }
-            
-            sort(indexes, indexes+current_number_of_controllers, [f_values](int a, int b) {return f_values[a] > f_values[b]; });
-            
-            
+
+            sort(indexes, indexes + current_number_of_controllers, [f_values](int a, int b) { return f_values[a] > f_values[b]; });
+
             initial_seed += nnets;
             total_n_evals += n_evals;
-            current_number_of_controllers = (int) ((double) current_number_of_controllers * gamma);
+            current_number_of_controllers = (int)((double)current_number_of_controllers * gamma);
 
             cout << "----" << endl;
             cout << current_number_of_controllers << endl;
             PrintArray(f_values, nnets);
             PrintArray(indexes, nnets);
-
         }
-
 
         int res = indexes[0];
         delete[] indexes;
         delete[] f_values;
 
         return res;
-
     }
 
     // fitness function in sequential order
@@ -166,21 +161,23 @@ struct Evaluator
         return res;
     }
 
-    // parallelize over the same network
-    __net_eval_decl void FitnessFunction_parallel(NEAT::CpuNetwork *net, int n_evals, double *res, int initial_seed)
-    {
-    }
-
     // compute the fitness value of all networks at training time.
     __net_eval_decl void execute(class NEAT::Network **nets_, NEAT::OrganismEvaluation *results, size_t nnets)
     {
-
+#define MAX_EVALS_PER_CONTROLLER_LAST_IT 5000
+#define MAX_EVALS_PER_CONTROLLER_REGULAR_IT 100
+#define EVAL_MIN_STEP 5
         using namespace PERMU;
         NEAT::CpuNetwork **nets = (NEAT::CpuNetwork **)nets_;
-        double *f_values = new double[nnets];
-        double *tmp_order = new double[nnets];
+        double **f_values = new double *[nnets];
         RandomNumberGenerator rng;
-        int initial_seed = rng.random_integer_fast((int)2e9, (int)3e9);
+
+        for (size_t i = 0; i < nnets; i++)
+        {
+            f_values[i] = new double[MAX_EVALS_PER_CONTROLLER_LAST_IT];
+        }
+
+        double *tmp_order = new double[nnets];
         // evaluate the individuals
 
         if (best_network == nullptr)
@@ -189,25 +186,83 @@ struct Evaluator
         }
         else
         {
-            parameters->neat_params->BEST_FITNESS_TRAIN = this->FitnessFunction(best_network, parameters->N_EVALS, rng.random_integer_fast((int) 1e9));
+            //parameters->neat_params->BEST_FITNESS_TRAIN = this->FitnessFunction(best_network, 25, rng.random_integer_fast((int)1e9));
         }
 
-        cout << "Evaluating -> ";
+        int current_n_of_evals = 0;
+        int target_n_controllers_left;
+        int max_evals_per_controller;
+        if (parameters->neat_params->IS_LAST_ITERATION)
+        {
+            target_n_controllers_left = 2;
+            max_evals_per_controller = MAX_EVALS_PER_CONTROLLER_LAST_IT;
+        }
+        else
+        {
+            target_n_controllers_left = (int)((double)nnets * NEAT::env->survival_thresh);
+            max_evals_per_controller = MAX_EVALS_PER_CONTROLLER_REGULAR_IT;
+        }
+        
 
-        progress_bar bar(nnets);
-#pragma omp parallel for num_threads(parameters->neat_params->N_OF_THREADS)
+        vector<int> surviving_candidates;
+
         for (int inet = 0; inet < nnets; inet++)
         {
-            NEAT::CpuNetwork *net = nets[inet];
-            NEAT::OrganismEvaluation eval;
-            int seed = initial_seed + inet;
-            results[inet] = eval;
-            f_values[inet] = this->FitnessFunction(net, parameters->N_EVALS, seed);
-            bar.step();
+            surviving_candidates.push_back(inet);
         }
-        bar.end();
 
-        double best_f_gen = f_values[argmax(f_values, (int)nnets)];
+        while (surviving_candidates.size() > target_n_controllers_left && max_evals_per_controller > current_n_of_evals)
+        {
+            int initial_seed = rng.random_integer_fast((int)2e9, (int)3e9);
+            cout << "Evaluating -> " << std::flush;
+
+#pragma omp parallel for num_threads(parameters->neat_params->N_OF_THREADS)
+            for (int i = 0; i < surviving_candidates.size() * EVAL_MIN_STEP; i++)
+            {
+                int inet = surviving_candidates[i / EVAL_MIN_STEP];
+                //cout << inet << "|" << current_n_of_evals + i%EVAL_MIN_STEP << endl;
+                NEAT::CpuNetwork *net = nets[inet];
+                int seed = initial_seed + i % EVAL_MIN_STEP;
+
+                f_values[inet][current_n_of_evals + i % EVAL_MIN_STEP] = this->FitnessFunction(net, 1, seed);
+            }
+            current_n_of_evals += EVAL_MIN_STEP;
+
+
+            for (auto &&inet : surviving_candidates)
+            {
+                tmp_order[inet] = Average(f_values[inet], current_n_of_evals) - (double)surviving_candidates.size() * 10000000.0;
+            }
+
+            //PrintMatrix(f_values, nnets, current_n_of_evals);
+            if (surviving_candidates.size() == 2)
+            {
+                double mean_candidate_0 = Average(f_values[surviving_candidates[0]], current_n_of_evals);
+                double mean_candidate_1 = Average(f_values[surviving_candidates[0]], current_n_of_evals);
+                int large = 0;
+                int small = 1;
+                if (mean_candidate_1 > mean_candidate_0)
+                {
+                    large = 1;
+                    small = 0;
+                }
+
+                if (is_A_larger_than_B_Signed_Willcoxon(f_values[surviving_candidates[large]], f_values[surviving_candidates[small]], current_n_of_evals))
+                {
+                    tmp_order[surviving_candidates[large]] = 20000000.0;
+                    tmp_order[surviving_candidates[small]] = 10000000.0;
+                    surviving_candidates.clear();
+                }
+            }
+            else
+            {
+                F_race_iteration(f_values, surviving_candidates, current_n_of_evals);
+            }
+            cout << ", perc_discarded: " << (double)(nnets - surviving_candidates.size()) / (double)(nnets - target_n_controllers_left);
+            cout << endl;
+        }
+
+        double best_f_gen = Average(f_values[argmax(tmp_order, (int)nnets)], current_n_of_evals);
         cout << "(best this gen, best last gen) -> (" << best_f_gen << ", " << parameters->neat_params->BEST_FITNESS_TRAIN << ")";
 
         if (best_f_gen > parameters->neat_params->BEST_FITNESS_TRAIN)
@@ -221,39 +276,39 @@ struct Evaluator
 
         cout << endl;
 
-
         //cout << "fitness_array: " << std::flush;
         //PrintArray(f_values, nnets);
 
-        compute_order_from_double_to_double(f_values, nnets, tmp_order, false, true);
+        compute_order_from_double_to_double(tmp_order, nnets, tmp_order, false, true);
 
-        std::swap(f_values, tmp_order);
-
-        multiply_array_with_value(f_values, 1.0 / (double)(nnets - 1), (int) nnets);
-        multiply_array_with_value(f_values, 1.0 + ((double)parameters->neat_params->N_TIMES_BEST_FITNESS_IMPROVED_TRAIN / 1000.0), (int) nnets);
+        multiply_array_with_value(tmp_order, 1.0 / (double)(nnets - 1), (int)nnets);
+        multiply_array_with_value(tmp_order, 1.0 + ((double)parameters->neat_params->N_TIMES_BEST_FITNESS_IMPROVED_TRAIN / 1000.0), (int)nnets);
 
         //cout << "fitness_array: " << std::flush;
         //PrintArray(f_values, nnets);
-
-
 
         // if (*is_last_gen)
         // {
         //     int argbest = argbest_net(nets_, nnets, 0.8);
         //     f_values[argbest] += 1.0;
         // }
-        
 
         // save scaled fitness
         for (size_t inet = 0; inet < nnets; inet++)
         {
-            results[inet].fitness = f_values[inet];
-            results[inet].error = 2 - f_values[inet];
+            NEAT::OrganismEvaluation eval;
+            results[inet] = eval;
+            results[inet].fitness = tmp_order[inet];
+            results[inet].error = 2 - tmp_order[inet];
         }
 
+        for (size_t i = 0; i < nnets; i++)
+        {
+            delete[] f_values[i];
+        }
+        delete[] f_values;
 
         delete[] tmp_order;
-        delete[] f_values;
     }
 };
 
@@ -303,8 +358,6 @@ void PermuEvaluator::read_conf_file(std::string conf_file_path)
         neat_params->EXPERIMENT_FOLDER_NAME = "controllers_trained_with_" + from_path_to_filename(parameters->INSTANCE_PATH);
 
         cout << "Learning from instance: " << from_path_to_filename(parameters->INSTANCE_PATH) << endl;
-
-
 
         if (search_type == "phased")
         {
@@ -400,8 +453,8 @@ void PermuEvaluator::execute(class NEAT::Network **nets_, class NEAT::OrganismEv
     ev->parameters = this->parameters;
     ev->iteration_number = this->iteration_number;
     ev->best_network = this->best_network;
-    ev->execute(nets_, results, nnets);    
-    
+    ev->execute(nets_, results, nnets);
+
     this->best_network = ev->best_network;
     this->iteration_number++;
     delete ev;

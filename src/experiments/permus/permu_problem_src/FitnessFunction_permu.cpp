@@ -75,7 +75,6 @@ double FitnessFunction_permu(NEAT::CpuNetwork *net_original, int n_evals, int se
     pop->rng->seed(seed);
     seed = pop->rng->random_integer_fast((int) 10e8);
 
-
     v_of_fitness = new double[n_evals];
 
     for (int i = 0; i < MAX_POPSIZE; i++)

@@ -40,40 +40,6 @@ void usage()
 int main(int argc, char *argv[])
 {
 
-    int n_candidates = 3;
-    int n_samples = 4;
-
-    double **f_values = new double*[n_candidates];
-
-    for (int i = 0; i < n_candidates; i++)
-    {
-        f_values[i] = new double[n_samples];
-    }
-    
-    RandomNumberGenerator rang = RandomNumberGenerator();
-
-    int index = 0;
-    for (int j = 0; j < n_samples; j++)
-    {
-        for (int i = 0; i < n_candidates; i++)
-        {
-            index++;
-            f_values[i][j] = (double)index;
-        }
-    }
-
-    f_values[0][0] = 2.5;
-    PrintMatrix(f_values, n_candidates, n_samples);
-
-    Friedman_test_are_there_critical_diferences(f_values, n_candidates, n_samples);
-
-    for (int i = 0; i < n_candidates; i++)
-    {
-        friedman_post_hoc(i, n_candidates, n_samples);
-    }
-    
-
-    exit(0);
 
 
     using namespace std;
@@ -90,10 +56,9 @@ int main(int argc, char *argv[])
          << endl;
     cout << "This software also uses some other software projects or parts of them." << endl;
     cout << "***\n";
-    cout << "Configuration file parser inih, available at \nhttps://github.com/jtilly/inih (BSD licence)" << endl;
-    cout << "Some parts of the PerMallows package by Ekhiñe Irurozki available at \nhttps://cran.r-project.org/web/packages/PerMallows/index.html (GLP licence)" << endl;
-    cout << "The incomplete gamma function (asa032.cpp and asa032.hpp),\n by G Bhattacharjee, originally written by John Burkardt, (GNU LGPL license).\n";
-    cout << "The incomplete Beta function (asa063.cpp and asa063.hpp),\n by KL Majumder and G Bhattacharjee (GNU LGPL license).\n"; 
+    cout << "Configuration file parser inih, available at https://github.com/jtilly/inih (BSD licence)" << endl;
+    cout << "Some parts of the PerMallows package by Ekhiñe Irurozki available at https://cran.r-project.org/web/packages/PerMallows/index.html (GLP licence)" << endl;
+    cout << "The incomplete gamma function (asa032.cpp and asa032.hpp), by G Bhattacharjee, originally written by John Burkardt, (GNU LGPL license).\n";
     cout << "***\n";
 
     cout << "The original part of the source code provided here was made by Etor Arza.\n";

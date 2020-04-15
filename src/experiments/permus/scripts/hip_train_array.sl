@@ -6,8 +6,8 @@
 #SBATCH --ntasks-per-node=1 #number of tasks per node
 #SBATCH --mem=32G
 #SBATCH --cpus-per-task=32 # number of CPUs
-#SBATCH --time=2-00:00:00 #Walltime
-#SBATCH -p large
+#SBATCH --time=0-06:00:00 #Walltime
+#SBATCH -p medium
 #SBATCH --exclude=n[001-004,017-018]
 
 
@@ -72,11 +72,9 @@ PROBLEM_NAME = permu
 
 
 [NEAT]
-MAX_TRAIN_TIME = 165600
-POPSIZE = 640
+MAX_TRAIN_TIME = 18000
+POPSIZE = $POPSIZE
 THREADS = 32
-N_EVALS = $N_EVALS
-
 
 SEARCH_TYPE = phased
 SEED = 2

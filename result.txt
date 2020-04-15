@@ -1,0 +1,4 @@
+[[5.21378e+06],"src/experiments/permus/instances/lop/N-be75np_150.lop","controllers_trained_with_cut30_tai60b_gen_0023","lop",1]
+[[-1.60982e+08],"src/experiments/permus/instances/qap/cut_instances/cut30_tai60b","controllers_trained_with_cut30_tai60b_gen_0023","qap",1]
+[[-1.53388e+08],"src/experiments/permus/instances/qap/cut_instances/cut30_tai60b","controllers_trained_with_cut30_tai60b_gen_0023","qap",1]
+[[-1.47955e+08],"src/experiments/permus/instances/qap/cut_instances/cut30_tai60b","controllers_trained_with_cut30_tai60b_gen_0023","qap",1]

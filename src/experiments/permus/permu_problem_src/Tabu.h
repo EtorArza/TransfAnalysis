@@ -19,12 +19,12 @@ public:
 	void decrease_tabu_size();
 	void resize(int new_size);
 	double return_current_relative_tabu_size();
+	int tabu_length;
 
 	double tabu_coef_neat = 0.0;
 
 private:
 	int MAX_TABU_LENGTH;
-	int tabu_length;
 	RandomNumberGenerator* rng;
 	static int n_indivs_created;
 	int* tabu_indices_i;

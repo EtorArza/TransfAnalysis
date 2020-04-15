@@ -49,7 +49,6 @@ cp neat -v $SCRATCH_JOB
 cd $SCRATCH_JOB
 
 
-N_EVALS=20
 cat > tmp.ini <<EOF
 ; temporal config file for train in hpc hipatia
 
@@ -60,11 +59,9 @@ PROBLEM_NAME = permu
 
 
 [NEAT]
-MAX_TRAIN_TIME = 43200
-POPSIZE = 640
+MAX_TRAIN_TIME = 18000
+POPSIZE = $POPSIZE
 THREADS = 32
-N_EVALS = $N_EVALS
-
 
 
 SEARCH_TYPE = phased
@@ -73,11 +70,11 @@ SEED = 2
 
 
 [Controller]
-MAX_TIME_PSO = $3
+MAX_TIME_PSO = $MAX_TIME_PSO
 
 
-PROBLEM_TYPE = $1
-PROBLEM_PATH = $2
+PROBLEM_TYPE = $PROBLEM_TYPE
+PROBLEM_PATH = $PROBLEM_PATH
 
 EOF
 
@@ -99,7 +96,7 @@ instancename="${filename%%.*}"
 echo "$instancename"
 
 
-DESTINATION_FOLDER="$SRCDIR/src/experiments/permus/results/controllers/"
+DESTINATION_FOLDER="$SRCDIR/${DESTINATION_FOLDER}"
 
 
 mkdir -p ${DESTINATION_FOLDER}

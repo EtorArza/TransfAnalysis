@@ -300,7 +300,7 @@ void PBP::local_search_iteration(CIndividual *indiv, PERMU::operator_t operator_
         break;
     }
 
-    cout << "LO detected." << endl;
+    //cout << "LO detected." << endl;
     indiv->is_local_optimum[operator_id] = true;
     if (operator_id == PERMU::EXCH)
     {

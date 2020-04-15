@@ -795,12 +795,14 @@ bool is_A_larger_than_B_Mann_Whitney(double* A, double* B, int length);
 bool is_A_larger_than_B_Signed_Willcoxon(double* A, double* B, int length);
 
 //Paired test
-bool Friedman_test_are_there_critical_diferences(double** f_values, int n_candidates, int sample_length);
+bool Friedman_test_are_there_critical_diferences(double** f_values, int n_candidates, int n_samples);
 
-bool friedman_post_hoc(int j, int n_candidates, int n_samples);
 
 
 double p_value_chisquared(double x, double df);
+
+
+void F_race_iteration(double** f_values, vector<int> &surviving_candidates, int n_samples);
 
 
 #define TOL 0.00001
