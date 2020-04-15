@@ -58,6 +58,8 @@ class PBP
 	void load_rng(RandomNumberGenerator *rng);
 	Tabu* tab;
 	RandomNumberGenerator *rng;
+	int evals;
+	int max_evals;
 
 
   protected:
@@ -83,9 +85,14 @@ class PBP
 	*/
 	// The f_value of the individuals does not change in this functions. Just return the delta.
 	virtual double _Evaluate(int * permu) = 0;
-	virtual double fitness_delta_swap(CIndividual *indiv, int i, int j) = 0;
-	virtual double fitness_delta_interchange(CIndividual *indiv, int i, int j) = 0;
-	virtual double fitness_delta_insert(CIndividual *indiv, int i, int j) = 0;
+	virtual double _fitness_delta_swap(CIndividual *indiv, int i, int j) = 0;
+	virtual double _fitness_delta_interchange(CIndividual *indiv, int i, int j) = 0;
+	virtual double _fitness_delta_insert(CIndividual *indiv, int i, int j) = 0;
+
+
+	double fitness_delta_swap(CIndividual *indiv, int i, int j);
+	double fitness_delta_interchange(CIndividual *indiv, int i, int j);
+	double fitness_delta_insert(CIndividual *indiv, int i, int j);
 
 
   private:

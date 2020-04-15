@@ -21,6 +21,7 @@ namespace PERMU{
 PBP::PBP()
 {
     rng = new RandomNumberGenerator();
+    evals = 0;
 }
 
 PBP::~PBP()
@@ -61,15 +62,17 @@ void PBP::initialize_variables_PBP(int problem_size)
 
 void PBP::Evaluate(CIndividual *indiv)
 {
+    evals++;
 	double fitness = 0;
 	fitness = _Evaluate(indiv->genome);
 	indiv->f_value = fitness;
 }
 
-double PBP::Evaluate(int *genome)
-{
-	return _Evaluate(genome);
-}
+double PBP::Evaluate(int *genome){evals++; return _Evaluate(genome);}
+double PBP::fitness_delta_swap(CIndividual *indiv, int i, int j){evals++; return _fitness_delta_swap(indiv, i, j);}
+double PBP::fitness_delta_interchange(CIndividual *indiv, int i, int j){evals++; return _fitness_delta_interchange(indiv, i, j);}
+double PBP::fitness_delta_insert(CIndividual *indiv, int i, int j){evals++; return _fitness_delta_insert(indiv, i, j);}
+
 
 std::mutex PBP::mut;
 int PBP::Read_with_mutex(string filename){
