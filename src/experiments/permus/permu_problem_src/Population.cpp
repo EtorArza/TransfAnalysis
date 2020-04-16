@@ -222,7 +222,7 @@ void CPopulation::apply_neat_output_to_individual_i(double* output_neat, int i){
         return;
     }
 
-    if (RANDOM_REINITIALIZE > CUTOFF_0)
+    if (output_neat[PERMU::RANDOM_REINITIALIZE] > CUTOFF_0)
     {
         random_reinitialize_individual_i(i);
         return;
@@ -235,7 +235,7 @@ void CPopulation::apply_neat_output_to_individual_i(double* output_neat, int i){
     if
     (
         (-CUTOFF_0 < output_neat[0] && output_neat[0] < CUTOFF_0) ||
-        (sum_abs_val_slice_vec(output_neat, 1, 1+PERMU::N_OPERATORS) == 0) 
+        (are_doubles_equal(sum_abs_val_slice_vec(output_neat, 1, 1+PERMU::N_OPERATORS), 0.0))
     )
     {return;}
 
@@ -252,11 +252,11 @@ void CPopulation::apply_neat_output_to_individual_i(double* output_neat, int i){
 
     }
 
-    if (CHANGE_TABU_SIZE > CUTOFF_0)
+    if (output_neat[PERMU::CHANGE_TABU_SIZE] > CUTOFF_0)
     {
         m_individuals[i]->tab->increase_tabu_size();
     }
-    else if (CHANGE_TABU_SIZE < -CUTOFF_0)
+    else if (output_neat[PERMU::CHANGE_TABU_SIZE] < -CUTOFF_0)
     {
         m_individuals[i]->tab->decrease_tabu_size();
     }
