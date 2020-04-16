@@ -341,7 +341,7 @@ double TSP::_Evaluate(int *genes)
 	return -distanceSum;
 }
 
-double TSP::_fitness_delta_swap(CIndividual *indiv, int i, int j)
+double TSP::fitness_delta_swap(CIndividual *indiv, int i, int j)
 {
 
 	double delta = 0;
@@ -382,7 +382,7 @@ double TSP::_fitness_delta_swap(CIndividual *indiv, int i, int j)
 	return -delta;
 }
 
-double TSP::_fitness_delta_interchange(CIndividual *indiv, int i, int j)
+double TSP::fitness_delta_interchange(CIndividual *indiv, int i, int j)
 {
 
 	if (i == j)
@@ -438,7 +438,7 @@ double TSP::_fitness_delta_interchange(CIndividual *indiv, int i, int j)
 	return -delta;
 }
 
-double TSP::_fitness_delta_insert(CIndividual *indiv, int i, int j)
+double TSP::fitness_delta_insert(CIndividual *indiv, int i, int j)
 {
 
 	// if insertion occurs with respect to the first one and the last one, the objective value does not change

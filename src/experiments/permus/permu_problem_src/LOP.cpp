@@ -126,7 +126,7 @@ int LOP::GetProblemSize()
 }
 
 // The Linear Ordering Problem: Instances, Search Space Analysis and Algorithms (Schiavinotto 2004)
-double LOP::_fitness_delta_swap(CIndividual *indiv, int i, int j)
+double LOP::fitness_delta_swap(CIndividual *indiv, int i, int j)
 {
 	if(i==j){
 		return 0;
@@ -154,7 +154,7 @@ double LOP::_fitness_delta_swap(CIndividual *indiv, int i, int j)
  * offers no computational advantage over Insertn, and this dissertation will not consider
  * it further 
  */
-double LOP::_fitness_delta_interchange(CIndividual *indiv, int i, int j)
+double LOP::fitness_delta_interchange(CIndividual *indiv, int i, int j)
 {
 	// the idea is to perform two insertion operations, assuming i < j. First insert item_i in position j, and then item_j in pos i
 	if (i==j){
@@ -186,7 +186,7 @@ double LOP::_fitness_delta_interchange(CIndividual *indiv, int i, int j)
 	}
 }
 
-double LOP::_fitness_delta_insert(CIndividual *indiv, int i, int j)
+double LOP::fitness_delta_insert(CIndividual *indiv, int i, int j)
 {
 	double delta = 0;
 	if (i > j)
