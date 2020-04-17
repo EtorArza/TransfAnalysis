@@ -203,10 +203,10 @@ public:
         // if (MODE == "train")
         // {
 
-        //     parameters->N_EVALS = reader.GetInteger("NEAT", "N_EVALS", -1);
-        //     string search_type = reader.Get("NEAT", "SEARCH_TYPE", "UNKOWN");
-        //     parameters->PROBLEM_TYPE = reader.Get("Controller", "PROBLEM_TYPE", "UNKOWN");
-        //     parameters->N_OF_INSTANCES = reader.GetInteger("Controller", "N_PROBLEMS", -1);
+        //     parameters->N_EVALS = reader.GetInteger("Global", "N_EVALS", -1);
+        //     string search_type = reader.Get("Global", "SEARCH_TYPE", "UNKOWN");
+        //     parameters->PROBLEM_TYPE = reader.Get("Global", "PROBLEM_TYPE", "UNKOWN");
+        //     parameters->N_OF_INSTANCES = reader.GetInteger("Global", "N_PROBLEMS", -1);
         //     parameters->INSTANCE_PATHS = new std::string[parameters->N_OF_INSTANCES];
         //     parameters->BEST_FITNESS_TRAIN_FOR_EACH_INSTANCE = new double[parameters->N_OF_INSTANCES];
         //     parameters->MAX_TIME_PSO_FOR_EACH_INSTANCE = new double[parameters->N_OF_INSTANCES];
@@ -218,12 +218,12 @@ public:
 
         //     for (int i = 0; i < parameters->N_OF_INSTANCES; i++)
         //     {
-        //         parameters->INSTANCE_PATHS[i] = reader.Get("Controller", "PROBLEM_PATH_" + to_string(i), "UNKOWN");
-        //         parameters->MAX_TIME_PSO_FOR_EACH_INSTANCE[i] = reader.GetReal("Controller", "MAX_TIME_PSO_FOR_EACH_INSTANCE_" + to_string(i), -1);
+        //         parameters->INSTANCE_PATHS[i] = reader.Get("Global", "PROBLEM_PATH_" + to_string(i), "UNKOWN");
+        //         parameters->MAX_TIME_PSO_FOR_EACH_INSTANCE[i] = reader.GetReal("Global", "MAX_TIME_PSO_FOR_EACH_INSTANCE_" + to_string(i), -1);
         //     }
 
-        //     parameters->POPSIZE = reader.GetInteger("Controller", "POPSIZE", -1);
-        //     parameters->TABU_LENGTH = reader.GetInteger("Controller", "TABU_LENGTH", -1);
+        //     parameters->POPSIZE = reader.GetInteger("Global", "POPSIZE", -1);
+        //     parameters->TABU_LENGTH = reader.GetInteger("Global", "TABU_LENGTH", -1);
 
         //     EXPERIMENT_FOLDER_NAME = "controllers_trained_with";
         //     cout << "Learning from instances: ";

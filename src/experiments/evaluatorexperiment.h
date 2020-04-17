@@ -20,17 +20,31 @@ namespace NEAT {
 //------------------------------
     class EvaluatorExperiment : public Experiment {
     private:
-        std::string get_dir_path(int experiment_num) {
+        std::string get_dir_path() {
             return "./" + neat_params->EXPERIMENT_FOLDER_NAME;
         }
 
-        std::string get_fittest_path(int experiment_num, int generation) {
+        std::string get_fittest_path(int generation, std::string last_dir_name="all_controllers") {
             char buf[1024];
-            sprintf(buf, "%s/%s_gen_%04d",
+            if (last_dir_name != "top_controllers")
+            {
+                sprintf(buf, "%s/%s/%s_gen_%04d.controller",
                     neat_params->EXPERIMENT_FOLDER_NAME.c_str(),
-                    neat_params->EXPERIMENT_FOLDER_NAME.c_str(),
+                    last_dir_name.c_str(),
+                    neat_params->CONTROLLER_NAME_PREFIX.c_str(),
                     generation
                     );
+            }
+            else
+            {
+            
+            sprintf(buf, "%s/%s/%s_best.controller",
+                    neat_params->EXPERIMENT_FOLDER_NAME.c_str(),
+                    last_dir_name.c_str(),
+                    neat_params->CONTROLLER_NAME_PREFIX.c_str()
+                    );
+            }
+
             return buf;
         }
 
@@ -72,7 +86,12 @@ namespace NEAT {
             vector<size_t> nlinks;
             vector<real_t> fitness;
 
-            mkdir( get_dir_path(1) );
+
+            
+            mkdir( get_dir_path() );
+            mkdir( get_dir_path() + "/all_controllers" );
+            mkdir( get_dir_path() + "/top_controllers" );
+
             //Create a unique rng sequence for this experiment
             rng_t rng_exp(rng.integer());
 
@@ -90,7 +109,8 @@ namespace NEAT {
 
 
             neat_params->IS_LAST_ITERATION = false;
-            for(double progress = 0; !neat_params->IS_LAST_ITERATION; progress = ((double) neat_params->global_timer.toc() / (double) neat_params->MAX_TRAIN_TIME)) {
+            for(double progress = 0; !neat_params->IS_LAST_ITERATION; progress = ((double) neat_params->global_timer.toc() / (double) neat_params->MAX_TRAIN_TIME)) 
+            {
 
                 if (progress >= 1.0){
                     neat_params->IS_LAST_ITERATION = true;
@@ -116,10 +136,15 @@ namespace NEAT {
 
 
 
-                if (save_best_network || neat_params->IS_LAST_ITERATION)
+                if (save_best_network)
                 {
                     save_best_network = false;
-                    print(1, gen);
+                    print(gen, false);
+                }
+
+                if (neat_params->IS_LAST_ITERATION)
+                {
+                    print(gen, true);
                 }
             }
 
@@ -147,12 +172,18 @@ namespace NEAT {
 
 
     private:
-        void print(int experiment_num,
-                   int generation) {
+        void print(int generation, bool is_last_gen = false) {
             using namespace std;
-
-            ofstream out(get_fittest_path(experiment_num, generation));
-            fittest->write(out);
+            if (!is_last_gen)
+            {
+                ofstream out(get_fittest_path(generation, "all_controllers"));
+                fittest->write(out);
+            }
+            else
+            {
+                ofstream out(get_fittest_path(generation, "top_controllers"));
+                fittest->write(out);
+            }
         }
 
         void evaluate() {

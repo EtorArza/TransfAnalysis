@@ -88,6 +88,7 @@ int main(int argc, char *argv[])
     std::string conf_file_path;
     neat_parameters* neat_params = new neat_parameters();
     INIReader reader;
+    neat_params->DELETE_PREV_EXPERIMENT_FOLDER = false;
 
 
     if (std::string(argv[1]) == "-f" && argc == 2)

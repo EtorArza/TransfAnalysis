@@ -31,7 +31,6 @@ MODE = train
 PROBLEM_NAME = true_ranking_eval
 
 
-[NEAT]
 MAX_TRAIN_TIME = $MAX_TRAIN_TIME
 POPSIZE = $POPSIZE
 THREADS = 32
@@ -44,7 +43,6 @@ SEED = 2
 
 
 
-[Controller]
 MAX_TIME_PSO = $MAX_TIME_PSO
 POPSIZE = 20
 TABU_LENGTH = 40

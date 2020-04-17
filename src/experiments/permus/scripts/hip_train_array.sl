@@ -71,7 +71,6 @@ MODE = train
 PROBLEM_NAME = permu
 
 
-[NEAT]
 MAX_TRAIN_TIME = 18000
 POPSIZE = $POPSIZE
 THREADS = 32
@@ -81,7 +80,6 @@ SEED = 2
 
 
 
-[Controller]
 MAX_TIME_PSO = $MAX_TIME_PSO
 
 

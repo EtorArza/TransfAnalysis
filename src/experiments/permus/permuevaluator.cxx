@@ -349,14 +349,18 @@ void PermuEvaluator::read_conf_file(std::string conf_file_path)
     if (parameters->MODE == "train")
     {
 
-        parameters->SEED = reader.GetInteger("NEAT", "SEED", -1);
-        parameters->N_EVALS = reader.GetInteger("NEAT", "N_EVALS", -1);
-        string search_type = reader.Get("NEAT", "SEARCH_TYPE", "UNKOWN");
-        parameters->PROBLEM_TYPE = reader.Get("Controller", "PROBLEM_TYPE", "UNKOWN");
-        parameters->INSTANCE_PATH = reader.Get("Controller", "PROBLEM_PATH", "UNKOWN");
-        parameters->MAX_TIME_PSO = reader.GetReal("Controller", "MAX_TIME_PSO", -1.0);
-        neat_params->EXPERIMENT_FOLDER_NAME = "controllers_trained_with_" + from_path_to_filename(parameters->INSTANCE_PATH);
+        parameters->SEED = reader.GetInteger("Global", "SEED", -1);
+        parameters->N_EVALS = reader.GetInteger("Global", "N_EVALS", -1);
+        string search_type = reader.Get("Global", "SEARCH_TYPE", "UNKOWN");
+        parameters->PROBLEM_TYPE = reader.Get("Global", "PROBLEM_TYPE", "UNKOWN");
+        parameters->INSTANCE_PATH = reader.Get("Global", "PROBLEM_PATH", "UNKOWN");
+        parameters->MAX_TIME_PSO = reader.GetReal("Global", "MAX_TIME_PSO", -1.0);
 
+        if (neat_params->EXPERIMENT_FOLDER_NAME == "UNKNOWN")
+        {
+            neat_params->EXPERIMENT_FOLDER_NAME = "controllers_trained_with_" + from_path_to_filename(parameters->INSTANCE_PATH);
+        }
+        
         cout << "Learning from instance: " << from_path_to_filename(parameters->INSTANCE_PATH) << endl;
 
         if (search_type == "phased")
@@ -415,13 +419,13 @@ void PermuEvaluator::read_conf_file(std::string conf_file_path)
         //const char * prob_name = "permu";
         //Experiment *exp = Experiment::get(prob_name);
 
-        parameters->PROBLEM_TYPE = reader.Get("Controller", "PROBLEM_TYPE", "UNKOWN");
-        parameters->INSTANCE_PATH = reader.Get("Controller", "PROBLEM_PATH", "UNKOWN");
-        parameters->MAX_TIME_PSO = reader.GetReal("Controller", "MAX_TIME_PSO", -1.0);
-        parameters->CONTROLLER_PATH = reader.Get("TestSettings", "CONTROLLER_PATH", "UNKNOWN");
-        parameters->N_REPS = reader.GetInteger("TestSettings", "N_REPS", -1);
-        parameters->N_EVALS = reader.GetInteger("TestSettings", "N_EVALS", -1);
-        parameters->COMPUTE_RESPONSE = reader.GetBoolean("TestSettings", "COMPUTE_RESPONSE", false);
+        parameters->PROBLEM_TYPE = reader.Get("Global", "PROBLEM_TYPE", "UNKOWN");
+        parameters->INSTANCE_PATH = reader.Get("Global", "PROBLEM_PATH", "UNKOWN");
+        parameters->MAX_TIME_PSO = reader.GetReal("Global", "MAX_TIME_PSO", -1.0);
+        parameters->CONTROLLER_PATH = reader.Get("Global", "CONTROLLER_PATH", "UNKNOWN");
+        parameters->N_REPS = reader.GetInteger("Global", "N_REPS", -1);
+        parameters->N_EVALS = reader.GetInteger("Global", "N_EVALS", -1);
+        parameters->COMPUTE_RESPONSE = reader.GetBoolean("Global", "COMPUTE_RESPONSE", false);
         neat_params->N_OF_THREADS = std::min(neat_params->N_OF_THREADS, parameters->N_EVALS);
 
         if (parameters->CONTROLLER_PATH == "UNKNOWN")

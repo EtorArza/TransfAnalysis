@@ -23,8 +23,10 @@ public:
     double BEST_FITNESS_TRAIN;
     double N_TIMES_BEST_FITNESS_IMPROVED_TRAIN;
     std::string EXPERIMENT_FOLDER_NAME;
+    std::string CONTROLLER_NAME_PREFIX;
     bool DELETE_PREV_EXPERIMENT_FOLDER;
     bool IS_LAST_ITERATION;
+
 
 
 };

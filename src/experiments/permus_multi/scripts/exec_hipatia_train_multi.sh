@@ -51,7 +51,6 @@ mode = train
 PROBLEM_NAME = permu_multi
 
 
-[NEAT]
 MAX_TRAIN_TIME = 18000
 POPSIZE = 512
 THREADS = 32
@@ -66,7 +65,6 @@ SEED = 2
 
 
 
-[Controller]
 POPSIZE = 20
 TABU_LENGTH = 40
 

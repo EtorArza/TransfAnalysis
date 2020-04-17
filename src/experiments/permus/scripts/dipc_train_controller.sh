@@ -54,7 +54,6 @@ cat > tmp.ini <<EOF
 MODE = train
 
 
-[NEAT]
 MAX_TRAIN_TIME = 3000
 POPSIZE = 520
 THREADS = 52
@@ -71,7 +70,6 @@ START_WITHOUT_HIDDEN = false
 
 
 
-[Controller]
 MAX_TIME_PSO = 0.5
 POPSIZE = 20
 TABU_LENGTH = 40

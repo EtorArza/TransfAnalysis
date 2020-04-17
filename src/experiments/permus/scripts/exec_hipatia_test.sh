@@ -56,14 +56,12 @@ MODE = test ;
 PROBLEM_NAME = permu
 
 
-[TestSettings]
 THREADS = 32 ;
 N_EVALS = 5 ;
 N_REPS = 20 ;
 CONTROLLER_PATH = $3 ; 
 COMPUTE_RESPONSE = $6
 
-[Controller]
 MAX_TIME_PSO = $4 ; 
 POPSIZE = 20 ;
 TABU_LENGTH = 40 ;

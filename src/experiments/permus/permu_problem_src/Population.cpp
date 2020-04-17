@@ -234,7 +234,7 @@ void CPopulation::apply_neat_output_to_individual_i(double* output_neat, int i){
 
     if
     (
-        (-CUTOFF_0 < output_neat[0] && output_neat[0] < CUTOFF_0) ||
+        (-CUTOFF_0 < output_neat[PERMU::ls_nothing_move] && output_neat[PERMU::ls_nothing_move] < CUTOFF_0) ||
         (are_doubles_equal(sum_abs_val_slice_vec(output_neat, 1, 1+PERMU::N_OPERATORS), 0.0))
     )
     {return;}
