@@ -35,7 +35,7 @@ for SEED in "2" "3" "4" "5" "6" "7" "8" "9" "10" "11" "12" "13" "14" "15" "16" "
         CONTROLLERS="src/experiments/permus/results/popsize_exp/top_controllers/${CONTROLLER_NAME_PREFIX}_best.controller"
         INSTANCES="src/experiments/permus/instances/qap/popsize_instance/tai75e01.qap"
         N_REPS=1
-        N_EVALS=20000
+        N_EVALS=40000
         PROBLEMS="qap"
         TESTING_JOB_IDS=`sbatch --parsable --dependency=afterok:${TRAINING_JOB_IDS} --export=CONTROLLERS=${CONTROLLERS},PROBLEMS=${PROBLEMS},INSTANCES=${INSTANCES},MAX_TIME_PSO=0.25,${MEASURE_RESPONSES}=false,TMP_RES_PATH=${TMP_RES_PATH},N_REPS=${N_REPS},N_EVALS=${N_EVALS} --array=0-$NUM_JOBS src/experiments/permus/scripts/hip_test_array.sl`:$TESTING_JOB_IDS
     done

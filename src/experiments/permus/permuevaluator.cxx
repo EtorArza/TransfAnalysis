@@ -197,7 +197,7 @@ struct Evaluator
                     small = 0;
                 }
 
-                if (is_A_larger_than_B_Signed_Willcoxon(f_values[surviving_candidates[large]], f_values[surviving_candidates[small]], current_n_of_evals))
+                if (is_A_larger_than_B_Signed_Wilcoxon(f_values[surviving_candidates[large]], f_values[surviving_candidates[small]], current_n_of_evals))
                 {
                     tmp_order[surviving_candidates[large]] = 20000000.0;
                     tmp_order[surviving_candidates[small]] = 10000000.0;
@@ -215,13 +215,13 @@ struct Evaluator
         double best_f_gen = Average(f_values[argmax(tmp_order, (int)nnets)], current_n_of_evals);
         cout << "(best this gen, best last gen) -> (" << best_f_gen << ", " << parameters->neat_params->BEST_FITNESS_TRAIN << ")";
 
-        if (best_f_gen > parameters->neat_params->BEST_FITNESS_TRAIN)
+        if (best_f_gen > parameters->neat_params->BEST_FITNESS_TRAIN || parameters->neat_params->IS_LAST_ITERATION)
         {
             parameters->neat_params->N_TIMES_BEST_FITNESS_IMPROVED_TRAIN++;
             cout << ", best replaced";
             parameters->neat_params->BEST_FITNESS_TRAIN = best_f_gen;
             delete best_network;
-            best_network = new NEAT::CpuNetwork(*nets[argmax(f_values, (int)nnets)]);
+            best_network = new NEAT::CpuNetwork(*nets[argmax(tmp_order, (int)nnets)]);
         }
 
         cout << endl;

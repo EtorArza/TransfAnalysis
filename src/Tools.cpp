@@ -1768,24 +1768,31 @@ bool is_A_larger_than_B_Mann_Whitney(double* A, double* B, int length){
     delete[] array_of_values;
     delete[] ranks;
 
-    cout << "Unpaired rank hypotesis testing at alpha =  "<< ALPHA <<  endl;
+    //cout << "Unpaired rank hypotesis testing at alpha =  "<< ALPHA <<  endl;
 
-    cout << "z = " << z << " ";
+    //cout << "z = " << z << " ";
 
     if (z > Z_THRESH)
     {   
-        cout << " > z_thresh = " << Z_THRESH << ", critical diff. found." << endl;
+        //cout << " > z_thresh = " << Z_THRESH << ", critical diff. found." << endl;
         return true;
     }else{
-        cout << " < z_thresh = " << Z_THRESH << ", no crit. diff." << endl;
+        //cout << " < z_thresh = " << Z_THRESH << ", no crit. diff." << endl;
         return false;
     }
 
 }
 
 
-// Paired test
-bool is_A_larger_than_B_Signed_Willcoxon(double* A, double* B, int length){
+// Paired test 
+// http://vassarstats.net/textbook/ch12a.html
+//    example:
+//
+//    vector<double> A{78, 24, 64, 45, 64, 52, 30, 50, 64, 50, 78, 22, 84, 40, 90, 72};
+//    vector<double> B{78, 24, 62, 48, 68, 56, 25, 44, 56, 40, 68, 36, 68, 20, 58, 32};
+//    cout << "\n\n" << is_A_larger_than_B_Signed_Wilcoxon(A.data(), B.data(), 16) << endl;
+//    exit(0);
+bool is_A_larger_than_B_Signed_Wilcoxon(double* A, double* B, int length){
 
 
     if(length < 4){
@@ -1793,35 +1800,41 @@ bool is_A_larger_than_B_Signed_Willcoxon(double* A, double* B, int length){
         exit(1);
     }
 
-    int *signs = new int[length];
-    double *abs_differences = new double[length];
+    //cout << "length: " << length << endl; 
+
     // double *signs_0s_discarded = new double[length];
     // double *abs_differences_0s_discarded = new double[length];
-    double *ranks = new double[length];
+    vector<double> ranks;
+    vector<int> signs;
+    vector<double> abs_differences;
 
     for (int i = 0; i < length; i++)
     {
-        abs_differences[i] = abs(A[i] - B[i]);
-        signs[i] = sign(A[i] - B[i]);
-    }
-
-    int N_r = 0;
-    for (int i = 0; i < length; i++)
-    {
-        if (signs[i] != 0)
+        double abs_diff = abs(A[i] - B[i]);
+        int sign_diff = sign(A[i] - B[i]);
+        if (sign_diff != 0)
         {
-            signs[N_r] = signs[i];
-            abs_differences[N_r] = abs_differences[i];
-            N_r++;
+            signs.push_back(sign_diff);
+            abs_differences.push_back(abs_diff);
         }
     }
 
+    int N_r = abs_differences.size();
+    ranks.resize(N_r);
 
-    compute_order_from_double_to_double(abs_differences, N_r, ranks, false, true);
-    sum_value_to_array(ranks, 1.0, N_r);
+    compute_order_from_double_to_double(abs_differences.data(), N_r, ranks.data(), false, true);
+    sum_value_to_array(ranks.data(), 1.0, N_r);
 
-    double W = scalar_multiplication(abs_differences, signs, N_r);
+    double W = scalar_multiplication(ranks.data(), signs.data(), N_r);
 
+
+    // cout << "----" << endl;
+    // print_vector(ranks);
+    // cout << endl;
+    // print_vector(signs);
+    // cout << endl;
+
+    //cout << "W: " << W << endl;
 
     if(W < 0) // one sided test, W must be positive.
     {
@@ -1829,23 +1842,27 @@ bool is_A_larger_than_B_Signed_Willcoxon(double* A, double* B, int length){
         return false;
     }
 
-    if (N_r < length / 4) // if the observations are the same in more than 75% of the cases, accept H0
-    {
-        //cout << "One sided test not performed, sequences are too simmilar." << endl;
-        // return false;
-    }
-    
-    
+    int critical_values_one_sided_0_05[10] = {INT_MAX, INT_MAX, INT_MAX, INT_MAX, INT_MAX, 15, 17, 22, 26, 29};
 
     double d_N_r = (double) N_r;
  
     double sigma_w = sqrt(d_N_r * (d_N_r + 1.0) * (2.0*d_N_r + 1.0) / 6.0);
 
-    // cout << "sigma_w: " << sigma_w << endl;
+    //cout << "sigma_w: " << sigma_w << endl;
 
     double z = W / sigma_w;
 
-
+    if (N_r <= 9)
+    {
+        if (W > critical_values_one_sided_0_05[N_r])
+        {
+            return true;
+        }else
+        {
+            return false;
+        }
+    }
+    
 
     //cout << "Paired rank hypothesis testing at alpha =  "<< ALPHA <<  endl;
 
@@ -2008,11 +2025,7 @@ bool Friedman_test_are_there_critical_diferences(double** f_values, int n_candid
 
 
 
-// In order to call this function, Friedman_test_are_there_critical_diferences needs to be called first.
-bool friedman_post_hoc(double** f_values, int i, int best_index, int n_samples)
-{
-    return is_A_larger_than_B_Signed_Willcoxon(f_values[best_index], f_values[i], n_samples);
-}
+
 
 void F_race_iteration(double** f_values, vector<int> &surviving_candidates, int n_samples)
 {
@@ -2062,7 +2075,7 @@ void F_race_iteration(double** f_values, vector<int> &surviving_candidates, int 
             // PrintArray(reduced_f_values[best_reduced_index], n_samples);
             // cout << endl;
             // cout << "---\n";
-            bool pos_hoc_test_result = is_A_larger_than_B_Signed_Willcoxon(reduced_f_values[best_reduced_index], reduced_f_values[i], n_samples);
+            bool pos_hoc_test_result = is_A_larger_than_B_Signed_Wilcoxon(reduced_f_values[best_reduced_index], reduced_f_values[i], n_samples);
 
             if (pos_hoc_test_result)
             {
