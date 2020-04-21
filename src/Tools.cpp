@@ -1752,7 +1752,7 @@ bool is_A_larger_than_B_Mann_Whitney(double* A, double* B, int length){
 
     if(r_A < r_B)
     {
-        cout << "One sided test not performed, z < 0 was found" << endl;
+        //cout << "One sided test not performed, z < 0 was found" << endl;
         return false;
     }
 
@@ -1825,7 +1825,7 @@ bool is_A_larger_than_B_Signed_Willcoxon(double* A, double* B, int length){
 
     if(W < 0) // one sided test, W must be positive.
     {
-        cout << "One sided test not performed, z < 0 was found" << endl;
+        //cout << "One sided test not performed, z < 0 was found" << endl;
         return false;
     }
 

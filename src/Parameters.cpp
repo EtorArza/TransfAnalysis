@@ -25,6 +25,8 @@ void neat_parameters::load_global_params(std::string conf_file_path)
     EXPERIMENT_FOLDER_NAME = reader.Get("Global", "EXPERIMENT_FOLDER_NAME", "UNKNOWN");
     CONTROLLER_NAME_PREFIX = reader.Get("Global", "CONTROLLER_NAME_PREFIX", "UNKNOWN");
     
+    cout << "EXPERIMENT_FOLDER_NAME: " << EXPERIMENT_FOLDER_NAME << endl;
+
     global_timer.tic();
     NEAT::env->pop_size = POPSIZE_NEAT;
 }

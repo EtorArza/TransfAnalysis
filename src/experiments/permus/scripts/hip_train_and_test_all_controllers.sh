@@ -45,7 +45,7 @@ bash src/experiments/permus/scripts/hip_test_all_controllers.sh "false"
 rm script_f60494109a40e623a82d5c76070b160e.sh
 EOF
 
-
+chmod +x script_f60494109a40e623a82d5c76070b160e.sh
 
 sbatch --dependency=afterok:${JOB_IDS_PROBLEMS[0]}:${JOB_IDS_PROBLEMS[1]}:${JOB_IDS_PROBLEMS[2]}:${JOB_IDS_PROBLEMS[3]}:$ID_2 script_f60494109a40e623a82d5c76070b160e.sh
 

@@ -21,8 +21,8 @@
 # # #SBATCH --ntasks-per-node=1 #number of tasks per node
 # # #SBATCH --mem=32G
 # # #SBATCH --cpus-per-task=32 # number of CPUs
-# # #SBATCH --time=0-13:00:00 #Walltime
-# # #SBATCH -p large
+# # #SBATCH --time=0-6:00:00 #Walltime
+# # #SBATCH -p medium
 # # #SBATCH --exclude=n[001-004,017-018]
 
 
@@ -59,6 +59,7 @@ cp neat -v $SCRATCH_JOB
 
 cd $SCRATCH_JOB
 
+DESTINATION_FOLDER="$SRCDIR/$DESTINATION_FOLDER"
 
 
 
@@ -76,9 +77,10 @@ POPSIZE = $POPSIZE
 THREADS = 32
 
 SEARCH_TYPE = phased
-SEED = 2
+SEED = $SEED
 
-
+CONTROLLER_NAME_PREFIX = $CONTROLLER_NAME_PREFIX
+EXPERIMENT_FOLDER_NAME = $EXPERIMENT_FOLDER_NAME
 
 MAX_TIME_PSO = $MAX_TIME_PSO
 
@@ -94,47 +96,4 @@ EOF
 date
 ./neat "tmp.ini"
 date
-
-instance_path=$INSTANCE
-
-
-
-
-filename="${instance_path##*/}"
-instancename="${filename%%.*}"
-
-echo "$instancename"
-
-
-DESTINATION_FOLDER="$SRCDIR/$DESTINATION_FOLDER"
-
-
-mkdir -p ${DESTINATION_FOLDER}
-cp "controllers_trained_with_$instancename"* -v -r "${DESTINATION_FOLDER}"
-
-cd ${DESTINATION_FOLDER}
-cd ..
-bash select_top_controllers.sh
-cd $SRCDIR
-
-exit 0
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

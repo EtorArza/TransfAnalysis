@@ -21,7 +21,7 @@ namespace NEAT {
     class EvaluatorExperiment : public Experiment {
     private:
         std::string get_dir_path() {
-            return "./" + neat_params->EXPERIMENT_FOLDER_NAME;
+            return neat_params->EXPERIMENT_FOLDER_NAME;
         }
 
         std::string get_fittest_path(int generation, std::string last_dir_name="all_controllers") {

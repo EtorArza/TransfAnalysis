@@ -101,56 +101,6 @@ struct Evaluator
 
     __net_eval_decl Evaluator(){};
 
-    int argbest_net(class NEAT::Network **nets_, size_t nnets, double gamma)
-    {
-        using namespace PERMU;
-        NEAT::CpuNetwork **nets = (NEAT::CpuNetwork **)nets_;
-
-        int *indexes = new int[nnets];
-        for (int i = 0; i < nnets; i++)
-        {
-            indexes[i] = i;
-        }
-
-        double *f_values = new double[nnets];
-        set_array_to_value(f_values, 0.0, nnets);
-        cout << "selecting_best_controller: " << endl;
-
-        RandomNumberGenerator rng;
-        int initial_seed = rng.random_integer_fast((int)10e7);
-
-        int current_number_of_controllers = nnets;
-        int total_n_evals = 0;
-        int n_evals = parameters->N_EVALS;
-
-        while (current_number_of_controllers > 1)
-        {
-#pragma omp parallel for num_threads(parameters->neat_params->N_OF_THREADS)
-            for (int inet = 0; inet < current_number_of_controllers; inet++)
-            {
-                NEAT::CpuNetwork *net = nets[indexes[inet]];
-                int seed = initial_seed + inet;
-                f_values[indexes[inet]] = (total_n_evals * f_values[indexes[inet]] + n_evals * this->FitnessFunction(net, n_evals, seed)) / (total_n_evals + n_evals);
-            }
-
-            sort(indexes, indexes + current_number_of_controllers, [f_values](int a, int b) { return f_values[a] > f_values[b]; });
-
-            initial_seed += nnets;
-            total_n_evals += n_evals;
-            current_number_of_controllers = (int)((double)current_number_of_controllers * gamma);
-
-            cout << "----" << endl;
-            cout << current_number_of_controllers << endl;
-            PrintArray(f_values, nnets);
-            PrintArray(indexes, nnets);
-        }
-
-        int res = indexes[0];
-        delete[] indexes;
-        delete[] f_values;
-
-        return res;
-    }
 
     // fitness function in sequential order
     __net_eval_decl double FitnessFunction(NEAT::CpuNetwork *net, int n_evals, int initial_seed)
@@ -213,7 +163,7 @@ struct Evaluator
 
         while (surviving_candidates.size() > target_n_controllers_left && max_evals_per_controller > current_n_of_evals)
         {
-            int initial_seed = rng.random_integer_fast((int)2e9, (int)3e9);
+            int initial_seed = rng.random_integer_uniform(INT_MAX);
             cout << "Evaluating -> " << std::flush;
 
 #pragma omp parallel for num_threads(parameters->neat_params->N_OF_THREADS)
@@ -355,6 +305,13 @@ void PermuEvaluator::read_conf_file(std::string conf_file_path)
         parameters->PROBLEM_TYPE = reader.Get("Global", "PROBLEM_TYPE", "UNKOWN");
         parameters->INSTANCE_PATH = reader.Get("Global", "PROBLEM_PATH", "UNKOWN");
         parameters->MAX_TIME_PSO = reader.GetReal("Global", "MAX_TIME_PSO", -1.0);
+
+        if (parameters->SEED == -1)
+        {
+            RandomNumberGenerator tmp_rng;
+            parameters->SEED = tmp_rng.random_integer_uniform(INT_MAX);
+        }
+        
 
         if (neat_params->EXPERIMENT_FOLDER_NAME == "UNKNOWN")
         {
