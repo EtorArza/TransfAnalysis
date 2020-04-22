@@ -27,14 +27,9 @@ https://github.com/sean-dougherty/accneat (APACHE LICENCE 2.0)
 
 This software also uses some other software projects or parts of them.
 ***
-Configuration file parser inih, available at 
-https://github.com/jtilly/inih (BSD licence)
-Some parts of the PerMallows package by Ekhiñe Irurozki available at 
-https://cran.r-project.org/web/packages/PerMallows/index.html (GLP licence)
-The incomplete gamma function (asa032.cpp and asa032.hpp),
- by G Bhattacharjee, originally written by John Burkardt, (GNU LGPL license).
-The incomplete Beta function (asa063.cpp and asa063.hpp),
- by KL Majumder and G Bhattacharjee (GNU LGPL license).
+Configuration file parser inih, available at https://github.com/jtilly/inih (BSD licence)
+Some parts of the PerMallows package by Ekhiñe Irurozki available at https://cran.r-project.org/web/packages/PerMallows/index.html (GLP licence)
+The incomplete gamma function (asa032.cpp and asa032.hpp), by G Bhattacharjee, originally written by John Burkardt, (GNU LGPL license).
 ***
 The original part of the source code provided here was made by Etor Arza.
 To keep the licence stuff as painless as possible, the software part writen by 
