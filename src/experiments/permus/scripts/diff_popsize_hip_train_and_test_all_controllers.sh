@@ -11,7 +11,7 @@ EXPERIMENT_FOLDER_NAME="${SRCDIR}/src/experiments/permus/results/popsize_exp"
 TRAINING_JOB_IDS=""
 for SEED in "2" "3" "4" "5" "6" "7" "8" "9" "10" "11" "12" "13" "14" "15" "16" "17" "18" "19" "20" "21";do
     for POPSIZE in "128" "256" "512" "1024" "2048"; do
-        INSTANCES="src/experiments/permus/instances/qap/popsize_instance/*.qap"
+        INSTANCES="src/experiments/permus/instances/diff_popsize_experiment/*.qap"
         PROBLEM_TYPE="qap"
         NUM_INSTANCES=$( ls -1 $INSTANCES | wc -l)
         NUM_INSTANCES=$(($NUM_INSTANCES - 1))
@@ -33,7 +33,7 @@ for SEED in "2" "3" "4" "5" "6" "7" "8" "9" "10" "11" "12" "13" "14" "15" "16" "
         NUM_JOBS=0
         CONTROLLER_NAME_PREFIX="popsize${POPSIZE}_SEED${SEED}"
         CONTROLLERS="src/experiments/permus/results/popsize_exp/top_controllers/${CONTROLLER_NAME_PREFIX}_best.controller"
-        INSTANCES="src/experiments/permus/instances/qap/popsize_instance/tai75e01.qap"
+        INSTANCES="src/experiments/permus/instances/diff_popsize_experiment/tai75e01.qap"
         N_REPS=1
         N_EVALS=40000
         PROBLEMS="qap"
