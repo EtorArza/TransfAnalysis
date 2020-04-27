@@ -3,44 +3,67 @@
 source scripts/array_to_string_functions.sh
 
 
-srun bash scripts/make_hip.sh
+#srun bash scripts/make_hip.sh
 
 SRCDIR=`pwd`
-EXPERIMENT_FOLDER_NAME="${SRCDIR}/src/experiments/permus/results/popsize_exp"
+EXPERIMENT_FOLDER_NAME=
 
-TRAINING_JOB_IDS=""
+PROBLEM_TYPE_ARRAY=()
+PROBLEM_PATH_ARRAY=()
+POPSIZE_ARRAY=()
+CONTROLLER_NAME_PREFIX_ARRAY=()
+EXPERIMENT_FOLDER_NAME_ARRAY=()
+CONTROLLER_ARRAY=()
+SEED_ARRAY=()
+MAX_TIME_PSO_ARRAY=()
+
+i=-1
 for SEED in "2" "3" "4" "5" "6" "7" "8" "9" "10" "11" "12" "13" "14" "15" "16" "17" "18" "19" "20" "21";do
     for POPSIZE in "128" "256" "512" "1024" "2048"; do
-        INSTANCES="src/experiments/permus/instances/diff_popsize_experiment/*.qap"
-        PROBLEM_TYPE="qap"
-        NUM_INSTANCES=$( ls -1 $INSTANCES | wc -l)
-        NUM_INSTANCES=$(($NUM_INSTANCES - 1))
+        i=$((i+1))
+
+        EXPERIMENT_FOLDER_NAME="${SRCDIR}/src/experiments/permus/results/popsize_exp"
         CONTROLLER_NAME_PREFIX="popsize${POPSIZE}_SEED${SEED}"
-        TRAINING_JOB_IDS=`sbatch --parsable --export=SEED=$SEED,PROBLEM_TYPE=$PROBLEM_TYPE,POPSIZE=$POPSIZE,INSTANCES=$INSTANCES,MAX_TIME_PSO=0.25,EXPERIMENT_FOLDER_NAME=${EXPERIMENT_FOLDER_NAME},CONTROLLER_NAME_PREFIX=${CONTROLLER_NAME_PREFIX} --array=0-$NUM_INSTANCES src/experiments/permus/scripts/hip_train_array.sl`:$TRAINING_JOB_IDS
+
+        POPSIZE_ARRAY+=(${POPSIZE})
+        SEED_ARRAY+=("${SEED}")
+
+        PROBLEM_TYPE_ARRAY+=("qap")
+        PROBLEM_PATH_ARRAY+=("src/experiments/permus/instances/diff_popsize_experiment/tai75e01.qap")
+        CONTROLLER_NAME_PREFIX_ARRAY+=("popsize${POPSIZE}_SEED${SEED}")
+        EXPERIMENT_FOLDER_NAME_ARRAY+=("${EXPERIMENT_FOLDER_NAME}")
+        CONTROLLER_ARRAY+=("${EXPERIMENT_FOLDER_NAME}/top_controllers/${CONTROLLER_NAME_PREFIX}_best.controller")
+        MAX_TIME_PSO_ARRAY+=("0.25")
     done
 done
-TRAINING_JOB_IDS=${TRAINING_JOB_IDS%?}
+
+PROBLEM_TYPE_ARRAY=$(to_list "${PROBLEM_TYPE_ARRAY[@]}")
+PROBLEM_PATH_ARRAY=$(to_list "${PROBLEM_PATH_ARRAY[@]}")
+POPSIZE_ARRAY=$(to_list "${POPSIZE_ARRAY[@]}")
+CONTROLLER_NAME_PREFIX_ARRAY=$(to_list "${CONTROLLER_NAME_PREFIX_ARRAY[@]}")
+EXPERIMENT_FOLDER_NAME_ARRAY=$(to_list "${EXPERIMENT_FOLDER_NAME_ARRAY[@]}")
+CONTROLLER_ARRAY=$(to_list "${CONTROLLER_ARRAY[@]}")
+SEED_ARRAY=$(to_list "${SEED_ARRAY[@]}")
+MAX_TIME_PSO_ARRAY=$(to_list "${MAX_TIME_PSO_ARRAY[@]}")
+
+
+TRAINING_JOB_ID=`sbatch --parsable --export=PROBLEM_TYPE_ARRAY=$PROBLEM_TYPE_ARRAY,PROBLEM_PATH_ARRAY=$PROBLEM_PATH_ARRAY,CONTROLLER_NAME_PREFIX_ARRAY=$CONTROLLER_NAME_PREFIX_ARRAY,EXPERIMENT_FOLDER_NAME_ARRAY=$EXPERIMENT_FOLDER_NAME_ARRAY,SEED_ARRAY=$SEED_ARRAY,POPSIZE_ARRAY=$POPSIZE_ARRAY,MAX_TIME_PSO_ARRAY=$MAX_TIME_PSO_ARRAY --array=0-$i src/experiments/permus/scripts/hip_train_array.sl`
+
+
+
 
 
 MEASURE_RESPONSES="false"
 SCORE_PATH="src/experiments/permus/results/popsize_exp/result_popsize_experiment.txt"
-TMP_RES_PATH=${SRCDIR}/"tmp"/$(dirname $SCORE_PATH)
+TMP_RES_PATH_ARRAY=${SRCDIR}/"tmp"/$(dirname ${SCORE_PATH})
+N_REPS=1
+N_EVALS=400 #TODO
 
 
-TESTING_JOB_IDS=""
-for SEED in "2" "3" "4" "5" "6" "7" "8" "9" "10" "11" "12" "13" "14" "15" "16" "17" "18" "19" "20" "21";do
-    for POPSIZE in "128" "256" "512" "1024" "2048"; do
-        NUM_JOBS=0
-        CONTROLLER_NAME_PREFIX="popsize${POPSIZE}_SEED${SEED}"
-        CONTROLLERS="src/experiments/permus/results/popsize_exp/top_controllers/${CONTROLLER_NAME_PREFIX}_best.controller"
-        INSTANCES="src/experiments/permus/instances/diff_popsize_experiment/tai75e01.qap"
-        N_REPS=1
-        N_EVALS=40000
-        PROBLEMS="qap"
-        TESTING_JOB_IDS=`sbatch --parsable --dependency=afterok:${TRAINING_JOB_IDS} --export=CONTROLLERS=${CONTROLLERS},PROBLEMS=${PROBLEMS},INSTANCES=${INSTANCES},MAX_TIME_PSO=0.25,${MEASURE_RESPONSES}=false,TMP_RES_PATH=${TMP_RES_PATH},N_REPS=${N_REPS},N_EVALS=${N_EVALS} --array=0-$NUM_JOBS src/experiments/permus/scripts/hip_test_array.sl`:$TESTING_JOB_IDS
-    done
-done
-TESTING_JOB_IDS=${TESTING_JOB_IDS%?}
+
+TESTING_JOB_ID=`sbatch --parsable --dependency=afterok:${TRAINING_JOB_ID} --export=CONTROLLER_ARRAY=${CONTROLLER_ARRAY},PROBLEM_TYPE_ARRAY=${PROBLEM_TYPE_ARRAY},PROBLEM_PATH_ARRAY=${PROBLEM_PATH_ARRAY},MAX_TIME_PSO_ARRAY=${MAX_TIME_PSO_ARRAY},MEASURE_RESPONSES=${MEASURE_RESPONSES},TMP_RES_PATH=${TMP_RES_PATH},N_REPS=${N_REPS},N_EVALS=${N_EVALS} --array=0-$i src/experiments/permus/scripts/hip_test_array.sl`
+
+
 
 
 if [ -z "$RESPONSE_PATH" ]; then
@@ -74,4 +97,4 @@ rm script_2828a8741ae82e71b77975df5ec94c25.sh
 EOF
 
 
-sbatch --dependency=afterok:$TESTING_JOB_IDS script_2828a8741ae82e71b77975df5ec94c25.sh
+sbatch --dependency=afterok:$TESTING_JOB_ID script_2828a8741ae82e71b77975df5ec94c25.sh

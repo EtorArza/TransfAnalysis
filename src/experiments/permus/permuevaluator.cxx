@@ -165,7 +165,7 @@ struct Evaluator
         {
             int initial_seed = rng.random_integer_uniform(INT_MAX);
             cout << "Evaluating -> " << std::flush;
-
+            progress_bar bar(surviving_candidates.size());
 #pragma omp parallel for num_threads(parameters->neat_params->N_OF_THREADS)
             for (int i = 0; i < surviving_candidates.size() * EVAL_MIN_STEP; i++)
             {
@@ -175,7 +175,10 @@ struct Evaluator
                 int seed = initial_seed + i % EVAL_MIN_STEP;
 
                 f_values[inet][current_n_of_evals + i % EVAL_MIN_STEP] = this->FitnessFunction(net, 1, seed);
+
             }
+            bar.end();
+            cout << ", ";
             current_n_of_evals += EVAL_MIN_STEP;
 
 
@@ -184,32 +187,16 @@ struct Evaluator
                 tmp_order[inet] = Average(f_values[inet], current_n_of_evals) - (double)surviving_candidates.size() * 10000000.0;
             }
 
-            //PrintMatrix(f_values, nnets, current_n_of_evals);
-            if (surviving_candidates.size() == 2)
-            {
-                double mean_candidate_0 = Average(f_values[surviving_candidates[0]], current_n_of_evals);
-                double mean_candidate_1 = Average(f_values[surviving_candidates[0]], current_n_of_evals);
-                int large = 0;
-                int small = 1;
-                if (mean_candidate_1 > mean_candidate_0)
-                {
-                    large = 1;
-                    small = 0;
-                }
+            F_race_iteration(f_values, surviving_candidates, current_n_of_evals);
 
-                if (is_A_larger_than_B_Signed_Wilcoxon(f_values[surviving_candidates[large]], f_values[surviving_candidates[small]], current_n_of_evals))
-                {
-                    tmp_order[surviving_candidates[large]] = 20000000.0;
-                    tmp_order[surviving_candidates[small]] = 10000000.0;
-                    surviving_candidates.clear();
-                }
-            }
-            else
-            {
-                F_race_iteration(f_values, surviving_candidates, current_n_of_evals);
-            }
+
             cout << ", perc_discarded: " << (double)(nnets - surviving_candidates.size()) / (double)(nnets - target_n_controllers_left);
             cout << endl;
+        }
+
+        for (auto &&inet : surviving_candidates)
+        {
+            tmp_order[inet] = Average(f_values[inet], current_n_of_evals) - (double)surviving_candidates.size() * 10000000.0;
         }
 
         double best_f_gen = Average(f_values[argmax(tmp_order, (int)nnets)], current_n_of_evals);
