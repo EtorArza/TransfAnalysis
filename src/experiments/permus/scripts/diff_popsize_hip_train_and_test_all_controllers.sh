@@ -22,7 +22,7 @@ for SEED in "2" "3" "4" "5" "6" "7" "8" "9" "10" "11" "12" "13" "14" "15" "16" "
     for POPSIZE in "128" "256" "512" "1024" "2048"; do
         i=$((i+1))
 
-        EXPERIMENT_FOLDER_NAME="${SRCDIR}/src/experiments/permus/results/popsize_exp"
+        EXPERIMENT_FOLDER_NAME="src/experiments/permus/results/popsize_exp"
         CONTROLLER_NAME_PREFIX="popsize${POPSIZE}_SEED${SEED}"
 
         POPSIZE_ARRAY+=(${POPSIZE})
@@ -31,7 +31,7 @@ for SEED in "2" "3" "4" "5" "6" "7" "8" "9" "10" "11" "12" "13" "14" "15" "16" "
         PROBLEM_TYPE_ARRAY+=("qap")
         PROBLEM_PATH_ARRAY+=("src/experiments/permus/instances/diff_popsize_experiment/tai75e01.qap")
         CONTROLLER_NAME_PREFIX_ARRAY+=("popsize${POPSIZE}_SEED${SEED}")
-        EXPERIMENT_FOLDER_NAME_ARRAY+=("${EXPERIMENT_FOLDER_NAME}")
+        EXPERIMENT_FOLDER_NAME_ARRAY+=("${SRCDIR}/${EXPERIMENT_FOLDER_NAME}")
         CONTROLLER_ARRAY+=("${EXPERIMENT_FOLDER_NAME}/top_controllers/${CONTROLLER_NAME_PREFIX}_best.controller")
         MAX_TIME_PSO_ARRAY+=("0.25")
     done

@@ -98,7 +98,6 @@ cat "result.txt" >> "${TMP_RES_PATH}/score_journal_out_${SLURM_JOB_ID}.txt"
 cat "responses.txt" >> "${TMP_RES_PATH}/responses_journal_${SLURM_JOB_ID}.txt"
 
 cd ..
-rm ${SLURM_JOB_ID} -r
 
 date
 

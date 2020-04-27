@@ -114,7 +114,7 @@ struct Evaluator
     // compute the fitness value of all networks at training time.
     __net_eval_decl void execute(class NEAT::Network **nets_, NEAT::OrganismEvaluation *results, size_t nnets)
     {
-#define MAX_EVALS_PER_CONTROLLER_LAST_IT 5000
+#define MAX_EVALS_PER_CONTROLLER_LAST_IT 500 // TODO
 #define MAX_EVALS_PER_CONTROLLER_REGULAR_IT 100
 #define EVAL_MIN_STEP 5
         using namespace PERMU;
