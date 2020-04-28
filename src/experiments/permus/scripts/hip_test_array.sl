@@ -4,8 +4,8 @@
 #SBATCH --error=err/slurm_err_%j.txt
 #SBATCH --ntasks=1 # number of tasks
 #SBATCH --ntasks-per-node=1 #number of tasks per node
-#SBATCH --mem=4G
-#SBATCH --cpus-per-task=4 # number of CPUs
+#SBATCH --mem=32G
+#SBATCH --cpus-per-task=32 # number of CPUs
 #SBATCH --time=0-00:30:00 #Walltime
 #SBATCH -p short
 #SBATCH --exclude=n[001-004,017-018]
@@ -46,10 +46,14 @@ MAX_TIME_PSO=${MAX_TIME_PSO_ARRAY[$SLURM_ARRAY_TASK_ID]}
 
 
 
+
+
+
+
 echo -n "CONTROLLER: " && echo $CONTROLLER
 echo -n "PROBLEM_TYPE: " && echo $PROBLEM_TYPE
 echo -n "PROBLEM_PATH: " && echo $PROBLEM_PATH
-echo -n "TMP_RES_PATH: " && echo $TMP_RES_PATH_ARRAY
+echo -n "TMP_RES_PATH: " && echo $TMP_RES_PATH
 
 SRCDIR=`pwd`
 

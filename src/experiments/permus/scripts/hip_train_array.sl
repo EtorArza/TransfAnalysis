@@ -4,9 +4,9 @@
 #SBATCH --error=err/slurm_err_%j.txt
 #SBATCH --ntasks=1 # number of tasks
 #SBATCH --ntasks-per-node=1 #number of tasks per node
-#SBATCH --mem=4G
-#SBATCH --cpus-per-task=4 # number of CPUs
-#SBATCH --time=0-01:10:00 #Walltime
+#SBATCH --mem=32G
+#SBATCH --cpus-per-task=32 # number of CPUs
+#SBATCH --time=0-06:00:00 #Walltime
 #SBATCH -p medium
 #SBATCH --exclude=n[001-004,017-018]
 
@@ -91,7 +91,7 @@ MODE = train
 PROBLEM_NAME = permu
 
 
-MAX_TRAIN_TIME = 600
+MAX_TRAIN_TIME = 19800
 POPSIZE = $POPSIZE
 THREADS = $SLURM_CPUS_PER_TASK
 

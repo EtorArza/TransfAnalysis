@@ -2050,7 +2050,7 @@ void F_race_iteration(double** f_values, vector<int> &surviving_candidates, int 
     // PrintMatrix(reduced_f_values, surviving_candidates.size(), n_samples);
 
 
-    if (Friedman_test_are_there_critical_diferences(reduced_f_values, surviving_candidates.size(), n_samples) || surviving_candidates.size() == 2)
+    if (surviving_candidates.size() == 2 || Friedman_test_are_there_critical_diferences(reduced_f_values, surviving_candidates.size(), n_samples))
     {
         int best_reduced_index = 0;
         double* avg_ranks = new double[surviving_candidates.size()];
