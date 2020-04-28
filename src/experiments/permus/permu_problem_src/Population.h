@@ -78,7 +78,7 @@ public:
 
 private:
 
-  double max_time_pso;
+  double MAX_SOLVER_TIME;
   // evaluate the whole population. Only used to initialize the population.
   void evaluate_population();
 

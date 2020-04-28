@@ -13,7 +13,7 @@ namespace PERMU{
         neat_parameters *neat_params;
 
         // PARAMETERS TO BE SPECIFIED IN CONFIG FILE//
-        double MAX_TIME_PSO;
+        double MAX_SOLVER_TIME;
         int POPSIZE;
         int N_EVALS;
         int TABU_LENGTH;

@@ -66,7 +66,7 @@ INSTANCES=$(to_list "${INSTANCES[@]}")
 
 
 
-ID=`sbatch --parsable --export=CONTROLLERS=${CONTROLLERS},PROBLEMS=${PROBLEMS},INSTANCES=${INSTANCES},MAX_TIME_PSO=0.25,MEASURE_RESPONSES=${MEASURE_RESPONSES},TMP_RES_PATH=${TMP_RES_PATH} --array=0-$NUM_JOBS src/experiments/permus/scripts/hip_test_array.sl`
+ID=`sbatch --parsable --export=CONTROLLERS=${CONTROLLERS},PROBLEMS=${PROBLEMS},INSTANCES=${INSTANCES},MAX_SOLVER_TIME=0.25,MEASURE_RESPONSES=${MEASURE_RESPONSES},TMP_RES_PATH=${TMP_RES_PATH} --array=0-$NUM_JOBS src/experiments/permus/scripts/hip_test_array.sl`
 sbatch --dependency=afterok:$ID script_527cff9ed08e301393afd8d723ce0182.sh
 
 
@@ -121,6 +121,6 @@ PROBLEMS=$(to_list "${PROBLEMS[@]}")
 INSTANCES=$(to_list "${INSTANCES[@]}")
 
 
-ID=`sbatch --parsable --export=CONTROLLERS=${CONTROLLERS},PROBLEMS=${PROBLEMS},INSTANCES=${INSTANCES},MAX_TIME_PSO=0.25,MEASURE_RESPONSES=${MEASURE_RESPONSES},TMP_RES_PATH=${TMP_RES_PATH} --array=0-$NUM_JOBS src/experiments/permus/scripts/hip_test_array.sl`
+ID=`sbatch --parsable --export=CONTROLLERS=${CONTROLLERS},PROBLEMS=${PROBLEMS},INSTANCES=${INSTANCES},MAX_SOLVER_TIME=0.25,MEASURE_RESPONSES=${MEASURE_RESPONSES},TMP_RES_PATH=${TMP_RES_PATH} --array=0-$NUM_JOBS src/experiments/permus/scripts/hip_test_array.sl`
 sbatch --dependency=afterok:$ID script_2828a8741ae82e71b77975df5ec94c25.sh
 

@@ -26,7 +26,7 @@
 
 
 if [[ "$#" -ne 3  ]] ; then
-    echo 'Please provide the name of the problem, the path of the instance and and max_pso_time. $# parameters where provided. 3 are needed. Example: '
+    echo 'Please provide the name of the problem, the path of the instance and and MAX_SOLVER_TIME. $# parameters where provided. 3 are needed. Example: '
     echo ""
     echo 'script.sh qap tai35a.dat.dat 0.5'
     echo ""
@@ -68,7 +68,7 @@ SEED = 2
 
 
 
-MAX_TIME_PSO = $MAX_TIME_PSO
+MAX_SOLVER_TIME = $MAX_SOLVER_TIME
 
 
 PROBLEM_TYPE = $PROBLEM_TYPE

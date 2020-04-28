@@ -292,7 +292,7 @@ void PermuEvaluator::read_conf_file(std::string conf_file_path)
         string search_type = reader.Get("Global", "SEARCH_TYPE", "UNKOWN");
         parameters->PROBLEM_TYPE = reader.Get("Global", "PROBLEM_TYPE", "UNKOWN");
         parameters->INSTANCE_PATH = reader.Get("Global", "PROBLEM_PATH", "UNKOWN");
-        parameters->MAX_TIME_PSO = reader.GetReal("Global", "MAX_TIME_PSO", -1.0);
+        parameters->MAX_SOLVER_TIME = reader.GetReal("Global", "MAX_SOLVER_TIME", -1.0);
 
         if (parameters->SEED == -1)
         {
@@ -366,7 +366,7 @@ void PermuEvaluator::read_conf_file(std::string conf_file_path)
 
         parameters->PROBLEM_TYPE = reader.Get("Global", "PROBLEM_TYPE", "UNKOWN");
         parameters->INSTANCE_PATH = reader.Get("Global", "PROBLEM_PATH", "UNKOWN");
-        parameters->MAX_TIME_PSO = reader.GetReal("Global", "MAX_TIME_PSO", -1.0);
+        parameters->MAX_SOLVER_TIME = reader.GetReal("Global", "MAX_SOLVER_TIME", -1.0);
         parameters->CONTROLLER_PATH = reader.Get("Global", "CONTROLLER_PATH", "UNKNOWN");
         parameters->N_REPS = reader.GetInteger("Global", "N_REPS", -1);
         parameters->N_EVALS = reader.GetInteger("Global", "N_EVALS", -1);

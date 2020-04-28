@@ -11,7 +11,7 @@ namespace PERMU_MULTI{
         int N_OF_INSTANCES;
         std::string* INSTANCE_PATHS;
 
-        double* MAX_TIME_PSO_FOR_EACH_INSTANCE;
+        double* MAX_SOLVER_TIME_FOR_EACH_INSTANCE;
         double* BEST_FITNESS_TRAIN_FOR_EACH_INSTANCE;
         double** F_VALUES_OBTAINED_BY_BEST_INDIV_FOR_EACH_INSTANCE; // [which_instance][which_run]
     };

@@ -45,7 +45,7 @@ struct Evaluator
         // int seed_seq = initial_seed;
         // params_multi parameters_tmp = params_multi(*parameters);
         // parameters_tmp.INSTANCE_PATH = parameters->INSTANCE_PATHS[instance_index];
-        // parameters_tmp.MAX_TIME_PSO = parameters->MAX_TIME_PSO_FOR_EACH_INSTANCE[instance_index];
+        // parameters_tmp.MAX_SOLVER_TIME = parameters->MAX_SOLVER_TIME_FOR_EACH_INSTANCE[instance_index];
         // double res = FitnessFunction_permu(net, n_evals, seed_seq, &parameters_tmp);
         // seed_seq += n_evals;
         // return res;
@@ -57,7 +57,7 @@ struct Evaluator
 //         int seed_parallel = initial_seed;
 //         params_multi parameters_tmp = params_multi(*parameters);
 //         parameters_tmp.INSTANCE_PATH = parameters->INSTANCE_PATHS[instance_index];
-//         parameters_tmp.MAX_TIME_PSO = parameters->MAX_TIME_PSO_FOR_EACH_INSTANCE[instance_index];
+//         parameters_tmp.MAX_SOLVER_TIME = parameters->MAX_SOLVER_TIME_FOR_EACH_INSTANCE[instance_index];
 // #pragma omp parallel for num_threads(N_OF_THREADS)
 //         for (int i = 0; i < n_evals; i++)
 //         {
@@ -209,7 +209,7 @@ public:
         //     parameters->N_OF_INSTANCES = reader.GetInteger("Global", "N_PROBLEMS", -1);
         //     parameters->INSTANCE_PATHS = new std::string[parameters->N_OF_INSTANCES];
         //     parameters->BEST_FITNESS_TRAIN_FOR_EACH_INSTANCE = new double[parameters->N_OF_INSTANCES];
-        //     parameters->MAX_TIME_PSO_FOR_EACH_INSTANCE = new double[parameters->N_OF_INSTANCES];
+        //     parameters->MAX_SOLVER_TIME_FOR_EACH_INSTANCE = new double[parameters->N_OF_INSTANCES];
 
 
 
@@ -219,7 +219,7 @@ public:
         //     for (int i = 0; i < parameters->N_OF_INSTANCES; i++)
         //     {
         //         parameters->INSTANCE_PATHS[i] = reader.Get("Global", "PROBLEM_PATH_" + to_string(i), "UNKOWN");
-        //         parameters->MAX_TIME_PSO_FOR_EACH_INSTANCE[i] = reader.GetReal("Global", "MAX_TIME_PSO_FOR_EACH_INSTANCE_" + to_string(i), -1);
+        //         parameters->MAX_SOLVER_TIME_FOR_EACH_INSTANCE[i] = reader.GetReal("Global", "MAX_SOLVER_TIME_FOR_EACH_INSTANCE_" + to_string(i), -1);
         //     }
 
         //     parameters->POPSIZE = reader.GetInteger("Global", "POPSIZE", -1);
@@ -302,7 +302,7 @@ public:
         //     delete[] parameters->F_VALUES_OBTAINED_BY_BEST_INDIV_FOR_EACH_INSTANCE;
         //     delete[] parameters->INSTANCE_PATHS;
         //     delete[] parameters->BEST_FITNESS_TRAIN_FOR_EACH_INSTANCE;
-        //     delete[] parameters->MAX_TIME_PSO_FOR_EACH_INSTANCE;
+        //     delete[] parameters->MAX_SOLVER_TIME_FOR_EACH_INSTANCE;
 
         //     return;
         // }
