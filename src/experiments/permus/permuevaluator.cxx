@@ -144,7 +144,7 @@ struct Evaluator
         int max_evals_per_controller;
         if (parameters->neat_params->IS_LAST_ITERATION)
         {
-            target_n_controllers_left = 2;
+            target_n_controllers_left = 1;
             max_evals_per_controller = MAX_EVALS_PER_CONTROLLER_LAST_IT;
         }
         else
