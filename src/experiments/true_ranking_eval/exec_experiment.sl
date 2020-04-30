@@ -58,7 +58,7 @@ EOF
 
 
 date
-./neat "tmp.ini"
+srun neat "tmp.ini"
 date
 
 cp true_ranking_res.csv $SRCDIR -v

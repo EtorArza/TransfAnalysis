@@ -80,7 +80,7 @@ EOF
 
 
 date
-./neat "tmp.ini"
+srun neat "tmp.ini"
 date
 
 instance_path=$2

@@ -113,7 +113,7 @@ EOF
 
 
 date
-./neat "tmp.ini"
+srun neat "tmp.ini"
 date
 
 rm neat
