@@ -36,8 +36,8 @@ done
 cat > script_527cff9ed08e301393afd8d723ce0182.sh <<EOF
 #!/bin/bash
 ###   s b a t c h --array=1-$runs:1 $SL_FILE_NAME
-#SBATCH --output=out/slurm_%j.txt
-#SBATCH --error=err/slurm_err_%j.txt
+#SBATCH --output=out/slurm_%j_out.txt
+#SBATCH --error=out/slurm_%j_err.txt
 #SBATCH --ntasks=1 # number of tasks
 #SBATCH --ntasks-per-node=1 #number of tasks per node
 #SBATCH --mem=2G
@@ -95,8 +95,8 @@ done
 cat > script_2828a8741ae82e71b77975df5ec94c25.sh <<EOF
 #!/bin/bash
 ###   s b a t c h --array=1-$runs:1 $SL_FILE_NAME
-#SBATCH --output=out/slurm_%j.txt
-#SBATCH --error=err/slurm_err_%j.txt
+#SBATCH --output=out/slurm_%i_out.txt
+#SBATCH --error=out/slurm_%i_err.txt
 #SBATCH --ntasks=1 # number of tasks
 #SBATCH --ntasks-per-node=1 #number of tasks per node
 #SBATCH --mem=2G
