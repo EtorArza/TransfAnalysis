@@ -31,14 +31,19 @@ ID_2=${ID##* }
 cat > script_f60494109a40e623a82d5c76070b160e.sh <<EOF
 #!/bin/bash
 ###   s b a t c h --array=1-$runs:1 $SL_FILE_NAME
-#SBATCH --output=out/slurm_%j_out.txt
-#SBATCH --error=out/slurm_%j_err.txt
+#SBATCH --output=out/slurm_%A_%a_out.txt
+#SBATCH --error=out/slurm_%A_%a_err.txt
 #SBATCH --ntasks=1 # number of tasks
 #SBATCH --ntasks-per-node=1 #number of tasks per node
 #SBATCH --mem=2G
 #SBATCH --cpus-per-task=2 # number of CPUs
 #SBATCH --time=0-00:30:00 #Walltime
 #SBATCH -p short
+
+SCRATCH_JOB=${SCRATCH_JOB}_${SLURM_ARRAY_TASK_ID}
+mkdir ${SCRATCH_JOB}
+module load GCC/8.3.0
+
 
 bash src/experiments/permus/scripts/hip_test_all_controllers.sh "false"
 

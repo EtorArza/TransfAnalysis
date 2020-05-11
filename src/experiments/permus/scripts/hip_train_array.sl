@@ -1,7 +1,7 @@
 #!/bin/bash
 ###   s b a t c h --array=1-$runs:1 $SL_FILE_NAME
 #SBATCH --output=out/slurm_%A_%a_out.txt
-#SBATCH --error=err/slurm_%A_%a_err.txt
+#SBATCH --error=out/slurm_%A_%a_err.txt
 #SBATCH --ntasks=1 # number of tasks
 #SBATCH --ntasks-per-node=1 #number of tasks per node
 #SBATCH --mem=32G
@@ -15,8 +15,8 @@
 
 # # #!/bin/bash
 # # ###   s b a t c h --array=1-$runs:1 $SL_FILE_NAME
-# #SBATCH --output=out/slurm_%i_out.txt
-# #SBATCH --error=out/slurm_%i_err.txt
+# # #SBATCH --output=out/slurm_%A_%a_out.txt
+# # #SBATCH --error=out/slurm_%A_%a_err.txt
 # # #SBATCH --ntasks=1 # number of tasks
 # # #SBATCH --ntasks-per-node=1 #number of tasks per node
 # # #SBATCH --mem=32G
@@ -25,7 +25,9 @@
 # # #SBATCH -p medium
 # # #SBATCH --exclude=n[001-004,017-018]
 
+SCRATCH_JOB=${SCRATCH_JOB}_${SLURM_ARRAY_TASK_ID}
 mkdir ${SCRATCH_JOB}
+module load GCC/8.3.0
 
 
 source scripts/array_to_string_functions.sh 
@@ -82,7 +84,7 @@ cp neat -v $SCRATCH_JOB
 
 cd $SCRATCH_JOB
 
-echo "cwd: `cwd`"
+echo "pwd: `pwd`"
 
 
 cat > tmp.ini <<EOF
