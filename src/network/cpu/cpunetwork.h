@@ -49,8 +49,8 @@ namespace NEAT {
         void return_average_response_and_stop_recording(double* res);
 
         virtual void configure(const NetDims &dims,
-                               NetNode *nodes,
-                               NetLink *links);
+                               const NetNode *nodes,
+                               const NetLink *links);
 
         virtual NetDims get_dims() { return dims; }
 	};

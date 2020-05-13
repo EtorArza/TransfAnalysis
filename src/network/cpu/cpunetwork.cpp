@@ -37,10 +37,11 @@ Network *Network::create() {
 CpuNetwork::CpuNetwork(const CpuNetwork&  other){ 
     this->activations = std::vector<real_t>(other.activations);
 
-    this->dims = other.dims;
-    this->dims.nnodes = other.dims.nnodes;
-    this->links = other.links;
-    this->nodes = other.nodes;
+    // this->dims = other.dims;
+    // this->dims.nnodes = other.dims.nnodes;
+    // this->links = other.links;
+    // this->nodes = other.nodes;
+    this->configure(other.dims, other.nodes.data(), other.links.data());
     this->response = other.response;
     this->response_is_being_recorded = other.response_is_being_recorded;
     this->samples_response = other.samples_response;
@@ -109,8 +110,8 @@ bool CpuNetwork::are_signatures_equal(CpuNetwork* other){
 
 // Requires nodes to be sorted by type: BIAS, SENSOR, OUTPUT, HIDDEN
 void CpuNetwork::configure(const NetDims &dims_,
-                           NetNode *nodes_,
-                           NetLink *links_) {
+                           const NetNode *nodes_,
+                           const NetLink *links_) {
     this->dims = dims_;
 
     nodes.resize(dims.nnodes.all);

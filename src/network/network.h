@@ -68,8 +68,8 @@ namespace NEAT {
 		virtual ~Network() {}
 
         virtual void configure(const NetDims &dims,
-                               NetNode *nodes,
-                               NetLink *links) = 0;
+                               const NetNode *nodes,
+                               const NetLink *links) = 0;
 
         virtual NetDims get_dims() = 0;
 	};

@@ -133,7 +133,7 @@ struct Evaluator
         }
         else
         {
-            //parameters->neat_params->BEST_FITNESS_TRAIN = this->FitnessFunction(best_network, 25, rng.random_integer_fast((int)1e9));
+            *nets[nnets-1] = *best_network;
         }
 
         int current_n_of_evals = 0;
@@ -163,7 +163,7 @@ struct Evaluator
             int initial_seed = rng.random_integer_uniform(INT_MAX);
             cout << "Evaluating -> " << std::flush;
             progress_bar bar(surviving_candidates.size());
-#pragma omp parallel for num_threads(parameters->neat_params->N_OF_THREADS)
+            #pragma omp parallel for num_threads(parameters->neat_params->N_OF_THREADS)
             for (int i = 0; i < surviving_candidates.size() * EVAL_MIN_STEP; i++)
             {
                 int inet = surviving_candidates[i / EVAL_MIN_STEP];
@@ -196,7 +196,7 @@ struct Evaluator
         {
             tmp_order[inet] = Average(f_values[inet], current_n_of_evals) - (double)surviving_candidates.size() * 10000000.0;
         }
-
+        parameters->neat_params->BEST_FITNESS_TRAIN = (tmp_order[nnets - 1] + parameters->neat_params->BEST_FITNESS_TRAIN) / 2;
         double best_f_gen = Average(f_values[argmax(tmp_order, (int)nnets)], current_n_of_evals);
         cout << "(best this gen, best last gen) -> (" << best_f_gen << ", " << parameters->neat_params->BEST_FITNESS_TRAIN << ")";
 

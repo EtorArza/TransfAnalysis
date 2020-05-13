@@ -797,7 +797,7 @@ bool is_A_larger_than_B_Signed_Wilcoxon(double* A, double* B, int length);
 //Paired test
 bool Friedman_test_are_there_critical_diferences(double** f_values, int n_candidates, int n_samples);
 
-
+void get_ranks_from_f_values(vector<vector<double>>& ranks, double** f_values, int n_candidates, int n_samples);
 
 double p_value_chisquared(double x, double df);
 
