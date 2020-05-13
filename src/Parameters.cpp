@@ -6,10 +6,10 @@
 #include "util.h"
 #include "neat.h"
 #include <stdio.h>
+#include "constants.h"
 
 // MACROS //
-#define MAX(A, B) ((A > B) ? A : B)
-#define MIN(A, B) ((A < B) ? A : B)
+
 ///////////
 
 neat_parameters::neat_parameters(){};

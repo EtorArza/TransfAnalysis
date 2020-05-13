@@ -2,10 +2,8 @@
 #include "Tools.h"
 #include <limits>
 #include "Parameters.h"
+#include "constants.h"
 
-#define MAX_TABU_LENGTH 100
-#define MIN_TABU_LENGTH 5
-#define LENGTH_CHANGE_STEP 5
 
 namespace PERMU
 {

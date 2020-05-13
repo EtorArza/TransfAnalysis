@@ -26,6 +26,7 @@
 #include <iomanip>
 #include "Parameters.h"
 #include "PERMU_params.h"
+#include "constants.h"
 #include <functional>
 #include <vector>
 #include <sstream>
@@ -38,10 +39,9 @@ using namespace std;
 namespace PERMU
 {
 
-#define SMALLEST_POSITIVE_DOUBLE 0.0000001
 void make_output_behaviour_mapping_more_injective(double *output)
 {
-#define POS_FIRS_OPERATOR 1
+    const int POS_FIRS_OPERATOR = 1;
     if (output[0] < -CUTOFF_0 || output[0] > CUTOFF_0)
     {
         output[0] = (double)move_to_0_minusone_or_one(output[0]);
@@ -114,9 +114,6 @@ struct Evaluator
     // compute the fitness value of all networks at training time.
     __net_eval_decl void execute(class NEAT::Network **nets_, NEAT::OrganismEvaluation *results, size_t nnets)
     {
-#define MAX_EVALS_PER_CONTROLLER_LAST_IT 1000
-#define MAX_EVALS_PER_CONTROLLER_REGULAR_IT 100
-#define EVAL_MIN_STEP 5
         using namespace PERMU;
         NEAT::CpuNetwork **nets = (NEAT::CpuNetwork **)nets_;
         double **f_values = new double *[nnets];

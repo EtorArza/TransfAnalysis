@@ -12,6 +12,7 @@
 #include <string.h>
 #include "Individual.h"
 #include "PERMU_params.h"
+#include "constants.h"
 
 class RandomNumberGenerator;
 
@@ -23,8 +24,7 @@ class PermuTools;
 class Tabu;
 
 
-#define MAX_POPSIZE 40
-#define MIN_POPSIZE 4
+
 
 class CPopulation
 {

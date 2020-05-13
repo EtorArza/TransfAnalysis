@@ -22,7 +22,8 @@
 #include <float.h>
 #include <vector>
 #include "asa032.hpp"
-#define TEMP_double_ARRAY_SIZE 30
+#include "constants.h"
+
 
 
 
@@ -783,7 +784,6 @@ void GenerateRandomRealvec_0_1(double *real_vec, int n, RandomNumberGenerator* r
     }
 }
 
-#define SMALLEST_POSITIVE_DOUBLE  0.0000001
 
 int count_n_dif_array_items_double(double* array1, double* array2, int n){
     int res = 0;
@@ -1207,8 +1207,7 @@ void PermuTools::compute_first_marginal(int** permu_list, int m){
     }
 }
 
-#define DEPTH_OF_ORDER_MARGINAL 4
-#define COMPUTE_ORDER_MARGINAL_EVERY_K_ITERATIONS 6
+
 void PermuTools::compute_order_marginal(int** permu_list, int m){
     // in the article "Exploiting Probabilistic Independence for Permutations", they define the first marg in the
     // order used in this implementation.
@@ -1491,10 +1490,9 @@ void compute_order_from_double_to_int(double* v, int len, int* order_res, bool r
 }
 
 
-#define TOL 0.00001
 bool are_doubles_equal(double x1, double x2)
 {
-    if (fabs(x1 - x2) < TOL)
+    if (fabs(x1 - x2) < SMALLEST_POSITIVE_DOUBLE)
     {
         return true;
     }else{
@@ -1596,9 +1594,10 @@ void compute_order_from_double_to_double(double* v, int len, double* order_res, 
 
 
 
-#define p 0.8
 // 1-p will be assigned to the best individual, (1-p)*p to the second one etc.
 void transform_from_values_to_geometric_ranking_probs(double* reference_and_result, int len, bool reverse){
+
+    int p = 0.8;
 
     int* indexes = new int[len];
     
@@ -1719,8 +1718,7 @@ double from_u_statistic_to_z(double u, double length, double* array_of_values){
 
 
 
-#define Z_THRESH 1.65 
-#define ALPHA 0.05
+
 
 //Unpaired test
 bool is_A_larger_than_B_Mann_Whitney(double* A, double* B, int length){
@@ -2204,4 +2202,22 @@ int n_choose_k(int n, int k){
     }
     
     return res;
+}
+
+
+// split string into vector of strings
+vector<string> split_string(string str, string token){
+    vector<string>result;
+    while(str.size()){
+        int index = str.find(token);
+        if(index!=string::npos){
+            result.push_back(str.substr(0,index));
+            str = str.substr(index+token.size());
+            if(str.size()==0)result.push_back(str);
+        }else{
+            result.push_back(str);
+            str = "";
+        }
+    }
+    return result;
 }

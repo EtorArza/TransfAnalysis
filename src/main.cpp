@@ -1,5 +1,3 @@
-#define SAME_SIZE_EXPERIMENT
-
 /*
   Copyright 2001 The University of Texas at Austin
 

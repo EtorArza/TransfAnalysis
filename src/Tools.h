@@ -20,6 +20,7 @@
 #include <functional>
 #include <mutex>
 #include <iomanip>
+#include "constants.h"
 
 using std::istream;
 using std::ostream;
@@ -31,7 +32,6 @@ using std::ifstream;
 using std::string;
 using std::stringstream;
 
-#define CUTOFF_0 0.25
 
 /*
  * Returs the first position at which value appears in array. If it does not appear, then it returns -1;
@@ -805,11 +805,10 @@ double p_value_chisquared(double x, double df);
 void F_race_iteration(double** f_values, vector<int> &surviving_candidates, int n_samples);
 
 
-#define TOL 0.00001
 template <class T>
 int sign(T value)
 {
-    if (value < TOL && -TOL < value)
+    if (value < SMALLEST_POSITIVE_DOUBLE && -SMALLEST_POSITIVE_DOUBLE < value)
     {
         return 0;
     }
@@ -822,7 +821,6 @@ int sign(T value)
         return -1;
     }
 }
-#undef TOL
 
 
 template <class T>
@@ -973,3 +971,6 @@ void restart(int n);
 
 
 };
+
+
+vector<string> split_string(string str, string token);

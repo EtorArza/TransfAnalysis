@@ -10,11 +10,8 @@
 #include "PFSP.h"
 #include "Tools.h"
 #include "Parameters.h"
+#include "constants.h"
 
-// MACROS //
-#define MAX(A, B) ((A > B) ? A : B)
-#define MIN(A, B) ((A < B) ? A : B)
-///////////
 
 namespace PERMU{
 
