@@ -24,7 +24,6 @@ public:
 	double tabu_coef_neat = 0.0;
 
 private:
-	int MAX_TABU_LENGTH;
 	RandomNumberGenerator* rng;
 	static int n_indivs_created;
 	int* tabu_indices_i;

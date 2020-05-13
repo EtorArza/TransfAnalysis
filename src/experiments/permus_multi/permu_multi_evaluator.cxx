@@ -24,6 +24,7 @@
 #include "permuevaluator.h"
 #include "PERMU_MULTI_params.h"
 #include "permu_multi_evaluator.h"
+#include <vector>
 
 using namespace std;
 
@@ -102,7 +103,7 @@ void Permu_multiEvaluator::read_conf_file(std::string conf_file_path)
 
 
     std::string COMMA_SEPARATED_LIST_OF_INSTANCE_PATHS = reader.Get("Global", "COMMA_SEPARATED_LIST_OF_INSTANCE_PATHS", "UNKNOWN");
-    parameters_multi->VECTOR_OF_INSTANCE_PATHS = new std::vector(split_string(COMMA_SEPARATED_LIST_OF_INSTANCE_PATHS, ","));
+    parameters_multi->VECTOR_OF_INSTANCE_PATHS = new std::vector<std::string>(split_string(COMMA_SEPARATED_LIST_OF_INSTANCE_PATHS, ","));
  
 }
 

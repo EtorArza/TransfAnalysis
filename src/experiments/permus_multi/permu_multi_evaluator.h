@@ -31,6 +31,6 @@ public:
     void execute(class NEAT::Network **nets_, class NEAT::OrganismEvaluation *results, size_t nnets);
 };
 
-class NetworkEvaluator *create_permu_evaluator();
+class NetworkEvaluator *create_permu_multi_evaluator();
 
 } // namespace NEAT

@@ -10,7 +10,7 @@ using namespace NEAT;
 static struct Permu_multiInit {
     Permu_multiInit() {
         auto create_evaluator = [] () {
-            return create_permu_multi_evaluator();
+            return NEAT::create_permu_multi_evaluator();
         };
  
         auto create_seeds = [] (rng_t rng_exp) {
@@ -18,15 +18,15 @@ static struct Permu_multiInit {
             int nhidden;
 
 
-            nhidden = __sensor_N;
+            nhidden = PERMU::__sensor_N;
 
             
 
             return env->genome_manager->create_seed_generation(env->pop_size,
                                                         rng_exp,
                                                         1,
-                                                        __sensor_N,  // number of input nodes.
-                                                        __output_N,  // number output nodes.
+                                                        PERMU::__sensor_N,  // number of input nodes.
+                                                        PERMU::__output_N,  // number output nodes.
                                                         nhidden); // number of default hidden nodes.
         };
 
