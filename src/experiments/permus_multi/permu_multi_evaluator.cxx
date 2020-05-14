@@ -107,7 +107,7 @@ struct Evaluator
         }
         else
         {
-            nets[nnets-1] = best_network;
+            *nets[nnets-1] = *best_network;
         }
 
         int current_n_of_evals = 0;
@@ -179,6 +179,7 @@ struct Evaluator
             tmp_order[inet] = Average(f_values[inet], current_n_of_evals) - (double)surviving_candidates.size() * 10000000.0;
         }
 
+        parameters->neat_params->BEST_FITNESS_TRAIN = (tmp_order[nnets - 1] + parameters->neat_params->BEST_FITNESS_TRAIN) / 2;
         double best_f_gen = Average(f_values[argmax(tmp_order, (int)nnets)], current_n_of_evals);
         cout << "(best this gen, best last gen) -> (" << best_f_gen << ", " << parameters->neat_params->BEST_FITNESS_TRAIN << ")";
 
