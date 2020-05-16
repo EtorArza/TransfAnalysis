@@ -42,7 +42,7 @@ cat > script_f60494109a40e623a82d5c76070b160e.sh <<EOF
 
 SCRATCH_JOB=${SCRATCH_JOB}_${SLURM_ARRAY_TASK_ID}
 mkdir ${SCRATCH_JOB}
-module load GCC/8.3.0
+
 
 
 bash src/experiments/permus/scripts/hip_test_all_controllers.sh "false"

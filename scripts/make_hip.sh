@@ -12,7 +12,6 @@
 
 SCRATCH_JOB=${SCRATCH_JOB}_${SLURM_ARRAY_TASK_ID}
 mkdir ${SCRATCH_JOB}
-module load GCC/8.3.0
 
 SRC_DIR=`pwd`
 

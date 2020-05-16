@@ -47,7 +47,7 @@ cat > script_527cff9ed08e301393afd8d723ce0182.sh <<EOF
 
 SCRATCH_JOB=${SCRATCH_JOB}_${SLURM_ARRAY_TASK_ID}
 mkdir ${SCRATCH_JOB}
-module load GCC/8.3.0
+
 
 
 if [ $MEASURE_RESPONSES == "true" ]; then
