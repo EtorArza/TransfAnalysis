@@ -949,8 +949,21 @@ int index(const T* array, const T item, int len){
         }
     }
     return -1;
-    
 }
+
+template< class T>
+bool is_item_in_array(const T* array, const T item, int len){
+    for (int i = 0; i < len; i++)
+    {
+        if (array[i] == item)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+
 int n_choose_k(int n, int k);
 
 class progress_bar
@@ -974,3 +987,5 @@ void restart(int n);
 
 
 vector<string> split_string(string str, string token);
+
+
