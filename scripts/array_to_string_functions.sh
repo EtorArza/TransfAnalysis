@@ -40,3 +40,20 @@ to_list () {
     echo "$*"
     disable_safety
 }
+
+
+list_to_array_with_comma () {
+    enable_safety
+    IFS=',' read -a BITRISE_CLI_LAST_PARSED_LIST <<< "$1"
+    disable_safety
+}
+
+
+to_list_with_comma () {
+    enable_safety
+    local IFS=','
+    echo "$*"
+    disable_safety
+}
+
+
