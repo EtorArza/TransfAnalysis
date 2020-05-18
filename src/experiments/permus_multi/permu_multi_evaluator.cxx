@@ -74,7 +74,7 @@ struct Evaluator
         int seed_seq = initial_seed;
         PERMU_MULTI::params_multi tmp_params = *parameters;
         tmp_params.INSTANCE_PATH = (*parameters->VECTOR_OF_INSTANCE_PATHS)[instance_index];
-        double res = FitnessFunction_permu(net, n_evals, seed_seq, parameters);
+        double res = FitnessFunction_permu(net, n_evals, seed_seq, &tmp_params);
         seed_seq += n_evals;
         return res;
     }
@@ -137,20 +137,20 @@ struct Evaluator
             int initial_seed = rng.random_integer_uniform(INT_MAX);
             cout << "Evaluating -> " << std::flush;
 
-            progress_bar bar(surviving_candidates.size());
+            progress_bar bar(surviving_candidates.size()* n_evals_each_it);
             #pragma omp parallel for num_threads(parameters->neat_params->N_OF_THREADS)
             for (int i = 0; i < surviving_candidates.size() * n_evals_each_it; i++)
             {
                 int inet = surviving_candidates[i / n_evals_each_it];
-                int instance_index =  i % n_reps_all_instances;
+                int instance_index =  i % n_instances;
                 int f_value_sample_index = current_n_of_evals + i % n_evals_each_it;
 
-                cout << inet << "," << f_value_sample_index << "," << instance_index << endl;
+                // cout << inet << "," << f_value_sample_index << "," << instance_index << endl;
                 NEAT::CpuNetwork *net = nets[inet];
                 int seed = initial_seed + i % n_evals_each_it;
 
                 f_values[inet][f_value_sample_index] = this->FitnessFunction(net, 1, seed, instance_index);
-
+                bar.step();
             }
 
             bar.end();
@@ -171,7 +171,6 @@ struct Evaluator
             cout << ", " << surviving_candidates.size() << " left.";
             cout << endl;
         }
-
         replace_f_values_with_ranks(surviving_candidates, f_values, current_n_of_evals);
 
         for (auto &&inet : surviving_candidates)

@@ -127,36 +127,6 @@ void PrintArray(float *array, int length)
     std::cout << std::endl;
 }
 
-/*
- * Prints in the standard output given matrix.
- */
-void PrintMatrix(int **matrix, int length, int length2)
-{
-    int i, j;
-    for (i = 0; i < length; i++)
-    {
-        cout << "" << endl;
-        for (j = 0; j < length2; j++)
-        {
-            cout << matrix[i][j] << " ";
-        }
-    }
-    cout << " " << endl;
-}
-
-void PrintMatrix(double **matrix, int length, int length2)
-{
-    int i, j;
-    for (i = 0; i < length; i++)
-    {
-        cout << "" << endl;
-        for (j = 0; j < length2; j++)
-        {
-            cout << matrix[i][j] << ", ";
-        }
-    }
-    cout << " " << endl;
-}
 
 
 void PrintArray(double *array, int length){
