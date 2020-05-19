@@ -1,4 +1,6 @@
-# # #!/bin/bash
+#!/bin/bash
+
+
 # # ###   s b a t c h --array=1-$runs:1 $SL_FILE_NAME
 # # #SBATCH --output=out/slurm_%A_%a_out.txt
 # # #SBATCH --error=out/slurm_%A_%a_err.txt
@@ -13,7 +15,6 @@
 
 
 
-#!/bin/bash
 ###   s b a t c h --array=1-$runs:1 $SL_FILE_NAME
 #SBATCH --output=out/slurm_%A_%a_out.txt
 #SBATCH --error=out/slurm_%A_%a_err.txt
@@ -33,7 +34,8 @@ mkdir ${SCRATCH_JOB}
 
 source scripts/array_to_string_functions.sh 
 
-
+replaced_with=","
+COMMA_SEPARATED_LIST_OF_INSTANCE_PATHS_ARRAY=${COMMA_SEPARATED_LIST_OF_INSTANCE_PATHS_ARRAY//"xyz_comma_xyz"/$replaced_with}
 
 list_to_array $PROBLEM_TYPE_ARRAY
 PROBLEM_TYPE_ARRAY=("${BITRISE_CLI_LAST_PARSED_LIST[@]}")
@@ -58,6 +60,10 @@ POPSIZE=${POPSIZE_ARRAY[$SLURM_ARRAY_TASK_ID]}
 list_to_array $MAX_SOLVER_TIME_ARRAY
 MAX_SOLVER_TIME_ARRAY=("${BITRISE_CLI_LAST_PARSED_LIST[@]}")
 MAX_SOLVER_TIME=${MAX_SOLVER_TIME_ARRAY[$SLURM_ARRAY_TASK_ID]}
+
+echo -n "COMMA_SEPARATED_LIST_OF_INSTANCE_PATHS_ARRAY: " 
+echo $COMMA_SEPARATED_LIST_OF_INSTANCE_PATHS_ARRAY
+
 
 list_to_array $COMMA_SEPARATED_LIST_OF_INSTANCE_PATHS_ARRAY
 COMMA_SEPARATED_LIST_OF_INSTANCE_PATHS_ARRAY=("${BITRISE_CLI_LAST_PARSED_LIST[@]}")
@@ -107,7 +113,7 @@ cat > tmp.ini <<EOF
 
 [Global]
 MODE = train
-PROBLEM_NAME = permu
+PROBLEM_NAME = permu_multi
 
 
 MAX_TRAIN_TIME = 40
