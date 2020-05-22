@@ -55,7 +55,7 @@ void make_output_behaviour_mapping_more_injective(double *output)
         return;
     }
 
-    if (sum_abs_val_slice_vec(output, 1, 1 + PERMU::N_OPERATORS) == 0)
+    if (sum_abs_val_slice_vec(output, 1, 1 + PERMU::N_OPERATORS) < SMALLEST_POSITIVE_DOUBLE)
     {
         for (int i = 0; i < PERMU::__output_N; i++)
         {
@@ -64,7 +64,26 @@ void make_output_behaviour_mapping_more_injective(double *output)
         return;
     }
 
-    output[PERMU::TABU] = (double)move_to_0_minusone_or_one(output[PERMU::TABU]);
+    if (output[PERMU::RANDOM_REINITIALIZE] > CUTOFF_0)
+    {
+        double R_or_clone_output = move_to_0_minusone_or_one(output[PERMU::REMOVE_OR_CLONE]);
+        for (int i = 0; i < PERMU::__output_N; i++)
+        {
+            output[i] = 0.0;
+        }
+        output[PERMU::REMOVE_OR_CLONE] = R_or_clone_output;
+        output[PERMU::RANDOM_REINITIALIZE] = 1.0;
+        return;
+    }
+    else{
+        output[PERMU::RANDOM_REINITIALIZE] = 0.0;
+    }
+
+
+
+    output[PERMU::TABU] = abs((double)move_to_0_minusone_or_one(output[PERMU::TABU]));
+    output[PERMU::RELATIVE_TABU_SIZE] = 0.0;
+    output[PERMU::REMOVE_OR_CLONE] = move_to_0_minusone_or_one(output[PERMU::REMOVE_OR_CLONE]);
 
     int nonzero_index = argmax(output + POS_FIRS_OPERATOR, PERMU::N_OPERATORS) + POS_FIRS_OPERATOR;
     for (int i = POS_FIRS_OPERATOR; i < POS_FIRS_OPERATOR + PERMU::N_OPERATORS; i++)
