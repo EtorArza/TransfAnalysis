@@ -96,11 +96,13 @@ PROBLEM_PATH_ARRAY=()
 MAX_SOLVER_TIME_ARRAY=()
 
 
-
+i=-1
 for INSTANCE_TYPE_TRAIN in "A|B" "A|C" "B|C";do
     for INSTANCE_INDEX_TRAIN in "1" "2" "3" "4" "5"; do
         for INSTANCE_INDEX_TEST in "1" "2" "3" "4" "5"; do
             for INSTANCE_TYPE_TEST in "A" "B" "C"; do
+
+                i=$((i+1))
 
                 if [ "$INSTANCE_INDEX_TRAIN" == "$INSTANCE_INDEX_TEST" ]; then
                     continue
