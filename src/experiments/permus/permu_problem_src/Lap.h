@@ -76,6 +76,7 @@ public:
         delete[] collist;
         delete[] matches;
         delete[] d;
+        delete rng;
     }
     
     int execute_lap(
