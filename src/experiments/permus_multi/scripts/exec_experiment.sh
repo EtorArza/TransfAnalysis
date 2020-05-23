@@ -2,6 +2,10 @@
 
 source scripts/array_to_string_functions.sh
 
+if false; then
+
+# ... Code I want to skip here ...
+
 
 COMPILE_JOB_ID=`sbatch --parsable scripts/make_hip.sh`
 
@@ -58,7 +62,9 @@ MAX_SOLVER_TIME_ARRAY=$(to_list "${MAX_SOLVER_TIME_ARRAY[@]}")
 
 
 
-
+# Replace all ocurrences of "," with "xyz_comma_xyz". 
+# This is necesary because sbatch --export argument separes different variables with coma, 
+# and if the values of the variables contain comas, it all gets mmessed up.
 replaced_with="xyz_comma_xyz"
 COMMA_SEPARATED_LIST_OF_INSTANCE_PATHS_ARRAY=${COMMA_SEPARATED_LIST_OF_INSTANCE_PATHS_ARRAY//","/$replaced_with}
 
@@ -76,6 +82,7 @@ TMP_RES_PATH=${SRCDIR}/"tmp"/$(dirname ${SCORE_PATH})
 N_REPS=1
 N_EVALS=40
 
+fi
 
 CONTROLLER_ARRAY=()
 PROBLEM_TYPE_ARRAY=()
@@ -87,23 +94,22 @@ MAX_SOLVER_TIME_ARRAY=()
 for INSTANCE_TYPE_TRAIN in "A|B" "A|C" "B|C";do
     for INSTANCE_INDEX_TRAIN in "1" "2" "3" "4" "5"; do
         for INSTANCE_INDEX_TEST in "1" "2" "3" "4" "5"; do
-            for INSTANCE_INDEX_TEST in "A" "B" "C"; do
+            for INSTANCE_TYPE_TEST in "A" "B" "C"; do
 
-                if [ "$INSTANCE_INDEX_1" == "$INSTANCE_INDEX_2" ]; then
+                if [ "$INSTANCE_INDEX_TRAIN" == "$INSTANCE_INDEX_TEST" ]; then
                     continue
                 fi
 
+                list_to_array $INSTANCE_TYPE_TRAIN
+                INSTANCE_TYPE_TRAIN_PAIR=("${BITRISE_CLI_LAST_PARSED_LIST[@]}")
 
-                list_to_array $INSTANCE_TYPE_PAIR
-                INSTANCE_TYPE_TRAIN=("${BITRISE_CLI_LAST_PARSED_LIST[@]}")
-
-                CONTROLLER_NAME_PREFIX="${INSTANCE_TYPE_TRAIN[0]}${INSTANCE_TYPE_TRAIN[1]}${INSTANCE_INDEX_TRAIN}"
+                CONTROLLER_NAME_PREFIX="${INSTANCE_TYPE_TRAIN_PAIR[0]}${INSTANCE_TYPE_TRAIN_PAIR[1]}${INSTANCE_INDEX_TRAIN}"
                 EXPERIMENT_FOLDER_NAME="src/experiments/permus_multi/results/qap_cut_multi_vs_mono"
 
 
                 CONTROLLER_ARRAY+=("${EXPERIMENT_FOLDER_NAME}/top_controllers/${CONTROLLER_NAME_PREFIX}_best.controller")
                 PROBLEM_TYPE_ARRAY+=("qap")
-                PROBLEM_PATH_ARRAY+=(`ls src/experiments/permus/instances/transfer_qap_cut_instances/${INSTANCE_INDEX_TEST}${INSTANCE_INDEX_TEST}*`)
+                PROBLEM_PATH_ARRAY+=(`ls src/experiments/permus/instances/transfer_qap_cut_instances/${INSTANCE_TYPE_TEST}${INSTANCE_INDEX_TEST}*`)
                 MAX_SOLVER_TIME_ARRAY+=("0.25")
 
 
@@ -112,6 +118,7 @@ for INSTANCE_TYPE_TRAIN in "A|B" "A|C" "B|C";do
         done
     done
 done
+
 
 
 CONTROLLER_ARRAY=$(to_list "${CONTROLLER_ARRAY[@]}")
