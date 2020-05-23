@@ -48,6 +48,7 @@ class Lap;
 using namespace std;
 class Lap{
 
+    RandomNumberGenerator* rng;
     int dim;
     row* free;
     col* collist;
@@ -64,6 +65,8 @@ public:
         matches = new col[dim];    // counts how many times a row could be assigned.
         d = new cost[dim];         // 'cost-distance' in augmenting path calculation.
         pred = new row[dim];       // row-predecessor of column in augmenting/alternating path.
+        rng = new RandomNumberGenerator();
+        rng->seed();
     }
 
     ~Lap(){
@@ -345,7 +348,7 @@ public:
     void seedRandom(unsigned int seed)
     // seed for random number generator.
     {
-        srand(seed);
+        rng->seed();
         return;   
     }
 
@@ -355,10 +358,7 @@ public:
     double drandom(void)
     // random number between 0.0 and 1.0 (uncluded).
     {
-        double rrr;
-        
-        rrr = (double) rand() / (double) RAND_MAX;
-        return rrr;
+        return rng->random_0_1_double();
     }
     
 
