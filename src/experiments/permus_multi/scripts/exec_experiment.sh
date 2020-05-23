@@ -3,12 +3,14 @@
 source scripts/array_to_string_functions.sh
 
 if false; then
-
+echo "this part not executed"
 # ... Code I want to skip here ...
 
 fi
 
-COMPILE_JOB_ID=`sbatch --parsable scripts/make_hip.sh`
+# COMPILE_JOB_ID=`sbatch --parsable scripts/make_hip.sh`
+echo "WARNING! NOt compiling."
+
 
 SRCDIR=`pwd`
 
