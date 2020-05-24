@@ -379,7 +379,18 @@ inline void set_array_to_value(T* array, T value, int length){
 
 double euclid_dist(double* array_1, double* array_2, int len);
 
-double l1_distance(double* array_1, double* array_2, int len);
+template <class T>
+T l1_distance(T* array_1, T* array_2, int len)
+{
+    T res = 0;
+
+    for (int i = 0; i < len; i++)
+    {
+        res += abs(array_1 - array_2);
+    }
+
+    return res;
+}
 
 // compute the average value of the elements on the array dropping the best and worst quarter
 template <class T>

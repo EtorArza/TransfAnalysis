@@ -1298,7 +1298,7 @@ void PermuTools::compute_hamming_consensus(int **permu_list, int m)
     for (int i = 0; i < m; i++)
         for (int j = 0; j < n; j++)
             freq_matrix[j][permu_list[i][j]]--;
-    //int cost = -1 * lap.lap(n_, freq, rows, cols, u, v);
+
     linear_assigment_problem->seedRandom(rng->x);
     linear_assigment_problem->execute_lap(freq_matrix, lap_rows, lap_cols, lap_u, lap_v);
 
@@ -2098,17 +2098,6 @@ double euclid_dist(double* array_1, double* array_2, int len) // equiv to l2 dis
 
 }
 
-double l1_distance(double* array_1, double* array_2, int len)
-{
-    double res = 0.0;
-
-    for (int i = 0; i < len; i++)
-    {
-        res += abs(array_1 - array_2);
-    }
-
-    return res;
-}
 
 
 
