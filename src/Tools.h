@@ -386,7 +386,7 @@ T l1_distance(T* array_1, T* array_2, int len)
 
     for (int i = 0; i < len; i++)
     {
-        res += abs(array_1 - array_2);
+        res += abs(array_1[i] - array_2[i]);
     }
 
     return res;
