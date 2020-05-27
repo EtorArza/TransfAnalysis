@@ -140,7 +140,7 @@ struct Evaluator
 
         for (size_t i = 0; i < nnets; i++)
         {
-            f_values[i] = new double[MAX_EVALS_PER_CONTROLLER_LAST_IT];
+            f_values[i] = new double[MAX_EVALS_PER_CONTROLLER_LAST_IT + EVAL_MIN_STEP];
         }
 
         double *tmp_order = new double[nnets];
@@ -234,21 +234,38 @@ struct Evaluator
             parameters->neat_params->BEST_FITNESS_TRAIN = best_f_gen;
             delete best_network;
             best_network = new NEAT::CpuNetwork(*nets[argmax(tmp_order, (int)nnets)]);
-        }
+            tmp_order[argmax(tmp_order, (int)nnets)] += 10000000.0;
+         }
 
         cout << endl;
 
-        //cout << "fitness_array: " << std::flush;
-        //PrintArray(f_values, nnets);
+
 
         compute_order_from_double_to_double(tmp_order, nnets, tmp_order, false, true);
+
+
 
         multiply_array_with_value(tmp_order, 1.0 / (double)(nnets - 1), (int)nnets);
         multiply_array_with_value(tmp_order, 1.0 + ((double)parameters->neat_params->N_TIMES_BEST_FITNESS_IMPROVED_TRAIN / 1000.0), (int)nnets);
 
-        //cout << "fitness_array: " << std::flush;
-        //PrintArray(f_values, nnets);
 
+
+        if (parameters->neat_params->IS_LAST_ITERATION)
+        {
+
+            cout << "fitness_matrix: " << std::flush;
+            PrintMatrix(f_values, nnets, 32);
+
+
+            cout << endl;
+            cout << "tmp_order: " << std::flush;
+            PrintArray(tmp_order, nnets);
+
+            cout << endl;
+            cout << "BEST_FITNESS_DEBUG_LAST_IT: " << this->FitnessFunction(best_network, 50, 2783492779) << endl;
+            
+            cout << endl;
+        }
         // if (*is_last_gen)
         // {
         //     int argbest = argbest_net(nets_, nnets, 0.8);

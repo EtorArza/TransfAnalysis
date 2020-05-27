@@ -303,10 +303,10 @@ def plot_MDS(responses_obj, file_name):
 
 
             if j==0:
-                label = str("trained_in " + trained_in[i])
+                label = str("A = " + trained_in[i])
                 plt.scatter([],[], marker=",", color=ci, label=label) 
             if i==len(trained_in)-1:
-                label = str("tested_on " + tested_on[j])
+                label = str("B = " + tested_on[j])
                 plt.scatter([],[], marker=mi, color="black", label=label) 
             
             label = None
@@ -314,7 +314,7 @@ def plot_MDS(responses_obj, file_name):
             plt.scatter(xi,yi,marker=mi, color=ci, label=label) 
 
 
-    plt.legend(fontsize=6, markerscale=0.5)
+    plt.legend(fontsize=8, markerscale=0.5)
     plt.tight_layout()
     plt.savefig(file_name)
     plt.close()

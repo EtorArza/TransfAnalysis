@@ -2,7 +2,7 @@
 
 #define MAX_EVALS_PER_CONTROLLER_LAST_IT 1000
 #define MAX_EVALS_PER_CONTROLLER_REGULAR_IT 100
-#define EVAL_MIN_STEP 5
+#define EVAL_MIN_STEP 32
 
 #define MAX(A, B) ((A > B) ? A : B)
 #define MIN(A, B) ((A < B) ? A : B)

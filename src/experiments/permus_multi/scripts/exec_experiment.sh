@@ -8,8 +8,7 @@ echo "this part not executed"
 
 fi
 
-# COMPILE_JOB_ID=`sbatch --parsable scripts/make_hip.sh`
-echo "WARNING! NOt compiling."
+COMPILE_JOB_ID=`sbatch --parsable scripts/make_hip.sh`
 
 
 SRCDIR=`pwd`
@@ -27,7 +26,7 @@ POPSIZE=40
 MAX_SOLVER_TIME="0.1"
 SEED=2
 
-echo "WARNING! toy parameters"
+echo "WARNING! toy parameters. Need the popsize experiment result to be able to execute this."
 
 
 i=-1
@@ -81,14 +80,14 @@ COMMA_SEPARATED_LIST_OF_INSTANCE_PATHS_ARRAY=${COMMA_SEPARATED_LIST_OF_INSTANCE_
 
 
 
-MEASURE_RESPONSES="false"
+MEASURE_RESPONSES="true"
 EXPERIMENT_FOLDER_NAME="src/experiments/permus_multi/results/qap_cut_multi_vs_mono"
-SCORE_PATH="src/experiments/permus_multi/results/qap_cut_multi_vs_mono/result_multi_instance_cut_qap.txt"
+SCORE_PATH="src/experiments/permus_multi/results/qap_cut_multi_vs_mono/score_multi_instance_cut_qap.txt"
+RESPONSE_PATH="src/experiments/permus_multi/results/qap_cut_multi_vs_mono/response_multi_instance_cut_qap.txt"
 TMP_RES_PATH=${SRCDIR}/"tmp"/$(dirname ${SCORE_PATH})
 N_REPS=1
-N_EVALS=40
+N_EVALS=10000
 
-echo "WARNING! toy parameters"
 
 CONTROLLER_ARRAY=()
 PROBLEM_TYPE_ARRAY=()
@@ -135,9 +134,8 @@ PROBLEM_PATH_ARRAY=$(to_list "${PROBLEM_PATH_ARRAY[@]}")
 MAX_SOLVER_TIME_ARRAY=$(to_list "${MAX_SOLVER_TIME_ARRAY[@]}")
 
 
-# --dependency=afterok:${TRAINING_JOB_ID}
-echo "WARNING! train not executed, dependency for test mode removed"
-TESTING_JOB_ID=`sbatch --parsable  --export=CONTROLLER_ARRAY=${CONTROLLER_ARRAY},PROBLEM_TYPE_ARRAY=${PROBLEM_TYPE_ARRAY},PROBLEM_PATH_ARRAY=${PROBLEM_PATH_ARRAY},MAX_SOLVER_TIME_ARRAY=${MAX_SOLVER_TIME_ARRAY},MEASURE_RESPONSES=${MEASURE_RESPONSES},TMP_RES_PATH=${TMP_RES_PATH},N_REPS=${N_REPS},N_EVALS=${N_EVALS} --array=0-$i src/experiments/permus/scripts/hip_test_array.sl`
+
+TESTING_JOB_ID=`sbatch --parsable --dependency=afterok:${TRAINING_JOB_ID} --export=CONTROLLER_ARRAY=${CONTROLLER_ARRAY},PROBLEM_TYPE_ARRAY=${PROBLEM_TYPE_ARRAY},PROBLEM_PATH_ARRAY=${PROBLEM_PATH_ARRAY},MAX_SOLVER_TIME_ARRAY=${MAX_SOLVER_TIME_ARRAY},MEASURE_RESPONSES=${MEASURE_RESPONSES},TMP_RES_PATH=${TMP_RES_PATH},N_REPS=${N_REPS},N_EVALS=${N_EVALS} --array=0-$i src/experiments/permus/scripts/hip_test_array.sl`
 
 
 if [ -z "$RESPONSE_PATH" ]; then

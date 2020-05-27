@@ -678,6 +678,8 @@ public:
 
     double compute_normalized_hamming_distance_to_consensus(int *permu) { return compute_hamming_distance_to_consensus(permu) / (double)n; }
     double compute_normalized_kendall_distance_to_consensus(int *permu) { return compute_kendall_distance_to_consensus(permu) / (double)(n * (n - 1) / 2); }
+    double compute_normalized_kendall_distance_to_consensus_fast_approx(int *permu) { return l1_distance(permu, kendall_mm_consensus, n) / (double)(n * n / 2); }
+
 
 private:
     void convert_to_permu(int *res);

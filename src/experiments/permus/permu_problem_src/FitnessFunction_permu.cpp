@@ -23,24 +23,23 @@
 namespace PERMU{
 
 
-PBP *GetProblemInfo(std::string problemType, std::string filename)
+void GetProblemInfo(std::string problemType, std::string filename, PBP** problem)
 {
-    PBP *problem;
     if (problemType == "pfsp")
     {
-        problem = new PFSP();
+        (*problem) = new PFSP();
     }
     else if (problemType == "tsp")
     {
-        problem = new TSP();
+        (*problem) = new TSP();
     }
     else if (problemType == "qap")
     {
-        problem = new QAP();
+        (*problem) = new QAP();
     }
     else if (problemType == "lop")
     {
-        problem = new LOP();
+        (*problem) = new LOP();
     }
     // else if (problemType == "api")
     //     problem = new API();
@@ -51,9 +50,8 @@ PBP *GetProblemInfo(std::string problemType, std::string filename)
      }
 
     //Read the instance.
-    problem->Read_with_mutex(filename);
+    (*problem)->Read_with_mutex(filename);
 
-    return problem;
 }
 
 
@@ -69,10 +67,10 @@ double FitnessFunction_permu(NEAT::CpuNetwork *net_original, int n_evals, int se
     NEAT::CpuNetwork *net = &tmp_net;
 
  
-    problem = GetProblemInfo(parameters->PROBLEM_TYPE, parameters->INSTANCE_PATH);     //Read the problem instance to optimize.
+    GetProblemInfo(parameters->PROBLEM_TYPE, parameters->INSTANCE_PATH, &problem);     //Read the problem instance to optimize.
     pop = new CPopulation(problem, parameters);
     problem->load_rng(pop->rng);
-    pop->rng->seed(seed);
+    pop->rng->seed();
     seed = pop->rng->random_integer_fast((int) 10e8);
 
     v_of_fitness = new double[n_evals];
@@ -97,13 +95,8 @@ double FitnessFunction_permu(NEAT::CpuNetwork *net_original, int n_evals, int se
         pop->rng->seed(seed + n_of_repetitions_completed);
         pop->Reset();
         //std::cout << "|" << n_of_repetitions_completed << "|" << std::endl;
-        for (int i = 0; i < MAX_POPSIZE; i++)
-        {
-            std::swap(net->activations, pop->m_individuals[i]->activation);
-            net->clear_noninput();
-            std::swap(net->activations, pop->m_individuals[i]->activation);
-        }
 
+        net->clear_noninput();
 
         #ifdef RANDOM_SEARCH
         pop->timer->tic();
@@ -132,14 +125,13 @@ double FitnessFunction_permu(NEAT::CpuNetwork *net_original, int n_evals, int se
             for (int i = 0; i < pop->popsize; i++)
             {
 
-                std::swap(net->activations, pop->m_individuals[i]->activation);
                 for (int sns_idx = 0; sns_idx < PERMU::__sensor_N; sns_idx++)
                 {
                     net->load_sensor(sns_idx, pop->get_neat_input_individual_i(i)[sns_idx]);
                 }
                 net->activate();
                 pop->apply_neat_output_to_individual_i(net->get_outputs(), i);
-                std::swap(net->activations, pop->m_individuals[i]->activation);
+                net->clear_noninput();
             }
             pop->end_iteration();
         }

@@ -67,6 +67,8 @@ void CPopulation::init_class(PBP *problem, RandomNumberGenerator* rng, PERMU::pa
     timer = new stopwatch();
     terminated = false;
     evaluate_population();
+    comp_sparsity(true);
+    comp_order_sparsity(true);
     end_iteration();
 }
 
@@ -96,6 +98,8 @@ void CPopulation::Reset(){
     terminated = false;
     timer->tic();
     evaluate_population();
+    comp_sparsity(true);
+    comp_order_sparsity(true);
     end_iteration();
 }
 
@@ -294,8 +298,8 @@ void CPopulation::get_population_info(){
     comp_relative_position();
     comp_relative_time();
     comp_distance();
-    comp_sparsity();
-    comp_order_sparsity();
+    comp_sparsity(false);
+    comp_order_sparsity(false);
     load_local_opt();
     for (int i = 0; i < popsize; i++)
     {
@@ -384,9 +388,27 @@ void CPopulation::comp_distance()
 }
 
 
-void CPopulation::comp_sparsity(){
+void CPopulation::comp_sparsity(bool first_time){
+
     copy_references_of_genomes_from_individuals_to_permus();
-    pt->compute_hamming_consensus(this->permus, this->popsize);
+
+
+    const int COMPUTE_CONSENSUS_EVERY = 20;
+    static int iterations_left_for_next_computation_of_consensus = 0;
+    
+    if (first_time)
+    {
+        iterations_left_for_next_computation_of_consensus = 0;
+    }
+
+    if(iterations_left_for_next_computation_of_consensus == 0)
+    {
+        pt->compute_hamming_consensus(this->permus, this->popsize);
+        iterations_left_for_next_computation_of_consensus = COMPUTE_CONSENSUS_EVERY;
+    }
+
+    iterations_left_for_next_computation_of_consensus--;
+
     for (int i = 0; i < this->popsize; i++)
     {
         m_individuals[i]->sparsity = 1.0 - pt->compute_normalized_hamming_distance_to_consensus(permus[i]);
@@ -395,11 +417,30 @@ void CPopulation::comp_sparsity(){
 }
 
 
-void CPopulation::comp_order_sparsity(){
-    pt->compute_kendall_consensus_borda(this->permus, popsize);
+void CPopulation::comp_order_sparsity(bool first_time){
+
+
+    const int COMPUTE_CONSENSUS_EVERY = 20;
+    static int iterations_left_for_next_computation_of_consensus = 0;
+
+    if (first_time)
+    {
+        iterations_left_for_next_computation_of_consensus = 0;
+    }
+    
+
+    if(iterations_left_for_next_computation_of_consensus == 0)
+    {
+        pt->compute_kendall_consensus_borda(this->permus, popsize);
+        iterations_left_for_next_computation_of_consensus = COMPUTE_CONSENSUS_EVERY;
+    }
+
+    iterations_left_for_next_computation_of_consensus--;
+
+
     for (int i = 0; i < this->popsize; i++)
     {
-        m_individuals[i]->order_sparsity = 1.0 - pt->compute_normalized_kendall_distance_to_consensus(permus[i]);
+        m_individuals[i]->order_sparsity = 1.0 - pt->compute_normalized_kendall_distance_to_consensus_fast_approx(permus[i]);
         pop_info[i][PERMU::ORDER_SPARSITY] = m_individuals[i]->order_sparsity;
     }
 }

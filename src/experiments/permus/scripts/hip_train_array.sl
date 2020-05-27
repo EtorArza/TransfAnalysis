@@ -114,7 +114,11 @@ PROBLEM_PATH = $PROBLEM_PATH
 
 EOF
 
+echo "---conf file begin---"
 
+cat tmp.ini
+
+echo "---conf file end---"
 
 
 date

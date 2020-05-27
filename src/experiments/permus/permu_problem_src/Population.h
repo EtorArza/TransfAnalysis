@@ -90,10 +90,10 @@ private:
   void comp_relative_position();
   void comp_relative_time();
   void comp_distance();
-  void comp_sparsity();
+  void comp_sparsity(bool first_time);
   void comp_r_number();
   void load_local_opt();
-  void comp_order_sparsity();
+  void comp_order_sparsity(bool first_time);
   
   // Individual i is duplicated only if there is enough space. Additionally, the popsize is updated consecuently.
   void duplicate_individual_i(int i);

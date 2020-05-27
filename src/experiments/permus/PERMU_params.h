@@ -26,7 +26,6 @@ namespace PERMU{
         bool COMPUTE_RESPONSE = false;
         /////////////////////////////////////////////
 
-        double* bk_f_average_sample;
         std::string prob_name;
         std::string MODE;
         int SEED;

@@ -349,7 +349,7 @@ public:
     void seedRandom(unsigned int seed)
     // seed for random number generator.
     {
-        rng->seed();
+        rng->seed(seed);
         return;   
     }
 

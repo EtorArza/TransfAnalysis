@@ -135,7 +135,11 @@ COMMA_SEPARATED_LIST_OF_INSTANCE_PATHS = $COMMA_SEPARATED_LIST_OF_INSTANCE_PATHS
 
 EOF
 
+echo "---conf file begin---"
 
+cat tmp.ini
+
+echo "---conf file end---"
 
 
 date
