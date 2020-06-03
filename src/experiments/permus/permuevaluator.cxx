@@ -146,15 +146,11 @@ struct Evaluator
         double *tmp_order = new double[nnets];
         // evaluate the individuals
 
-        double f_value_of_last_iterations_best;
         if (best_network == nullptr)
         {
             best_network = new NEAT::CpuNetwork(*nets[0]);
         }
-        else
-        {
-            *nets[nnets-1] = *best_network;
-        }
+
 
         int current_n_of_evals = 0;
         int target_n_controllers_left;
@@ -187,21 +183,15 @@ struct Evaluator
             for (int i = 0; i < surviving_candidates.size() * EVAL_MIN_STEP; i++)
             {
                 int inet = surviving_candidates[i / EVAL_MIN_STEP];
-                //cout << inet << "|" << current_n_of_evals + i%EVAL_MIN_STEP << endl;
                 NEAT::CpuNetwork *net = nets[inet];
                 int seed = initial_seed + i % EVAL_MIN_STEP;
-
                 f_values[inet][current_n_of_evals + i % EVAL_MIN_STEP] = this->FitnessFunction(net, 1, seed);
-
+                cout << inet << "|" << current_n_of_evals + i % EVAL_MIN_STEP << "|" << seed << endl;
             }
             bar.end();
             cout << ", ";
             current_n_of_evals += EVAL_MIN_STEP;
 
-            if (is_item_in_array(surviving_candidates.data(), (int) (nnets-1), surviving_candidates.size()))
-            {
-                f_value_of_last_iterations_best = Average(f_values[nnets-1], current_n_of_evals);
-            }
             for (auto &&inet : surviving_candidates)
             {
                 tmp_order[inet] = Average(f_values[inet], current_n_of_evals) - (double)surviving_candidates.size() * 10000000.0;
@@ -215,15 +205,22 @@ struct Evaluator
             cout << endl;
         }
 
-        if (is_item_in_array(surviving_candidates.data(),(int) (nnets-1), surviving_candidates.size()))
-        {
-            f_value_of_last_iterations_best = Average(f_values[nnets-1], current_n_of_evals);
-        }
+
         for (auto &&inet : surviving_candidates)
         {
             tmp_order[inet] = Average(f_values[inet], current_n_of_evals) - (double)surviving_candidates.size() * 10000000.0;
         }
-        parameters->neat_params->BEST_FITNESS_TRAIN = (f_value_of_last_iterations_best + parameters->neat_params->BEST_FITNESS_TRAIN) / 2;
+
+        double avg_perf_best = 0;
+        int initial_seed = rng.random_integer_uniform(INT_MAX);
+
+        #pragma omp parallel for num_threads(parameters->neat_params->N_OF_THREADS)
+        for (int i = 0; i < current_n_of_evals; i++)
+        {
+            avg_perf_best += this->FitnessFunction(best_network, 1, initial_seed + i) / (double) current_n_of_evals;
+        }
+
+        parameters->neat_params->BEST_FITNESS_TRAIN = (avg_perf_best + parameters->neat_params->BEST_FITNESS_TRAIN) / 2;
         double best_f_gen = Average(f_values[argmax(tmp_order, (int)nnets)], current_n_of_evals);
         cout << "(best this gen, best last gen) -> (" << best_f_gen << ", " << parameters->neat_params->BEST_FITNESS_TRAIN << ")";
 
@@ -235,7 +232,7 @@ struct Evaluator
             delete best_network;
             best_network = new NEAT::CpuNetwork(*nets[argmax(tmp_order, (int)nnets)]);
             tmp_order[argmax(tmp_order, (int)nnets)] += 10000000.0;
-         }
+        }
 
         cout << endl;
 

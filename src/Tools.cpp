@@ -1810,7 +1810,17 @@ bool is_A_larger_than_B_Signed_Wilcoxon(double* A, double* B, int length){
         return false;
     }
 
-    int critical_values_one_sided_0_05[10] = {INT_MAX, INT_MAX, INT_MAX, INT_MAX, INT_MAX, 15, 17, 22, 26, 29};
+    #if ALPHA_INDEX == 0
+        int critical_values_one_sided[10] = {INT_MAX, INT_MAX, INT_MAX, INT_MAX, INT_MAX, 15,      17,      22,      26, 29};
+    #elif ALPHA_INDEX == 1
+        int critical_values_one_sided[10] = {INT_MAX, INT_MAX, INT_MAX, INT_MAX, INT_MAX, INT_MAX, INT_MAX, 28,      34, 39};
+    #elif ALPHA_INDEX == 2
+        int critical_values_one_sided[10] = {INT_MAX, INT_MAX, INT_MAX, INT_MAX, INT_MAX, INT_MAX, INT_MAX, INT_MAX, 36, 43};
+    #else
+        #error Only indexes 0, 1 and 2 allowed in alpha selection.
+    #endif
+
+
 
     double d_N_r = (double) N_r;
  
@@ -1822,7 +1832,7 @@ bool is_A_larger_than_B_Signed_Wilcoxon(double* A, double* B, int length){
 
     if (N_r <= 9)
     {
-        if (W > critical_values_one_sided_0_05[N_r])
+        if (W > critical_values_one_sided[N_r])
         {
             return true;
         }else

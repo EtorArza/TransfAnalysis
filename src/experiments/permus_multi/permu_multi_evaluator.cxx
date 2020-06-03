@@ -101,13 +101,13 @@ struct Evaluator
         double *tmp_order = new double[nnets];
         // evaluate the individuals
 
-        double f_value_of_last_iterations_best;
         if (best_network == nullptr)
         {
             best_network = new NEAT::CpuNetwork(*nets[0]);
         }
         else
         {
+            cout << "TODO: get rid of this. ORganism not replaced, only network. Therefore, wron organism is credited a high score." << endl;
             *nets[nnets-1] = *best_network;
         }
 
@@ -160,10 +160,7 @@ struct Evaluator
 
             replace_f_values_with_ranks(surviving_candidates, f_values, current_n_of_evals);
 
-            if (is_item_in_array(surviving_candidates.data(), (int) (nnets-1), surviving_candidates.size()))
-            {
-                f_value_of_last_iterations_best = Average(f_values[nnets-1], current_n_of_evals);
-            }
+
 
             for (auto &&inet : surviving_candidates)
             {
@@ -178,16 +175,13 @@ struct Evaluator
         }
         replace_f_values_with_ranks(surviving_candidates, f_values, current_n_of_evals);
 
-        if (is_item_in_array(surviving_candidates.data(),(int) (nnets-1), surviving_candidates.size()))
-        {
-            f_value_of_last_iterations_best = Average(f_values[nnets-1], current_n_of_evals);
-        }
+
         for (auto &&inet : surviving_candidates)
         {
             tmp_order[inet] = Average(f_values[inet], current_n_of_evals) - (double)surviving_candidates.size() * 10000000.0;
         }
-
-        parameters->neat_params->BEST_FITNESS_TRAIN = (f_value_of_last_iterations_best + parameters->neat_params->BEST_FITNESS_TRAIN) / 2;
+        cout << "TODO: error nnets-1 replaced by best, but organism was not replaced, therefore, a shitty network was saved." << endl;
+        //parameters->neat_params->BEST_FITNESS_TRAIN = (f_value_of_last_iterations_best + parameters->neat_params->BEST_FITNESS_TRAIN) / 2;
         double best_f_gen = Average(f_values[argmax(tmp_order, (int)nnets)], current_n_of_evals);
         cout << "(best this gen, best last gen) -> (" << best_f_gen << ", " << parameters->neat_params->BEST_FITNESS_TRAIN << ")";
 

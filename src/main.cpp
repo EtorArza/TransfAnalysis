@@ -37,8 +37,15 @@ void usage()
 
 int main(int argc, char *argv[])
 {
+    // int n = 13;
 
- 
+    // int sigma_1[n] = {5,11,2,9,4,6,0,7,8,3,10,1,12};
+    // int sigma_2[n] = {12,11,10,9,8,7,6,5,4,3,2,1,0};
+
+    // cout << Kendall(sigma_1, sigma_2, n) / (double) (n*(n-1) / 2) << endl;
+    // cout << l1_distance(sigma_1, sigma_2, n) / (double) (n*n / 2) << endl;
+    // cout << n*n / 2 << endl;
+    // exit(1);
 
     using namespace std;
     using namespace NEAT;
