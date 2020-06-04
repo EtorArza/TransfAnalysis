@@ -94,7 +94,7 @@ struct Evaluator
 
         for (size_t i = 0; i < nnets; i++)
         {
-            f_values[i] = new double[MAX_EVALS_PER_CONTROLLER_LAST_IT + n_evals_each_it];
+            f_values[i] = new double[EVALS_TO_SELECT_BEST_CONTROLLER_IN_LAST_IT + n_evals_each_it];
         }
 
         double *tmp_order = new double[nnets];
@@ -116,12 +116,12 @@ struct Evaluator
         if (parameters->neat_params->IS_LAST_ITERATION)
         {
             target_n_controllers_left = 1;
-            max_evals_per_controller = MAX_EVALS_PER_CONTROLLER_LAST_IT;
+            max_evals_per_controller = EVALS_TO_SELECT_BEST_CONTROLLER_IN_LAST_IT;
         }
         else
         {
             target_n_controllers_left = (int)((double)nnets * NEAT::env->survival_thresh);
-            max_evals_per_controller = MAX_EVALS_PER_CONTROLLER_REGULAR_IT;
+            max_evals_per_controller = MAX_EVALS_PER_CONTROLLER_NEUROEVOLUTION;
         }
         
 
