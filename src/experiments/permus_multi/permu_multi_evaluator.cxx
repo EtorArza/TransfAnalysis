@@ -69,13 +69,12 @@ struct Evaluator
     __net_eval_decl Evaluator(){};
 
     // fitness function in sequential order
-    __net_eval_decl double FitnessFunction(NEAT::CpuNetwork *net, int n_evals, int initial_seed, int instance_index)
+    __net_eval_decl double FitnessFunction(NEAT::CpuNetwork *net, int initial_seed, int instance_index)
     {
         int seed_seq = initial_seed;
         PERMU_MULTI::params_multi tmp_params = *parameters;
         tmp_params.INSTANCE_PATH = (*parameters->VECTOR_OF_INSTANCE_PATHS)[instance_index];
-        double res = FitnessFunction_permu(net, n_evals, seed_seq, &tmp_params);
-        seed_seq += n_evals;
+        double res = FitnessFunction_permu(net, seed_seq, &tmp_params);
         return res;
     }
 
@@ -150,7 +149,7 @@ struct Evaluator
                 NEAT::CpuNetwork *net = nets[inet];
                 int seed = initial_seed + i % n_evals_each_it;
 
-                f_values[inet][f_value_sample_index] = this->FitnessFunction(net, 1, seed, instance_index);
+                f_values[inet][f_value_sample_index] = this->FitnessFunction(net, seed, instance_index);
                 bar.step();
             }
 

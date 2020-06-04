@@ -122,11 +122,9 @@ struct Evaluator
 
 
     // fitness function in sequential order
-    __net_eval_decl double FitnessFunction(NEAT::CpuNetwork *net, int n_evals, int initial_seed)
+    __net_eval_decl double FitnessFunction(NEAT::CpuNetwork *net, int seed)
     {
-        int seed_seq = initial_seed;
-        double res = FitnessFunction_permu(net, n_evals, seed_seq, parameters);
-        seed_seq += n_evals;
+        double res = FitnessFunction_permu(net, seed, parameters);
         return res;
     }
 
@@ -185,7 +183,7 @@ struct Evaluator
                 int inet = surviving_candidates[i / EVAL_MIN_STEP];
                 NEAT::CpuNetwork *net = nets[inet];
                 int seed = initial_seed + i % EVAL_MIN_STEP;
-                f_values[inet][current_n_of_evals + i % EVAL_MIN_STEP] = this->FitnessFunction(net, 1, seed);
+                f_values[inet][current_n_of_evals + i % EVAL_MIN_STEP] = this->FitnessFunction(net, seed);
                 //cout << inet << "|" << current_n_of_evals + i % EVAL_MIN_STEP << "|" << seed << endl;
             }
             bar.end();
@@ -218,7 +216,7 @@ struct Evaluator
             #pragma omp parallel for num_threads(parameters->neat_params->N_OF_THREADS)
             for (int i = 0; i < current_n_of_evals; i++)
             {
-                avg_perf_best += this->FitnessFunction(best_network, 1, initial_seed + i) / (double) current_n_of_evals;
+                avg_perf_best += this->FitnessFunction(best_network, initial_seed + i) / (double) current_n_of_evals;
             }
             parameters->neat_params->BEST_FITNESS_TRAIN = (avg_perf_best + parameters->neat_params->BEST_FITNESS_TRAIN) / 2;
         }
@@ -260,7 +258,16 @@ struct Evaluator
             PrintArray(tmp_order, nnets);
 
             cout << endl;
-            cout << "BEST_FITNESS_DEBUG_LAST_IT: " << this->FitnessFunction(best_network, 50, 2783492779) << endl;
+
+            double avg_perf_best = 0;
+            int initial_seed = rng.random_integer_uniform(INT_MAX);
+            #pragma omp parallel for num_threads(parameters->neat_params->N_OF_THREADS)
+            for (int i = 0; i < 200; i++)
+            {
+                avg_perf_best += this->FitnessFunction(best_network, 2783492779) / (double) 200;
+            }
+
+            cout << "BEST_FITNESS_DEBUG_LAST_IT: " << avg_perf_best << endl;
             
             cout << endl;
         }
@@ -491,7 +498,7 @@ void PermuEvaluator::run_given_conf_file(std::string conf_file_path)
 #pragma omp parallel for num_threads(parameters->neat_params->N_OF_THREADS)
             for (int i = 0; i < parameters->N_EVALS; i++)
             {
-                v_of_f_values[i] = FitnessFunction_permu(&net, 1, initial_seed + i, parameters);
+                v_of_f_values[i] = FitnessFunction_permu(&net, initial_seed + i, parameters);
             }
             initial_seed += parameters->N_EVALS;
             double res = Average(v_of_f_values, parameters->N_EVALS);

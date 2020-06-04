@@ -7,6 +7,6 @@ namespace PERMU{
 
 class PBP;
 void GetProblemInfo(std::string problemType, std::string filename, PBP ** problem);
-double FitnessFunction_permu(NEAT::CpuNetwork *net, int n_evals, int seed, PERMU::params *parameters);
+double FitnessFunction_permu(NEAT::CpuNetwork *net, int seed, PERMU::params *parameters);
 
 }

@@ -56,35 +56,34 @@ void GetProblemInfo(std::string problemType, std::string filename, PBP** problem
 
 
 //#define COUNTER
-double FitnessFunction_permu(NEAT::CpuNetwork *net_original, int n_evals, int seed, PERMU::params* parameters)
-{   using namespace PERMU;
+double FitnessFunction_permu(NEAT::CpuNetwork *net_original, int seed, PERMU::params* parameters)
+{   
+    using namespace PERMU;
+
 
     double *v_of_fitness;
-    PERMU::PBP *problem;
     PERMU::CPopulation *pop;
+    PERMU::PBP *problem;
 
     NEAT::CpuNetwork tmp_net = *net_original;
     NEAT::CpuNetwork *net = &tmp_net;
 
- 
+
     GetProblemInfo(parameters->PROBLEM_TYPE, parameters->INSTANCE_PATH, &problem);     //Read the problem instance to optimize.
+    
+
     pop = new CPopulation(problem, parameters);
     problem->load_rng(pop->rng);
     pop->rng->seed();
     seed = pop->rng->random_integer_fast((int) 10e8);
 
-    v_of_fitness = new double[n_evals];
-
-    for (int i = 0; i < MAX_POPSIZE; i++)
-    {
-        pop->m_individuals[i]->activation = std::vector<double>(net->activations);
-    }
 
     #ifdef COUNTER
         int counter = 0;
     #endif
 
-    for (int n_of_repetitions_completed = 0; n_of_repetitions_completed < n_evals; n_of_repetitions_completed++)
+
+    double res = -DBL_MAX;
     {
 
         #ifdef COUNTER
@@ -92,7 +91,7 @@ double FitnessFunction_permu(NEAT::CpuNetwork *net_original, int n_evals, int se
         #endif
 
 
-        pop->rng->seed(seed + n_of_repetitions_completed);
+        pop->rng->seed(seed);
         pop->Reset();
         //std::cout << "|" << n_of_repetitions_completed << "|" << std::endl;
 
@@ -118,10 +117,6 @@ double FitnessFunction_permu(NEAT::CpuNetwork *net_original, int n_evals, int se
             // }
             #endif
 
-
-
-
-
             for (int i = 0; i < pop->popsize; i++)
             {
 
@@ -142,22 +137,19 @@ double FitnessFunction_permu(NEAT::CpuNetwork *net_original, int n_evals, int se
             PrintArray(pop->genome_best, pop->n);
             exit(1);
         }
-        v_of_fitness[n_of_repetitions_completed] = problem->Evaluate(pop->genome_best);
+        res = problem->Evaluate(pop->genome_best);
         net->clear_noninput();
         #ifdef COUNTER
         cout << counter << endl;
         #endif
     }
 
-    double res = Average(v_of_fitness, n_evals);
 
 
     delete[] v_of_fitness;
     delete pop;
-    delete problem;
     pop = NULL;
     v_of_fitness = NULL;
-    problem = NULL;
     net = NULL;
     return res;
 }
