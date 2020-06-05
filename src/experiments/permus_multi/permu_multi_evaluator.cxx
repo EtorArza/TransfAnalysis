@@ -165,7 +165,7 @@ struct Evaluator
             {
                 tmp_order[inet] = Average(f_values[inet], current_n_of_evals) - (double)surviving_candidates.size() * 10000000.0;
             }
-            F_race_iteration(f_values, surviving_candidates, current_n_of_evals);
+            F_race_iteration(f_values, surviving_candidates, current_n_of_evals, 0);
 
 
             cout << ", perc_discarded: " << (double)(nnets - surviving_candidates.size()) / (double)(nnets);
