@@ -275,7 +275,7 @@ struct Evaluator
                 avg_perf_best += this->FitnessFunction(best_network, 2783492779) / (double) 200;
             }
 
-            cout << "BEST_FITNESS_DEBUG_LAST_IT: " << avg_perf_best << endl;
+            cout << "BEST_FITNESS_DEBUG_LAST_IT, (reeval200, selection_best) ->" << avg_perf_best << ", " << Average(f_values[argmax(tmp_order, (int)nnets)], EVALS_TO_SELECT_BEST_CONTROLLER_IN_LAST_IT) << endl;
             
             cout << endl;
         }
