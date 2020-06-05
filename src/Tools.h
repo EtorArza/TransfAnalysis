@@ -802,20 +802,20 @@ int arg_element_in_centile_specified_by_percentage(T* array, int len, double per
 
 
 //Unpaired test
-bool is_A_larger_than_B_Mann_Whitney(double* A, double* B, int length);
+bool is_A_larger_than_B_Mann_Whitney(double* A, double* B, int length, int ALPHA_INDEX);
 
 //Paired test
-bool is_A_larger_than_B_Signed_Wilcoxon(double* A, double* B, int length);
+bool is_A_larger_than_B_Signed_Wilcoxon(double* A, double* B, int length, int ALPHA_INDEX);
 
 //Paired test
-bool Friedman_test_are_there_critical_diferences(double** f_values, int n_candidates, int n_samples);
+bool Friedman_test_are_there_critical_diferences(double** f_values, int n_candidates, int n_samples, int ALPHA_INDEX);
 
 void get_ranks_from_f_values(vector<vector<double>>& ranks, double** f_values, int n_candidates, int n_samples);
 
 double p_value_chisquared(double x, double df);
 
 
-void F_race_iteration(double** f_values, vector<int> &surviving_candidates, int n_samples);
+void F_race_iteration(double** f_values, vector<int> &surviving_candidates, int n_samples, int ALPHA_INDEX);
 
 
 template <class T>

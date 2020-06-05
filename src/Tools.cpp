@@ -1688,13 +1688,55 @@ double from_u_statistic_to_z(double u, double length, double* array_of_values){
 
 
 
+void load_statistical_sigificant_parameters_given_alpha_index(int ALPHA_INDEX, double &ALPHA, double &Z_THRESH, int *critical_values_one_sided = nullptr)
+{
+    
+    if (ALPHA_INDEX == 0)
+    {
+        ALPHA = 0.05;
+        Z_THRESH = 1.645;
+        if (critical_values_one_sided != nullptr)
+        {
+            int crit_vals[10] = {INT_MAX, INT_MAX, INT_MAX, INT_MAX, INT_MAX, 15,      17,      22,      26, 29};
+            copy_array(critical_values_one_sided, crit_vals, 10);
+        }
+    } 
+    else if(ALPHA_INDEX == 1)
+    {
+        ALPHA = 0.01;
+        Z_THRESH = 2.326;
+        if (critical_values_one_sided != nullptr)
+        {
+            int crit_vals[10] = {INT_MAX, INT_MAX, INT_MAX, INT_MAX, INT_MAX, INT_MAX, INT_MAX, 28,      34, 39};
+            copy_array(critical_values_one_sided, crit_vals, 10);
+        }
+    }
+    else if (ALPHA_INDEX == 2)
+    {
+        ALPHA = 0.005;
+        Z_THRESH = 2.576;
+        if (critical_values_one_sided != nullptr)
+        {
+            int crit_vals[10] = {INT_MAX, INT_MAX, INT_MAX, INT_MAX, INT_MAX, INT_MAX, INT_MAX, INT_MAX, 36, 43};
+            copy_array(critical_values_one_sided, crit_vals, 10);
+        }
+    }
+    else
+    {
+        cout << "ERROR:  Only indexes 0, 1 and 2 allowed in alpha selection.";
+    }
+}
+
+
 
 
 //Unpaired test
-bool is_A_larger_than_B_Mann_Whitney(double* A, double* B, int length){
+bool is_A_larger_than_B_Mann_Whitney(double* A, double* B, int length, int ALPHA_INDEX){
 
+    double Z_THRESH;
+    double ALPHA;
 
-
+    load_statistical_sigificant_parameters_given_alpha_index(ALPHA_INDEX, ALPHA, Z_THRESH);
 
     if(length < 20){
         cout << "A larger sample size than 20 is required to correctly estimate p-value. " << endl;
@@ -1760,7 +1802,7 @@ bool is_A_larger_than_B_Mann_Whitney(double* A, double* B, int length){
 //    vector<double> B{78, 24, 62, 48, 68, 56, 25, 44, 56, 40, 68, 36, 68, 20, 58, 32};
 //    cout << "\n\n" << is_A_larger_than_B_Signed_Wilcoxon(A.data(), B.data(), 16) << endl;
 //    exit(0);
-bool is_A_larger_than_B_Signed_Wilcoxon(double* A, double* B, int length){
+bool is_A_larger_than_B_Signed_Wilcoxon(double* A, double* B, int length, int ALPHA_INDEX){
 
 
     if(length < 4){
@@ -1810,17 +1852,11 @@ bool is_A_larger_than_B_Signed_Wilcoxon(double* A, double* B, int length){
         return false;
     }
 
-    #if ALPHA_INDEX == 0
-        int critical_values_one_sided[10] = {INT_MAX, INT_MAX, INT_MAX, INT_MAX, INT_MAX, 15,      17,      22,      26, 29};
-    #elif ALPHA_INDEX == 1
-        int critical_values_one_sided[10] = {INT_MAX, INT_MAX, INT_MAX, INT_MAX, INT_MAX, INT_MAX, INT_MAX, 28,      34, 39};
-    #elif ALPHA_INDEX == 2
-        int critical_values_one_sided[10] = {INT_MAX, INT_MAX, INT_MAX, INT_MAX, INT_MAX, INT_MAX, INT_MAX, INT_MAX, 36, 43};
-    #else
-        #error Only indexes 0, 1 and 2 allowed in alpha selection.
-    #endif
+    double ALPHA;
+    double Z_THRESH;
+    int critical_values_one_sided[10] = {0};
 
-
+    load_statistical_sigificant_parameters_given_alpha_index(ALPHA_INDEX, ALPHA, Z_THRESH, critical_values_one_sided);
 
     double d_N_r = (double) N_r;
  
@@ -1913,12 +1949,17 @@ void get_ranks_from_f_values(vector<vector<double>>& ranks, double** f_values, i
 }
 
 
-bool Friedman_test_are_there_critical_diferences(double** f_values, int n_candidates, int n_samples)
+bool Friedman_test_are_there_critical_diferences(double** f_values, int n_candidates, int n_samples, int ALPHA_INDEX)
 {
     // value_1 of controller_1, value_2 of controller_1, ..., value_sample_length of controller_1
     // value_1 of controller_2, value_2 of controller_2, ..., value_sample_length of controller_2
     // ...
     // value_1 of controller_n_candidates, value_2 of controller_n_candidates, ..., value_sample_length of controller_n_candidates
+
+    double ALPHA;
+    double Z_THRESH;
+
+    load_statistical_sigificant_parameters_given_alpha_index(ALPHA_INDEX, ALPHA, Z_THRESH);
 
     static vector<vector<double>> ranks;
 
@@ -1980,7 +2021,7 @@ bool Friedman_test_are_there_critical_diferences(double** f_values, int n_candid
     int df = m - 1;
     double p = p_value_chisquared(T, (double) df);
 
-
+    
 
 
     if (p > ALPHA)
@@ -1998,14 +2039,7 @@ bool Friedman_test_are_there_critical_diferences(double** f_values, int n_candid
 }
 
 
-
-
-
-
-
-
-
-void F_race_iteration(double** f_values, vector<int> &surviving_candidates, int n_samples)
+void F_race_iteration(double** f_values, vector<int> &surviving_candidates, int n_samples, int ALPHA_INDEX)
 {
     double** reduced_f_values = new double*[surviving_candidates.size()];
     static vector<vector<double>> ranks;
@@ -2028,7 +2062,7 @@ void F_race_iteration(double** f_values, vector<int> &surviving_candidates, int 
     // PrintMatrix(reduced_f_values, surviving_candidates.size(), n_samples);
 
 
-    if (surviving_candidates.size() == 2 || Friedman_test_are_there_critical_diferences(reduced_f_values, surviving_candidates.size(), n_samples))
+    if (surviving_candidates.size() == 2 || Friedman_test_are_there_critical_diferences(reduced_f_values, surviving_candidates.size(), n_samples, ALPHA_INDEX))
     {
         int best_reduced_index = 0;
         double* avg_ranks = new double[surviving_candidates.size()];
@@ -2053,7 +2087,7 @@ void F_race_iteration(double** f_values, vector<int> &surviving_candidates, int 
             // PrintArray(reduced_f_values[best_reduced_index], n_samples);
             // cout << endl;
             // cout << "---\n";
-            bool pos_hoc_test_result = is_A_larger_than_B_Signed_Wilcoxon(reduced_f_values[best_reduced_index], reduced_f_values[i], n_samples);
+            bool pos_hoc_test_result = is_A_larger_than_B_Signed_Wilcoxon(reduced_f_values[best_reduced_index], reduced_f_values[i], n_samples, ALPHA_INDEX);
 
             if (pos_hoc_test_result)
             {

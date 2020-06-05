@@ -16,21 +16,6 @@
 #define COMPUTE_ORDER_MARGINAL_EVERY_K_ITERATIONS 6
 
 
-#define ALPHA_INDEX 0
-
-
-#if ALPHA_INDEX == 0
-    #define ALPHA 0.05
-    #define Z_THRESH 1.645
-#elif ALPHA_INDEX == 1
-    #define ALPHA 0.01
-    #define Z_THRESH 2.326
-#elif ALPHA_INDEX == 2
-    #define ALPHA 0.005
-    #define Z_THRESH 2.576
-#else
-    #error Only indexes 0, 1 and 2 allowed in alpha selection.
-#endif
 
 
 
