@@ -101,11 +101,13 @@ for INSTANCE_TYPE_TRAIN in "A|B" "A|C" "B|C";do
         for INSTANCE_INDEX_TEST in "1" "2" "3" "4" "5"; do
             for INSTANCE_TYPE_TEST in "A" "B" "C"; do
 
-                i=$((i+1))
 
                 if [ "$INSTANCE_INDEX_TRAIN" == "$INSTANCE_INDEX_TEST" ]; then
                     continue
                 fi
+
+                i=$((i+1))
+
 
                 list_to_array $INSTANCE_TYPE_TRAIN
                 INSTANCE_TYPE_TRAIN_PAIR=("${BITRISE_CLI_LAST_PARSED_LIST[@]}")
