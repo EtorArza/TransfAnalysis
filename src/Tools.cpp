@@ -1832,6 +1832,13 @@ bool is_A_larger_than_B_Signed_Wilcoxon(double* A, double* B, int length, int AL
     int N_r = abs_differences.size();
     ranks.resize(N_r);
 
+    if (N_r == 0)
+    {
+        // Samples are equal
+        return false;
+    }
+    
+
     compute_order_from_double_to_double(abs_differences.data(), N_r, ranks.data(), false, true);
     sum_value_to_array(ranks.data(), 1.0, N_r);
 
@@ -2057,7 +2064,7 @@ void F_race_iteration(double** f_values, vector<int> &surviving_candidates, int 
 
     get_ranks_from_f_values(ranks, reduced_f_values, surviving_candidates.size(), n_samples);
 
-    // PrintMatrix(reduced_f_values, surviving_candidates.size(), n_samples);
+    PrintMatrix(reduced_f_values, surviving_candidates.size(), n_samples);
     // cout << "\n ---- \n";
     // PrintMatrix(reduced_f_values, surviving_candidates.size(), n_samples);
 
@@ -2072,21 +2079,21 @@ void F_race_iteration(double** f_values, vector<int> &surviving_candidates, int 
         }
         best_reduced_index = argmin(avg_ranks, surviving_candidates.size());
 
-        // cout << endl;
-        // cout << "avg_raks: ";
-        // PrintArray(avg_ranks, surviving_candidates.size());
-        // cout << endl;
+        cout << endl;
+        cout << "avg_raks: ";
+        PrintArray(avg_ranks, surviving_candidates.size());
+        cout << endl;
         // cout << endl;
         // cout << "best_reduced_index: " << best_reduced_index << endl;
         delete[] avg_ranks;
 
         for (int i = 0; i < surviving_candidates.size(); i++)
         {
-            // PrintArray(reduced_f_values[i], n_samples);
-            // cout << endl;
-            // PrintArray(reduced_f_values[best_reduced_index], n_samples);
-            // cout << endl;
-            // cout << "---\n";
+            PrintArray(reduced_f_values[i], n_samples);
+            cout << endl;
+            PrintArray(reduced_f_values[best_reduced_index], n_samples);
+            cout << endl;
+            cout << "---\n";
             bool pos_hoc_test_result = is_A_larger_than_B_Signed_Wilcoxon(reduced_f_values[best_reduced_index], reduced_f_values[i], n_samples, ALPHA_INDEX);
 
             if (pos_hoc_test_result)
