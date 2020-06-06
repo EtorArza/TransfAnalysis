@@ -3,7 +3,7 @@
 source scripts/array_to_string_functions.sh
 
 
-COMPILE_JOB_ID=`sbatch --parsable scripts/make_hip.sh`
+#COMPILE_JOB_ID=`sbatch --parsable scripts/make_hip.sh`
 
 SRCDIR=`pwd`
 
@@ -48,7 +48,9 @@ SEED_ARRAY=$(to_list "${SEED_ARRAY[@]}")
 MAX_SOLVER_TIME_ARRAY=$(to_list "${MAX_SOLVER_TIME_ARRAY[@]}")
 
 
-TRAINING_JOB_ID=`sbatch --parsable --dependency=afterok:${COMPILE_JOB_ID} --export=PROBLEM_TYPE_ARRAY=$PROBLEM_TYPE_ARRAY,PROBLEM_PATH_ARRAY=$PROBLEM_PATH_ARRAY,CONTROLLER_NAME_PREFIX_ARRAY=$CONTROLLER_NAME_PREFIX_ARRAY,EXPERIMENT_FOLDER_NAME_ARRAY=$EXPERIMENT_FOLDER_NAME_ARRAY,SEED_ARRAY=$SEED_ARRAY,POPSIZE_ARRAY=$POPSIZE_ARRAY,MAX_SOLVER_TIME_ARRAY=$MAX_SOLVER_TIME_ARRAY --array=0-$i src/experiments/permus/scripts/hip_train_array.sl`
+
+echo "WARNING: training disabled"
+#TRAINING_JOB_ID=`sbatch --parsable --dependency=afterok:${COMPILE_JOB_ID} --export=PROBLEM_TYPE_ARRAY=$PROBLEM_TYPE_ARRAY,PROBLEM_PATH_ARRAY=$PROBLEM_PATH_ARRAY,CONTROLLER_NAME_PREFIX_ARRAY=$CONTROLLER_NAME_PREFIX_ARRAY,EXPERIMENT_FOLDER_NAME_ARRAY=$EXPERIMENT_FOLDER_NAME_ARRAY,SEED_ARRAY=$SEED_ARRAY,POPSIZE_ARRAY=$POPSIZE_ARRAY,MAX_SOLVER_TIME_ARRAY=$MAX_SOLVER_TIME_ARRAY --array=0-$i src/experiments/permus/scripts/hip_train_array.sl`
 
 
 
@@ -62,16 +64,17 @@ N_REPS=1
 N_EVALS=40000
 
 
-CONTROLLER_ARRAY=()
-PROBLEM_TYPE_ARRAY=()
-PROBLEM_PATH_ARRAY=()
-MAX_SOLVER_TIME_ARRAY=()
-
-i=-1
+TESTING_JOB_ID=""
 for PROBLEM_TYPE_TRAIN in "qap" "tsp" "pfsp" "lop"; do
-    for PROBLEM_PATH_TRAIN in "src/experiments/permus/instances/transfer_permuproblems/${PROBLEM_TYPE}/"*; do
+    CONTROLLER_ARRAY=()
+    PROBLEM_TYPE_ARRAY=()
+    PROBLEM_PATH_ARRAY=()
+    MAX_SOLVER_TIME_ARRAY=()
+
+    i=-1
+    for PROBLEM_PATH_TRAIN in "src/experiments/permus/instances/transfer_permuproblems/${PROBLEM_TYPE_TRAIN}/"*; do
         for PROBLEM_TYPE_TEST in "qap" "tsp" "pfsp" "lop"; do
-            for PROBLEM_PATH_TEST in "src/experiments/permus/instances/transfer_permuproblems/${PROBLEM_TYPE}/"*; do
+            for PROBLEM_PATH_TEST in "src/experiments/permus/instances/transfer_permuproblems/${PROBLEM_TYPE_TEST}/"*; do
 
                 # Skip if training and testing instance is the same. i++ comes later, since this case is not added to experimentation
                 if [ "$PROBLEM_PATH_TRAIN" == "$PROBLEM_PATH_TEST" ]; then
@@ -90,14 +93,21 @@ for PROBLEM_TYPE_TRAIN in "qap" "tsp" "pfsp" "lop"; do
             done
         done
     done
+    CONTROLLER_ARRAY=$(to_list "${CONTROLLER_ARRAY[@]}")
+    PROBLEM_TYPE_ARRAY=$(to_list "${PROBLEM_TYPE_ARRAY[@]}")
+    PROBLEM_PATH_ARRAY=$(to_list "${PROBLEM_PATH_ARRAY[@]}")
+    MAX_SOLVER_TIME_ARRAY=$(to_list "${MAX_SOLVER_TIME_ARRAY[@]}")
+
+
+    echo "WARNING: training dependency removed"
+    TESTING_JOB_ID=$TESTING_JOB_ID:`sbatch --parsable  --export=CONTROLLER_ARRAY=${CONTROLLER_ARRAY},PROBLEM_TYPE_ARRAY=${PROBLEM_TYPE_ARRAY},PROBLEM_PATH_ARRAY=${PROBLEM_PATH_ARRAY},MAX_SOLVER_TIME_ARRAY=${MAX_SOLVER_TIME_ARRAY},MEASURE_RESPONSES=${MEASURE_RESPONSES},TMP_RES_PATH=${TMP_RES_PATH},N_REPS=${N_REPS},N_EVALS=${N_EVALS} --array=0-$i src/experiments/permus/scripts/hip_test_array.sl`
+
+    # --dependency=afterok:${TRAINING_JOB_ID}
 done
 
 
 
-TESTING_JOB_ID=`sbatch --parsable --dependency=afterok:${TRAINING_JOB_ID} --export=CONTROLLER_ARRAY=${CONTROLLER_ARRAY},PROBLEM_TYPE_ARRAY=${PROBLEM_TYPE_ARRAY},PROBLEM_PATH_ARRAY=${PROBLEM_PATH_ARRAY},MAX_SOLVER_TIME_ARRAY=${MAX_SOLVER_TIME_ARRAY},MEASURE_RESPONSES=${MEASURE_RESPONSES},TMP_RES_PATH=${TMP_RES_PATH},N_REPS=${N_REPS},N_EVALS=${N_EVALS} --array=0-$i src/experiments/permus/scripts/hip_test_array.sl`
-
-
-sbatch --dependency=afterok:$TESTING_JOB_ID --export=SCORE_PATH=${SCORE_PATH},RESPONSE_PATH=${RESPONSE_PATH} scripts/cat_result_files_to_exp_folder.sh
+sbatch --dependency=afterok$TESTING_JOB_ID --export=SCORE_PATH=${SCORE_PATH},RESPONSE_PATH=${RESPONSE_PATH} scripts/cat_result_files_to_exp_folder.sh
 
 
 
@@ -147,7 +157,8 @@ SEED_ARRAY=$(to_list "${SEED_ARRAY[@]}")
 MAX_SOLVER_TIME_ARRAY=$(to_list "${MAX_SOLVER_TIME_ARRAY[@]}")
 
 
-TRAINING_JOB_ID=`sbatch --parsable --dependency=afterok:${COMPILE_JOB_ID} --export=PROBLEM_TYPE_ARRAY=$PROBLEM_TYPE_ARRAY,PROBLEM_PATH_ARRAY=$PROBLEM_PATH_ARRAY,CONTROLLER_NAME_PREFIX_ARRAY=$CONTROLLER_NAME_PREFIX_ARRAY,EXPERIMENT_FOLDER_NAME_ARRAY=$EXPERIMENT_FOLDER_NAME_ARRAY,SEED_ARRAY=$SEED_ARRAY,POPSIZE_ARRAY=$POPSIZE_ARRAY,MAX_SOLVER_TIME_ARRAY=$MAX_SOLVER_TIME_ARRAY --array=0-$i src/experiments/permus/scripts/hip_train_array.sl`
+echo "WARNING: training disabled"
+#TRAINING_JOB_ID=`sbatch --parsable --dependency=afterok:${COMPILE_JOB_ID} --export=PROBLEM_TYPE_ARRAY=$PROBLEM_TYPE_ARRAY,PROBLEM_PATH_ARRAY=$PROBLEM_PATH_ARRAY,CONTROLLER_NAME_PREFIX_ARRAY=$CONTROLLER_NAME_PREFIX_ARRAY,EXPERIMENT_FOLDER_NAME_ARRAY=$EXPERIMENT_FOLDER_NAME_ARRAY,SEED_ARRAY=$SEED_ARRAY,POPSIZE_ARRAY=$POPSIZE_ARRAY,MAX_SOLVER_TIME_ARRAY=$MAX_SOLVER_TIME_ARRAY --array=0-$i src/experiments/permus/scripts/hip_train_array.sl`
 
 
 
@@ -187,10 +198,15 @@ for PROBLEM_PATH_TRAIN in "src/experiments/permus/instances/transfer_qap_cut_ins
     done
 done
 
+CONTROLLER_ARRAY=$(to_list "${CONTROLLER_ARRAY[@]}")
+PROBLEM_TYPE_ARRAY=$(to_list "${PROBLEM_TYPE_ARRAY[@]}")
+PROBLEM_PATH_ARRAY=$(to_list "${PROBLEM_PATH_ARRAY[@]}")
+MAX_SOLVER_TIME_ARRAY=$(to_list "${MAX_SOLVER_TIME_ARRAY[@]}")
 
+echo "WARNING: training dependency removed"
+# --dependency=afterok:${TRAINING_JOB_ID}
 
-
-TESTING_JOB_ID=`sbatch --parsable --dependency=afterok:${TRAINING_JOB_ID} --export=CONTROLLER_ARRAY=${CONTROLLER_ARRAY},PROBLEM_TYPE_ARRAY=${PROBLEM_TYPE_ARRAY},PROBLEM_PATH_ARRAY=${PROBLEM_PATH_ARRAY},MAX_SOLVER_TIME_ARRAY=${MAX_SOLVER_TIME_ARRAY},MEASURE_RESPONSES=${MEASURE_RESPONSES},TMP_RES_PATH=${TMP_RES_PATH},N_REPS=${N_REPS},N_EVALS=${N_EVALS} --array=0-$i src/experiments/permus/scripts/hip_test_array.sl`
+TESTING_JOB_ID=`sbatch --parsable --export=CONTROLLER_ARRAY=${CONTROLLER_ARRAY},PROBLEM_TYPE_ARRAY=${PROBLEM_TYPE_ARRAY},PROBLEM_PATH_ARRAY=${PROBLEM_PATH_ARRAY},MAX_SOLVER_TIME_ARRAY=${MAX_SOLVER_TIME_ARRAY},MEASURE_RESPONSES=${MEASURE_RESPONSES},TMP_RES_PATH=${TMP_RES_PATH},N_REPS=${N_REPS},N_EVALS=${N_EVALS} --array=0-$i src/experiments/permus/scripts/hip_test_array.sl`
 
 
 
