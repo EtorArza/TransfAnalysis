@@ -1946,7 +1946,7 @@ void get_ranks_from_f_values(vector<vector<double>>& ranks, double** f_values, i
             scores.push_back(f_values[j][i]);
         }
         // conover practical statistics page 381 -> rank 1 assigned to the lowest value
-        compute_order_from_double_to_double(scores.data(), n_candidates, scores.data(), true, true);
+        compute_order_from_double_to_double(scores.data(), n_candidates, scores.data(), false, true);
         sum_value_to_array(scores.data(), 1.0, n_candidates);
         for (int j = 0; j < n_candidates; j++)
         {
