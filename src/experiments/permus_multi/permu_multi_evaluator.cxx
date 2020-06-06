@@ -35,24 +35,24 @@ using namespace std;
 namespace PERMU_MULTI
 {
 
-void replace_f_values_with_ranks(vector<int> surviving_candidates, double **f_values, int current_n_of_evals)
+void convert_f_values_to_ranks(vector<int> surviving_candidates, double **f_values, double **ranks, int current_n_of_evals)
 {
     // replace f values with ranks
-    static vector<vector<double>> ranks;
+    static vector<vector<double>> ranks_vec;
     double *f_values_surviving_candidates[surviving_candidates.size()]; 
-    ranks.resize(surviving_candidates.size());
+    ranks_vec.resize(surviving_candidates.size());
     for (int i = 0; i < surviving_candidates.size(); i++)
     {
         f_values_surviving_candidates[i] = f_values[surviving_candidates[i]];
-        ranks[i].resize(current_n_of_evals);
+        ranks_vec[i].resize(current_n_of_evals);
     }
 
-    get_ranks_from_f_values(ranks, f_values, surviving_candidates.size(), current_n_of_evals);
+    get_ranks_from_f_values(ranks_vec, f_values, surviving_candidates.size(), current_n_of_evals);
     for (int i = 0; i < surviving_candidates.size(); i++)
     {
         for (int j = 0; j < current_n_of_evals; j++)
         {
-            f_values[surviving_candidates[i]][j] = ranks[i][j];
+            ranks[surviving_candidates[i]][j] = ranks_vec[i][j];
         }
     }
 }
@@ -83,47 +83,47 @@ struct Evaluator
     __net_eval_decl void execute(class NEAT::Network **nets_, NEAT::OrganismEvaluation *results, size_t nnets)
     {
 
+
+        
+
         int n_instances = (*this->parameters->VECTOR_OF_INSTANCE_PATHS).size();
         int n_reps_all_instances = (EVAL_MIN_STEP-1) / n_instances + 1;
         int n_evals_each_it = n_reps_all_instances * n_instances;
 
-        using namespace PERMU;
-        NEAT::CpuNetwork **nets = (NEAT::CpuNetwork **)nets_;
-        double **f_values = new double *[nnets];
-        RandomNumberGenerator rng;
-
-        for (size_t i = 0; i < nnets; i++)
+        if (n_instances == 0)
         {
-            f_values[i] = new double[EVALS_TO_SELECT_BEST_CONTROLLER_IN_LAST_IT + n_evals_each_it];
+            cout << "n_instances = 0 in permu_multi_evaluator.cxx" << endl;
+            exit(1);
         }
 
-        double *tmp_order = new double[nnets];
+
+
+        using namespace PERMU;
+        NEAT::CpuNetwork **nets = (NEAT::CpuNetwork **)nets_;
+        double **f_values = new double *[nnets+1];
+        double **f_value_ranks = new double *[nnets+1];
+
+        RandomNumberGenerator rng;
+
+        for (size_t i = 0; i < nnets+1; i++)
+        {
+            f_values[i] = new double[EVALS_TO_SELECT_BEST_CONTROLLER_IN_LAST_IT + EVAL_MIN_STEP + n_evals_each_it];
+            f_value_ranks[i] = new double[EVALS_TO_SELECT_BEST_CONTROLLER_IN_LAST_IT + EVAL_MIN_STEP + n_evals_each_it];
+        }
+
+        double *tmp_order = new double[nnets+1];
         // evaluate the individuals
 
         if (best_network == nullptr)
         {
             best_network = new NEAT::CpuNetwork(*nets[0]);
         }
-        else
-        {
-            cout << "TODO: get rid of this. ORganism not replaced, only network. Therefore, wron organism is credited a high score." << endl;
-            *nets[nnets-1] = *best_network;
-        }
+
 
         int current_n_of_evals = 0;
         int target_n_controllers_left;
         int max_evals_per_controller;
-        if (parameters->neat_params->IS_LAST_ITERATION)
-        {
-            target_n_controllers_left = 1;
-            max_evals_per_controller = EVALS_TO_SELECT_BEST_CONTROLLER_IN_LAST_IT;
-        }
-        else
-        {
-            target_n_controllers_left = (int)((double)nnets * NEAT::env->survival_thresh);
-            max_evals_per_controller = MAX_EVALS_PER_CONTROLLER_NEUROEVOLUTION;
-        }
-        
+        int ALPHA_INDEX;
 
         vector<int> surviving_candidates;
 
@@ -132,11 +132,28 @@ struct Evaluator
             surviving_candidates.push_back(inet);
         }
 
+
+        if (!parameters->neat_params->IS_LAST_ITERATION)
+        {
+            target_n_controllers_left = (int)((double)nnets * NEAT::env->survival_thresh);
+            max_evals_per_controller = MAX_EVALS_PER_CONTROLLER_NEUROEVOLUTION;
+            ALPHA_INDEX = 0;
+        }
+        else
+        {
+            target_n_controllers_left = 1;
+            max_evals_per_controller = EVALS_TO_SELECT_BEST_CONTROLLER_IN_LAST_IT;
+            ALPHA_INDEX = 1;
+        }
+        
+
+
+
+
         while (surviving_candidates.size() > target_n_controllers_left && max_evals_per_controller > current_n_of_evals)
         {
             int initial_seed = rng.random_integer_uniform(INT_MAX);
             cout << "Evaluating -> " << std::flush;
-
             progress_bar bar(surviving_candidates.size()* n_evals_each_it);
             #pragma omp parallel for num_threads(parameters->neat_params->N_OF_THREADS)
             for (int i = 0; i < surviving_candidates.size() * n_evals_each_it; i++)
@@ -157,31 +174,43 @@ struct Evaluator
             cout << ", ";
             current_n_of_evals += n_evals_each_it;
 
-            replace_f_values_with_ranks(surviving_candidates, f_values, current_n_of_evals);
-
+            convert_f_values_to_ranks(surviving_candidates, f_values, f_value_ranks, current_n_of_evals);
 
 
             for (auto &&inet : surviving_candidates)
             {
-                tmp_order[inet] = Average(f_values[inet], current_n_of_evals) - (double)surviving_candidates.size() * 10000000.0;
+                tmp_order[inet] = Average(f_value_ranks[inet], current_n_of_evals) - (double)surviving_candidates.size() * 10000000.0;
             }
-            F_race_iteration(f_values, surviving_candidates, current_n_of_evals, 0);
+
+
+
+            F_race_iteration(f_value_ranks, surviving_candidates, current_n_of_evals, ALPHA_INDEX);
 
 
             cout << ", perc_discarded: " << (double)(nnets - surviving_candidates.size()) / (double)(nnets);
             cout << ", " << surviving_candidates.size() << " left.";
             cout << endl;
         }
-        replace_f_values_with_ranks(surviving_candidates, f_values, current_n_of_evals);
 
+
+        // update best known of last iteration
+        int initial_seed = rng.random_integer_uniform(INT_MAX);
+        #pragma omp parallel for num_threads(parameters->neat_params->N_OF_THREADS)
+        for (int i = 0; i < current_n_of_evals; i++)
+        {
+            f_values[nnets][i] = this->FitnessFunction(best_network, initial_seed + i, i % n_instances);
+        }
+        surviving_candidates.push_back((int) nnets);
+        convert_f_values_to_ranks(surviving_candidates, f_values, f_value_ranks, current_n_of_evals);
+        double avg_perf_best = Average(f_value_ranks[nnets], current_n_of_evals);
+        parameters->neat_params->BEST_FITNESS_TRAIN = (avg_perf_best + parameters->neat_params->BEST_FITNESS_TRAIN) / 2;
 
         for (auto &&inet : surviving_candidates)
         {
-            tmp_order[inet] = Average(f_values[inet], current_n_of_evals) - (double)surviving_candidates.size() * 10000000.0;
+            tmp_order[inet] = Average(f_value_ranks[inet], current_n_of_evals) - (double)surviving_candidates.size() * 10000000.0;
         }
-        cout << "TODO: error nnets-1 replaced by best, but organism was not replaced, therefore, a shitty network was saved." << endl;
-        //parameters->neat_params->BEST_FITNESS_TRAIN = (f_value_of_last_iterations_best + parameters->neat_params->BEST_FITNESS_TRAIN) / 2;
-        double best_f_gen = Average(f_values[argmax(tmp_order, (int)nnets)], current_n_of_evals);
+
+        double best_f_gen = Average(f_value_ranks[argmax(tmp_order, (int)nnets)], current_n_of_evals);
         cout << "(best this gen, best last gen) -> (" << best_f_gen << ", " << parameters->neat_params->BEST_FITNESS_TRAIN << ")";
 
         if (best_f_gen > parameters->neat_params->BEST_FITNESS_TRAIN || parameters->neat_params->IS_LAST_ITERATION)
@@ -191,26 +220,52 @@ struct Evaluator
             parameters->neat_params->BEST_FITNESS_TRAIN = best_f_gen;
             delete best_network;
             best_network = new NEAT::CpuNetwork(*nets[argmax(tmp_order, (int)nnets)]);
+            tmp_order[argmax(tmp_order, (int)nnets)] += 10000000.0;
         }
 
         cout << endl;
 
-        //cout << "fitness_array: " << std::flush;
-        //PrintArray(f_values, nnets);
+
 
         compute_order_from_double_to_double(tmp_order, nnets, tmp_order, false, true);
+
+
 
         multiply_array_with_value(tmp_order, 1.0 / (double)(nnets - 1), (int)nnets);
         multiply_array_with_value(tmp_order, 1.0 + ((double)parameters->neat_params->N_TIMES_BEST_FITNESS_IMPROVED_TRAIN / 1000.0), (int)nnets);
 
-        //cout << "fitness_array: " << std::flush;
-        //PrintArray(f_values, nnets);
 
-        // if (*is_last_gen)
-        // {
-        //     int argbest = argbest_net(nets_, nnets, 0.8);
-        //     f_values[argbest] += 1.0;
-        // }
+        if (parameters->neat_params->IS_LAST_ITERATION)
+        {
+
+            cout << "fitness_matrix: " << std::flush;
+            PrintMatrix(f_values, nnets, 32);
+
+            cout << "franks_matrix (it is normal that ranks are repeated, since rows are updated in every iteration, with only the surviving_candidates being updated): " << std::flush;
+            PrintMatrix(f_value_ranks, nnets, 32);
+
+            for (int i = 0; i < nnets; i++)
+            {
+                cout << "|" << " i = " << i << " " << Average(f_values[i], 32) << endl; 
+            }
+            
+
+            cout << endl;
+            cout << "tmp_order: " << std::flush;
+            PrintArray(tmp_order, nnets);
+
+            cout << endl;
+
+            double avg_perf_best = 0;
+
+
+            cout << "BEST_FITNESS_DEBUG_LAST_IT, (reeval200, selection_best) ->" << 0 << ", " << Average(f_values[argmax(tmp_order, (int)nnets)], EVALS_TO_SELECT_BEST_CONTROLLER_IN_LAST_IT) << endl;
+            
+            cout << endl;
+        }
+
+
+
 
         // save scaled fitness
         for (size_t inet = 0; inet < nnets; inet++)
@@ -221,15 +276,16 @@ struct Evaluator
             results[inet].error = 2 - tmp_order[inet];
         }
 
-        for (size_t i = 0; i < nnets; i++)
+        for (size_t i = 0; i < nnets+1; i++)
         {
             delete[] f_values[i];
+            delete[] f_value_ranks[i];
         }
         delete[] f_values;
+        delete[] f_value_ranks;
 
         delete[] tmp_order;
     }
-
 };
 
 } //namespace PERMU_MULTI
