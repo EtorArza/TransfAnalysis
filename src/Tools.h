@@ -90,6 +90,8 @@ string array_to_python_list_string(T* array, int len)
     return res_ss.str();
 }
 
+
+
 /*
  * Applies the random keys sorting strategy to the vector of doubles
  */
@@ -462,6 +464,23 @@ template <class T>
 void PrintMatrix(T **M, int m, int n)
 {
 
+	cout << "\n";
+	for (int i = 0; i < m; i++)
+	{
+		cout << "| i = " << i << " ( ";
+		for (int j = 0; j < n; j++)
+		{
+			cout << M[i][j] << " ";
+		}
+		cout << ")\n";
+	}
+}
+
+template <class T>
+void PrintMatrixVec(vector<vector<T>> M)
+{
+    int m = M.size();
+    int n = M[0].size();
 	cout << "\n";
 	for (int i = 0; i < m; i++)
 	{

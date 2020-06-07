@@ -47,7 +47,7 @@ void convert_f_values_to_ranks(vector<int> surviving_candidates, double **f_valu
         ranks_vec[i].resize(current_n_of_evals);
     }
 
-    get_ranks_from_f_values(ranks_vec, f_values, surviving_candidates.size(), current_n_of_evals);
+    get_ranks_from_f_values(ranks_vec, f_values_surviving_candidates, surviving_candidates.size(), current_n_of_evals);
     for (int i = 0; i < surviving_candidates.size(); i++)
     {
         for (int j = 0; j < current_n_of_evals; j++)
@@ -239,14 +239,14 @@ struct Evaluator
         {
 
             cout << "fitness_matrix: " << std::flush;
-            PrintMatrix(f_values, nnets, 32);
+            PrintMatrix(f_values, nnets, EVAL_MIN_STEP);
 
             cout << "franks_matrix (it is normal that ranks are repeated, since rows are updated in every iteration, with only the surviving_candidates being updated): " << std::flush;
-            PrintMatrix(f_value_ranks, nnets, 32);
+            PrintMatrix(f_value_ranks, nnets, EVAL_MIN_STEP);
 
             for (int i = 0; i < nnets; i++)
             {
-                cout << "|" << " i = " << i << " " << Average(f_values[i], 32) << endl; 
+                cout << "|" << " i = " << i << " " << Average(f_values[i], EVAL_MIN_STEP) << endl; 
             }
             
 
