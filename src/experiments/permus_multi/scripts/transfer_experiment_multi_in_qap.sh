@@ -22,11 +22,9 @@ CONTROLLER_ARRAY=()
 SEED_ARRAY=()
 MAX_SOLVER_TIME_ARRAY=()
 
-POPSIZE=40
-MAX_SOLVER_TIME="0.1"
+POPSIZE=128
+MAX_SOLVER_TIME="0.25"
 SEED=2
-
-echo "WARNING! toy parameters. Need the popsize experiment result to be able to execute this."
 
 
 i=-1
@@ -74,7 +72,7 @@ replaced_with="xyz_comma_xyz"
 COMMA_SEPARATED_LIST_OF_INSTANCE_PATHS_ARRAY=${COMMA_SEPARATED_LIST_OF_INSTANCE_PATHS_ARRAY//","/$replaced_with}
 
 
-#TRAINING_JOB_ID=`sbatch --parsable --dependency=afterok:${COMPILE_JOB_ID} --export=PROBLEM_TYPE_ARRAY=${PROBLEM_TYPE_ARRAY},COMMA_SEPARATED_LIST_OF_INSTANCE_PATHS_ARRAY=${COMMA_SEPARATED_LIST_OF_INSTANCE_PATHS_ARRAY},CONTROLLER_NAME_PREFIX_ARRAY=${CONTROLLER_NAME_PREFIX_ARRAY},EXPERIMENT_FOLDER_NAME_ARRAY=${EXPERIMENT_FOLDER_NAME_ARRAY},SEED_ARRAY=${SEED_ARRAY},POPSIZE_ARRAY=${POPSIZE_ARRAY},MAX_SOLVER_TIME_ARRAY=${MAX_SOLVER_TIME_ARRAY} --array=0-$i src/experiments/permus_multi/scripts/hip_train_array.sl`
+TRAINING_JOB_ID=`sbatch --parsable --dependency=afterok:${COMPILE_JOB_ID} --export=PROBLEM_TYPE_ARRAY=${PROBLEM_TYPE_ARRAY},COMMA_SEPARATED_LIST_OF_INSTANCE_PATHS_ARRAY=${COMMA_SEPARATED_LIST_OF_INSTANCE_PATHS_ARRAY},CONTROLLER_NAME_PREFIX_ARRAY=${CONTROLLER_NAME_PREFIX_ARRAY},EXPERIMENT_FOLDER_NAME_ARRAY=${EXPERIMENT_FOLDER_NAME_ARRAY},SEED_ARRAY=${SEED_ARRAY},POPSIZE_ARRAY=${POPSIZE_ARRAY},MAX_SOLVER_TIME_ARRAY=${MAX_SOLVER_TIME_ARRAY} --array=0-$i src/experiments/permus_multi/scripts/hip_train_multi_array.sl`
 
 
 
@@ -86,7 +84,7 @@ SCORE_PATH="src/experiments/permus_multi/results/qap_cut_multi_vs_mono/score_mul
 RESPONSE_PATH="src/experiments/permus_multi/results/qap_cut_multi_vs_mono/response_multi_instance_cut_qap.txt"
 TMP_RES_PATH=${SRCDIR}/"tmp"/$(dirname ${SCORE_PATH})
 N_REPS=1
-N_EVALS=10000
+N_EVALS=40000
 
 
 CONTROLLER_ARRAY=()
@@ -103,7 +101,9 @@ for INSTANCE_TYPE_TRAIN in "A|B" "A|C" "B|C";do
 
 
                 if [ "$INSTANCE_INDEX_TRAIN" == "$INSTANCE_INDEX_TEST" ]; then
-                    continue
+                    if [[ "$INSTANCE_TYPE_TRAIN" == *"$INSTANCE_TYPE_TEST"* ]]; then
+                        continue
+                    fi
                 fi
 
                 i=$((i+1))
@@ -113,7 +113,6 @@ for INSTANCE_TYPE_TRAIN in "A|B" "A|C" "B|C";do
                 INSTANCE_TYPE_TRAIN_PAIR=("${BITRISE_CLI_LAST_PARSED_LIST[@]}")
 
                 CONTROLLER_NAME_PREFIX="${INSTANCE_TYPE_TRAIN_PAIR[0]}${INSTANCE_TYPE_TRAIN_PAIR[1]}${INSTANCE_INDEX_TRAIN}"
-                EXPERIMENT_FOLDER_NAME="src/experiments/permus_multi/results/qap_cut_multi_vs_mono"
 
 
                 CONTROLLER_ARRAY+=("${EXPERIMENT_FOLDER_NAME}/top_controllers/${CONTROLLER_NAME_PREFIX}_best.controller")
@@ -140,40 +139,4 @@ MAX_SOLVER_TIME_ARRAY=$(to_list "${MAX_SOLVER_TIME_ARRAY[@]}")
 TESTING_JOB_ID=`sbatch --parsable --dependency=afterok:${TRAINING_JOB_ID} --export=CONTROLLER_ARRAY=${CONTROLLER_ARRAY},PROBLEM_TYPE_ARRAY=${PROBLEM_TYPE_ARRAY},PROBLEM_PATH_ARRAY=${PROBLEM_PATH_ARRAY},MAX_SOLVER_TIME_ARRAY=${MAX_SOLVER_TIME_ARRAY},MEASURE_RESPONSES=${MEASURE_RESPONSES},TMP_RES_PATH=${TMP_RES_PATH},N_REPS=${N_REPS},N_EVALS=${N_EVALS} --array=0-$i src/experiments/permus/scripts/hip_test_array.sl`
 
 
-if [ -z "$RESPONSE_PATH" ]; then
-    RESPONSE_PATH=/dev/null
-fi
-if [ -z "$SCORE_PATH" ]; then
-    SCORE_PATH=/dev/null
-fi
-cat > script_2828a8741ae82e71b77975df5ec94c25.sh <<EOF
-#!/bin/bash
-###   s b a t c h --array=1-$runs:1 $SL_FILE_NAME
-#SBATCH --output=out/slurm_%j_out.txt
-#SBATCH --error=out/slurm_%j_err.txt
-#SBATCH --ntasks=1 # number of tasks
-#SBATCH --ntasks-per-node=1 #number of tasks per node
-#SBATCH --mem=2G
-#SBATCH --cpus-per-task=2 # number of CPUs
-#SBATCH --time=0-00:15:00 #Walltime
-#SBATCH -p short
-
-SCRATCH_JOB=${SCRATCH_JOB}_${SLURM_ARRAY_TASK_ID}
-mkdir ${SCRATCH_JOB}
-
-
-
-if [ "$MEASURE_RESPONSES" == "true" ]; then
-    cat ${TMP_RES_PATH}/response_* > ${RESPONSE_PATH}
-elif [ "$MEASURE_RESPONSES" == "false" ]; then
-    cat ${TMP_RES_PATH}/score_* > ${SCORE_PATH}
-else
-    echo "MEASURE_RESPONSES = $MEASURE_RESPONSES not set correctly"
-    exit 1
-fi
-
-rm script_2828a8741ae82e71b77975df5ec94c25.sh
-EOF
-
-
-sbatch --dependency=afterok:$TESTING_JOB_ID script_2828a8741ae82e71b77975df5ec94c25.sh
+sbatch --dependency=afterok:$TESTING_JOB_ID --export=SCORE_PATH=${SCORE_PATH},RESPONSE_PATH=${RESPONSE_PATH},MEASURE_RESPONSES=${MEASURE_RESPONSES} scripts/cat_result_files_to_exp_folder.sh

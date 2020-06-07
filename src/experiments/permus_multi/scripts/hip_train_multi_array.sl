@@ -1,30 +1,30 @@
 #!/bin/bash
 
 
-# # ###   s b a t c h --array=1-$runs:1 $SL_FILE_NAME
-# # #SBATCH --output=out/slurm_%A_%a_out.txt
-# # #SBATCH --error=out/slurm_%A_%a_err.txt
-# # #SBATCH --ntasks=1 # number of tasks
-# # #SBATCH --ntasks-per-node=1 #number of tasks per node
-# # #SBATCH --mem=32G
-# # #SBATCH --cpus-per-task=32 # number of CPUs
-# # #SBATCH --time=0-06:00:00 #Walltime
-# # #SBATCH -p medium
-# # #SBATCH --exclude=n[001-004,017-018]
-
-
-
-
 ###   s b a t c h --array=1-$runs:1 $SL_FILE_NAME
 #SBATCH --output=out/slurm_%A_%a_out.txt
 #SBATCH --error=out/slurm_%A_%a_err.txt
 #SBATCH --ntasks=1 # number of tasks
 #SBATCH --ntasks-per-node=1 #number of tasks per node
-#SBATCH --mem=4G
-#SBATCH --cpus-per-task=4 # number of CPUs
-#SBATCH --time=0-0:30:00 #Walltime
-#SBATCH -p short
+#SBATCH --mem=32G
+#SBATCH --cpus-per-task=32 # number of CPUs
+#SBATCH --time=0-06:00:00 #Walltime
+#SBATCH -p medium
 #SBATCH --exclude=n[001-004,017-018]
+
+
+
+
+# ###   s b a t c h --array=1-$runs:1 $SL_FILE_NAME
+# #SBATCH --output=out/slurm_%A_%a_out.txt
+# #SBATCH --error=out/slurm_%A_%a_err.txt
+# #SBATCH --ntasks=1 # number of tasks
+# #SBATCH --ntasks-per-node=1 #number of tasks per node
+# #SBATCH --mem=4G
+# #SBATCH --cpus-per-task=4 # number of CPUs
+# #SBATCH --time=0-0:30:00 #Walltime
+# #SBATCH -p short
+# #SBATCH --exclude=n[001-004,017-018]
 
 
 SCRATCH_JOB=${SCRATCH_JOB}_${SLURM_ARRAY_TASK_ID}
@@ -116,7 +116,7 @@ MODE = train
 PROBLEM_NAME = permu_multi
 
 
-MAX_TRAIN_TIME = 40
+MAX_TRAIN_TIME = 3600
 POPSIZE = $POPSIZE
 THREADS = $SLURM_CPUS_PER_TASK
 
