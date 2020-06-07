@@ -61,7 +61,7 @@ SCORE_PATH="src/experiments/permus/results/4by4_permu_problems/result_score_tran
 RESPONSE_PATH="src/experiments/permus/results/4by4_permu_problems/result_response_transfer_permuproblem.txt"
 TMP_RES_PATH=${SRCDIR}/"tmp"/$(dirname ${SCORE_PATH})
 N_REPS=1
-N_EVALS=40000
+N_EVALS=10000
 
 
 TESTING_JOB_ID=""
@@ -76,10 +76,11 @@ for PROBLEM_TYPE_TRAIN in "qap" "tsp" "pfsp" "lop"; do
         for PROBLEM_TYPE_TEST in "qap" "tsp" "pfsp" "lop"; do
             for PROBLEM_PATH_TEST in "src/experiments/permus/instances/transfer_permuproblems/${PROBLEM_TYPE_TEST}/"*; do
 
-                # Skip if training and testing instance is the same. i++ comes later, since this case is not added to experimentation
-                if [ "$PROBLEM_PATH_TRAIN" == "$PROBLEM_PATH_TEST" ]; then
-                    continue
-                fi
+                # # # we need every iteration to normalize transferability !!!
+                # # Skip if training and testing instance is the same. i++ comes later, since this case is not added to experimentation
+                # if [ "$PROBLEM_PATH_TRAIN" == "$PROBLEM_PATH_TEST" ]; then
+                #     continue
+                # fi
 
                 i=$((i+1))
 
@@ -169,7 +170,7 @@ SCORE_PATH="src/experiments/permus/results/transfer_qap_with_cut_instances/resul
 RESPONSE_PATH="src/experiments/permus/results/transfer_qap_with_cut_instances/result_response_transfer_qap.txt"
 TMP_RES_PATH=${SRCDIR}/"tmp"/$(dirname ${SCORE_PATH})
 N_REPS=1
-N_EVALS=40000
+N_EVALS=10000
 
 
 CONTROLLER_ARRAY=()
@@ -181,20 +182,20 @@ i=-1
 for PROBLEM_PATH_TRAIN in "src/experiments/permus/instances/transfer_qap_cut_instances/"*; do
     for PROBLEM_PATH_TEST in "src/experiments/permus/instances/transfer_qap_cut_instances/"*; do
 
+        # # # we need every iteration to normalize transferability !!!
+        # # Skip if training and testing instance is the same. i++ comes later, since this case is not added to experimentation
+        # if [ "$PROBLEM_PATH_TRAIN" == "$PROBLEM_PATH_TEST" ]; then
+        #     continue
+        # fi
 
-                # Skip if training and testing instance is the same. i++ comes later, since this case is not added to experimentation
-                if [ "$PROBLEM_PATH_TRAIN" == "$PROBLEM_PATH_TEST" ]; then
-                    continue
-                fi
+        i=$((i+1))
 
-                i=$((i+1))
+        CONTROLLER_NAME_PREFIX=`basename ${PROBLEM_PATH_TRAIN}`
 
-                CONTROLLER_NAME_PREFIX=`basename ${PROBLEM_PATH_TRAIN}`
-
-                CONTROLLER_ARRAY+=("${EXPERIMENT_FOLDER_NAME}/top_controllers/${CONTROLLER_NAME_PREFIX}_best.controller")
-                PROBLEM_TYPE_ARRAY+=("qap")
-                PROBLEM_PATH_ARRAY+=("${PROBLEM_PATH_TEST}")
-                MAX_SOLVER_TIME_ARRAY+=("0.25")
+        CONTROLLER_ARRAY+=("${EXPERIMENT_FOLDER_NAME}/top_controllers/${CONTROLLER_NAME_PREFIX}_best.controller")
+        PROBLEM_TYPE_ARRAY+=("qap")
+        PROBLEM_PATH_ARRAY+=("${PROBLEM_PATH_TEST}")
+        MAX_SOLVER_TIME_ARRAY+=("0.25")
     done
 done
 
