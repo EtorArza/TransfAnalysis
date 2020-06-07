@@ -107,7 +107,7 @@ done
 
 
 
-sbatch --dependency=afterok$TESTING_JOB_ID --export=SCORE_PATH=${SCORE_PATH},RESPONSE_PATH=${RESPONSE_PATH} scripts/cat_result_files_to_exp_folder.sh
+sbatch --dependency=afterok$TESTING_JOB_ID --export=SCORE_PATH=${SCORE_PATH},RESPONSE_PATH=${RESPONSE_PATH},MEASURE_RESPONSES=${MEASURE_RESPONSES} scripts/cat_result_files_to_exp_folder.sh
 
 
 
@@ -212,5 +212,5 @@ TESTING_JOB_ID=`sbatch --parsable --export=CONTROLLER_ARRAY=${CONTROLLER_ARRAY},
 
 
 
-sbatch --dependency=afterok:$TESTING_JOB_ID --export=SCORE_PATH=${SCORE_PATH},RESPONSE_PATH=${RESPONSE_PATH} scripts/cat_result_files_to_exp_folder.sh
+sbatch --dependency=afterok:$TESTING_JOB_ID --export=SCORE_PATH=${SCORE_PATH},RESPONSE_PATH=${RESPONSE_PATH},MEASURE_RESPONSES=${MEASURE_RESPONSES} scripts/cat_result_files_to_exp_folder.sh
 
