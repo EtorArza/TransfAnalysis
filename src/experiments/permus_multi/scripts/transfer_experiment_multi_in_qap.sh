@@ -1,5 +1,8 @@
 #!/bin/bash
 
+EXPERIMENT_FOLDER_NAME="src/experiments/permus_multi/results/qap_cut_multi_vs_mono"
+
+
 source scripts/array_to_string_functions.sh
 
 if false; then
@@ -12,6 +15,8 @@ COMPILE_JOB_ID=`sbatch --parsable scripts/make_hip.sh`
 
 
 SRCDIR=`pwd`
+
+
 
 PROBLEM_TYPE_ARRAY=()
 COMMA_SEPARATED_LIST_OF_INSTANCE_PATHS_ARRAY=()
@@ -38,8 +43,10 @@ for INSTANCE_TYPE_PAIR in "A|B" "A|C" "B|C";do
         ins_path_0=`ls src/experiments/permus/instances/transfer_qap_cut_instances/${INSTANCE_TYPE_PAIR_ARRAY[0]}${INSTANCE_INDEX}*`
         ins_path_1=`ls src/experiments/permus/instances/transfer_qap_cut_instances/${INSTANCE_TYPE_PAIR_ARRAY[1]}${INSTANCE_INDEX}*`
 
-        EXPERIMENT_FOLDER_NAME="src/experiments/permus_multi/results/qap_cut_multi_vs_mono"
-        CONTROLLER_NAME_PREFIX="${INSTANCE_TYPE_PAIR_ARRAY[0]}${INSTANCE_TYPE_PAIR_ARRAY[1]}${INSTANCE_INDEX}"
+        ins_name_0=`basename $ins_path_0`
+        ins_name_1=`basename $ins_path_1`
+
+        CONTROLLER_NAME_PREFIX="${ins_name_0}_${ins_name_0}"
 
         POPSIZE_ARRAY+=(${POPSIZE})
         SEED_ARRAY+=("${SEED}")
@@ -79,12 +86,11 @@ TRAINING_JOB_ID=`sbatch --parsable --dependency=afterok:${COMPILE_JOB_ID} --expo
 
 
 MEASURE_RESPONSES="true"
-EXPERIMENT_FOLDER_NAME="src/experiments/permus_multi/results/qap_cut_multi_vs_mono"
 SCORE_PATH="src/experiments/permus_multi/results/qap_cut_multi_vs_mono/score_multi_instance_cut_qap.txt"
 RESPONSE_PATH="src/experiments/permus_multi/results/qap_cut_multi_vs_mono/response_multi_instance_cut_qap.txt"
 TMP_RES_PATH=${SRCDIR}/"tmp"/$(dirname ${SCORE_PATH})
 N_REPS=1
-N_EVALS=40000
+N_EVALS=10000
 
 
 CONTROLLER_ARRAY=()
@@ -112,7 +118,15 @@ for INSTANCE_TYPE_TRAIN in "A|B" "A|C" "B|C";do
                 list_to_array $INSTANCE_TYPE_TRAIN
                 INSTANCE_TYPE_TRAIN_PAIR=("${BITRISE_CLI_LAST_PARSED_LIST[@]}")
 
-                CONTROLLER_NAME_PREFIX="${INSTANCE_TYPE_TRAIN_PAIR[0]}${INSTANCE_TYPE_TRAIN_PAIR[1]}${INSTANCE_INDEX_TRAIN}"
+                ins_path_0=`ls src/experiments/permus/instances/transfer_qap_cut_instances/${INSTANCE_TYPE_TRAIN_PAIR[0]}${INSTANCE_INDEX}*`
+                ins_path_1=`ls src/experiments/permus/instances/transfer_qap_cut_instances/${INSTANCE_TYPE_TRAIN_PAIR[1]}${INSTANCE_INDEX}*`
+
+                ins_name_0=`basename $ins_path_0`
+                ins_name_1=`basename $ins_path_1`
+
+                CONTROLLER_NAME_PREFIX="${ins_name_0}_${ins_name_1}"
+
+
 
 
                 CONTROLLER_ARRAY+=("${EXPERIMENT_FOLDER_NAME}/top_controllers/${CONTROLLER_NAME_PREFIX}_best.controller")
