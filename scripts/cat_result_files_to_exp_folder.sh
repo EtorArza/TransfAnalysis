@@ -26,9 +26,9 @@ fi
 
 
 
-cat ${TMP_RES_PATH}/score_* > ${SCORE_PATH}
+cat ${TMP_RES_PATH}/scor* > ${SCORE_PATH}
 if [ "$MEASURE_RESPONSES" == "true" ]; then
-    cat ${TMP_RES_PATH}/response_* > ${RESPONSE_PATH}
+    cat ${TMP_RES_PATH}/respon* > ${RESPONSE_PATH}
 elif [ "$MEASURE_RESPONSES" == "false" ]; then
     echo "Measure responses not copyed."
 else

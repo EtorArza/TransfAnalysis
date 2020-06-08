@@ -46,7 +46,7 @@ for INSTANCE_TYPE_PAIR in "A|B" "A|C" "B|C";do
         ins_name_0=`basename $ins_path_0`
         ins_name_1=`basename $ins_path_1`
 
-        CONTROLLER_NAME_PREFIX="${ins_name_0}_${ins_name_0}"
+        CONTROLLER_NAME_PREFIX="${ins_name_0}_${ins_name_1}"
 
         POPSIZE_ARRAY+=(${POPSIZE})
         SEED_ARRAY+=("${SEED}")
@@ -153,4 +153,4 @@ MAX_SOLVER_TIME_ARRAY=$(to_list "${MAX_SOLVER_TIME_ARRAY[@]}")
 TESTING_JOB_ID=`sbatch --parsable --dependency=afterok:${TRAINING_JOB_ID} --export=CONTROLLER_ARRAY=${CONTROLLER_ARRAY},PROBLEM_TYPE_ARRAY=${PROBLEM_TYPE_ARRAY},PROBLEM_PATH_ARRAY=${PROBLEM_PATH_ARRAY},MAX_SOLVER_TIME_ARRAY=${MAX_SOLVER_TIME_ARRAY},MEASURE_RESPONSES=${MEASURE_RESPONSES},TMP_RES_PATH=${TMP_RES_PATH},N_REPS=${N_REPS},N_EVALS=${N_EVALS} --array=0-$i src/experiments/permus/scripts/hip_test_array.sl`
 
 
-sbatch --dependency=afterok:$TESTING_JOB_ID --export=SCORE_PATH=${SCORE_PATH},RESPONSE_PATH=${RESPONSE_PATH},MEASURE_RESPONSES=${MEASURE_RESPONSES} scripts/cat_result_files_to_exp_folder.sh
+sbatch --dependency=afterok:$TESTING_JOB_ID --export=SCORE_PATH=${SCORE_PATH},RESPONSE_PATH=${RESPONSE_PATH},MEASURE_RESPONSES=${MEASURE_RESPONSES},TMP_RES_PATH=${TMP_RES_PATH} scripts/cat_result_files_to_exp_folder.sh
