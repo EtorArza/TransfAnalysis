@@ -7,6 +7,9 @@ COMPILE_JOB_ID=`sbatch --parsable scripts/make_hip.sh`
 
 SRCDIR=`pwd`
 
+
+OPTIMIZATION_TIME=0.1
+
 ######################## PERMUPROBLEMS TRANSFER #################################
 EXPERIMENT_FOLDER_NAME="src/experiments/permus/results/4by4_permu_problems"
 
@@ -32,7 +35,7 @@ for PROBLEM_TYPE in "qap" "tsp" "pfsp" "lop"; do
         CONTROLLER_NAME_PREFIX_ARRAY+=("${CONTROLLER_NAME_PREFIX}")
         EXPERIMENT_FOLDER_NAME_ARRAY+=("${SRCDIR}/${EXPERIMENT_FOLDER_NAME}")
         SEED_ARRAY+=("2")
-        MAX_SOLVER_TIME_ARRAY+=("0.25")
+        MAX_SOLVER_TIME_ARRAY+=("${OPTIMIZATION_TIME}")
     done
 done
 
@@ -89,7 +92,7 @@ for PROBLEM_TYPE_TRAIN in "qap" "tsp" "pfsp" "lop"; do
                 CONTROLLER_ARRAY+=("${EXPERIMENT_FOLDER_NAME}/top_controllers/${CONTROLLER_NAME_PREFIX}_best.controller")
                 PROBLEM_TYPE_ARRAY+=("${PROBLEM_TYPE_TEST}")
                 PROBLEM_PATH_ARRAY+=("${PROBLEM_PATH_TEST}")
-                MAX_SOLVER_TIME_ARRAY+=("0.25")
+                MAX_SOLVER_TIME_ARRAY+=("${OPTIMIZATION_TIME}")
             done
         done
     done
@@ -138,7 +141,7 @@ for PROBLEM_PATH in "src/experiments/permus/instances/transfer_qap_cut_instances
     EXPERIMENT_FOLDER_NAME_ARRAY+=("${SRCDIR}/${EXPERIMENT_FOLDER_NAME}")
     CONTROLLER_ARRAY+=("${EXPERIMENT_FOLDER_NAME}/top_controllers/${CONTROLLER_NAME_PREFIX}_best.controller")
     SEED_ARRAY+=("2")
-    MAX_SOLVER_TIME_ARRAY+=("0.25")
+    MAX_SOLVER_TIME_ARRAY+=("${OPTIMIZATION_TIME}")
 done
 
 
@@ -191,7 +194,7 @@ for PROBLEM_PATH_TRAIN in "src/experiments/permus/instances/transfer_qap_cut_ins
         CONTROLLER_ARRAY+=("${EXPERIMENT_FOLDER_NAME}/top_controllers/${CONTROLLER_NAME_PREFIX}_best.controller")
         PROBLEM_TYPE_ARRAY+=("qap")
         PROBLEM_PATH_ARRAY+=("${PROBLEM_PATH_TEST}")
-        MAX_SOLVER_TIME_ARRAY+=("0.25")
+        MAX_SOLVER_TIME_ARRAY+=("${OPTIMIZATION_TIME}")
     done
 done
 

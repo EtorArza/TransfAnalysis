@@ -2,6 +2,8 @@
 
 EXPERIMENT_FOLDER_NAME="src/experiments/permus_multi/results/qap_cut_multi_vs_mono"
 
+OPTIMIZATION_TIME=0.1
+
 
 source scripts/array_to_string_functions.sh
 
@@ -28,7 +30,6 @@ SEED_ARRAY=()
 MAX_SOLVER_TIME_ARRAY=()
 
 POPSIZE=128
-MAX_SOLVER_TIME="0.25"
 SEED=2
 
 
@@ -56,7 +57,7 @@ for INSTANCE_TYPE_PAIR in "A|B" "A|C" "B|C";do
         CONTROLLER_NAME_PREFIX_ARRAY+=("${CONTROLLER_NAME_PREFIX}")
         EXPERIMENT_FOLDER_NAME_ARRAY+=("${SRCDIR}/${EXPERIMENT_FOLDER_NAME}")
         CONTROLLER_ARRAY+=("${EXPERIMENT_FOLDER_NAME}/top_controllers/${CONTROLLER_NAME_PREFIX}_best.controller")
-        MAX_SOLVER_TIME_ARRAY+=("${MAX_SOLVER_TIME}")
+        MAX_SOLVER_TIME_ARRAY+=("${OPTIMIZATION_TIME}")
     done
 done
 
@@ -132,7 +133,7 @@ for INSTANCE_TYPE_TRAIN in "A|B" "A|C" "B|C";do
                 CONTROLLER_ARRAY+=("${EXPERIMENT_FOLDER_NAME}/top_controllers/${CONTROLLER_NAME_PREFIX}_best.controller")
                 PROBLEM_TYPE_ARRAY+=("qap")
                 PROBLEM_PATH_ARRAY+=(`ls src/experiments/permus/instances/transfer_qap_cut_instances/${INSTANCE_TYPE_TEST}${INSTANCE_INDEX_TEST}*`)
-                MAX_SOLVER_TIME_ARRAY+=("0.25")
+                MAX_SOLVER_TIME_ARRAY+=("${OPTIMIZATION_TIME}")
 
 
 
