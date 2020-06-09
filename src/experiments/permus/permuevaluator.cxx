@@ -131,19 +131,29 @@ struct Evaluator
     // compute the fitness value of all networks at training time.
     __net_eval_decl void execute(class NEAT::Network **nets_, NEAT::OrganismEvaluation *results, size_t nnets)
     {
+
+
         using namespace PERMU;
         NEAT::CpuNetwork **nets = (NEAT::CpuNetwork **)nets_;
-        double **f_values = new double *[nnets];
         RandomNumberGenerator rng;
 
+        double **f_values = new double *[nnets];
         for (size_t i = 0; i < nnets; i++)
         {
-            f_values[i] = new double[EVALS_TO_SELECT_BEST_CONTROLLER_IN_LAST_IT + EVAL_MIN_STEP + MAX_EVALS_PER_CONTROLLER_NEUROEVOLUTION];
+            size_t size_of_array = EVALS_TO_SELECT_BEST_CONTROLLER_IN_LAST_IT + EVAL_MIN_STEP + MAX_EVALS_PER_CONTROLLER_NEUROEVOLUTION;
+            f_values[i] = new double[size_of_array];
+            for (size_t j = 0; j < size_of_array; j++)
+            {
+                f_values[i][j] = DBL_MAX;
+            }
         }
 
         double *tmp_order = new double[nnets];
 
-
+        for (size_t i = 0; i < nnets; i++)
+        {
+            tmp_order[i] = -DBL_MAX;
+        }
 
 
 
@@ -219,7 +229,7 @@ struct Evaluator
 
         
         // update best known of last iteration
-        double avg_perf_best;
+        double avg_perf_best=0;
         int initial_seed = rng.random_integer_uniform(INT_MAX);
         #pragma omp parallel for num_threads(parameters->neat_params->N_OF_THREADS)
         for (int i = 0; i < current_n_of_evals; i++)
@@ -281,7 +291,7 @@ struct Evaluator
                 avg_perf_best += this->FitnessFunction(best_network, 2783492779) / (double) 200;
             }
 
-            cout << "BEST_FITNESS_DEBUG_LAST_IT, (reeval200, selection_best) ->" << avg_perf_best << ", " << Average(f_values[argmax(tmp_order, (int)nnets)], EVALS_TO_SELECT_BEST_CONTROLLER_IN_LAST_IT) << endl;
+            cout << "BEST_FITNESS_DEBUG_LAST_IT, (reeval200, selection_best) ->" << avg_perf_best << ", " << Average(f_values[argmax(tmp_order, (int)nnets)], current_n_of_evals) << endl;
             
             cout << endl;
         }

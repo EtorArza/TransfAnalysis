@@ -148,6 +148,8 @@ double FitnessFunction_permu(NEAT::CpuNetwork *net_original, int seed, PERMU::pa
 
     delete pop;
     pop = NULL;
+    delete problem;
+    problem = NULL;
     v_of_fitness = NULL;
     net = NULL;
     return res;

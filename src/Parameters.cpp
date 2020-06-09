@@ -19,7 +19,6 @@ void neat_parameters::load_global_params(std::string conf_file_path)
 {
     INIReader reader(conf_file_path);
     N_OF_THREADS = reader.GetInteger("Global", "THREADS", -1);
-    N_OF_THREADS = MAX(N_OF_THREADS, reader.GetInteger("Global", "THREADS", -1));
     MAX_TRAIN_TIME = reader.GetInteger("Global", "MAX_TRAIN_TIME", -1);
     POPSIZE_NEAT = reader.GetInteger("Global", "POPSIZE", -1);
     EXPERIMENT_FOLDER_NAME = reader.Get("Global", "EXPERIMENT_FOLDER_NAME", "UNKNOWN");

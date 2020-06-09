@@ -5,16 +5,21 @@
 
 using namespace std;
 
-void mkdir(const string &path) {
+void mkdir(const string &path)
+{
     if (!exists(path))
     {
-    int status = ::mkdir(path.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
-    if(0 != status) {
-        char buf[2048];
-        sprintf(buf, "Failed making directory '%s'", path.c_str());
-        perror(buf);
-        exit(1);
-    }
+        int status = ::mkdir(path.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+        if (0 != status)
+        {
+            char buf[2048];
+            sprintf(buf, "Failed making directory '%s'", path.c_str());
+            perror(buf);
+            if (!exists(path))
+            {
+                exit(1);
+            }
+        }
     }
 }
 
