@@ -6,8 +6,8 @@
 #SBATCH --ntasks-per-node=1 #number of tasks per node
 #SBATCH --mem=32G
 #SBATCH --cpus-per-task=32 # number of CPUs
-#SBATCH --time=0-06:00:00 #Walltime
-#SBATCH -p medium
+#SBATCH --time=1-00:00:00 #Walltime
+#SBATCH -p large
 #SBATCH --exclude=n[001-004,017-018]
 
 
@@ -96,7 +96,7 @@ MODE = train
 PROBLEM_NAME = permu
 
 
-MAX_TRAIN_TIME = 7200
+MAX_TRAIN_TIME = 43200
 POPSIZE = $POPSIZE
 THREADS = $SLURM_CPUS_PER_TASK
 
