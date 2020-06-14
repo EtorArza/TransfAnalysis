@@ -23,6 +23,7 @@ save_fig_path = "/home/paran/Dropbox/BCAM/NEAT_code/src/experiments/permus/resul
 DATASET_list = [
 "PERMUPROB",
 "PERMUPROB",
+"PERMUPROB",
 "QAP",
 "QAP"
 ]
@@ -30,6 +31,7 @@ DATASET_list = [
 input_file_list = [
     "/home/paran/Dropbox/BCAM/NEAT_code/src/experiments/permus/results/4by4_permu_problems/result_response_transfer_permuproblem_0_1s_2h.txt",
     "/home/paran/Dropbox/BCAM/NEAT_code/src/experiments/permus/results/4by4_permu_problems/result_response_transfer_permuproblem_0_25s_1h.txt",
+    "/home/paran/Dropbox/BCAM/NEAT_code/src/experiments/permus/results/4by4_permu_problems/result_response_transfer_permuproblem_0_1s_12h.txt",
     "/home/paran/Dropbox/BCAM/NEAT_code/src/experiments/permus/results/transfer_qap_with_cut_instances/result_response_transfer_qap_0_1s_2h.txt",
     "/home/paran/Dropbox/BCAM/NEAT_code/src/experiments/permus/results/transfer_qap_with_cut_instances/result_response_transfer_qap_0_25s_1h.txt"
 ]
@@ -295,10 +297,14 @@ for DATASET, input_file in zip(DATASET_list, input_file_list):
             for j in range(m):
     #            dist_matrix_dict[i,j] = np.log(1 + hamming_dist(pop[i], pop[j])) / np.log(1+ n)
                 dist_matrix_dict[i,j] = L1_dist(list_of_responses[i], list_of_responses[j])
-
-            
-        embedding = sklearn.manifold.MDS(dissimilarity="precomputed", n_components=2, n_init=3, max_iter=500, n_jobs=8)
-        res = np.array(embedding.fit_transform(dist_matrix_dict))
+        # # MDS
+        # embedding = sklearn.manifold.MDS(dissimilarity="precomputed", n_components=2, n_init=3, max_iter=500, n_jobs=8)
+        # res = np.array(embedding.fit_transform(dist_matrix_dict))
+        
+        # PCA
+        response_array = np.array([np.array(resp) for resp in list_of_responses])
+        embedding = sklearn.decomposition.PCA(n_components=2)
+        res = embedding.fit_transform(response_array)
 
         return res
 
@@ -360,6 +366,7 @@ for DATASET, input_file in zip(DATASET_list, input_file_list):
         colors = list(matplotlib.colors.TABLEAU_COLORS)
 
         
+        fig, ax = plt.subplots()
 
 
         for idx, train_instance in enumerate(avgd_responses["train_instance"]):
@@ -367,22 +374,23 @@ for DATASET, input_file in zip(DATASET_list, input_file_list):
             yi = np.array(df.iloc[idx,1])
             color_idx = trained_classes.index(get_type_of_instance(train_instance))
             ci = colors[color_idx] #color for ith feature 
+            ax.annotate(train_instance, (xi, yi), fontsize='x-small')
 
 
             
             label = None
 
-            plt.scatter(xi,yi,marker=",", color=ci, label=label) 
+            ax.scatter(xi,yi,marker=",", color=ci, label=label)
 
         for idx, t_class in enumerate(trained_classes):
             label = str("A = " + t_class)
-            plt.scatter([],[], marker=",", color=colors[idx], label=label) 
+            ax.scatter([],[], marker=",", color=colors[idx], label=label)
 
 
 
-        plt.legend(fontsize=8, markerscale=0.5)
-        plt.tight_layout()
-        plt.savefig(file_name)
+        ax.legend(fontsize=8, markerscale=0.5)
+        fig.tight_layout()
+        fig.savefig(file_name)
         plt.close()
 
 

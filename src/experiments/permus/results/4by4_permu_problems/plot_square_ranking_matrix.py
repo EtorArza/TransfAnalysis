@@ -17,12 +17,14 @@ save_fig_path = "figures/"
 txt_paths = [
 "/home/paran/Dropbox/BCAM/NEAT_code/src/experiments/permus/results/4by4_permu_problems/result_score_transfer_permuproblem_0_1s_2h.txt",
 "/home/paran/Dropbox/BCAM/NEAT_code/src/experiments/permus/results/4by4_permu_problems/result_score_transfer_permuproblem_0_25s_1h.txt",
+"/home/paran/Dropbox/BCAM/NEAT_code/src/experiments/permus/results/4by4_permu_problems/result_score_transfer_permuproblem_0_1s_12h.txt",
 "/home/paran/Dropbox/BCAM/NEAT_code/src/experiments/permus/results/transfer_qap_with_cut_instances/result_score_transfer_qap_0_1s_2h.txt",
 "/home/paran/Dropbox/BCAM/NEAT_code/src/experiments/permus/results/transfer_qap_with_cut_instances/result_score_transfer_qap_0_25s_1h.txt"
 ]
 
 
 transfer_exp_list =[
+"PERMUPROB",
 "PERMUPROB",
 "PERMUPROB",
 "QAP",
@@ -156,9 +158,9 @@ for input_txt, transfer_exp in zip(txt_paths, transfer_exp_list):
 
     transfer_result = transfer_result.applymap(mean)
 
-
-    print(transfer_result)
-
+    pd.set_option('display.max_rows', 1000)
+    # print(transfer_result)
+    # print(data_frame[data_frame["test_type"] == "tsp"])
 
 
     # print(get_score(data_frame, "N-t65d11xx_150.lop", "pr136.tsp"))
