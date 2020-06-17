@@ -31,7 +31,6 @@ DEPENDS+=${CUDA_OBJECTS:%.o=%.d}
 ifeq (${DEVMODE}, true)
 	OPT=-O0 
 	OPENMP=-fopenmp
-	MISC_FLAGS=  
 	NVCC_FLAGS=-G -g 
 	UBSAN=-fsanitize=undefined
 else
@@ -41,6 +40,14 @@ else
 	UBSAN=
 
 endif
+
+ifeq (${HIPATIA}, true)
+	DEFINES+=-DHIPATIA
+else
+
+endif
+
+
 
 
 CC_FLAGS=-Wall ${DEFINES} ${MISC_FLAGS} ${PROFILE} ${INCLUDES} ${OPENMP} ${OPT} ${UBSAN} -c -g -gdwarf-3  -Wextra

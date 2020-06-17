@@ -15,6 +15,16 @@ mkdir ${SCRATCH_JOB}
 
 SRC_DIR=`pwd`
 
+cat > Makefile.conf <<EOF
+ENABLE_CUDA=false
+DEVMODE=false
+CFLAGS=-fopenmp -std=c++11 -pthread -Wall -DNDEBUG
+
+HIPATIA=true
+PFM_LD_FLAGS=
+PFM_NVCC_CCBIN=
+EOF
+
 cp -r -v src ${SCRATCH_JOB}/
 cp -v Makefile ${SCRATCH_JOB}/
 cp -v Makefile.conf ${SCRATCH_JOB}/

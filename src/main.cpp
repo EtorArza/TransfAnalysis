@@ -23,6 +23,10 @@
 #include "INIReader.h"
 #include "Parameters.h"
 
+
+
+
+
 void usage()
 {
     using namespace std;
@@ -46,6 +50,12 @@ int main(int argc, char *argv[])
     // cout << l1_distance(sigma_1, sigma_2, n) / (double) (n*n / 2) << endl;
     // cout << n*n / 2 << endl;
     // exit(1);
+
+    #ifdef HIPATIA
+    cout << "HIPATIA is defined" << endl;
+    #else
+    cout << "HIPATIA is NOT defined" << endl;
+    #endif
 
     using namespace std;
     using namespace NEAT;

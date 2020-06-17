@@ -2232,3 +2232,22 @@ vector<string> split_string(string str, string token){
     }
     return result;
 }
+
+std::string system_exec(const char* cmd) {
+    std::array<char, 128> buffer;
+    std::string result;
+    std::unique_ptr<FILE, decltype(&pclose)> pipe(popen(cmd, "r"), pclose);
+    if (!pipe) {
+        throw std::runtime_error("popen() failed!");
+    }
+    while (fgets(buffer.data(), buffer.size(), pipe.get()) != nullptr) {
+        result += buffer.data();
+    }
+    return result;
+}
+
+double get_runtime_hipatia(){
+    std::string time_string = system_exec("sacct -j  ${SLURM_JOB_ID} --format=ElapsedRaw --parsable | sed -n 2p | cut -d '=' -f 2 | sed 's/|$//'");
+    int time_sec = atoi(time_string.c_str());
+    return (double) time_sec;
+}

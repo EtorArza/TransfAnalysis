@@ -109,7 +109,13 @@ namespace NEAT {
 
 
             neat_params->IS_LAST_ITERATION = false;
+
+
+            #ifdef HIPATIA
+            for(double progress = 0; !neat_params->IS_LAST_ITERATION; progress = ((double) get_runtime_hipatia() / (double) neat_params->MAX_TRAIN_TIME)) 
+            #else
             for(double progress = 0; !neat_params->IS_LAST_ITERATION; progress = ((double) neat_params->global_timer.toc() / (double) neat_params->MAX_TRAIN_TIME)) 
+            #endif
             {
 
                 if (progress >= 1.0){
@@ -119,7 +125,11 @@ namespace NEAT {
                 gen++;
                 cout << "\n ---------------------------------------------------- \n\n";
                 cout << "Gen " << gen-1 << ", progress: " << progress << endl;	
+                #ifdef HIPATIA
+                cout << "Time left:" << ((double) neat_params->MAX_TRAIN_TIME - get_runtime_hipatia()) / 60.0 / 60.0 << "h" << endl;
+                #else
                 cout << "Time left:" << ((double) neat_params->MAX_TRAIN_TIME - neat_params->global_timer.toc()) / 60.0 / 60.0 << "h" << endl;
+                #endif
                 
 
                 static Timer timer("epoch");
