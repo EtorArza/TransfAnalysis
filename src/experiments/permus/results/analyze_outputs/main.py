@@ -25,6 +25,7 @@ DATASET_list = [
 "PERMUPROB",
 "PERMUPROB",
 "QAP",
+"QAP",
 "QAP"
 ]
 
@@ -33,7 +34,8 @@ input_file_list = [
     "/home/paran/Dropbox/BCAM/NEAT_code/src/experiments/permus/results/4by4_permu_problems/result_response_transfer_permuproblem_0_25s_1h.txt",
     "/home/paran/Dropbox/BCAM/NEAT_code/src/experiments/permus/results/4by4_permu_problems/result_response_transfer_permuproblem_0_1s_12h.txt",
     "/home/paran/Dropbox/BCAM/NEAT_code/src/experiments/permus/results/transfer_qap_with_cut_instances/result_response_transfer_qap_0_1s_2h.txt",
-    "/home/paran/Dropbox/BCAM/NEAT_code/src/experiments/permus/results/transfer_qap_with_cut_instances/result_response_transfer_qap_0_25s_1h.txt"
+    "/home/paran/Dropbox/BCAM/NEAT_code/src/experiments/permus/results/transfer_qap_with_cut_instances/result_response_transfer_qap_0_25s_1h.txt",
+    "/home/paran/Dropbox/BCAM/NEAT_code/src/experiments/permus/results/transfer_qap_with_cut_instances/result_response_transfer_qap_0_1s_12h.txt"
 ]
 
 
@@ -364,6 +366,7 @@ for DATASET, input_file in zip(DATASET_list, input_file_list):
 
 
         colors = list(matplotlib.colors.TABLEAU_COLORS)
+        markers = ["o" ,  "^", "," ,"x" , "<", ">"]
 
         
         fig, ax = plt.subplots()
@@ -374,17 +377,18 @@ for DATASET, input_file in zip(DATASET_list, input_file_list):
             yi = np.array(df.iloc[idx,1])
             color_idx = trained_classes.index(get_type_of_instance(train_instance))
             ci = colors[color_idx] #color for ith feature 
-            ax.annotate(train_instance, (xi, yi), fontsize='x-small')
+            ma = markers[color_idx]
+            #ax.annotate(train_instance, (xi, yi), fontsize='x-small')
 
 
             
             label = None
 
-            ax.scatter(xi,yi,marker=",", color=ci, label=label)
+            ax.scatter(xi,yi,marker=ma, color=ci, label=label)
 
         for idx, t_class in enumerate(trained_classes):
             label = str("A = " + t_class)
-            ax.scatter([],[], marker=",", color=colors[idx], label=label)
+            ax.scatter([],[], marker=markers[idx], color=colors[idx], label=label)
 
 
 

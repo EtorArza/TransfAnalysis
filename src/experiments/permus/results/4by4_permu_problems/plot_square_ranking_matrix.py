@@ -19,7 +19,8 @@ txt_paths = [
 "/home/paran/Dropbox/BCAM/NEAT_code/src/experiments/permus/results/4by4_permu_problems/result_score_transfer_permuproblem_0_25s_1h.txt",
 "/home/paran/Dropbox/BCAM/NEAT_code/src/experiments/permus/results/4by4_permu_problems/result_score_transfer_permuproblem_0_1s_12h.txt",
 "/home/paran/Dropbox/BCAM/NEAT_code/src/experiments/permus/results/transfer_qap_with_cut_instances/result_score_transfer_qap_0_1s_2h.txt",
-"/home/paran/Dropbox/BCAM/NEAT_code/src/experiments/permus/results/transfer_qap_with_cut_instances/result_score_transfer_qap_0_25s_1h.txt"
+"/home/paran/Dropbox/BCAM/NEAT_code/src/experiments/permus/results/transfer_qap_with_cut_instances/result_score_transfer_qap_0_25s_1h.txt",
+"/home/paran/Dropbox/BCAM/NEAT_code/src/experiments/permus/results/transfer_qap_with_cut_instances/result_score_transfer_qap_0_1s_12h.txt"
 ]
 
 
@@ -27,6 +28,7 @@ transfer_exp_list =[
 "PERMUPROB",
 "PERMUPROB",
 "PERMUPROB",
+"QAP",
 "QAP",
 "QAP"
 ]
@@ -174,4 +176,4 @@ for input_txt, transfer_exp in zip(txt_paths, transfer_exp_list):
 
 
     data = pd.DataFrame(transfer_result)
-    data.to_csv(save_fig_path + "_transferability_"+ transfer_exp + "_" + input_txt.split("/")[-1].split(".")[0] + ".csv", float_format="%.3f")
+    data.to_csv(save_fig_path + "_transferability_"+ transfer_exp + "_" + input_txt.split("/")[-1].split(".")[0] + ".csv", float_format="%.4f")
