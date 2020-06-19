@@ -10,11 +10,12 @@ import fnmatch
 import matplotlib
 
 # save in figures local folder
-save_fig_path = "figures/"
+save_fig_path = "/home/paran/Dropbox/BCAM/NEAT_code/src/experiments/permus/results/4by4_permu_problems/figures/"
 # save_fig_path = "/home/paran/Dropbox/BCAM/02_NEAT_permus/paper/images/permu_problems_transfer/"
 
 
 txt_paths = [
+"/home/paran/Dropbox/BCAM/NEAT_code/src/experiments/permus_multi/results/qap_cut_multi_vs_mono/score_multi_instance_cut_qap.txt",
 "/home/paran/Dropbox/BCAM/NEAT_code/src/experiments/permus/results/4by4_permu_problems/result_score_transfer_permuproblem_0_1s_2h.txt",
 "/home/paran/Dropbox/BCAM/NEAT_code/src/experiments/permus/results/4by4_permu_problems/result_score_transfer_permuproblem_0_25s_1h.txt",
 "/home/paran/Dropbox/BCAM/NEAT_code/src/experiments/permus/results/4by4_permu_problems/result_score_transfer_permuproblem_0_1s_12h.txt",
@@ -25,6 +26,7 @@ txt_paths = [
 
 
 transfer_exp_list =[
+"QAP_MULTI",
 "PERMUPROB",
 "PERMUPROB",
 "PERMUPROB",
@@ -45,6 +47,19 @@ for input_txt, transfer_exp in zip(txt_paths, transfer_exp_list):
     elif transfer_exp == "PERMUPROB":
         def get_type(instance_name):
             return instance_name.split(".")[-1]
+
+    elif transfer_exp == "QAP_MULTI":
+        def get_type(instance_name):
+            type_name = ""
+            if "A" in instance_name:
+                type_name += "A"
+            if "B" in instance_name:
+                type_name += "B"
+            if "C" in instance_name:
+                type_name += "C"
+            if len(type_name)==2:
+                type_name = type_name[0] + "_" + type_name[1]
+            return type_name
 
     print(input_txt.split("/")[-1])
 
