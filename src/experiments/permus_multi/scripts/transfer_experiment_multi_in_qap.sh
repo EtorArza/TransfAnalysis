@@ -107,7 +107,7 @@ for INSTANCE_TYPE_TRAIN in "A|B" "A|C" "B|C";do
             for INSTANCE_TYPE_TEST in "A" "B" "C"; do
 
 
-                if [ "$INSTANCE_INDEX_TRAIN" == "$INSTANCE_INDEX_TEST" ]; then
+                if [[ "$INSTANCE_INDEX_TRAIN" == "$INSTANCE_INDEX_TEST" ]]; then
                     if [[ "$INSTANCE_TYPE_TRAIN" == *"$INSTANCE_TYPE_TEST"* ]]; then
                         continue
                     fi
@@ -119,8 +119,8 @@ for INSTANCE_TYPE_TRAIN in "A|B" "A|C" "B|C";do
                 list_to_array $INSTANCE_TYPE_TRAIN
                 INSTANCE_TYPE_TRAIN_PAIR=("${BITRISE_CLI_LAST_PARSED_LIST[@]}")
 
-                ins_path_0=`ls src/experiments/permus/instances/transfer_qap_cut_instances/${INSTANCE_TYPE_TRAIN_PAIR[0]}${INSTANCE_INDEX}*`
-                ins_path_1=`ls src/experiments/permus/instances/transfer_qap_cut_instances/${INSTANCE_TYPE_TRAIN_PAIR[1]}${INSTANCE_INDEX}*`
+                ins_path_0=`ls src/experiments/permus/instances/transfer_qap_cut_instances/${INSTANCE_TYPE_TRAIN_PAIR[0]}${INSTANCE_INDEX_TEST}*`
+                ins_path_1=`ls src/experiments/permus/instances/transfer_qap_cut_instances/${INSTANCE_TYPE_TRAIN_PAIR[1]}${INSTANCE_INDEX_TEST}*`
 
                 ins_name_0=`basename $ins_path_0`
                 ins_name_1=`basename $ins_path_1`
