@@ -20,16 +20,17 @@ with open(in_path,"r") as file:
         new_line = [str(int(el)) for el in new_line if el.isdigit()]
         lines.append(new_line)
 
-
-with open(out_path,"w") as file:
-    print(n, file=file, end="\n")
-    for i in range(n):
-        print(" ".join(lines[i][0:n]), file=file, end="\n")
-    for i in range(n):
-        if i == n-1:
-            print(" ".join(lines[N+i][0:n]), file=file, end="")
-            continue
-        print(" ".join(lines[N+i][0:n]), file=file, end="\n")
+for n_out_instance in range(int(N / n)):
+    with open(out_path+"_"+str(n_out_instance)+".qap","w") as file:
+        print(n, file=file, end="\n")
+        k = n*n_out_instance
+        for i in range(n):
+            print(" ".join(lines[i+k][k:k+n]), file=file, end="\n")
+        for i in range(n):
+            print(" ".join(lines[N+k+i][k:k+n]), file=file, end="")
+            if i != n-1:
+                print("\n", file=file, end="")
+            
 
 
 
