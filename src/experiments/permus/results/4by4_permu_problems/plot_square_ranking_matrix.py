@@ -120,15 +120,22 @@ for input_txt, transfer_exp in zip(txt_paths, transfer_exp_list):
         test_name = row["test_name"]
 
         norm_score = data_frame.iloc[get_row_index(data_frame, test_name, test_name)]["score"]
-        average_score = mean(data_frame[data_frame["test_name"] == test_name]["score"])
-        stdev_score = stdev(data_frame[data_frame["test_name"] == test_name]["score"])
+
+        sub_data_frame_with_certain_test_instance = data_frame[data_frame["test_name"] == test_name]
+        
+        average_score = mean(sub_data_frame_with_certain_test_instance["score"])
+        stdev_score = stdev(sub_data_frame_with_certain_test_instance["score"])
+        ranks = sub_data_frame_with_certain_test_instance["score"].rank(ascending=False)
+
+        indx_in_selected = sub_data_frame_with_certain_test_instance["score"][sub_data_frame_with_certain_test_instance["score"]==data_frame.iloc[get_row_index(data_frame, train_name, test_name)]["score"]].index[0]
 
         if norm_score > row["score"]:
             pos += 1
         else:
             neg += 1
-        transferability.append(    (norm_score - row["score"]) / abs(norm_score)    ) # as defined on the paper
-        # transferability.append(    (row["score"] - average_score) / stdev_score    ) 
+        #transferability.append(    (norm_score - row["score"]) / abs(norm_score)    ) # as defined on the paper
+        # transferability.append(    (row["score"] - average_score) / stdev_score    )
+        transferability.append(ranks[indx_in_selected])
 
 
 
