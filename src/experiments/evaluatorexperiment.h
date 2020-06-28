@@ -28,7 +28,7 @@ namespace NEAT {
             char buf[1024];
             if (last_dir_name != "top_controllers")
             {
-                sprintf(buf, "%s/%s/%s_gen_%04d.controller",
+                sprintf(buf, "%s/%s/%s_gen_%09d.controller",
                     neat_params->EXPERIMENT_FOLDER_NAME.c_str(),
                     last_dir_name.c_str(),
                     neat_params->CONTROLLER_NAME_PREFIX.c_str(),

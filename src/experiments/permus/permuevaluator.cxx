@@ -39,6 +39,17 @@ using namespace std;
 namespace PERMU
 {
 
+
+
+void operator++( PERMU::operator_t &c, int )
+{
+    int index = (int) c;
+    index++;
+    index %= PERMU::N_OPERATORS;
+    PERMU::operator_t res;
+    c = (PERMU::operator_t) index;
+}
+
 void make_output_behaviour_mapping_more_injective(double *output)
 {
     const int POS_FIRS_OPERATOR = 1;
@@ -199,14 +210,15 @@ struct Evaluator
             int initial_seed = rng.random_integer_uniform(INT_MAX);
             cout << "Evaluating -> " << std::flush;
             progress_bar bar(surviving_candidates.size());
+            int surv_cand_size = surviving_candidates.size();
             #pragma omp parallel for num_threads(parameters->neat_params->N_OF_THREADS)
-            for (int i = 0; i < surviving_candidates.size() * EVAL_MIN_STEP; i++)
+            for (int i = 0; i < surv_cand_size * EVAL_MIN_STEP; i++)
             {
-                int inet = surviving_candidates[i / EVAL_MIN_STEP];
+                int inet = surviving_candidates[i % surv_cand_size];
                 NEAT::CpuNetwork *net = nets[inet];
-                int seed = initial_seed + i % EVAL_MIN_STEP;
-                f_values[inet][current_n_of_evals + i % EVAL_MIN_STEP] = this->FitnessFunction(net, seed);
-                //cout << inet << "|" << current_n_of_evals + i % EVAL_MIN_STEP << "|" << seed << endl;
+                int seed = initial_seed + i / surv_cand_size;
+                f_values[inet][current_n_of_evals + i / surv_cand_size] = this->FitnessFunction(net, seed);
+                //cout << inet << "|" << current_n_of_evals + i / surv_cand_size << "|" << seed << endl;
             }
             bar.end();
             cout << ", ";
@@ -266,7 +278,7 @@ struct Evaluator
 
 
         multiply_array_with_value(tmp_order, 1.0 / (double)(nnets - 1), (int)nnets);
-        multiply_array_with_value(tmp_order, 1.0 + ((double)parameters->neat_params->N_TIMES_BEST_FITNESS_IMPROVED_TRAIN / 1000.0), (int)nnets);
+        multiply_array_with_value(tmp_order, 1.0 + ((double)parameters->neat_params->N_TIMES_BEST_FITNESS_IMPROVED_TRAIN / 1000000.0), (int)nnets);
 
 
 

@@ -15,6 +15,9 @@ namespace PERMU{
     N_OPERATORS = 3,
     };
 
+    void operator++(operator_t &c, int );
+
+
     enum sensor_t {
         OPT_SWAP = SWAP, // 1 if local optima for swap neighborhood. 0 else.
         OPT_EXCH = EXCH,
@@ -47,6 +50,9 @@ namespace PERMU{
         c_above = 13,
         __output_N = 14,
     };
+
+
+
 }
 
 
