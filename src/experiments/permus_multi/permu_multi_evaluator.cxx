@@ -87,7 +87,7 @@ struct Evaluator
         
 
         int n_instances = (*this->parameters->VECTOR_OF_INSTANCE_PATHS).size();
-        int n_reps_all_instances = (EVAL_MIN_STEP-1) / n_instances + 1;
+        int n_reps_all_instances = EVAL_MIN_STEP / n_instances;
         int n_evals_each_it = n_reps_all_instances * n_instances;
 
         if (n_instances == 0)
@@ -154,17 +154,22 @@ struct Evaluator
         {
             int initial_seed = rng.random_integer_uniform(INT_MAX);
             cout << "Evaluating -> " << std::flush;
-            progress_bar bar(surviving_candidates.size()* n_evals_each_it);
-            #pragma omp parallel for num_threads(parameters->neat_params->N_OF_THREADS)
-            for (int i = 0; i < surviving_candidates.size() * n_evals_each_it; i++)
-            {
-                int inet = surviving_candidates[i / n_evals_each_it];
-                int instance_index =  i % n_instances;
-                int f_value_sample_index = current_n_of_evals + i % n_evals_each_it;
+            cout << endl << "inet" << "," << "f_value_sample_index" << "," << "instance_index" << "," << "seed" << endl;
 
-                // cout << inet << "," << f_value_sample_index << "," << instance_index << endl;
+            int n_surviving_candidates = surviving_candidates.size();
+            progress_bar bar(n_surviving_candidates* n_evals_each_it);
+            #pragma omp parallel for num_threads(parameters->neat_params->N_OF_THREADS)
+            for (int i = 0; i < n_surviving_candidates * n_evals_each_it; i++)
+            {
+                int inet = surviving_candidates[i % n_surviving_candidates];
+                int f_value_sample_index = i / n_surviving_candidates;
+                int instance_index =  f_value_sample_index % n_instances;
+
                 NEAT::CpuNetwork *net = nets[inet];
-                int seed = initial_seed + i % n_evals_each_it;
+                int seed = initial_seed + i / n_surviving_candidates;
+
+                cout << inet << "," << f_value_sample_index << "," << instance_index << "," << seed << endl;
+
 
                 f_values[inet][f_value_sample_index] = this->FitnessFunction(net, seed, instance_index);
                 bar.step();
@@ -182,6 +187,7 @@ struct Evaluator
                 tmp_order[inet] = Average(f_value_ranks[inet], current_n_of_evals) - (double)surviving_candidates.size() * 10000000.0;
             }
 
+            exit(1);
 
 
             F_race_iteration(f_value_ranks, surviving_candidates, current_n_of_evals, ALPHA_INDEX);
