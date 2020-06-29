@@ -34,8 +34,8 @@ SEED=2
 
 
 i=-1
-for INSTANCE_TYPE_PAIR in "A|B" "A|C" "B|C";do
-    for INSTANCE_INDEX in "1" "2" "3" "4" "5"; do
+for INSTANCE_TYPE_PAIR in "A|B" "A|C" "B|C" "A|B|C";do
+    for INSTANCE_INDEX in "1" "2" "3" "4" "5" "6" "7"; do
         i=$((i+1))
 
         list_to_array $INSTANCE_TYPE_PAIR
@@ -47,13 +47,24 @@ for INSTANCE_TYPE_PAIR in "A|B" "A|C" "B|C";do
         ins_name_0=`basename $ins_path_0`
         ins_name_1=`basename $ins_path_1`
 
-        CONTROLLER_NAME_PREFIX="${ins_name_0}_${ins_name_1}"
+
+
+        if [[ "$INSTANCE_TYPE_PAIR" == "A|B|C" ]]; then
+            ins_path_2=`ls src/experiments/permus/instances/transfer_qap_cut_instances/${INSTANCE_TYPE_PAIR_ARRAY[2]}${INSTANCE_INDEX}*`
+            ins_name_2=`basename $ins_path_2`
+            COMMA_SEPARATED_LIST_OF_INSTANCE_PATHS_ARRAY+=("${ins_path_0},${ins_path_1},${ins_path_2}")
+            CONTROLLER_NAME_PREFIX="${ins_name_0}_${ins_name_1}_${ins_path_2}"
+        else    
+            COMMA_SEPARATED_LIST_OF_INSTANCE_PATHS_ARRAY+=("${ins_path_0},${ins_path_1}")
+            CONTROLLER_NAME_PREFIX="${ins_name_0}_${ins_name_1}"
+        fi
+
+
 
         POPSIZE_ARRAY+=(${POPSIZE})
         SEED_ARRAY+=("${SEED}")
 
         PROBLEM_TYPE_ARRAY+=("qap")
-        COMMA_SEPARATED_LIST_OF_INSTANCE_PATHS_ARRAY+=("${ins_path_0},${ins_path_1}")
         CONTROLLER_NAME_PREFIX_ARRAY+=("${CONTROLLER_NAME_PREFIX}")
         EXPERIMENT_FOLDER_NAME_ARRAY+=("${SRCDIR}/${EXPERIMENT_FOLDER_NAME}")
         CONTROLLER_ARRAY+=("${EXPERIMENT_FOLDER_NAME}/top_controllers/${CONTROLLER_NAME_PREFIX}_best.controller")
@@ -101,9 +112,9 @@ MAX_SOLVER_TIME_ARRAY=()
 
 
 i=-1
-for INSTANCE_TYPE_TRAIN in "A|B" "A|C" "B|C";do
-    for INSTANCE_INDEX_TRAIN in "1" "2" "3" "4" "5"; do
-        for INSTANCE_INDEX_TEST in "1" "2" "3" "4" "5"; do
+for INSTANCE_TYPE_TRAIN in "A|B" "A|C" "B|C" "A|B|C";do
+    for INSTANCE_INDEX_TRAIN in "1" "2" "3" "4" "5" "6" "7"; do
+        for INSTANCE_INDEX_TEST in "1" "2" "3" "4" "5" "6" "7"; do
             for INSTANCE_TYPE_TEST in "A" "B" "C"; do
 
 
@@ -125,7 +136,14 @@ for INSTANCE_TYPE_TRAIN in "A|B" "A|C" "B|C";do
                 ins_name_0=`basename $ins_path_0`
                 ins_name_1=`basename $ins_path_1`
 
-                CONTROLLER_NAME_PREFIX="${ins_name_0}_${ins_name_1}"
+
+                if [[ "$INSTANCE_TYPE_PAIR" == "A|B|C" ]]; then
+                    ins_path_2=`ls src/experiments/permus/instances/transfer_qap_cut_instances/${INSTANCE_TYPE_PAIR_ARRAY[2]}${INSTANCE_INDEX}*`
+                    ins_name_2=`basename $ins_path_2`
+                    CONTROLLER_NAME_PREFIX="${ins_name_0}_${ins_name_1}_${ins_path_2}"
+                else    
+                    CONTROLLER_NAME_PREFIX="${ins_name_0}_${ins_name_1}"
+                fi
 
 
 
