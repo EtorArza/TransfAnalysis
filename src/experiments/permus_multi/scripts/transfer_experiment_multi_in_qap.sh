@@ -105,14 +105,16 @@ N_REPS=1
 N_EVALS=10000
 
 
-CONTROLLER_ARRAY=()
-PROBLEM_TYPE_ARRAY=()
-PROBLEM_PATH_ARRAY=()
-MAX_SOLVER_TIME_ARRAY=()
+TESTING_JOB_ID=""
 
-
-i=-1
 for INSTANCE_TYPE_TRAIN in "A|B" "A|C" "B|C" "A|B|C";do
+    i=-1
+
+    CONTROLLER_ARRAY=()
+    PROBLEM_TYPE_ARRAY=()
+    PROBLEM_PATH_ARRAY=()
+    MAX_SOLVER_TIME_ARRAY=()
+
     for INSTANCE_INDEX_TRAIN in "1" "2" "3" "4" "5" "6" "7"; do
         for INSTANCE_INDEX_TEST in "1" "2" "3" "4" "5" "6" "7"; do
             for INSTANCE_TYPE_TEST in "A" "B" "C"; do
@@ -158,9 +160,6 @@ for INSTANCE_TYPE_TRAIN in "A|B" "A|C" "B|C" "A|B|C";do
             done
         done
     done
-done
-
-
 
 CONTROLLER_ARRAY=$(to_list "${CONTROLLER_ARRAY[@]}")
 PROBLEM_TYPE_ARRAY=$(to_list "${PROBLEM_TYPE_ARRAY[@]}")
@@ -169,7 +168,13 @@ MAX_SOLVER_TIME_ARRAY=$(to_list "${MAX_SOLVER_TIME_ARRAY[@]}")
 
 
 
-TESTING_JOB_ID=`sbatch --parsable --dependency=afterok:${TRAINING_JOB_ID} --export=CONTROLLER_ARRAY=${CONTROLLER_ARRAY},PROBLEM_TYPE_ARRAY=${PROBLEM_TYPE_ARRAY},PROBLEM_PATH_ARRAY=${PROBLEM_PATH_ARRAY},MAX_SOLVER_TIME_ARRAY=${MAX_SOLVER_TIME_ARRAY},MEASURE_RESPONSES=${MEASURE_RESPONSES},TMP_RES_PATH=${TMP_RES_PATH},N_REPS=${N_REPS},N_EVALS=${N_EVALS} --array=0-$i src/experiments/permus/scripts/hip_test_array.sl`
+TESTING_JOB_ID=$TESTING_JOB_ID:`sbatch --parsable --dependency=afterok:${TRAINING_JOB_ID} --export=CONTROLLER_ARRAY=${CONTROLLER_ARRAY},PROBLEM_TYPE_ARRAY=${PROBLEM_TYPE_ARRAY},PROBLEM_PATH_ARRAY=${PROBLEM_PATH_ARRAY},MAX_SOLVER_TIME_ARRAY=${MAX_SOLVER_TIME_ARRAY},MEASURE_RESPONSES=${MEASURE_RESPONSES},TMP_RES_PATH=${TMP_RES_PATH},N_REPS=${N_REPS},N_EVALS=${N_EVALS} --array=0-$i src/experiments/permus/scripts/hip_test_array.sl`
 
 
-sbatch --dependency=afterok:$TESTING_JOB_ID --export=SCORE_PATH=${SCORE_PATH},RESPONSE_PATH=${RESPONSE_PATH},MEASURE_RESPONSES=${MEASURE_RESPONSES},TMP_RES_PATH=${TMP_RES_PATH} scripts/cat_result_files_to_exp_folder.sh
+done
+
+
+
+
+
+sbatch --dependency=afterok$TESTING_JOB_ID --export=SCORE_PATH=${SCORE_PATH},RESPONSE_PATH=${RESPONSE_PATH},MEASURE_RESPONSES=${MEASURE_RESPONSES},TMP_RES_PATH=${TMP_RES_PATH} scripts/cat_result_files_to_exp_folder.sh
