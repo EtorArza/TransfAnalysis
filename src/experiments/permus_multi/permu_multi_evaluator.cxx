@@ -187,7 +187,6 @@ struct Evaluator
                 tmp_order[inet] = Average(f_value_ranks[inet], current_n_of_evals) - (double)surviving_candidates.size() * 10000000.0;
             }
 
-            exit(1);
 
 
             F_race_iteration(f_value_ranks, surviving_candidates, current_n_of_evals, ALPHA_INDEX);
