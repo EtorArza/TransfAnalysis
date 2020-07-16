@@ -154,7 +154,7 @@ struct Evaluator
         {
             int initial_seed = rng.random_integer_uniform(INT_MAX);
             cout << "Evaluating -> " << std::flush;
-            cout << endl << "inet" << "," << "f_value_sample_index" << "," << "instance_index" << "," << "seed" << endl;
+            //cout << endl << "inet" << "," << "f_value_sample_index" << "," << "instance_index" << "," << "seed" << endl;
 
             int n_surviving_candidates = surviving_candidates.size();
             progress_bar bar(n_surviving_candidates* n_evals_each_it);
@@ -168,7 +168,7 @@ struct Evaluator
                 NEAT::CpuNetwork *net = nets[inet];
                 int seed = initial_seed + i / n_surviving_candidates;
 
-                cout << inet << "," << f_value_sample_index << "," << instance_index << "," << seed << endl;
+                //cout << inet << "," << f_value_sample_index << "," << instance_index << "," << seed << endl;
 
 
                 f_values[inet][f_value_sample_index] = this->FitnessFunction(net, seed, instance_index);
@@ -244,14 +244,14 @@ struct Evaluator
         {
 
             cout << "fitness_matrix: " << std::flush;
-            PrintMatrix(f_values, nnets, EVAL_MIN_STEP);
+            PrintMatrix(f_values, nnets, n_evals_each_it);
 
             cout << "franks_matrix (it is normal that ranks are repeated, since rows are updated in every iteration, with only the surviving_candidates being updated): " << std::flush;
-            PrintMatrix(f_value_ranks, nnets, EVAL_MIN_STEP);
+            PrintMatrix(f_value_ranks, nnets, n_evals_each_it);
 
             for (int i = 0; i < nnets; i++)
             {
-                cout << "|" << " i = " << i << " " << Average(f_values[i], EVAL_MIN_STEP) << endl; 
+                cout << "|" << " i = " << i << " " << Average(f_values[i], n_evals_each_it) << endl; 
             }
             
 
