@@ -11,6 +11,7 @@
 #SBATCH --time=30-0:00:00 #Walltime
 #SBATCH -p xlarge
 #SBATCH --exclude=n[001-004,017-018]
+#SBATCH --exclusive
 
 
 

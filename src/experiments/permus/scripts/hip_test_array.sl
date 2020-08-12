@@ -9,6 +9,7 @@
 #SBATCH --time=0-00:30:00 #Walltime
 #SBATCH -p short
 #SBATCH --exclude=n[001-004,017-018]
+#SBATCH --exclusive
 
 
 

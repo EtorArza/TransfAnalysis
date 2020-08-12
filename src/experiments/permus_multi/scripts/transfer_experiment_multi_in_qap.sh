@@ -53,7 +53,7 @@ for INSTANCE_TYPE_PAIR in "A|B" "A|C" "B|C" "A|B|C";do
             ins_path_2=`ls src/experiments/permus/instances/transfer_qap_cut_instances/${INSTANCE_TYPE_PAIR_ARRAY[2]}${INSTANCE_INDEX}*`
             ins_name_2=`basename $ins_path_2`
             COMMA_SEPARATED_LIST_OF_INSTANCE_PATHS_ARRAY+=("${ins_path_0},${ins_path_1},${ins_path_2}")
-            CONTROLLER_NAME_PREFIX="${ins_name_0}_${ins_name_1}_${ins_path_2}"
+            CONTROLLER_NAME_PREFIX="${ins_name_0}_${ins_name_1}_${ins_name_2}"
         else    
             COMMA_SEPARATED_LIST_OF_INSTANCE_PATHS_ARRAY+=("${ins_path_0},${ins_path_1}")
             CONTROLLER_NAME_PREFIX="${ins_name_0}_${ins_name_1}"
@@ -142,7 +142,7 @@ for INSTANCE_TYPE_TRAIN in "A|B" "A|C" "B|C" "A|B|C";do
                 if [[ "$INSTANCE_TYPE_PAIR" == "A|B|C" ]]; then
                     ins_path_2=`ls src/experiments/permus/instances/transfer_qap_cut_instances/${INSTANCE_TYPE_PAIR_ARRAY[2]}${INSTANCE_INDEX}*`
                     ins_name_2=`basename $ins_path_2`
-                    CONTROLLER_NAME_PREFIX="${ins_name_0}_${ins_name_1}_${ins_path_2}"
+                    CONTROLLER_NAME_PREFIX="${ins_name_0}_${ins_name_1}_${ins_name_2}"
                 else    
                     CONTROLLER_NAME_PREFIX="${ins_name_0}_${ins_name_1}"
                 fi

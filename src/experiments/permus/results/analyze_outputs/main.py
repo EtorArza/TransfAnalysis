@@ -26,6 +26,7 @@ DATASET_list = [
 "PERMUPROB",
 "QAP",
 "QAP",
+"QAP",
 "QAP"
 ]
 
@@ -35,7 +36,8 @@ input_file_list = [
     "/home/paran/Dropbox/BCAM/NEAT_code/src/experiments/permus/results/4by4_permu_problems/result_response_transfer_permuproblem_0_1s_12h.txt",
     "/home/paran/Dropbox/BCAM/NEAT_code/src/experiments/permus/results/transfer_qap_with_cut_instances/result_response_transfer_qap_0_1s_2h.txt",
     "/home/paran/Dropbox/BCAM/NEAT_code/src/experiments/permus/results/transfer_qap_with_cut_instances/result_response_transfer_qap_0_25s_1h.txt",
-    "/home/paran/Dropbox/BCAM/NEAT_code/src/experiments/permus/results/transfer_qap_with_cut_instances/result_response_transfer_qap_0_1s_12h.txt"
+    "/home/paran/Dropbox/BCAM/NEAT_code/src/experiments/permus/results/transfer_qap_with_cut_instances/result_response_transfer_qap_0_1s_12h.txt",
+    "/home/paran/Dropbox/BCAM/NEAT_code/src/experiments/permus/results/transfer_qap_with_cut_instances/result_response_transfer_qap_0_1s_12h_7instances.txt"
 ]
 
 

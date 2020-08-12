@@ -15,21 +15,23 @@ save_fig_path = "/home/paran/Dropbox/BCAM/NEAT_code/src/experiments/permus/resul
 
 
 txt_paths = [
-"/home/paran/Dropbox/BCAM/NEAT_code/src/experiments/permus_multi/results/qap_cut_multi_vs_mono/score_multi_instance_cut_qap.txt",
+#"/home/paran/Dropbox/BCAM/NEAT_code/src/experiments/permus_multi/results/qap_cut_multi_vs_mono/score_multi_instance_cut_qap.txt",
 "/home/paran/Dropbox/BCAM/NEAT_code/src/experiments/permus/results/4by4_permu_problems/result_score_transfer_permuproblem_0_1s_2h.txt",
 "/home/paran/Dropbox/BCAM/NEAT_code/src/experiments/permus/results/4by4_permu_problems/result_score_transfer_permuproblem_0_25s_1h.txt",
 "/home/paran/Dropbox/BCAM/NEAT_code/src/experiments/permus/results/4by4_permu_problems/result_score_transfer_permuproblem_0_1s_12h.txt",
 "/home/paran/Dropbox/BCAM/NEAT_code/src/experiments/permus/results/transfer_qap_with_cut_instances/result_score_transfer_qap_0_1s_2h.txt",
 "/home/paran/Dropbox/BCAM/NEAT_code/src/experiments/permus/results/transfer_qap_with_cut_instances/result_score_transfer_qap_0_25s_1h.txt",
-"/home/paran/Dropbox/BCAM/NEAT_code/src/experiments/permus/results/transfer_qap_with_cut_instances/result_score_transfer_qap_0_1s_12h.txt"
+"/home/paran/Dropbox/BCAM/NEAT_code/src/experiments/permus/results/transfer_qap_with_cut_instances/result_score_transfer_qap_0_1s_12h.txt",
+"/home/paran/Dropbox/BCAM/NEAT_code/src/experiments/permus/results/transfer_qap_with_cut_instances/result_score_transfer_qap_0_1s_12h_7instances.txt"
 ]
 
 
 transfer_exp_list =[
-"QAP_MULTI",
+#"QAP_MULTI",
 "PERMUPROB",
 "PERMUPROB",
 "PERMUPROB",
+"QAP",
 "QAP",
 "QAP",
 "QAP"
@@ -133,9 +135,9 @@ for input_txt, transfer_exp in zip(txt_paths, transfer_exp_list):
             pos += 1
         else:
             neg += 1
-        #transferability.append(    (norm_score - row["score"]) / abs(norm_score)    ) # as defined on the paper
+        transferability.append(    (norm_score - row["score"]) / abs(norm_score)    ) # as defined on the paper
         # transferability.append(    (row["score"] - average_score) / stdev_score    )
-        transferability.append(ranks[indx_in_selected])
+        # transferability.append(ranks[indx_in_selected])
 
 
 
