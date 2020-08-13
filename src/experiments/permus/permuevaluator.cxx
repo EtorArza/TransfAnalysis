@@ -370,7 +370,6 @@ void PermuEvaluator::read_conf_file(std::string conf_file_path)
     {
 
         parameters->SEED = reader.GetInteger("Global", "SEED", -1);
-        parameters->N_EVALS = reader.GetInteger("Global", "N_EVALS", -1);
         string search_type = reader.Get("Global", "SEARCH_TYPE", "UNKOWN");
         parameters->PROBLEM_TYPE = reader.Get("Global", "PROBLEM_TYPE", "UNKOWN");
         parameters->INSTANCE_PATH = reader.Get("Global", "PROBLEM_PATH", "UNKOWN");
@@ -501,7 +500,6 @@ void PermuEvaluator::run_given_conf_file(std::string conf_file_path)
 
     if (parameters->MODE == "train")
     {
-
         Experiment *exp = Experiment::get(parameters->prob_name.c_str());
         rng_t rng{parameters->SEED};
         exp->neat_params->global_timer.tic();
