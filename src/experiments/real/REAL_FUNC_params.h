@@ -1,15 +1,15 @@
 
 #include <string>
+#include "Parameters.h"
 #pragma once
 
 
 namespace REAL_FUNC{
 
-    class params{
+    class params: public base_params{
 
     public:
 
-        neat_parameters *neat_params;
 
 
 

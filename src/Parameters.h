@@ -30,3 +30,9 @@ public:
 
 
 };
+
+class base_params
+{
+public:
+    neat_parameters *neat_params;
+};

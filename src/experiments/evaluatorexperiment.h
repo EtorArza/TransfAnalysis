@@ -174,7 +174,6 @@ namespace NEAT {
         }
 
         virtual void run_given_conf_file(std::string conf_file_path) override{
-            this->neat_params = new neat_parameters();
             neat_params->load_global_params(conf_file_path);
             network_evaluator = unique_ptr<NetworkEvaluator>(create_evaluator());
             network_evaluator->neat_params = neat_params;

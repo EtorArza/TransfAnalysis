@@ -7,10 +7,9 @@
 
 namespace PERMU{
 
-    class params{
+    class params: public base_params{
 
     public:
-        neat_parameters *neat_params;
 
         // PARAMETERS TO BE SPECIFIED IN CONFIG FILE//
         double MAX_SOLVER_TIME;
