@@ -24,34 +24,37 @@
 using namespace std;
 // #define COUNTER
 
-MultidimBenchmarkFF *load_problem(int problem_index, int dim)
+MultidimBenchmarkFF *load_problem(int problem_index, int dim, double x_lower_lim, double x_upper_lim)
 {
     MultidimBenchmarkFF *problem;
     switch (problem_index)
     {
     case 1:
-        problem = new F1(dim);
+        problem = new F1(dim, x_lower_lim, x_upper_lim);
         break;
     case 2:
-        problem = new F2(dim);
+        problem = new F2(dim, x_lower_lim, x_upper_lim);
         break;
     case 3:
-        problem = new F3(dim);
+        problem = new F3(dim, x_lower_lim, x_upper_lim);
         break;
     case 4:
-        problem = new F4(dim);
+        problem = new F4(dim, x_lower_lim, x_upper_lim);
         break;
     case 5:
-        problem = new F5(dim);
+        problem = new F5(dim, x_lower_lim, x_upper_lim);
         break;
     case 6:
-        problem = new F6(dim);
+        problem = new F6(dim, x_lower_lim, x_upper_lim);
         break;
     case 7:
-        problem = new F7(dim);
+        problem = new F7(dim, x_lower_lim, x_upper_lim);
         break;
     case 8:
-        problem = new F8(dim);
+        problem = new F8(dim, x_lower_lim, x_upper_lim);
+        break;
+    case 9:
+        problem = new F9(dim, x_lower_lim, x_upper_lim);
         break;
     default:
         cout << "Incorrect problem index, only integers between 1 and 8 allowed. problem_index = " << problem_index << "  was provided." << endl;
@@ -65,7 +68,7 @@ double FitnessFunction_real_func(class NEAT::CpuNetwork *net_original, int probl
 {
 
     double *v_of_fitness;
-    MultidimBenchmarkFF *problem = load_problem(problem_index, dim);
+    MultidimBenchmarkFF *problem = load_problem(problem_index, dim, parameters->X_LOWER_LIM, parameters->X_UPPER_LIM);
 
     CPopulation *pop;
 
@@ -178,6 +181,8 @@ double FitnessFunction(NEAT::CpuNetwork *net, int initial_seed, int instance_ind
     REAL_FUNC::params tmp_params = *static_cast<REAL_FUNC::params*>(parameters);
     tmp_params.PROBLEM_INDEX = (*tmp_params.PROBLEM_INDEX_LIST)[instance_index];
     tmp_params.PROBLEM_DIM = (*tmp_params.PROBLEM_DIM_LIST)[instance_index];
+    tmp_params.X_LOWER_LIM = (*tmp_params.X_LOWER_LIST)[instance_index];
+    tmp_params.X_UPPER_LIM = (*tmp_params.X_UPPER_LIST)[instance_index];
     double res = FitnessFunction_real_func(net, seed_seq, &tmp_params);
     return res;
 }
@@ -273,6 +278,14 @@ namespace NEAT
             COMMA_SEPARATED_LIST = reader.Get("Global", "COMMA_SEPARATED_PROBLEM_DIM_LIST", "UNKNOWN");
             parameters->PROBLEM_DIM_LIST = new std::vector<int>(from_comma_sep_values_in_string_to_int_vector(COMMA_SEPARATED_LIST));
 
+            COMMA_SEPARATED_LIST = reader.Get("Global", "COMMA_SEPARATED_X_LOWER_LIST", "UNKNOWN");
+            parameters->X_LOWER_LIST = new std::vector<int>(from_comma_sep_values_in_string_to_int_vector(COMMA_SEPARATED_LIST));
+
+            COMMA_SEPARATED_LIST = reader.Get("Global", "COMMA_SEPARATED_X_UPPER_LIST", "UNKNOWN");
+            parameters->X_UPPER_LIST = new std::vector<int>(from_comma_sep_values_in_string_to_int_vector(COMMA_SEPARATED_LIST));
+
+
+
             parameters->MAX_SOLVER_FE = reader.GetInteger("Global", "MAX_SOLVER_FE", -1);
 
             if (neat_params->EXPERIMENT_FOLDER_NAME == "UNKNOWN")
@@ -351,6 +364,10 @@ namespace NEAT
             parameters->COMPUTE_RESPONSE = reader.GetBoolean("Global", "COMPUTE_RESPONSE", false);
             parameters->PRINT_POSITIONS = reader.GetBoolean("Global", "PRINT_POSITIONS", false);
             neat_params->N_OF_THREADS = std::min(neat_params->N_OF_THREADS, parameters->N_EVALS);
+
+            parameters->X_LOWER_LIM = reader.GetReal("Global", "X_LOWER_LIM", -1.0);
+            parameters->X_UPPER_LIM = reader.GetReal("Global", "X_UPPER_LIM", -1.0);
+
 
             if (parameters->CONTROLLER_PATH == "UNKNOWN")
             {

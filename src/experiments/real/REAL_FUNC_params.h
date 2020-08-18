@@ -24,7 +24,9 @@ namespace REAL_FUNC{
         // TRAIN PARAMS TO BE SPECIFIED IN CONFIG FILE//
         std::vector<int>* PROBLEM_INDEX_LIST; 
         std::vector<int>* PROBLEM_DIM_LIST; 
-
+        std::vector<int>* X_LOWER_LIST;
+        std::vector<int>* X_UPPER_LIST;
+    
         // TEST PARAMS TO BE SPECIFIED IN CONFIG FILE//
         std::string CONTROLLER_PATH;
         int N_REPS;
@@ -34,6 +36,8 @@ namespace REAL_FUNC{
         int PROBLEM_DIM;
         bool COMPUTE_RESPONSE = false;
 
+        double X_LOWER_LIM;
+        double X_UPPER_LIM;
 
 
     };

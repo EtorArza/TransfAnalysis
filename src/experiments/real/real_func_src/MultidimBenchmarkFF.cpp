@@ -3,11 +3,18 @@
 #include <assert.h>
 #include "MultidimBenchmarkFF.h"
 
-MultidimBenchmarkFF::MultidimBenchmarkFF(int dim)
+MultidimBenchmarkFF::MultidimBenchmarkFF(int dim, double x_lower_lim, double x_upper_lim)
 {
     this->dim = dim;
     rng = new RandomNumberGenerator();
     temp_vect_1 = new double[this->dim];
+    this->x_lower_lim = x_lower_lim;
+    this->x_upper_lim = x_upper_lim;
+    if (x_lower_lim >= x_upper_lim)
+    {
+        cout << "\n Error in MultidimBenchmarkFF, x_lims = (" << x_lower_lim << ", " << x_upper_lim << ") not correct.\n" <<endl;
+        exit(1);
+    }
 }
 
 
@@ -46,6 +53,19 @@ double MultidimBenchmarkFF::Fitness_Func_0_1(double* x_vec_0_1){
 }
 
 
+
+double MultidimBenchmarkFF::get_x_lim_lower()
+{
+    return this->x_lower_lim;
+}
+
+
+double MultidimBenchmarkFF::get_x_lim_upper()
+{
+    return this->x_upper_lim;
+}
+
+
 void MultidimBenchmarkFF::Evaluate(CIndividual *indiv)
 {
 	double fitness = 0;
@@ -63,8 +83,6 @@ void MultidimBenchmarkFF::Evaluate(CIndividual *indiv)
 
 
 // Sphere
-double F1::get_x_lim_upper(){return 5.12;};
-double F1::get_x_lim_lower(){return -5.12;};
 double F1::FitnessFunc(double* x_vec){
     double res = 0;
     for (int i = 0; i < dim; i++)
@@ -76,8 +94,6 @@ double F1::FitnessFunc(double* x_vec){
 
 
 // Dixon & price
-double F2::get_x_lim_upper(){return 10.0;};
-double F2::get_x_lim_lower(){return -10.0;};
 double F2::FitnessFunc(double* x_vec){
     double res = (x_vec[0] - 1.0) * (x_vec[0] - 1.0);
     for (int i = 2; i <= dim; i++)
@@ -90,8 +106,6 @@ double F2::FitnessFunc(double* x_vec){
 
 
 // Zakharov
-double F3::get_x_lim_upper(){return 10.0;};
-double F3::get_x_lim_lower(){return -5.0;};
 double F3::FitnessFunc(double* x_vec){
     double val_1 = 0.0;
     double val_2 = 0.0;
@@ -111,8 +125,6 @@ double F3::FitnessFunc(double* x_vec){
 
 
 // Rastrigin
-double F4::get_x_lim_upper(){return 5.12;};
-double F4::get_x_lim_lower(){return -5.12;};
 double F4::FitnessFunc(double* x_vec){
     double res = (double) 10 * dim;
 
@@ -126,8 +138,6 @@ double F4::FitnessFunc(double* x_vec){
 
 
 // Levy
-double F5::get_x_lim_upper(){return 30.0;};
-double F5::get_x_lim_lower(){return -15.0;};
 double F5::FitnessFunc(double* x_vec){
     double w_1 = 1.0 + (x_vec[0] - 1.0)/4.0;
     double res = sin(M_PI * w_1) * sin(M_PI * w_1);
@@ -148,8 +158,6 @@ double F5::FitnessFunc(double* x_vec){
 
 
 // Griewank
-double F6::get_x_lim_upper(){return 600.0;};
-double F6::get_x_lim_lower(){return -600.0;};
 double F6::FitnessFunc(double* x_vec){
     double val_1 = 0.0;
     for (int i = 0; i < dim; i++)
@@ -171,8 +179,6 @@ double F6::FitnessFunc(double* x_vec){
 
 
 // Rosenbrock
-double F7::get_x_lim_upper(){return 10.0;};
-double F7::get_x_lim_lower(){return -5.0;};
 double F7::FitnessFunc(double* x_vec){
     double res = 0.0;
 
@@ -192,8 +198,6 @@ double F7::FitnessFunc(double* x_vec){
 
 
 // Ackley
-double F8::get_x_lim_upper(){return 30.0;};
-double F8::get_x_lim_lower(){return -15.0;};
 double F8::FitnessFunc(double* x_vec){
     double sum_1 = 0.0;
     double sum_2 = 0.0;
@@ -215,4 +219,21 @@ double F8::FitnessFunc(double* x_vec){
 
     return 20.0 + exp(1) + sum_1 + sum_2;
 }
+
+// Quadratic
+double F9::FitnessFunc(double* x_vec){
+    double res = 0;
+    double tmp;
+    for (int i = 0; i < dim; i++)
+    {
+        tmp = 0;
+        for (int j = 0; i < i+1; i++)
+        {
+            tmp += x_vec[j];
+        }
+        res += tmp * tmp;
+    }
+    return res;
+}
+
 

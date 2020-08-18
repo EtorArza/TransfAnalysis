@@ -19,7 +19,7 @@ class MultidimBenchmarkFF
 
 
   public:
-	MultidimBenchmarkFF(int dim);
+	MultidimBenchmarkFF(int dim, double x_lower_lim, double x_upper_lim);
 	virtual ~MultidimBenchmarkFF() = 0;
     int GetProblemSize();
     double Fitness_Func_0_1(double* x_vec_0_1);
@@ -31,102 +31,86 @@ class MultidimBenchmarkFF
   protected:
 
     double* temp_vect_1;
-    virtual double get_x_lim_upper() = 0;
-    virtual double get_x_lim_lower() = 0;
+    double get_x_lim_upper();
+    double get_x_lim_lower();
     int dim;
     bool rng_deleted = false;
+
+  private:
+    double x_upper_lim;
+    double x_lower_lim;
+
 
 };
 
 class F1 : public MultidimBenchmarkFF
 {
 public:
-    F1(int dim) : MultidimBenchmarkFF(dim){};
+    F1(int dim, double x_lower_lim, double x_upper_lim) : MultidimBenchmarkFF(dim, x_lower_lim, x_upper_lim){};
     ~F1(){};
-    double get_x_lim_upper();
-    double get_x_lim_lower();
     double FitnessFunc(double *x_vec);
 };
 
 class F2 : public MultidimBenchmarkFF
 {
 public:
-
-	F2(int dim):MultidimBenchmarkFF(dim){};
+    F2(int dim, double x_lower_lim, double x_upper_lim) : MultidimBenchmarkFF(dim, x_lower_lim, x_upper_lim){};
     ~F2(){};
-    double get_x_lim_upper();
-    double get_x_lim_lower();
-    double FitnessFunc(double* x_vec);
+    double FitnessFunc(double *x_vec);
 };
-
 
 class F3 : public MultidimBenchmarkFF
 {
 public:
-
-	F3(int dim):MultidimBenchmarkFF(dim){};
+    F3(int dim, double x_lower_lim, double x_upper_lim) : MultidimBenchmarkFF(dim, x_lower_lim, x_upper_lim){};
     ~F3(){};
-    double get_x_lim_upper();
-    double get_x_lim_lower();
-    double FitnessFunc(double* x_vec);
+    double FitnessFunc(double *x_vec);
 };
-
 
 class F4 : public MultidimBenchmarkFF
 {
 public:
-
-	F4(int dim):MultidimBenchmarkFF(dim){};
+    F4(int dim, double x_lower_lim, double x_upper_lim) : MultidimBenchmarkFF(dim, x_lower_lim, x_upper_lim){};
     ~F4(){};
-    double get_x_lim_upper();
-    double get_x_lim_lower();
-    double FitnessFunc(double* x_vec);
+    double FitnessFunc(double *x_vec);
 };
-
 
 class F5 : public MultidimBenchmarkFF
 {
 public:
-
-	F5(int dim):MultidimBenchmarkFF(dim){};
+    F5(int dim, double x_lower_lim, double x_upper_lim) : MultidimBenchmarkFF(dim, x_lower_lim, x_upper_lim){};
     ~F5(){};
-    double get_x_lim_upper();
-    double get_x_lim_lower();
-    double FitnessFunc(double* x_vec);
+    double FitnessFunc(double *x_vec);
 };
-
 
 class F6 : public MultidimBenchmarkFF
 {
 public:
-
-	F6(int dim):MultidimBenchmarkFF(dim){};
+    F6(int dim, double x_lower_lim, double x_upper_lim) : MultidimBenchmarkFF(dim, x_lower_lim, x_upper_lim){};
     ~F6(){};
-    double get_x_lim_upper();
-    double get_x_lim_lower();
-    double FitnessFunc(double* x_vec);
+    double FitnessFunc(double *x_vec);
 };
-
 
 class F7 : public MultidimBenchmarkFF
 {
 public:
-
-	F7(int dim):MultidimBenchmarkFF(dim){};
+    F7(int dim, double x_lower_lim, double x_upper_lim) : MultidimBenchmarkFF(dim, x_lower_lim, x_upper_lim){};
     ~F7(){};
-    double get_x_lim_upper();
-    double get_x_lim_lower();
-    double FitnessFunc(double* x_vec);
+    double FitnessFunc(double *x_vec);
 };
 
 class F8 : public MultidimBenchmarkFF
 {
 public:
-
-	F8(int dim):MultidimBenchmarkFF(dim){};
+    F8(int dim, double x_lower_lim, double x_upper_lim) : MultidimBenchmarkFF(dim, x_lower_lim, x_upper_lim){};
     ~F8(){};
-    double get_x_lim_upper();
-    double get_x_lim_lower();
-    double FitnessFunc(double* x_vec);
+    double FitnessFunc(double *x_vec);
 };
 
+class F9 : public MultidimBenchmarkFF
+{
+public:
+    F9(int dim, double x_lower_lim, double x_upper_lim) : MultidimBenchmarkFF(dim, x_lower_lim, x_upper_lim){};
+    ~F9(){};
+    double FitnessFunc(double *x_vec);
+};
