@@ -160,12 +160,11 @@ void CPopulation::apply_neat_output_to_individual_i(double *output_neat, int i)
     copy_array(m_individuals[i]->momentum, templ_double_array1_of_size_n, n);
 
 
-    // clip momentum  between -0.5 and 0.5
+    // clip momentum  between -1 and 1
     for (int j = 0; j < n; j++)
     {
-        m_individuals[i]->momentum[j] = max(m_individuals[i]->momentum[j], -0.5);
-        m_individuals[i]->momentum[j] = min(m_individuals[i]->momentum[j], 0.5);
-
+        m_individuals[i]->momentum[j] = max(m_individuals[i]->momentum[j], -1.0);
+        m_individuals[i]->momentum[j] = min(m_individuals[i]->momentum[j], 1.0);
     }
 
 
