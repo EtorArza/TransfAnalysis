@@ -417,15 +417,19 @@ namespace NEAT
 
             double *v_of_f_values = new double[parameters->N_EVALS];
 
-            cout << std::setprecision(15);
             RandomNumberGenerator *rng;
             rng = new RandomNumberGenerator();
             rng->seed();
             int initial_seed = rng->random_integer_uniform(40000000, 50000000);
             delete rng;
+
+
+            
+
             ostringstream result_string_stream;
-            result_string_stream << std::setprecision(15);
-            result_string_stream << std::flush;
+            cout << std::setprecision(30) << std::flush;
+            result_string_stream << std::setprecision(30) << std::flush;
+
 
             result_string_stream << "[[";
             for (int j = 0; j < parameters->N_REPS; j++)
@@ -446,9 +450,15 @@ namespace NEAT
                 result_string_stream << "]," << std::flush;
                 delete[] v_of_f_values;
 
-                result_string_stream << "\"" << parameters->PROBLEM_INDEX << "\",\""
-                                     << parameters->PROBLEM_DIM << "\","
-                                     << parameters->CONTROLLER_PATH << "\",\""
+                result_string_stream << "" << parameters->PROBLEM_INDEX << ","
+                                    << std::setprecision(8)
+                                    << std::flush
+                                    << "(" << parameters->X_LOWER_LIM << "," << parameters->X_UPPER_LIM << "),"
+                                    << std::setprecision(30)
+                                    << std::flush
+
+                                     << parameters->PROBLEM_DIM << ",\""
+                                     << parameters->CONTROLLER_PATH << "\","
                                      << parameters->N_EVALS
                                      << "]"
                                      << endl;
