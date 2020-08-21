@@ -7,10 +7,15 @@ include Makefile.conf
 CC_CUDA=nvcc -DENABLE_CUDA ${NVCC_FLAGS} -arch=sm_13 --compiler-bindir ${PFM_NVCC_CCBIN} -Xcompiler "${OPT} ${INCLUDES} ${OPENMP}"
 
 INCLUDES=$(patsubst %,-I%,$(shell find src -type d))
-SOURCES=$(shell find src/ ! -name "test_permuproblem.cpp" -name "*.cpp")
-CXX_SOURCES=$(shell find src -name "*.cxx")
+SOURCES=$(shell find src/ -name "*.cpp")
+CXX_SOURCES=$(shell find src/ -name "*.cxx")
+C_SOURCES=$(shell find src/ -name "*.c")
+
+
+
 
 OBJECTS=${SOURCES:src/%.cpp=obj/cpp/%.o}
+OBJECTS+=${C_SOURCES:src/%.c=obj/c/%.o}
 
 LIBS=-lgomp
 DEFINES=
@@ -97,5 +102,10 @@ endif
 obj/cpp/%.o: src/%.cpp Makefile.conf Makefile src/util/std.h.gch
 	@mkdir -p $(shell dirname $@)
 	g++ ${CC_FLAGS} -std=c++11 -MMD $< -o $@
+
+obj/c/%.o: src/%.c Makefile.conf Makefile
+	@mkdir -p $(shell dirname $@)
+	gcc ${CC_FLAGS} -std=c99 -MMD $< -o $@
+
 
 -include ${DEPENDS}
