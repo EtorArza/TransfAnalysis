@@ -22,7 +22,7 @@
 #include "evaluatorexperiment.h"
 #include "INIReader.h"
 #include "Parameters.h"
-
+#include "generator.h"
 
 
 
@@ -51,17 +51,26 @@ int main(int argc, char *argv[])
     // cout << n*n / 2 << endl;
     // exit(1);
 
+    char config_path[] = "src/experiments/real/real_func_src/jani_ronkkonen_problem_generator/quad_function.dat";
+    g_seeded_initialize(config_path, 178, 2);
+    double x[2] = {stod(argv[1]),stod(argv[2])}; 
+    cout << g_calculate(x) << endl;
+    exit(0);
+
     #ifdef HIPATIA
     cout << "HIPATIA is defined" << endl;
     #else
     cout << "HIPATIA is NOT defined" << endl;
     #endif
 
+
+
+
     using namespace std;
     using namespace NEAT;
 
     cout << "\n---------- BEGIN LICENCE DISCLAIMER----------\n";
-    cout << "This code is based on accneat. Although some small changes \n";
+    cout << "The neuroevolution algorithm is based in accneat. Although some small changes \n";
     cout << "have been made, most of the NEAT algorithm remains unchanged.\n"
          << endl;
     cout << "Accneat is a fork of Stanley et al.'s implementation with some \n";
@@ -74,11 +83,12 @@ int main(int argc, char *argv[])
     cout << "Configuration file parser inih, available at https://github.com/jtilly/inih (BSD licence)" << endl;
     cout << "Some parts of the PerMallows package by Ekhiñe Irurozki available at https://cran.r-project.org/web/packages/PerMallows/index.html (GLP licence)" << endl;
     cout << "The incomplete gamma function (asa032.cpp and asa032.hpp), by G Bhattacharjee, originally written by John Burkardt, (GNU LGPL license).\n";
+    cout << "Continuous optimization problem generator, by Jani Rönkkönen, available at http://ronkkonen.com/generator/ (MIT licence)" << endl;
     cout << "***\n";
 
     cout << "The original part of the source code provided here was made by Etor Arza.\n";
     cout << "To keep the licence stuff as painless as possible, the software part writen by \n";
-    cout << "Etor Arza is distributed with APACHE LICENCE 2.0 too.\n\n";
+    cout << "Etor Arza is distributed with APACHE LICENCE 2.0.\n\n";
     cout << "----------END LICENCE DISCLAIMER----------\n\n\n\n\n\n";
 
 #ifndef NDEBUG
