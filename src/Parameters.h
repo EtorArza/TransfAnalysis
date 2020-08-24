@@ -15,7 +15,8 @@ public:
 
     // PARAMS TO BE SPECIFIED IN CONFIG FILE//
     int N_OF_THREADS;
-    double MAX_TRAIN_TIME;
+    int MAX_TRAIN_TIME;
+    int MAX_TRAIN_ITERATIONS;
     int POPSIZE_NEAT;
     stopwatch global_timer;
 

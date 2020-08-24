@@ -52,7 +52,7 @@ TRAINING_JOB_ID=`sbatch --parsable --dependency=afterok:${COMPILE_JOB_ID} --expo
 
 
 
-MEASURE_RESPONSES="false"
+COMPUTE_RESPONSE="false"
 SCORE_PATH="src/experiments/permus/results/popsize_exp/result_popsize_experiment.txt"
 TMP_RES_PATH=${SRCDIR}/"tmp"/$(dirname ${SCORE_PATH})
 N_REPS=1
@@ -60,7 +60,7 @@ N_EVALS=40000
 
 
 
-TESTING_JOB_ID=`sbatch --parsable --dependency=afterok:${TRAINING_JOB_ID} --export=CONTROLLER_ARRAY=${CONTROLLER_ARRAY},PROBLEM_TYPE_ARRAY=${PROBLEM_TYPE_ARRAY},PROBLEM_PATH_ARRAY=${PROBLEM_PATH_ARRAY},MAX_SOLVER_TIME_ARRAY=${MAX_SOLVER_TIME_ARRAY},MEASURE_RESPONSES=${MEASURE_RESPONSES},TMP_RES_PATH=${TMP_RES_PATH},N_REPS=${N_REPS},N_EVALS=${N_EVALS} --array=0-$i src/experiments/permus/scripts/hip_test_array.sl`
+TESTING_JOB_ID=`sbatch --parsable --dependency=afterok:${TRAINING_JOB_ID} --export=CONTROLLER_ARRAY=${CONTROLLER_ARRAY},PROBLEM_TYPE_ARRAY=${PROBLEM_TYPE_ARRAY},PROBLEM_PATH_ARRAY=${PROBLEM_PATH_ARRAY},MAX_SOLVER_TIME_ARRAY=${MAX_SOLVER_TIME_ARRAY},COMPUTE_RESPONSE=${COMPUTE_RESPONSE},TMP_RES_PATH=${TMP_RES_PATH},N_REPS=${N_REPS},N_EVALS=${N_EVALS} --array=0-$i src/experiments/permus/scripts/hip_test_array.sl`
 
 
 
@@ -87,12 +87,12 @@ mkdir ${SCRATCH_JOB}
 
 
 
-if [ "$MEASURE_RESPONSES" == "true" ]; then
+if [ "$COMPUTE_RESPONSE" == "true" ]; then
     cat ${TMP_RES_PATH}/response_* > ${RESPONSE_PATH}
-elif [ "$MEASURE_RESPONSES" == "false" ]; then
+elif [ "$COMPUTE_RESPONSE" == "false" ]; then
     cat ${TMP_RES_PATH}/score_* > ${SCORE_PATH}
 else
-    echo "MEASURE_RESPONSES = $MEASURE_RESPONSES not set correctly"
+    echo "COMPUTE_RESPONSE = $COMPUTE_RESPONSE not set correctly"
     exit 1
 fi
 

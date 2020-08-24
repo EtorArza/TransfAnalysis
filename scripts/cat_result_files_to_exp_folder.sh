@@ -27,11 +27,11 @@ fi
 
 
 cat ${TMP_RES_PATH}/scor* > ${SCORE_PATH}
-if [ "$MEASURE_RESPONSES" == "true" ]; then
+if [ "$COMPUTE_RESPONSE" == "true" ]; then
     cat ${TMP_RES_PATH}/respon* > ${RESPONSE_PATH}
-elif [ "$MEASURE_RESPONSES" == "false" ]; then
+elif [ "$COMPUTE_RESPONSE" == "false" ]; then
     echo "Measure responses not copyed."
 else
-    echo "MEASURE_RESPONSES = $MEASURE_RESPONSES not set correctly"
+    echo "COMPUTE_RESPONSE = $COMPUTE_RESPONSE not set correctly"
     exit 1
 fi

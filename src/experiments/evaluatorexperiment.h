@@ -87,6 +87,12 @@ namespace NEAT {
             vector<real_t> fitness;
 
 
+            if (neat_params->MAX_TRAIN_TIME == -1 && neat_params->MAX_TRAIN_ITERATIONS == -1)
+            {
+                std::cout << "Error, MAX_TRAIN_TIME or MAX_TRAIN_ITERATIONS required as stopping criteria for training with NEAT." << endl;
+                exit(1);
+            }
+
             
             mkdir( get_dir_path() );
             mkdir( get_dir_path() + "/all_controllers" );
@@ -118,13 +124,13 @@ namespace NEAT {
             #endif
             {
 
-                if (progress >= 1.0){
+                if (progress >= 1.0 || gen >= neat_params->MAX_TRAIN_ITERATIONS){
                     neat_params->IS_LAST_ITERATION = true;
                 }
                 
                 gen++;
                 cout << "\n ---------------------------------------------------- \n\n";
-                cout << "Gen " << gen-1 << ", progress: " << progress << endl;	
+                cout << "Gen " << gen-1 << " / " << neat_params->MAX_TRAIN_ITERATIONS << ", progress: " << progress << endl;	
                 #ifdef HIPATIA
                 cout << "Time left:" << ((double) neat_params->MAX_TRAIN_TIME - get_runtime_hipatia()) / 60.0 / 60.0 << "h" << endl;
                 #else
@@ -135,7 +141,7 @@ namespace NEAT {
                 static Timer timer("epoch");
                 timer.start();
 
-                if(gen != 1) {
+                if(gen != 0) {
                     pop->next_generation();
                 }
 

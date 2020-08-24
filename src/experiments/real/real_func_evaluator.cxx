@@ -448,11 +448,8 @@ namespace NEAT
 
             double *v_of_f_values = new double[parameters->N_EVALS];
 
-            RandomNumberGenerator *rng;
-            rng = new RandomNumberGenerator();
-            rng->seed();
-            int initial_seed = rng->random_integer_uniform(40000000, 50000000);
-            delete rng;
+
+            int initial_seed = 6374058;
 
 
             
