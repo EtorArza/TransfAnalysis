@@ -1,8 +1,8 @@
 import pandas as pd
 import subprocess
 
-CONTROLLER_PATH = "src/experiments/real/results/trained_controllers/top_controllers/controller_1_2_3_best.controller"
-N_EVALS = 1
+CONTROLLER_PATH = "src/experiments/real/results/comparison_other_pso/randomly_generated_problems_best.controller"
+N_EVALS = 30
 N_REPS = 1
 THREADS = 1
 
@@ -53,15 +53,15 @@ X_UPPER_LIM = {X_UPPER_LIM}
 
 def record_results(METHOD_SHORTNAME,SOLVER_POPSIZE,PROBLEM_INDEX,PROBLEM_DIM,MAX_SOLVER_FE,X_LOWER_LIM,X_UPPER_LIM,F_COMPETITION):
     write_conf_file(METHOD_SHORTNAME,SOLVER_POPSIZE,PROBLEM_INDEX,PROBLEM_DIM,MAX_SOLVER_FE,X_LOWER_LIM,X_UPPER_LIM,F_COMPETITION)
-#    subprocess.run("./neat tmp_conf_file.ini > /dev/null",shell=True)
-    subprocess.run("./neat tmp_conf_file.ini",shell=True)
+    subprocess.run("./neat tmp_conf_file.ini > /dev/null",shell=True)
+    # subprocess.run("./neat tmp_conf_file.ini",shell=True)
     with open("result.txt","r") as f:
         res = f.readline().strip()
     print("["+str(F_COMPETITION)+","+res+"]"), # file="coparison_result.txt")
     subprocess.run("rm result.txt",shell=True)
 
 
-        
+
 
 
 df = pd.read_csv("src/experiments/real/results/comparison_other_pso/comparison_other_pso_methods.csv")

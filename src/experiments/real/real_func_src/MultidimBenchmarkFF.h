@@ -114,3 +114,14 @@ public:
     ~F9(){};
     double FitnessFunc(double *x_vec);
 };
+
+class F10 : public MultidimBenchmarkFF
+{
+public:
+
+    F10(int dim, double x_lower_lim, double x_upper_lim, int seed);
+    ~F10();
+    double FitnessFunc(double *x_vec);
+};
+
+

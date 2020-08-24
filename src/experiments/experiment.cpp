@@ -148,7 +148,7 @@ void  execute_multi(class NEAT::Network **nets_, NEAT::OrganismEvaluation *resul
 
             int n_surviving_candidates = surviving_candidates.size();
             progress_bar bar(n_surviving_candidates* n_evals_each_it);
-            #pragma omp parallel for num_threads(parameters->neat_params->N_OF_THREADS)
+            #pragma omp parallel for num_threads(parameters->neat_params->N_OF_THREADS) schedule(dynamic,1)
             for (int i = 0; i < n_surviving_candidates * n_evals_each_it; i++)
             {
                 int inet = surviving_candidates[i % n_surviving_candidates];
@@ -158,7 +158,6 @@ void  execute_multi(class NEAT::Network **nets_, NEAT::OrganismEvaluation *resul
                 NEAT::CpuNetwork *net = nets[inet];
                 int seed = initial_seed + i / n_surviving_candidates;
 
-                //cout << inet << "," << f_value_sample_index << "," << instance_index << "," << seed << endl;
 
 
                 f_values[inet][f_value_sample_index] = FitnessFunction(net, seed, instance_index, parameters);

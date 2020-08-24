@@ -24,7 +24,7 @@
 using namespace std;
 // #define COUNTER
 
-MultidimBenchmarkFF *load_problem(int problem_index, int dim, double x_lower_lim, double x_upper_lim)
+MultidimBenchmarkFF *load_problem(int problem_index, int dim, double x_lower_lim, double x_upper_lim, int seed_randomly_generated_instance=2)
 {
     MultidimBenchmarkFF *problem;
     switch (problem_index)
@@ -56,6 +56,9 @@ MultidimBenchmarkFF *load_problem(int problem_index, int dim, double x_lower_lim
     case 9:
         problem = new F9(dim, x_lower_lim, x_upper_lim);
         break;
+    case 10:
+        problem = new F10(dim, x_lower_lim, x_upper_lim, seed_randomly_generated_instance);
+        break;
     default:
         cout << "Incorrect problem index, only integers between 1 and 8 allowed. problem_index = " << problem_index << "  was provided." << endl;
         std::exit(1);
@@ -68,7 +71,17 @@ double FitnessFunction_real_func(class NEAT::CpuNetwork *net_original, int probl
 {
 
     double *v_of_fitness;
-    MultidimBenchmarkFF *problem = load_problem(problem_index, dim, parameters->X_LOWER_LIM, parameters->X_UPPER_LIM);
+    MultidimBenchmarkFF *problem;
+    if (problem_index == 10)
+    {
+        problem = load_problem(problem_index, dim, parameters->X_LOWER_LIM, parameters->X_UPPER_LIM, seed);
+    }
+    else
+    {
+        problem = load_problem(problem_index, dim, parameters->X_LOWER_LIM, parameters->X_UPPER_LIM);
+    }
+    
+     
 
     CPopulation *pop;
 
@@ -183,6 +196,7 @@ double FitnessFunction(NEAT::CpuNetwork *net, int initial_seed, int instance_ind
     tmp_params.PROBLEM_DIM = (*tmp_params.PROBLEM_DIM_LIST)[instance_index];
     tmp_params.X_LOWER_LIM = (*tmp_params.X_LOWER_LIST)[instance_index];
     tmp_params.X_UPPER_LIM = (*tmp_params.X_UPPER_LIST)[instance_index];
+    tmp_params.SEED = initial_seed;
     double res = FitnessFunction_real_func(net, seed_seq, &tmp_params);
     return res;
 }
@@ -205,6 +219,23 @@ struct Evaluator
     {
         int n_instances = (*this->parameters->PROBLEM_INDEX_LIST).size();
         execute_multi(nets_, results, nnets, n_instances, FitnessFunction, best_network, parameters);
+        // if ((*parameters->PROBLEM_INDEX_LIST)[0] == 10)
+        // {
+        //     double res;
+        //     static int initial_seed = 6284314136;
+        //     res = 0;
+        //     int N = 7;
+        //     #pragma omp parallel for num_threads(parameters->neat_params->N_OF_THREADS) schedule(dynamic,1)
+        //     for (int i = 0; i < N; i++)
+        //     {
+        //         //int seed = initial_seed + i;
+        //         res += FitnessFunction(best_network, initial_seed, 0, parameters);
+        //     }
+        //     res /= (double) N;
+        //     cout << endl;
+        //     cout << "best_fitness: " << res << endl; 
+        // }
+
     }
 };
 

@@ -23,7 +23,7 @@
 #include "INIReader.h"
 #include "Parameters.h"
 #include "generator.h"
-
+#include "MultidimBenchmarkFF.h"
 
 
 
@@ -51,11 +51,16 @@ int main(int argc, char *argv[])
     // cout << n*n / 2 << endl;
     // exit(1);
 
-    char config_path[] = "src/experiments/real/real_func_src/jani_ronkkonen_problem_generator/quad_function.dat";
-    g_seeded_initialize(config_path, 178, 2);
-    double x[2] = {stod(argv[1]),stod(argv[2])}; 
-    cout << g_calculate(x) << endl;
-    exit(0);
+    // char config_path[] = "src/experiments/real/real_func_src/jani_ronkkonen_problem_generator/quad_function.dat";
+    // g_seeded_initialize(config_path, 178, 2);
+    // double x[2] = {stod(argv[1]),stod(argv[2])}; 
+    // cout << g_calculate(x) << endl;
+    // exit(0);
+
+    // F7 rosembrock_test = F7(3, -2.048,2.048);
+    // double x[3] = {1.0,1.0,1.2};
+    // cout << rosembrock_test.FitnessFunc(x);
+    // exit(1);
 
     #ifdef HIPATIA
     cout << "HIPATIA is defined" << endl;

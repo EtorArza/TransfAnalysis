@@ -5,13 +5,13 @@
   
   Author: 
   
-  Jani Rönkkönen						
+  Jani Rï¿½nkkï¿½nen						
   Lappeenranta University of Technology			
   Department of Information Technology				
   P.O.Box 20, FIN-53851 LAPPEENRANTA, Finland			
   E-mail: jani.ronkkonen@lut.fi	
   
-  Copyright (c) 2007 Jani Rönkkönen
+  Copyright (c) 2007 Jani Rï¿½nkkï¿½nen
   
   Permission is hereby granted, free of charge, to any person obtaining a copy
   of this software and associated documentation files (the "Software"), to deal
@@ -51,7 +51,7 @@
 #define MINSHAPE 0.0001 /*The lower limit for the distribution in shape of a single optima*/
 #define MAXSHAPE 1.0/sqrt(quad_local_amount()+1) /*The upper limit for the distribution 
 						 in shape of a single optima*/
-#define MINIMA -1.0 /*The global optimum value*/
+#define MINIMA 0.0 /*The global optimum value*/
 #define DIVUPL MINIMA/8.1 /*Defines the upper limit for the optimum value of local minima as the 
 			    fraction of global minima*/
 #define DIVLOWL MINIMA/1.01 /*Defines the lower limit for the optimum value of local minima as the 

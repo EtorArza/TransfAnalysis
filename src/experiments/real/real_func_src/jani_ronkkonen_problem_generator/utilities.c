@@ -5,13 +5,13 @@
   
   Author: 
   
-  Jani Rönkkönen						
+  Jani Rï¿½nkkï¿½nen						
   Lappeenranta University of Technology			
   Department of Information Technology				
   P.O.Box 20, FIN-53851 LAPPEENRANTA, Finland			
   E-mail: jani.ronkkonen@lut.fi	
   
-  Copyright (c) 2007 Jani Rönkkönen, Ville Kyrki, Jarmo Ilonen
+  Copyright (c) 2007 Jani Rï¿½nkkï¿½nen, Ville Kyrki, Jarmo Ilonen
   
   Permission is hereby granted, free of charge, to any person obtaining a copy
   of this software and associated documentation files (the "Software"), to deal
@@ -52,30 +52,24 @@ static double constr[2*DMAX][DMAX+1]; /*The multipliers for constraint functions
 
 double g_randu(void)
 {
-  const int a = 16807, m = 2147483647; /*Park&Miller*/
-  const int q = 127773, r = 2863; /*Schrage*/
-  const double idouble = 1./((double)m);
-  int k;
+  srand(rn);
+  int r = rand();
+  rn = r;
+  return (double) r / (double) RAND_MAX;
   
-  k = rn/q;
-  rn = a*(rn-k*q)-r*k;
-  if (rn<0) rn+=m;
-  return idouble*rn;
 }
 
 void g_init_seed(int seed)
 {
   if(seed==-1){
-    rn=(int)time(0) ^ 666666666;	
+    rn=rand();	
   }else{
-    /*xor with mask to avoid clashes with s=0*/
-    rn = seed ^ 666666666;
+    rn = seed;
   }
+
   if (rn<=0) rn=-rn+1;
   
-  g_randu();/*discard the first three numbers of the sequence*/
-  g_randu();
-  g_randu();
+  g_randu();/*discard the first number of the sequence*/
 }
 
 double g_randn(void)
