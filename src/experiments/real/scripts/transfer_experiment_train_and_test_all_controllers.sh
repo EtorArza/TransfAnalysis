@@ -144,7 +144,7 @@ MAX_SOLVER_FE_ARRAY=()
 
 
 i=-1
-for DIM_train in 2 8 32 128; do
+for DIM_train in 1 8 64; do
     i=$((i+1))
 
     NEAT_POPSIZE_ARRAY+=("${standard_NEAT_POPSIZE}")
@@ -187,8 +187,8 @@ PROBLEM_DIM_ARRAY=()
 SOLVER_POPSIZE_ARRAY=()
 MAX_SOLVER_FE_ARRAY=()
 i=-1
-for DIM_train in 2 8 32 128; do
-    for DIM_test in 2 8 32 128; do
+for DIM_train in 1 8 64; do
+    for DIM_test in 1 8 64; do
         i=$((i+1))
 
         NEAT_POPSIZE_ARRAY+=("${standard_NEAT_POPSIZE}")
@@ -328,7 +328,7 @@ for MAX_SOLVER_FE_train in 1000 5000 25000 125000; do
     i=$((i+1))
 
     NEAT_POPSIZE_ARRAY+=("${standard_NEAT_POPSIZE}")
-    CONTROLLER_NAME_PREFIX_ARRAY+=("MAX_SOLVER_FE_${MAX_SOLVER_FE}")
+    CONTROLLER_NAME_PREFIX_ARRAY+=("MAX_SOLVER_FE_${MAX_SOLVER_FE_train}")
     EXPERIMENT_FOLDER_NAME_ARRAY+=("${EXPERIMENT_FOLDER_NAME}")
     SEED_ARRAY+=("${i}")
     PROBLEM_NLO_ARRAY+=("${standard_NLO}")
