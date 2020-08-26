@@ -125,3 +125,12 @@ public:
 };
 
 
+class F11 : public MultidimBenchmarkFF
+{
+public:
+    F11(int dim, double x_lower_lim, double x_upper_lim) : MultidimBenchmarkFF(dim, x_lower_lim, x_upper_lim){};
+    ~F11(){};
+    double FitnessFunc(double *x_vec);
+};
+
+

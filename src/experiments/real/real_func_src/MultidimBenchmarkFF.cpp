@@ -304,3 +304,18 @@ double F10::FitnessFunc(double* x_vec)
 {
     return g_calculate(x_vec);
 }
+
+
+
+// Rosembrock EZ
+double F11::FitnessFunc(double* x_vec){
+    
+    double res = 0;
+
+    for (int i = 1; i <= dim/2; i++)
+    {
+        res += (100.0*pow(x_vec[2*i - 1]- x_vec[2*i -2]* x_vec[2*i -2],2) + pow(1.0 - x_vec[2*i -2],2)  );
+    }
+    return res;
+
+}

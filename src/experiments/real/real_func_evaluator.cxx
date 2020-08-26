@@ -59,6 +59,9 @@ MultidimBenchmarkFF *load_problem(int problem_index, int dim, double x_lower_lim
     case 10:
         problem = new F10(dim, x_lower_lim, x_upper_lim, seed_randomly_generated_instance);
         break;
+    case 11:
+        problem = new F11(dim, x_lower_lim, x_upper_lim);
+        break;
     default:
         cout << "Incorrect problem index, only integers between 1 and 8 allowed. problem_index = " << problem_index << "  was provided." << endl;
         std::exit(1);
