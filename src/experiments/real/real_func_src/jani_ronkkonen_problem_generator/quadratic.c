@@ -44,7 +44,7 @@
 
 #define INITPARAM 7 /*The amount of parameters read from initialization file excluding the 
 		      common parameters already red in generator.c*/
-#define TRYLIMIT 10000 /*The amount of attempts to generate random coordinates for an optima
+#define TRYLIMIT 100000 /*The amount of attempts to generate random coordinates for an optima
 		      in initialization before deciding to give up*/
 #define MINDISTLOW 0.0001 /*Lower bound for mindist*/
 #define MINDISTUP 0.95*pow(quad_global_amount(),-1.0/g_dimension()) /*Upper bound for mindist*/
