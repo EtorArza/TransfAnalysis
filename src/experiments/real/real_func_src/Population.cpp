@@ -147,17 +147,31 @@ void CPopulation::apply_neat_output_to_individual_i(double *output_neat, int i)
 
     #define MAX_COMPONENT_STEP_SIZE 1
 
-
+    
     for (int j = 0; j < n; j++)
     {
-        templ_double_array1_of_size_n[j] = 0.0;
-        templ_double_array1_of_size_n[j] += MAX_COMPONENT_STEP_SIZE * output_neat[REAL_FUNC::MOMENTUM] * m_individuals[i]->momentum[j];
-        templ_double_array1_of_size_n[j] += MAX_COMPONENT_STEP_SIZE * output_neat[REAL_FUNC::L_BEST] * (-m_individuals[i]->genome[j] + m_individuals[i]->genome_best[j]);
-        templ_double_array1_of_size_n[j] += MAX_COMPONENT_STEP_SIZE * output_neat[REAL_FUNC::G_BEST] * (-m_individuals[i]->genome[j] + this->genome_best[j]);
+        templ_double_array1_of_size_n[j] = m_individuals[i]->genome_best[j] - m_individuals[i]->genome[j];
+        templ_double_array2_of_size_n[j] = this->genome_best[j] - m_individuals[i]->genome[j];
     }
 
 
-    copy_array(m_individuals[i]->momentum, templ_double_array1_of_size_n, n);
+    normalize_vector_L1(m_individuals[i]->momentum, n);
+    normalize_vector_L1(m_individuals[i]->momentum, m_individuals[i]->n);
+    normalize_vector_L1(m_individuals[i]->momentum, m_individuals[i]->n);
+
+
+
+    for (int j = 0; j < n; j++)
+    {
+        m_individuals[i]->momentum[j] = MAX_COMPONENT_STEP_SIZE * 
+        (
+            m_individuals[i]->momentum[j] * output_neat[REAL_FUNC::MOMENTUM] +
+            templ_double_array1_of_size_n[j] * output_neat[REAL_FUNC::L_BEST] + 
+            templ_double_array2_of_size_n[j] * output_neat[REAL_FUNC::G_BEST] 
+        );
+    }
+
+
 
 
     // clip momentum  between -1 and 1

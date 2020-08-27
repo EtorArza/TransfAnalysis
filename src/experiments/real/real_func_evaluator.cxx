@@ -97,6 +97,21 @@ double FitnessFunction_real_func(class NEAT::CpuNetwork *net_original, int probl
     problem->load_rng(pop->rng);
     pop->rng->seed(seed);
 
+
+    // Detailed response initialize ///////////////////////////////
+    double*** detailed_response;
+    const int N_OF_TIME_POSITIONS = 20;
+    bool COMPUTE_RESPONSE = parameters->COMPUTE_RESPONSE;
+    if (COMPUTE_RESPONSE)
+    {
+
+        detailed_response = new double **[2];
+        zero_initialize_matrix(detailed_response[0],pop->popsize,REAL_FUNC::__output_N);
+        zero_initialize_matrix(detailed_response[1],N_OF_TIME_POSITIONS,REAL_FUNC::__output_N);
+    }
+
+
+
     v_of_fitness = new double[n_evals];
 
     for (int i = 0; i < pop->popsize; i++)
@@ -117,17 +132,10 @@ double FitnessFunction_real_func(class NEAT::CpuNetwork *net_original, int probl
         pop->rng->seed(seed + n_of_repetitions_completed);
         pop->Reset();
         best_first_it = pop->f_best;
-
+        int F_evals = -1;
 
         while (!pop->terminated)
         {
-#ifdef COUNTER
-            counter++;
-// if (counter < 3 || counter == 50)
-// {
-//     std::cout << "iteration number: " << counter << std::endl;
-// }
-#endif
 
             if (parameters->PRINT_POSITIONS)
             {
@@ -136,6 +144,7 @@ double FitnessFunction_real_func(class NEAT::CpuNetwork *net_original, int probl
 
             for (int i = 0; i < pop->popsize; i++)
             {
+                F_evals ++;
                 net->clear_noninput();
                 for (int sns_idx = 0; sns_idx < REAL_FUNC::__sensor_N; sns_idx++)
                 {
@@ -143,6 +152,13 @@ double FitnessFunction_real_func(class NEAT::CpuNetwork *net_original, int probl
                 }
                 net->activate();
                 pop->apply_neat_output_to_individual_i(net->get_outputs(), i);
+                if (COMPUTE_RESPONSE)
+                {
+                    sum_arrays(detailed_response[0][i], detailed_response[0][i], net->get_outputs(), REAL_FUNC::__output_N);
+                    sum_arrays(detailed_response[1][N_OF_TIME_POSITIONS * F_evals / parameters->MAX_SOLVER_FE], detailed_response[1][N_OF_TIME_POSITIONS * F_evals / parameters->MAX_SOLVER_FE], net->get_outputs(), REAL_FUNC::__output_N);
+                }
+                
+                
             }
             pop->end_iteration();
             //pop->Print();
@@ -163,24 +179,48 @@ double FitnessFunction_real_func(class NEAT::CpuNetwork *net_original, int probl
 
     double res = Average(v_of_fitness, n_evals);
 
+    if (COMPUTE_RESPONSE)
+    {
+        for (int i = 0; i < pop->popsize; i++)
+        {
+            multiply_array_with_value(detailed_response[0][i], (double) pop->popsize / (double) parameters->MAX_SOLVER_FE / (double) n_evals, REAL_FUNC::__output_N);
+        }
+
+        for (int i = 0; i < pop->popsize; i++)
+        {
+            multiply_array_with_value(detailed_response[1][i], (double) N_OF_TIME_POSITIONS / (double) parameters->MAX_SOLVER_FE / (double) n_evals, REAL_FUNC::__output_N);
+        }
+
+        stringstream result_string_stream;
+        cout << std::setprecision(6) << std::flush;
+        result_string_stream << std::setprecision(6) << std::flush;
+
+        PrintMatrix(detailed_response[0],pop->popsize,REAL_FUNC::__output_N, result_string_stream);
+        PrintMatrix(detailed_response[1],N_OF_TIME_POSITIONS,REAL_FUNC::__output_N, result_string_stream);
+
+
+        string result_string = result_string_stream.str();
+
+
+
+        append_line_to_file("detailed_response.txt", result_string);
+
+
+
+        delete_matrix(detailed_response[0], pop->popsize, REAL_FUNC::__output_N);
+        delete_matrix(detailed_response[1], N_OF_TIME_POSITIONS, REAL_FUNC::__output_N);
+        delete[] detailed_response;
+    }
+
     delete[] v_of_fitness;
     delete pop;
     delete problem;
+    
     pop = NULL;
     v_of_fitness = NULL;
     problem = NULL;
     net = NULL;
     return res;
-}
-
-double FitnessFunction_real_func(NEAT::CpuNetwork *net_original, int seed, int n_evals, REAL_FUNC::params *parameters)
-{
-    return FitnessFunction_real_func(net_original, parameters->PROBLEM_INDEX, parameters->PROBLEM_DIM, n_evals, seed, parameters);
-}
-
-double FitnessFunction_real_func(NEAT::CpuNetwork *net_original, int seed, REAL_FUNC::params *parameters)
-{
-    return FitnessFunction_real_func(net_original, parameters->PROBLEM_INDEX, parameters->PROBLEM_DIM, 1, seed, parameters);
 }
 
 
@@ -193,14 +233,13 @@ namespace REAL_FUNC
 // fitness function in sequential order
 double FitnessFunction(NEAT::CpuNetwork *net, int initial_seed, int instance_index, base_params *parameters)
 {
-    int seed_seq = initial_seed;
     REAL_FUNC::params tmp_params = *static_cast<REAL_FUNC::params*>(parameters);
     tmp_params.PROBLEM_INDEX = (*tmp_params.PROBLEM_INDEX_LIST)[instance_index];
     tmp_params.PROBLEM_DIM = (*tmp_params.PROBLEM_DIM_LIST)[instance_index];
     tmp_params.X_LOWER_LIM = (*tmp_params.X_LOWER_LIST)[instance_index];
     tmp_params.X_UPPER_LIM = (*tmp_params.X_UPPER_LIST)[instance_index];
     tmp_params.SEED = initial_seed;
-    double res = FitnessFunction_real_func(net, seed_seq, &tmp_params);
+    double res = FitnessFunction_real_func(net, tmp_params.PROBLEM_INDEX, tmp_params.PROBLEM_DIM, 1, initial_seed, &tmp_params);
     return res;
 }
 
@@ -389,7 +428,7 @@ namespace NEAT
             //const char * prob_name = "permu";
             //Experiment *exp = Experiment::get(prob_name);
 
-            parameters->MAX_SOLVER_FE = reader.GetReal("Global", "MAX_SOLVER_FE", -1.0);
+            parameters->MAX_SOLVER_FE = reader.GetInteger("Global", "MAX_SOLVER_FE", -1);
             parameters->CONTROLLER_PATH = reader.Get("Global", "CONTROLLER_PATH", "UNKNOWN");
             parameters->N_REPS = reader.GetInteger("Global", "N_REPS", -1);
             parameters->N_EVALS = reader.GetInteger("Global", "N_EVALS", -1);
@@ -465,63 +504,72 @@ namespace NEAT
             result_string_stream << "[[";
             for (int j = 0; j < parameters->N_REPS; j++)
             {
+                double res;
+                if (parameters->COMPUTE_RESPONSE)
+                {
+                    res = FitnessFunction_real_func(&net, parameters->PROBLEM_INDEX, parameters->PROBLEM_DIM, parameters->N_EVALS, initial_seed, parameters);
+                }
+                else
+                {
                     #pragma omp parallel for num_threads(parameters->neat_params->N_OF_THREADS)
                     for (int i = 0; i < parameters->N_EVALS; i++)
                     {
-                        v_of_f_values[i] = FitnessFunction_real_func(&net, initial_seed + i, parameters);
+                        v_of_f_values[i] = FitnessFunction_real_func(&net, parameters->PROBLEM_INDEX, parameters->PROBLEM_DIM, 1, initial_seed + i, parameters);
                     }
                     initial_seed += parameters->N_EVALS;
-                    double res = Average(v_of_f_values, parameters->N_EVALS);
-                    result_string_stream << res;
-                    if (j < parameters->N_REPS - 1)
-                    {
-                        result_string_stream << ",";
-                    }
+                    res = Average(v_of_f_values, parameters->N_EVALS);
                 }
-                result_string_stream << "]," << std::flush;
-                delete[] v_of_f_values;
 
-                result_string_stream << "" << parameters->PROBLEM_INDEX << ","
-                                    << std::setprecision(8)
-                                    << std::flush
-                                    << "(" << parameters->X_LOWER_LIM << "," << parameters->X_UPPER_LIM << "),"
-                                    << std::setprecision(30)
-                                    << std::flush
-
-                                     << parameters->PROBLEM_DIM << ",\""
-                                     << parameters->CONTROLLER_PATH << "\","
-                                     << parameters->N_EVALS
-                                     << "]"
-                                     << endl;
-
-                if (parameters->COMPUTE_RESPONSE)
+                result_string_stream << res;
+                if (j < parameters->N_REPS - 1)
                 {
-                    double *res = new double[REAL_FUNC::__output_N];
-                    net.return_average_response_and_stop_recording(res);
-                    append_line_to_file(
-                        "responses.txt",
-                        "['" + parameters->CONTROLLER_PATH + "', '" +
-                            to_string(parameters->PROBLEM_INDEX) + "', '" +
-                            to_string(parameters->PROBLEM_DIM) + "', " +
-                            array_to_python_list_string(res, REAL_FUNC::__output_N) + "]\n");
-                    delete[] res;
+                    result_string_stream << ",";
                 }
-
-                // cout << res << std::endl;;
-                result_string_stream << std::flush;
-
-                string result_string = result_string_stream.str();
-
-                append_line_to_file("result.txt", result_string);
-
-                return;
             }
-            else
+            result_string_stream << "]," << std::flush;
+            delete[] v_of_f_values;
+
+            result_string_stream << "" << parameters->PROBLEM_INDEX << ","
+                                 << std::setprecision(8)
+                                 << std::flush
+                                 << "(" << parameters->X_LOWER_LIM << "," << parameters->X_UPPER_LIM << "),"
+                                 << std::setprecision(30)
+                                 << std::flush
+
+                                 << parameters->PROBLEM_DIM << ",\""
+                                 << parameters->CONTROLLER_PATH << "\","
+                                 << parameters->N_EVALS
+                                 << "]"
+                                 << endl;
+
+            if (parameters->COMPUTE_RESPONSE)
             {
-                cout << "invalid mode provided. Please, use the configuration file to specify either test or train.";
-                exit(1);
+                double *res = new double[REAL_FUNC::__output_N];
+                net.return_average_response_and_stop_recording(res);
+                append_line_to_file(
+                    "responses.txt",
+                    "['" + parameters->CONTROLLER_PATH + "', '" +
+                        to_string(parameters->PROBLEM_INDEX) + "', '" +
+                        to_string(parameters->PROBLEM_DIM) + "', " +
+                        array_to_python_list_string(res, REAL_FUNC::__output_N) + "]\n");
+                delete[] res;
             }
+
+            // cout << res << std::endl;;
+            result_string_stream << std::flush;
+
+            string result_string = result_string_stream.str();
+
+            append_line_to_file("result.txt", result_string);
+
+            return;
         }
+        else
+        {
+            cout << "invalid mode provided. Please, use the configuration file to specify either test or train.";
+            exit(1);
+        }
+    }
 
     class NetworkEvaluator *create_real_func_evaluator()
     {

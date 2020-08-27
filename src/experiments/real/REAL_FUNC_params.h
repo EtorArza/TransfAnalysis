@@ -18,7 +18,7 @@ namespace REAL_FUNC{
         std::string MODE;
         int SEED;
 
-        double MAX_SOLVER_FE;
+        int MAX_SOLVER_FE;
         int SOLVER_POPSIZE;
         
         // TRAIN PARAMS TO BE SPECIFIED IN CONFIG FILE//

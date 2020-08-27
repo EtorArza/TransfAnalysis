@@ -240,9 +240,6 @@ double F9::FitnessFunc(double* x_vec){
 
 
 static int current_jobs_with_this_seed = 0;
-static omp_lock_t writelock;
-static int current_seed = -1;
-
 F10::F10(int dim, double x_lower_lim, double x_upper_lim, int seed) : MultidimBenchmarkFF(dim, x_lower_lim, x_upper_lim)
 {
     char config_path[] = "src/experiments/real/real_func_src/jani_ronkkonen_problem_generator/quad_function.dat";
@@ -255,7 +252,7 @@ F10::F10(int dim, double x_lower_lim, double x_upper_lim, int seed) : MultidimBe
         {
             //cout << "(" << seed << "," << dim;
             static int current_dim = -1;
-
+            static int current_seed = -1;
             if (current_jobs_with_this_seed == 0)
             {
                 g_seeded_initialize(config_path, seed, dim);
@@ -277,7 +274,7 @@ F10::F10(int dim, double x_lower_lim, double x_upper_lim, int seed) : MultidimBe
             //cout << endl;
         }
         if (repeat == true)
-        {   
+        {
             usleep((useconds_t) 1000 );
         }
         
@@ -292,10 +289,6 @@ F10::~F10()
     {
         //cout << current_seed << "," << dim << ")" << endl;
         current_jobs_with_this_seed--;
-        if(current_jobs_with_this_seed == 0)
-        {
-            omp_unset_lock(&writelock);
-        }
     }
 };
 

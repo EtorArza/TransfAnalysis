@@ -21,6 +21,7 @@
 #include <mutex>
 #include <iomanip>
 #include "constants.h"
+#include <float.h>
 
 using std::istream;
 using std::ostream;
@@ -458,23 +459,74 @@ void normalize_vector(T *array, int len)
     }
 }
 
+template <class T>
+void normalize_vector_L1(T *array, int len)
+{
+    T sum = 0;
+    for (int i = 0; i < len; i++)
+    {
+        sum += abs(array[i]);
+    }
+    
+    if (sum < 1.0e-30)
+    {
+        multiply_array_with_value(array, 0.0, len);
+    }
+    else
+    {
+        multiply_array_with_value(array, 1.0 / sum, len);
+    }
+
+}
+
+template <class T>
+void normalize_vector_L2(T *array, int len)
+{
+    T sum = 0;
+    for (int i = 0; i < len; i++)
+    {
+        sum += array[i] * array[i];
+    }
+
+    if (sum < 1.0e-30)
+    {
+        multiply_array_with_value(array, 0.0, len);
+    }
+    else
+    {
+        multiply_array_with_value(array, 1.0 / sqrt(sum), len);
+    }
+
+}
+
+
+
+template <class T>
+void PrintMatrix(T **M, int m, int n, std::stringstream& out_ss)
+{
+
+	out_ss << "\n";
+	for (int i = 0; i < m; i++)
+	{
+		out_ss << "| i = " << i << " ( ";
+		for (int j = 0; j < n; j++)
+		{
+			out_ss << M[i][j] << " ";
+		}
+		out_ss << ")\n";
+	}
+}
 
 
 template <class T>
 void PrintMatrix(T **M, int m, int n)
 {
-
-	cout << "\n";
-	for (int i = 0; i < m; i++)
-	{
-		cout << "| i = " << i << " ( ";
-		for (int j = 0; j < n; j++)
-		{
-			cout << M[i][j] << " ";
-		}
-		cout << ")\n";
-	}
+    stringstream res;
+    PrintMatrix(M,m,n, res);
+    std::cout << res.str() << std::flush;
 }
+
+
 
 template <class T>
 void PrintMatrixVec(vector<vector<T>> M)
@@ -874,7 +926,14 @@ void sum_arrays(T* res, T* array_1, T* array_2, int len){
     }
 }
 
-
+// sum two arrays of the same length elementwise after applying the absolute value. The result array is allowed to be one of the summands (although it is not required)
+template <class T>
+void sum_arrays_abs_value(T* res, T* array_1, T* array_2, int len){
+    for (int i = 0; i < len; i++)
+    {
+        res[i] = abs(array_1[i]) + abs(array_2[i]);
+    }
+}
 
 template <class T>
 std::string array_to_string(T* array, int len){
@@ -1026,3 +1085,31 @@ std::string system_exec(const char* cmd);
 
 // get runtime of job in hipatia to get around the suspension mechanism during training
 double get_runtime_hipatia();
+
+
+template<class T>
+void zero_initialize_matrix(T** &matrix, int m, int n)
+{
+    matrix = new T*[m];
+    for (int i = 0; i < m; i++)
+    {
+        matrix[i] = new T[n];
+    }
+    for (int i = 0; i < m; i++)
+    {
+        for (int j = 0; j < n; j++)
+        {
+            matrix[i][j] = 0;
+        }      
+    }
+}
+
+template<class T>
+void delete_matrix(T** &matrix, int m, int n)
+{
+    for (int i = 0; i < m; i++)
+    {
+        delete[] matrix[i];
+    }
+    delete[] matrix;
+}
