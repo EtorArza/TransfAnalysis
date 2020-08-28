@@ -17,8 +17,8 @@ mkdir ${SCRATCH_JOB}
 
 
 SRCDIR=`pwd`
-EXPERIMENT_FOLDER_NAME="${SRCDIR}/src/experiments/real/results/comparison_other_pso/controllers_trained_on_random_instances"
-
+EXPERIMENT_FOLDER_NAME="${SRCDIR}/src/experiments/real/results/comparison_other_pso/controllers_trained_on_all_problems"
+CONTROLLER_NAME_PREFIX="trained_with_all_problems"
 
 
 echo -n "SLURM_ARRAY_TASK_ID: "
@@ -32,20 +32,6 @@ cd $SCRATCH_JOB
 
 echo "pwd: `pwd`"
 
-mkdir -p src/experiments/real/real_func_src/jani_ronkkonen_problem_generator/
-cat > src/experiments/real/real_func_src/jani_ronkkonen_problem_generator/quad_function.dat <<EOF
-1
-1
-4
-1
-2
-1
-20
-0.02
--1
--1
--1
-EOF
 
 
 
@@ -59,7 +45,7 @@ POPSIZE = 576
 MAX_TRAIN_TIME = 86400
 THREADS = 72
 EXPERIMENT_FOLDER_NAME = ${EXPERIMENT_FOLDER_NAME}
-CONTROLLER_NAME_PREFIX = randomly_generated_problems
+CONTROLLER_NAME_PREFIX = ${CONTROLLER_NAME_PREFIX}
 
 
 
@@ -73,13 +59,12 @@ SOLVER_POPSIZE = 20
 
 
 
-COMMA_SEPARATED_PROBLEM_INDEX_LIST = 10,10,10
-COMMA_SEPARATED_PROBLEM_DIM_LIST   = 5,10,20
+COMMA_SEPARATED_PROBLEM_INDEX_LIST = 1,2,3,4,5,7,8,9,11,1,2,3,4,5,7,8,9,11
+COMMA_SEPARATED_PROBLEM_DIM_LIST   = 4,4,4,4,4,4,4,4,4,20,20,20,20,20,20,20,20,20
 
 
-COMMA_SEPARATED_X_LOWER_LIST = 0,0,0,0
-COMMA_SEPARATED_X_UPPER_LIST = 1,1,1,1
-
+COMMA_SEPARATED_X_LOWER_LIST = -5,-5,-5,-5,-5,-5,-5,-5,-5,-5,-5,-5,-5,-5,-5,-5,-5,-5
+COMMA_SEPARATED_X_UPPER_LIST = 4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4
 EOF
 
 

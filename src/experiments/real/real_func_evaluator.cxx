@@ -186,7 +186,7 @@ double FitnessFunction_real_func(class NEAT::CpuNetwork *net_original, int probl
             multiply_array_with_value(detailed_response[0][i], (double) pop->popsize / (double) parameters->MAX_SOLVER_FE / (double) n_evals, REAL_FUNC::__output_N);
         }
 
-        for (int i = 0; i < pop->popsize; i++)
+        for (int i = 0; i < N_OF_TIME_POSITIONS; i++)
         {
             multiply_array_with_value(detailed_response[1][i], (double) N_OF_TIME_POSITIONS / (double) parameters->MAX_SOLVER_FE / (double) n_evals, REAL_FUNC::__output_N);
         }
