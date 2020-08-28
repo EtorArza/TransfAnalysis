@@ -124,7 +124,8 @@ namespace NEAT {
             #endif
             {
 
-                if (progress >= 1.0 || gen >= neat_params->MAX_TRAIN_ITERATIONS){
+                if (   progress >= 1.0 || (gen >= neat_params->MAX_TRAIN_ITERATIONS && neat_params->MAX_TRAIN_ITERATIONS != -1)   )
+                {
                     neat_params->IS_LAST_ITERATION = true;
                 }
                 

@@ -33,10 +33,6 @@ namespace NEAT {
 }
 
 
-namespace PERMU_MULTI
-{
-    class params_multi;
-}
 
 
 typedef double (*FF_type)(NEAT::CpuNetwork *net, int initial_seed, int instance_index, base_params *parameters);  // Declare typedef
