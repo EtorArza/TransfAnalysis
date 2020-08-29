@@ -142,7 +142,7 @@ namespace NEAT {
                 static Timer timer("epoch");
                 timer.start();
 
-                if(gen != 0) {
+                if(gen != 1) {
                     pop->next_generation();
                 }
 
