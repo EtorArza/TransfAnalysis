@@ -151,7 +151,7 @@ struct Evaluator
         double **f_values = new double *[nnets];
         for (size_t i = 0; i < nnets; i++)
         {
-            size_t size_of_array = EVALS_TO_SELECT_BEST_CONTROLLER_IN_LAST_IT + EVAL_MIN_STEP + MAX_EVALS_PER_CONTROLLER_NEUROEVOLUTION;
+            size_t size_of_array = MAX_EVALS_PER_CONTROLLER_NEUROEVOLUTION + EVAL_MIN_STEP + MAX_EVALS_PER_CONTROLLER_NEUROEVOLUTION;
             f_values[i] = new double[size_of_array];
             for (size_t j = 0; j < size_of_array; j++)
             {
@@ -197,7 +197,7 @@ struct Evaluator
         else
         {
             target_n_controllers_left = 1;
-            max_evals_per_controller = EVALS_TO_SELECT_BEST_CONTROLLER_IN_LAST_IT;
+            max_evals_per_controller = MAX_EVALS_PER_CONTROLLER_NEUROEVOLUTION;
             ALPHA_INDEX = 1;
         }
 
