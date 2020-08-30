@@ -78,7 +78,7 @@ void convert_f_values_to_ranks(vector<int> surviving_candidates, double **f_valu
 
 void  execute_multi(class NEAT::Network **nets_, NEAT::OrganismEvaluation *results, size_t nnets, int n_instances, FF_type FitnessFunction, NEAT::CpuNetwork *&best_network, base_params *parameters)
 {
-        int n_reps_all_instances = EVAL_MIN_STEP / n_instances;
+        int n_reps_all_instances = max(EVAL_MIN_STEP / n_instances, 1);
         int n_evals_each_it = n_reps_all_instances * n_instances;
 
         if (n_instances == 0)
@@ -94,7 +94,7 @@ void  execute_multi(class NEAT::Network **nets_, NEAT::OrganismEvaluation *resul
         double **f_values;
         double **f_value_ranks;
 
-        int row_length =  nnets*EVAL_MIN_STEP - (EVAL_MIN_STEP % n_instances) + EVALS_TO_SELECT_BEST_CONTROLLER_IN_LAST_IT + EVAL_MIN_STEP + n_evals_each_it + parameters->neat_params->N_OF_THREADS;
+        int row_length =  nnets*EVAL_MIN_STEP - (EVAL_MIN_STEP % n_instances) + MAX_EVALS_PER_CONTROLLER_NEUROEVOLUTION + EVAL_MIN_STEP + n_evals_each_it + parameters->neat_params->N_OF_THREADS;
 
         zero_initialize_matrix(f_values, nnets + 1, row_length);
         zero_initialize_matrix(f_value_ranks, nnets + 1, row_length);
@@ -135,7 +135,7 @@ void  execute_multi(class NEAT::Network **nets_, NEAT::OrganismEvaluation *resul
         else
         {
             target_n_controllers_left = 1;
-            max_evals_per_controller = EVALS_TO_SELECT_BEST_CONTROLLER_IN_LAST_IT;
+            max_evals_per_controller = MAX_EVALS_PER_CONTROLLER_NEUROEVOLUTION;
             ALPHA_INDEX = 2;
         }
         
@@ -202,14 +202,13 @@ void  execute_multi(class NEAT::Network **nets_, NEAT::OrganismEvaluation *resul
         surviving_candidates.clear();
         surviving_candidates.push_back(best_current_iteration_index);
         surviving_candidates.push_back(nnets);
-        int n_of_evals = max(32UL, (int) nnets*EVAL_MIN_STEP/2 - (nnets*EVAL_MIN_STEP/2 % n_instances) );
         
         cout << "Reevaluating best -> ";
-        progress_bar bar(n_of_evals);
+        progress_bar bar(max_evals_per_controller);
         
         current_n_of_evals = 0;
         bool test_result = false;
-        while (!test_result && current_n_of_evals < n_of_evals)
+        while (!test_result && current_n_of_evals < max_evals_per_controller)
         {
             #pragma omp parallel for num_threads(parameters->neat_params->N_OF_THREADS) schedule(dynamic,1)
             for (int i = 0; i < n_evals_each_it; i++)
