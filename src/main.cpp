@@ -62,6 +62,13 @@ int main(int argc, char *argv[])
     // cout << rosembrock_test.FitnessFunc(x);
     // exit(1);
 
+    // int n = 15;
+    // int y = 5;
+
+    // cout << p_sign_test(n,y) << endl;
+    // exit(1);
+
+
     #ifdef HIPATIA
     cout << "HIPATIA is defined" << endl;
     #else

@@ -1793,6 +1793,99 @@ bool is_A_larger_than_B_Mann_Whitney(double* A, double* B, int length, int ALPHA
 
 }
 
+// https://stackoverflow.com/questions/9330915/number-of-combinations-n-choose-r-in-c
+double p_sign_test_sumand(unsigned n, unsigned k)
+{
+    if (k > n)
+        return 0;
+    if (k * 2 > n)
+        k = n - k;
+
+    int s;
+    double result;
+    if (k == 0)
+    {
+        s = 0;
+        result = 1.0;
+    }
+    else
+    {
+        result = n;
+        s = 0;
+        for (int i = 2; i <= k; ++i)
+        {
+            result *= (n - i + 1);
+            if (s < n)
+            {
+                result *= 0.5;
+                s++;
+            }
+            result /= i;
+        }
+    }
+    while (s < n)
+    {
+        result *= 0.5;
+        s++;
+    }
+    return result;
+}
+
+double p_sign_test(int n, int y)
+{
+    double res = 0.0;
+    for (int i = 0; i <= y; i++)
+    {
+        res += p_sign_test_sumand(n, i);
+    }
+    return res;
+}
+
+
+// the one sided sign test as defined in Conover
+bool is_A_larger_than_B_sign_test(double* A, double* B, int length, int ALPHA_INDEX)
+{
+    int statistic = 0;
+    int n  = 0;
+    for (int i = 0; i < length; i++)
+    {
+        if (A[i] < B[i])
+        {
+            statistic++;
+            n++;
+        }
+        else if (A[i] > B[i])
+        {
+            n++;
+        }
+    }
+    if (n < 2)
+    {
+        return false;
+    }
+    
+
+    double p_value = p_sign_test(n, statistic);
+
+    double ALPHA;
+    double Z_THRESH;
+
+    //cout << p_value << endl;
+
+    load_statistical_sigificant_parameters_given_alpha_index(ALPHA_INDEX, ALPHA, Z_THRESH);
+
+    if (p_value < ALPHA)
+    {
+        return true;
+    }else
+    {
+        return false;
+    }
+
+}
+
+
+
 
 // Paired test 
 // http://vassarstats.net/textbook/ch12a.html
@@ -2011,7 +2104,7 @@ bool Friedman_test_are_there_critical_diferences(double** f_values, int n_candid
 
 
 
-    denominator -= (double)(k*m*(m+1)*(m+1)) / 4.0;
+    denominator -= (double)((double)k*(double)m*((double)m+1.0)*((double)m+1.0)) / 4.0;
 
     // cout << numerator << " / " << denominator << endl;
 
@@ -2094,7 +2187,7 @@ void F_race_iteration(double** f_values, vector<int> &surviving_candidates, int 
             // PrintArray(reduced_f_values[best_reduced_index], n_samples);
             // cout << endl;
             // cout << "---\n";
-            bool pos_hoc_test_result = is_A_larger_than_B_Signed_Wilcoxon(reduced_f_values[best_reduced_index], reduced_f_values[i], n_samples, ALPHA_INDEX);
+            bool pos_hoc_test_result = is_A_larger_than_B_sign_test(reduced_f_values[best_reduced_index], reduced_f_values[i], n_samples, ALPHA_INDEX);
 
             // statistically significantly worse than best of generation
             if (pos_hoc_test_result)

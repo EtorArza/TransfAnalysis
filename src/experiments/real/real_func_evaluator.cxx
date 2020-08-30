@@ -207,8 +207,8 @@ double FitnessFunction_real_func(class NEAT::CpuNetwork *net_original, int probl
 
 
 
-        delete_matrix(detailed_response[0], pop->popsize, REAL_FUNC::__output_N);
-        delete_matrix(detailed_response[1], N_OF_TIME_POSITIONS, REAL_FUNC::__output_N);
+        delete_matrix(detailed_response[0], pop->popsize);
+        delete_matrix(detailed_response[1], N_OF_TIME_POSITIONS);
         delete[] detailed_response;
     }
 

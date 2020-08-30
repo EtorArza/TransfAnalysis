@@ -878,6 +878,12 @@ bool is_A_larger_than_B_Mann_Whitney(double* A, double* B, int length, int ALPHA
 //Paired test
 bool is_A_larger_than_B_Signed_Wilcoxon(double* A, double* B, int length, int ALPHA_INDEX);
 
+// Paired test
+bool is_A_larger_than_B_sign_test(double* A, double* B, int length, int ALPHA_INDEX);
+
+double p_sign_test(int y, int n);
+
+
 //Paired test
 bool Friedman_test_are_there_critical_diferences(double** f_values, int n_candidates, int n_samples, int ALPHA_INDEX);
 
@@ -1105,7 +1111,7 @@ void zero_initialize_matrix(T** &matrix, int m, int n)
 }
 
 template<class T>
-void delete_matrix(T** &matrix, int m, int n)
+void delete_matrix(T** &matrix, int m)
 {
     for (int i = 0; i < m; i++)
     {
