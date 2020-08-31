@@ -16,7 +16,6 @@ namespace REAL_FUNC{
         //PARAMETERS TO BE SPECIFIED IN CONFIG FILE//
         std::string prob_name;
         std::string MODE;
-        int SEED;
 
         int MAX_SOLVER_FE;
         int SOLVER_POPSIZE;

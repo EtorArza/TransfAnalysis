@@ -155,8 +155,6 @@ int main(int argc, char *argv[])
         exit(1);
     }
 
-    int rng_seed = 2;
-
     if (reader.ParseError() != 0)
     {
         std::cout << "Can't load configuration file: " << argv[1] << "\n";
@@ -177,9 +175,11 @@ int main(int argc, char *argv[])
         cout << "Working on problem: " << prob_name << endl;
     }
 
+
     Experiment *exp = Experiment::get(prob_name.c_str());
     exp->neat_params = neat_params;
-    rng_t rng{rng_seed};
+    global_rng.seed(neat_params->SEED);
+    rng_t rng{neat_params->SEED};
     exp->run_given_conf_file(conf_file_path);
     delete neat_params;
     return 0;

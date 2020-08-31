@@ -669,6 +669,7 @@ class RandomNumberGenerator{
 
 };
 
+extern RandomNumberGenerator global_rng;
 
 // Generate Random Permutation
 void GenerateRandomPermutation(int *permutation, int n);

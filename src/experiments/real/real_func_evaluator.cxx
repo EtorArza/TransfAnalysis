@@ -231,15 +231,14 @@ namespace REAL_FUNC
 
 
 // fitness function in sequential order
-double FitnessFunction(NEAT::CpuNetwork *net, int initial_seed, int instance_index, base_params *parameters)
+double FitnessFunction(NEAT::CpuNetwork *net, int seed, int instance_index, base_params *parameters)
 {
     REAL_FUNC::params tmp_params = *static_cast<REAL_FUNC::params*>(parameters);
     tmp_params.PROBLEM_INDEX = (*tmp_params.PROBLEM_INDEX_LIST)[instance_index];
     tmp_params.PROBLEM_DIM = (*tmp_params.PROBLEM_DIM_LIST)[instance_index];
     tmp_params.X_LOWER_LIM = (*tmp_params.X_LOWER_LIST)[instance_index];
     tmp_params.X_UPPER_LIM = (*tmp_params.X_UPPER_LIST)[instance_index];
-    tmp_params.SEED = initial_seed;
-    double res = FitnessFunction_real_func(net, tmp_params.PROBLEM_INDEX, tmp_params.PROBLEM_DIM, 1, initial_seed, &tmp_params);
+    double res = FitnessFunction_real_func(net, tmp_params.PROBLEM_INDEX, tmp_params.PROBLEM_DIM, 1, seed, &tmp_params);
     return res;
 }
 
@@ -327,12 +326,6 @@ namespace NEAT
             exit(1);
         }
 
-        parameters->SEED = reader.GetInteger("Global", "SEED", -1);
-        if (parameters->SEED == -1)
-        {
-            RandomNumberGenerator tmp_rng;
-            parameters->SEED = tmp_rng.random_integer_uniform(INT_MAX);
-        }
         parameters->prob_name = reader.Get("Global", "PROBLEM_NAME", "UNKNOWN");
         parameters->MODE = reader.Get("Global", "MODE", "UNKNOWN");
         parameters->SOLVER_POPSIZE = reader.GetInteger("Global", "SOLVER_POPSIZE", -1);
@@ -473,7 +466,7 @@ namespace NEAT
         if (parameters->MODE == "train")
         {
             Experiment *exp = Experiment::get(parameters->prob_name.c_str());
-            rng_t rng{parameters->SEED};
+            rng_t rng{parameters->neat_params->SEED};
             exp->neat_params->global_timer.tic();
             exp->run(rng);
             return;
@@ -491,8 +484,7 @@ namespace NEAT
             double *v_of_f_values = new double[parameters->N_EVALS];
 
 
-            int initial_seed = 6374058;
-
+            int initial_seed = global_rng.random_integer_uniform(INT_MAX / 10);
 
             
 
@@ -507,14 +499,14 @@ namespace NEAT
                 double res;
                 if (parameters->COMPUTE_RESPONSE)
                 {
-                    res = FitnessFunction_real_func(&net, parameters->PROBLEM_INDEX, parameters->PROBLEM_DIM, parameters->N_EVALS, initial_seed, parameters);
+                    res = FitnessFunction_real_func(&net, parameters->PROBLEM_INDEX, parameters->PROBLEM_DIM, parameters->N_EVALS, initial_seed + parameters->N_EVALS*j, parameters);
                 }
                 else
                 {
                     #pragma omp parallel for num_threads(parameters->neat_params->N_OF_THREADS)
                     for (int i = 0; i < parameters->N_EVALS; i++)
                     {
-                        v_of_f_values[i] = FitnessFunction_real_func(&net, parameters->PROBLEM_INDEX, parameters->PROBLEM_DIM, 1, initial_seed + i, parameters);
+                        v_of_f_values[i] = FitnessFunction_real_func(&net, parameters->PROBLEM_INDEX, parameters->PROBLEM_DIM, 1, initial_seed + i + parameters->N_EVALS*j, parameters);
                     }
                     initial_seed += parameters->N_EVALS;
                     res = Average(v_of_f_values, parameters->N_EVALS);

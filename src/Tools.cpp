@@ -711,6 +711,8 @@ double RandomNumberGenerator::random_0_1_double()
     return (double) xorshf96() / (double) INT_MAX;
 }
 
+RandomNumberGenerator global_rng;
+
 void GenerateRandomPermutation(int *permutation, int n)
 {
     #ifndef NDEBUG

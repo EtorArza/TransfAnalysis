@@ -99,8 +99,6 @@ void  execute_multi(class NEAT::Network **nets_, NEAT::OrganismEvaluation *resul
         zero_initialize_matrix(f_values, nnets + 1, row_length);
         zero_initialize_matrix(f_value_ranks, nnets + 1, row_length);
 
-        RandomNumberGenerator rng;
-        rng.seed();
 
 
 
@@ -142,10 +140,9 @@ void  execute_multi(class NEAT::Network **nets_, NEAT::OrganismEvaluation *resul
 
 
 
-
+        int initial_seed = global_rng.random_integer_uniform(INT_MAX / 10);
         while (surviving_candidates.size() > target_n_controllers_left && max_evals_per_controller > current_n_of_evals)
         {
-            int initial_seed = rng.random_integer_uniform(INT_MAX);
             cout << "Evaluating -> " << std::flush;
             //cout << endl << "inet" << "," << "f_value_sample_index" << "," << "instance_index" << "," << "seed" << endl;
 
@@ -159,7 +156,7 @@ void  execute_multi(class NEAT::Network **nets_, NEAT::OrganismEvaluation *resul
                 int instance_index =  f_value_sample_index % n_instances;
 
                 NEAT::CpuNetwork *net = nets[inet];
-                int seed = initial_seed + i / n_surviving_candidates;
+                int seed = initial_seed + f_value_sample_index;
 
                 f_values[inet][f_value_sample_index] = FitnessFunction(net, seed, instance_index, parameters);
                 bar.step();
@@ -198,7 +195,7 @@ void  execute_multi(class NEAT::Network **nets_, NEAT::OrganismEvaluation *resul
 
 
         // update best known of last iteration and this iteration
-        int initial_seed = rng.random_integer_uniform(INT_MAX);
+        initial_seed = global_rng.random_integer_uniform(INT_MAX / 10);
         surviving_candidates.clear();
         surviving_candidates.push_back(best_current_iteration_index);
         surviving_candidates.push_back(nnets);
@@ -214,9 +211,10 @@ void  execute_multi(class NEAT::Network **nets_, NEAT::OrganismEvaluation *resul
             for (int i = 0; i < n_evals_each_it; i++)
             {
                 bar.step();
-                int seed = initial_seed + i;
                 int instance_index =  i % n_instances;
                 int f_value_sample_index = i + current_n_of_evals;
+                int seed = f_value_sample_index + initial_seed;
+
 
                 NEAT::CpuNetwork *net = nets[best_current_iteration_index];
                 f_values[best_current_iteration_index][f_value_sample_index] = FitnessFunction(net, seed, instance_index, parameters);

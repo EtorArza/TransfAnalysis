@@ -18,6 +18,7 @@ public:
     int MAX_TRAIN_TIME;
     int MAX_TRAIN_ITERATIONS;
     int POPSIZE_NEAT;
+    int SEED;
     stopwatch global_timer;
 
     // Global variables //
