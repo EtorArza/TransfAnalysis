@@ -1,10 +1,10 @@
 import pandas as pd
 import subprocess
 
-CONTROLLER_PATH = "src/experiments/real/results/comparison_other_pso/randomly_generated_problems_best.controller"
+CONTROLLER_PATH = "src/experiments/real/results/comparison_other_pso/controllers_trained_on_all_problems/top_controllers/"
 N_EVALS = 30
 N_REPS = 1
-THREADS = 1
+THREADS = 7
 
 
 def write_conf_file(METHOD_SHORTNAME,SOLVER_POPSIZE,PROBLEM_INDEX,PROBLEM_DIM,MAX_SOLVER_FE,X_LOWER_LIM,X_UPPER_LIM,F_COMPETITION):
@@ -30,7 +30,9 @@ PROBLEM_NAME = real_func
 THREADS = {THREADS}
 N_EVALS = {N_EVALS}
 N_REPS = {N_REPS}
-CONTROLLER_PATH = {CONTROLLER_PATH}
+CONTROLLER_PATH = {CONTROLLER_PATH}trained_with_all_problems_best.controller
+
+;CONTROLLER_PATH = {CONTROLLER_PATH}LeaveOutF_{PROBLEM_INDEX}_best.controller
 
 
 PRINT_POSITIONS = false
@@ -57,7 +59,8 @@ def record_results(METHOD_SHORTNAME,SOLVER_POPSIZE,PROBLEM_INDEX,PROBLEM_DIM,MAX
     # subprocess.run("./neat tmp_conf_file.ini",shell=True)
     with open("result.txt","r") as f:
         res = f.readline().strip()
-    print("["+str(F_COMPETITION)+","+res+"]"), # file="coparison_result.txt")
+    res_list = eval("["+str(F_COMPETITION)+","+res+"]") # file="coparison_result.txt")
+    print(METHOD_SHORTNAME, MAX_SOLVER_FE, SOLVER_POPSIZE, (X_LOWER_LIM,X_UPPER_LIM), "{:.4e}".format(res_list[0]), "{:.4e}".format(-res_list[1][0][0]), res_list[1][1], sep=",")
     subprocess.run("rm result.txt",shell=True)
 
 
@@ -66,6 +69,7 @@ def record_results(METHOD_SHORTNAME,SOLVER_POPSIZE,PROBLEM_INDEX,PROBLEM_DIM,MAX
 
 df = pd.read_csv("src/experiments/real/results/comparison_other_pso/comparison_other_pso_methods.csv")
 
+print("other_method_name,FE,swarm_size,bounds,f_other_method,f_proposed_method,test_function_index")
 
 METHOD_SHORTNAME = ""
 for row_index, row in df.iterrows():

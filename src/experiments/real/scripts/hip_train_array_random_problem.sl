@@ -6,7 +6,7 @@
 #SBATCH --ntasks-per-node=1 #number of tasks per node
 #SBATCH --mem=32G
 #SBATCH --cpus-per-task=32 # number of CPUs
-#SBATCH --time=2-00:00:00 #Walltime
+#SBATCH --time=5-00:00:00 #Walltime
 #SBATCH -p large
 #SBATCH --exclude=n[001-004,017-018]
 #SBATCH --exclusive
@@ -118,7 +118,7 @@ mode = train
 PROBLEM_NAME = real_func
 
 POPSIZE = ${NEAT_POPSIZE}
-MAX_TRAIN_ITERATIONS = 200
+MAX_TRAIN_ITERATIONS = ${MAX_TRAIN_ITERATIONS}
 THREADS =  $SLURM_CPUS_PER_TASK
 EXPERIMENT_FOLDER_NAME = ${EXPERIMENT_FOLDER_NAME}
 CONTROLLER_NAME_PREFIX = ${CONTROLLER_NAME_PREFIX}
