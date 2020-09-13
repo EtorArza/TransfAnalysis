@@ -223,8 +223,14 @@ double FitnessFunction_real_func(class NEAT::CpuNetwork *net_original, int probl
     return res;
 }
 
-
-
+void pow_5(double *vec)
+{
+    int n_out = REAL_FUNC::__output_N;
+    for (size_t i = 0; i < n_out; i++)
+    {
+        vec[i] = pow(vec[i], 5);
+    }
+}
 
 namespace REAL_FUNC
 {
@@ -476,9 +482,12 @@ namespace NEAT
 
             CpuNetwork net = load_network(parameters->CONTROLLER_PATH);
 
+
+
+
             if (parameters->COMPUTE_RESPONSE)
             {
-                net.start_recording_response();
+                net.start_recording_response(pow_5);
             }
 
             double *v_of_f_values = new double[parameters->N_EVALS];

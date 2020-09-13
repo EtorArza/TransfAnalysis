@@ -156,8 +156,8 @@ void CPopulation::apply_neat_output_to_individual_i(double *output_neat, int i)
 
 
     normalize_vector_L1(m_individuals[i]->momentum, n);
-    normalize_vector_L1(m_individuals[i]->momentum, m_individuals[i]->n);
-    normalize_vector_L1(m_individuals[i]->momentum, m_individuals[i]->n);
+    normalize_vector_L1(templ_double_array1_of_size_n, m_individuals[i]->n);
+    normalize_vector_L1(templ_double_array2_of_size_n, m_individuals[i]->n);
 
 
 
@@ -165,9 +165,9 @@ void CPopulation::apply_neat_output_to_individual_i(double *output_neat, int i)
     {
         m_individuals[i]->momentum[j] = MAX_COMPONENT_STEP_SIZE * 
         (
-            m_individuals[i]->momentum[j] * output_neat[REAL_FUNC::MOMENTUM] +
-            templ_double_array1_of_size_n[j] * output_neat[REAL_FUNC::L_BEST] + 
-            templ_double_array2_of_size_n[j] * output_neat[REAL_FUNC::G_BEST] 
+            m_individuals[i]->momentum[j] *  pow(output_neat[REAL_FUNC::MOMENTUM],5) +
+            templ_double_array1_of_size_n[j] * pow(output_neat[REAL_FUNC::L_BEST],5) + 
+            templ_double_array2_of_size_n[j] * pow(output_neat[REAL_FUNC::G_BEST],5) 
         );
     }
 
@@ -241,7 +241,7 @@ void CPopulation::evaluate_population()
 
 void CPopulation::get_population_info(){
     comp_distance_to_closest();
-    comp_dist_to_average();
+    comp_RELATIVE_DIST_TO_AVERAGE();
     comp_relative_dist_to_best();
     comp_relative_time();
     comp_relative_score();
@@ -263,25 +263,25 @@ void CPopulation::comp_distance_to_closest()
             {
                 continue;
             }
-            double d = euclid_dist(m_individuals[i]->genome, m_individuals[j]->genome, n);
+            double d = l1_distance(m_individuals[i]->genome, m_individuals[j]->genome, n);
             if (d < min_dist)
             {
                 min_dist = d;
             }
         }
-        templ_double_array1_of_size_POPSIZE[i] = min_dist;
+        templ_double_array1_of_size_POPSIZE[i] = min_dist / ((double)n);
     }
     compute_order_from_double_to_double(templ_double_array1_of_size_POPSIZE, this->popsize, templ_double_array2_of_size_POPSIZE);
     multiply_array_with_value(templ_double_array2_of_size_POPSIZE, 1/ (double) this->popsize, this->popsize);
     for (int i = 0; i < this->popsize; i++)
     {
-        pop_info[i][REAL_FUNC::DIST_TO_CLOSEST] = templ_double_array2_of_size_POPSIZE[i];
+        pop_info[i][REAL_FUNC::RELATIVE_DIST_TO_CLOSEST] = templ_double_array2_of_size_POPSIZE[i];
     }
 }
 
 
 
-void CPopulation::comp_dist_to_average()
+void CPopulation::comp_RELATIVE_DIST_TO_AVERAGE()
 {
     for (int j = 0; j < n; j++)
     {
@@ -294,15 +294,17 @@ void CPopulation::comp_dist_to_average()
     }
     for (int i = 0; i < this->popsize; i++)
     {
-        templ_double_array2_of_size_POPSIZE[i] = euclid_dist(templ_double_array1_of_size_n, m_individuals[i]->genome, n);
+        templ_double_array2_of_size_POPSIZE[i] = l1_distance(templ_double_array1_of_size_n, m_individuals[i]->genome, n) / ((double)n);
+        pop_info[i][REAL_FUNC::ABSOLUTE_DIST_TO_AVERAGE] = templ_double_array2_of_size_POPSIZE[i];
     }
+
 
     compute_order_from_double_to_double(templ_double_array2_of_size_POPSIZE, this->popsize, templ_double_array1_of_size_POPSIZE);
     multiply_array_with_value(templ_double_array1_of_size_POPSIZE, 1/ (double) this->popsize, this->popsize);
 
     for (int i = 0; i < this->popsize; i++)
     {
-        pop_info[i][REAL_FUNC::DIST_TO_AVERAGE] = templ_double_array1_of_size_POPSIZE[i];
+        pop_info[i][REAL_FUNC::RELATIVE_DIST_TO_AVERAGE] = templ_double_array1_of_size_POPSIZE[i];
     }
 
 }
@@ -311,10 +313,18 @@ void CPopulation::comp_dist_to_average()
 // relative to best in population.
 void CPopulation::comp_relative_dist_to_best()
 {
+
     for (int j = 0; j < this->popsize; j++)
     {
-        templ_double_array2_of_size_POPSIZE[j] = euclid_dist(m_individuals[0]->genome, m_individuals[j]->genome, n);
+        templ_double_array2_of_size_POPSIZE[j] = l1_distance(m_individuals[0]->genome, m_individuals[j]->genome, n) / (double) this->popsize;
     }
+
+
+    for (int i = 0; i < this->popsize; i++)
+    {
+        pop_info[i][REAL_FUNC::ABSOLUTE_DIST_TO_BEST] = templ_double_array2_of_size_POPSIZE[i];
+    }
+
     compute_order_from_double_to_double(templ_double_array2_of_size_POPSIZE, this->popsize, templ_double_array1_of_size_POPSIZE);
     multiply_array_with_value(templ_double_array1_of_size_POPSIZE, 1/ (double) this->popsize, this->popsize);
 

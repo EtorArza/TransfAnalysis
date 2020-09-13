@@ -9,15 +9,17 @@ namespace REAL_FUNC
 {
 
     enum sensor_t {
-        DIST_TO_CLOSEST = 0,
-        DIST_TO_AVERAGE = 1,
-        RELATIVE_DIST_TO_BEST = 2,
-        RELATIVE_TIME = 3,
-        RELATIVE_SCORE = 4,
-        INDIVIDUAL_BEST_WAS_IMPROVED = 5,
-        GLOBAL_BEST_WAS_IMPROVED = 6,
-        RANDOM_NUMBER = 7,
-        __sensor_N = 8,
+        ABSOLUTE_DIST_TO_AVERAGE = 0,
+        ABSOLUTE_DIST_TO_BEST = 1,
+        RELATIVE_DIST_TO_CLOSEST = 2,
+        RELATIVE_DIST_TO_AVERAGE = 3,
+        RELATIVE_DIST_TO_BEST = 4,
+        RELATIVE_TIME = 5,
+        RELATIVE_SCORE = 6,
+        INDIVIDUAL_BEST_WAS_IMPROVED = 7,
+        GLOBAL_BEST_WAS_IMPROVED = 8,
+        RANDOM_NUMBER = 9,
+        __sensor_N = 10,
     };
 
     enum output_t {

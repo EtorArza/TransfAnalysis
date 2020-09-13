@@ -70,7 +70,7 @@ private:
   void comp_relative_score();
   void comp_relative_time();
   void comp_distance_to_closest();
-  void comp_dist_to_average();
+  void comp_RELATIVE_DIST_TO_AVERAGE();
   void comp_relative_dist_to_best();
   void  load_INDIVIDUAL_BEST_WAS_IMPROVED();
   void  load_GLOBAL_BEST_WAS_IMPROVED();
