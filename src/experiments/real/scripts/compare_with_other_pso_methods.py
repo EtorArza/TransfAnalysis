@@ -54,13 +54,14 @@ X_UPPER_LIM = {X_UPPER_LIM}
     
 
 def record_results(METHOD_SHORTNAME,SOLVER_POPSIZE,PROBLEM_INDEX,PROBLEM_DIM,MAX_SOLVER_FE,X_LOWER_LIM,X_UPPER_LIM,F_COMPETITION):
-    write_conf_file(METHOD_SHORTNAME,SOLVER_POPSIZE,PROBLEM_INDEX,PROBLEM_DIM,MAX_SOLVER_FE,X_LOWER_LIM,X_UPPER_LIM,F_COMPETITION)
+    write_conf_file(METHOD_SHORTNAME, SOLVER_POPSIZE, PROBLEM_INDEX,
+                    PROBLEM_DIM, MAX_SOLVER_FE, X_LOWER_LIM, X_UPPER_LIM, F_COMPETITION)
     subprocess.run("./neat tmp_conf_file.ini > /dev/null",shell=True)
     # subprocess.run("./neat tmp_conf_file.ini",shell=True)
     with open("result.txt","r") as f:
         res = f.readline().strip()
     res_list = eval("["+str(F_COMPETITION)+","+res+"]") # file="coparison_result.txt")
-    print(METHOD_SHORTNAME, MAX_SOLVER_FE, SOLVER_POPSIZE, (X_LOWER_LIM,X_UPPER_LIM), "{:.4e}".format(res_list[0]), "{:.4e}".format(-res_list[1][0][0]), res_list[1][1], sep=",")
+    print(METHOD_SHORTNAME, MAX_SOLVER_FE, SOLVER_POPSIZE, (X_LOWER_LIM,X_UPPER_LIM), "{:.4e}".format(res_list[0]), "{:.4e}".format(-res_list[1][0][0]), res_list[1][1], PROBLEM_DIM, sep=",")
     subprocess.run("rm result.txt",shell=True)
 
 
@@ -69,7 +70,7 @@ def record_results(METHOD_SHORTNAME,SOLVER_POPSIZE,PROBLEM_INDEX,PROBLEM_DIM,MAX
 
 df = pd.read_csv("src/experiments/real/results/comparison_other_pso/comparison_other_pso_methods.csv")
 
-print("other_method_name,FE,swarm_size,bounds,f_other_method,f_proposed_method,test_function_index")
+print("other_method_name,FE,swarm_size,bounds,f_other_method,f_proposed_method,test_function_index,dim")
 
 METHOD_SHORTNAME = ""
 for row_index, row in df.iterrows():

@@ -2000,7 +2000,6 @@ bool is_A_larger_than_B_Signed_Wilcoxon(double* A, double* B, int length, int AL
 double p_value_chisquared(double x, double df)
 {
     int* error_code = new int(0);
-    double res = gamain(x/2.0, df/2.0, error_code);
 
     if(x - 300.0 > df)
     {
@@ -2020,6 +2019,7 @@ double p_value_chisquared(double x, double df)
         return 0.0;
     }
 
+    double res = gamain(x/2.0, df/2.0, error_code);
     if (*error_code != 0)
     {
         cout << "Error in gmain. x = " << x << ", df = " << df << ", res = " << res << ",  Error code: " << *error_code << endl;
@@ -2060,6 +2060,11 @@ bool Friedman_test_are_there_critical_diferences(double** f_values, int n_candid
 
     double ALPHA;
     double Z_THRESH;
+
+    if (are_all_values_the_same_in_matrix(f_values, n_candidates, n_samples))
+    {
+        return false;
+    }
 
     load_statistical_sigificant_parameters_given_alpha_index(ALPHA_INDEX, ALPHA, Z_THRESH);
 
@@ -2358,4 +2363,22 @@ double get_runtime_hipatia(){
     std::string time_string = system_exec("sacct -j  ${SLURM_JOB_ID} --format=ElapsedRaw --parsable | sed -n 2p | cut -d '=' -f 2 | sed 's/|$//'");
     int time_sec = atoi(time_string.c_str());
     return (double) time_sec;
+}
+
+bool are_all_values_the_same_in_matrix(double **matrix, int m, int n)
+{
+    double value = matrix[0][0];
+    bool res = true;
+
+    for (int j = 0; j < m; j++)
+    {
+        for (int i = 0; i < n; i++)
+        {
+            if (abs(value - matrix[j][i]) > 10e-20)
+            {
+                return false;
+            }
+        }
+    }
+    return true;
 }

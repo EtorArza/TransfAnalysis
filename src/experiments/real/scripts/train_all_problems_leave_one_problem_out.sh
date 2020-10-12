@@ -9,10 +9,6 @@ SRCDIR=`pwd`
 
 
 
-if false; then
-echo "this part not executed"
-# ... Code I want to skip here ...
-fi
 
 
 
@@ -23,18 +19,64 @@ EXPERIMENT_FOLDER_NAME="src/experiments/real/results/comparison_other_pso/contro
 SEED=2
 NEAT_POPSIZE=512
 SOLVER_POPSIZE=20
-MAX_SOLVER_FE=100000
-MAX_TRAIN_ITERATIONS=2000
+MAX_SOLVER_FE=20000
+MAX_TRAIN_ITERATIONS=50
 
 
 instance_list="[1,2,3,4,5,6,7,8,9,11,1,2,3,4,5,6,7,8,9,11]"
-dim_list="[10,10,10,10,10,10,10,10,10,10,20,20,20,20,20,20,20,20,20,20]"
+dim_list="[8,8,8,8,8,8,8,8,8,8,16,16,16,16,16,16,16,16,16,16]"
 lower_list="[-10,-10,-5,-5.12,-15,-600,-5,-15,-100,-2.048,-10,-10,-5,-5.12,-15,-600,-5,-15,-100,-2.048]"
 upper_list="[5,10,10,5,30,600,10,30,100,2.048,5,10,10,5,30,600,10,30,100,2.048]"
+dim_list_train_in_one="[10,30]"
 ########################################################################
 
 
 i=-1
+
+
+if false; then
+echo "this part not executed"
+# ... Code I want to skip here ...
+
+
+# Leave one out cross validation
+j=-1
+for instance_index in 1 2 3 4 5 6 7 8 9 11; do
+    i=$((i+1))
+    j=$((j+1))
+
+    CONTROLLER_NAME_PREFIX_ARRAY+=("LeaveOutF_${instance_index}")
+    SEED_ARRAY+=("${SEED}")
+
+    COMMA_SEPARATED_PROBLEM_INDEX_LIST_ARRAY+=(`python -c "a = ${instance_list}; a.pop(${j}+10); a.pop(${j}); a = [str(el) for el in a]; print('s_e_p'.join(a))"`)
+    COMMA_SEPARATED_PROBLEM_DIM_LIST_ARRAY+=(`python -c "a = ${dim_list}; a.pop(${j}+10); a.pop(${j}); a = [str(el) for el in a]; print('s_e_p'.join(a))"`)
+    COMMA_SEPARATED_X_LOWER_LIST_ARRAY+=(`python -c "a = ${lower_list}; a.pop(${j}+10); a.pop(${j}); a = [str(el) for el in a]; print('s_e_p'.join(a))"`)
+    COMMA_SEPARATED_X_UPPER_LIST_ARRAY+=(`python -c "a = ${upper_list}; a.pop(${j}+10); a.pop(${j}); a = [str(el) for el in a]; print('s_e_p'.join(a))"`)
+done
+
+
+fi
+
+
+# Train in one
+j=-1
+for instance_index in 1 2 3 4 5 6 7 8 9 11; do
+    i=$((i+1))
+    j=$((j+1))
+
+
+    CONTROLLER_NAME_PREFIX_ARRAY+=("TrainOnlyInF_${instance_index}")
+    SEED_ARRAY+=("${SEED}")
+
+    COMMA_SEPARATED_PROBLEM_INDEX_LIST_ARRAY+=(`python -c "b = ${instance_list}; a = [b[${j}],b[${j}+10]]; a = [str(el) for el in a]; print('s_e_p'.join(a))"`)
+    COMMA_SEPARATED_PROBLEM_DIM_LIST_ARRAY+=(`python -c "b = ${dim_list}; a = [b[${j}],b[${j}+10]]; a = [str(el) for el in a]; print('s_e_p'.join(a))"`)
+    COMMA_SEPARATED_X_LOWER_LIST_ARRAY+=(`python -c "b = ${lower_list}; a = [b[${j}],b[${j}+10]]; a = [str(el) for el in a]; print('s_e_p'.join(a))"`)
+    COMMA_SEPARATED_X_UPPER_LIST_ARRAY+=(`python -c "b = ${upper_list}; a = [b[${j}],b[${j}+10]]; a = [str(el) for el in a]; print('s_e_p'.join(a))"`)
+done
+
+
+
+
 
 
 i=$((i+1))
@@ -47,18 +89,6 @@ COMMA_SEPARATED_X_UPPER_LIST_ARRAY+=(`python -c "a = ${upper_list}; a = [str(el)
 
 
 
-
-for instance_index in 1 2 3 4 5 6 7 8 9 11; do
-    i=$((i+1))
-
-    CONTROLLER_NAME_PREFIX_ARRAY+=("LeaveOutF_${instance_index}")
-    SEED_ARRAY+=("${SEED}")
-
-    COMMA_SEPARATED_PROBLEM_INDEX_LIST_ARRAY+=(`python -c "a = ${instance_list}; a.pop(${i}+10); a.pop(${i}); a = [str(el) for el in a]; print('s_e_p'.join(a))"`)
-    COMMA_SEPARATED_PROBLEM_DIM_LIST_ARRAY+=(`python -c "a = ${dim_list}; a.pop(${i}+10); a.pop(${i}); a = [str(el) for el in a]; print('s_e_p'.join(a))"`)
-    COMMA_SEPARATED_X_LOWER_LIST_ARRAY+=(`python -c "a = ${lower_list}; a.pop(${i}+10); a.pop(${i}); a = [str(el) for el in a]; print('s_e_p'.join(a))"`)
-    COMMA_SEPARATED_X_UPPER_LIST_ARRAY+=(`python -c "a = ${upper_list}; a.pop(${i}+10); a.pop(${i}); a = [str(el) for el in a]; print('s_e_p'.join(a))"`)
-done
 
 
 
