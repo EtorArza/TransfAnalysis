@@ -604,13 +604,13 @@ int move_to_0_minusone_or_one(T value)
 
 template <class T>
 int argmin(T *v, int len){
-    T max = v[0];
+    T min = v[0];
     int res = 0;
     for (int i = 1; i < len; i++)
     {
-        if (v[i] < max)
+        if (v[i] < min)
         {
-            max = v[i];
+            min = v[i];
             res = i;
         }
     }

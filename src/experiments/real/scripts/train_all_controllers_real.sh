@@ -20,7 +20,8 @@ SEED=2
 NEAT_POPSIZE=512
 SOLVER_POPSIZE=20
 MAX_SOLVER_FE=200000
-MAX_TRAIN_ITERATIONS=50
+MAX_TRAIN_ITERATIONS=800
+FULL_MODEL="false"
 
 instance_list="[1,2,3,4,5,6,7,8,9,11,1,2,3,4,5,6,7,8,9,11]"
 dim_list="[10,10,10,10,10,10,10,10,10,10,30,30,30,30,30,30,30,30,30,30]"
@@ -50,10 +51,11 @@ for instance_index in 1 2 3 4 5 6 7 8 9 11; do
     COMMA_SEPARATED_PROBLEM_DIM_LIST_ARRAY+=(`python -c "a = ${dim_list}; a.pop(${j}+10); a.pop(${j}); a = [str(el) for el in a]; print('s_e_p'.join(a))"`)
     COMMA_SEPARATED_X_LOWER_LIST_ARRAY+=(`python -c "a = ${lower_list}; a.pop(${j}+10); a.pop(${j}); a = [str(el) for el in a]; print('s_e_p'.join(a))"`)
     COMMA_SEPARATED_X_UPPER_LIST_ARRAY+=(`python -c "a = ${upper_list}; a.pop(${j}+10); a.pop(${j}); a = [str(el) for el in a]; print('s_e_p'.join(a))"`)
+    FULL_MODEL_ARRAY+=("${FULL_MODEL}")
 done
 
 
-fi
+
 
 
 # Train in one
@@ -70,22 +72,26 @@ for instance_index in 1 2 3 4 5 6 7 8 9 11; do
     COMMA_SEPARATED_PROBLEM_DIM_LIST_ARRAY+=(`python -c "b = ${dim_list}; a = [b[${j}],b[${j}+10]]; a = [str(el) for el in a]; print('s_e_p'.join(a))"`)
     COMMA_SEPARATED_X_LOWER_LIST_ARRAY+=(`python -c "b = ${lower_list}; a = [b[${j}],b[${j}+10]]; a = [str(el) for el in a]; print('s_e_p'.join(a))"`)
     COMMA_SEPARATED_X_UPPER_LIST_ARRAY+=(`python -c "b = ${upper_list}; a = [b[${j}],b[${j}+10]]; a = [str(el) for el in a]; print('s_e_p'.join(a))"`)
+    FULL_MODEL_ARRAY+=("${FULL_MODEL}")
 done
 
 
+fi
 
 
 
+for FULL_MODEL_WHICH in "true"; do
 
 i=$((i+1))
-CONTROLLER_NAME_PREFIX_ARRAY+=("trained_with_all_problems")
+CONTROLLER_NAME_PREFIX_ARRAY+=("trained_with_all_problems_${FULL_MODEL_WHICH}")
 SEED_ARRAY+=("${SEED}")
 COMMA_SEPARATED_PROBLEM_INDEX_LIST_ARRAY+=(`python -c "a = ${instance_list}; a = [str(el) for el in a]; print('s_e_p'.join(a))"`)
 COMMA_SEPARATED_PROBLEM_DIM_LIST_ARRAY+=(`python -c "a = ${dim_list}; a = [str(el) for el in a]; print('s_e_p'.join(a))"`)
 COMMA_SEPARATED_X_LOWER_LIST_ARRAY+=(`python -c "a = ${lower_list}; a = [str(el) for el in a]; print('s_e_p'.join(a))"`)
 COMMA_SEPARATED_X_UPPER_LIST_ARRAY+=(`python -c "a = ${upper_list}; a = [str(el) for el in a]; print('s_e_p'.join(a))"`)
+FULL_MODEL_ARRAY+=("${FULL_MODEL_WHICH}")
 
-
+done
 
 
 
@@ -93,6 +99,7 @@ COMMA_SEPARATED_X_UPPER_LIST_ARRAY+=(`python -c "a = ${upper_list}; a = [str(el)
 
 CONTROLLER_NAME_PREFIX_ARRAY=$(to_list "${CONTROLLER_NAME_PREFIX_ARRAY[@]}")
 SEED_ARRAY=$(to_list "${SEED_ARRAY[@]}")
+FULL_MODEL_ARRAY=$(to_list "${FULL_MODEL_ARRAY[@]}")
 COMMA_SEPARATED_PROBLEM_INDEX_LIST_ARRAY=$(to_list "${COMMA_SEPARATED_PROBLEM_INDEX_LIST_ARRAY[@]}")
 COMMA_SEPARATED_PROBLEM_DIM_LIST_ARRAY=$(to_list "${COMMA_SEPARATED_PROBLEM_DIM_LIST_ARRAY[@]}")
 COMMA_SEPARATED_X_LOWER_LIST_ARRAY=$(to_list "${COMMA_SEPARATED_X_LOWER_LIST_ARRAY[@]}")
@@ -109,6 +116,7 @@ MAX_TRAIN_ITERATIONS=${MAX_TRAIN_ITERATIONS},\
 EXPERIMENT_FOLDER_NAME=${EXPERIMENT_FOLDER_NAME},\
 CONTROLLER_NAME_PREFIX_ARRAY=${CONTROLLER_NAME_PREFIX_ARRAY},\
 SEED_ARRAY=${SEED_ARRAY},\
+FULL_MODEL_ARRAY=${FULL_MODEL_ARRAY},\
 COMMA_SEPARATED_PROBLEM_INDEX_LIST_ARRAY=${COMMA_SEPARATED_PROBLEM_INDEX_LIST_ARRAY},\
 COMMA_SEPARATED_PROBLEM_DIM_LIST_ARRAY=${COMMA_SEPARATED_PROBLEM_DIM_LIST_ARRAY},\
 COMMA_SEPARATED_X_LOWER_LIST_ARRAY=${COMMA_SEPARATED_X_LOWER_LIST_ARRAY},\

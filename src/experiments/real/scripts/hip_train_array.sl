@@ -5,10 +5,10 @@
 #SBATCH --ntasks=1 # number of tasks
 #SBATCH --ntasks-per-node=1 #number of tasks per node
 #SBATCH --mem-per-cpu=1G
-#SBATCH --cpus-per-task=32 # number of CPUs
-#SBATCH --time=5-00:00:00 #Walltime
-#SBATCH -p large
-#SBATCH --exclude=n[001-004,017-018]
+#SBATCH --cpus-per-task=72 # number of CPUs
+#SBATCH --time=30-00:00:00 #Walltime
+#SBATCH -p xlarge
+#SBATCH --exclude=n[001-004]
 #SBATCH --exclusive
 
 
@@ -32,6 +32,11 @@ list_to_array $SEED_ARRAY
 SEED_ARRAY=("${BITRISE_CLI_LAST_PARSED_LIST[@]}")
 SEED=${SEED_ARRAY[$SLURM_ARRAY_TASK_ID]}
 
+
+
+list_to_array $FULL_MODEL_ARRAY
+FULL_MODEL_ARRAY=("${BITRISE_CLI_LAST_PARSED_LIST[@]}")
+FULL_MODEL=${FULL_MODEL_ARRAY[$SLURM_ARRAY_TASK_ID]}
 
 
 replaced_with=","
@@ -93,7 +98,7 @@ MAX_TRAIN_ITERATIONS = ${MAX_TRAIN_ITERATIONS}
 THREADS = ${SLURM_CPUS_PER_TASK}
 EXPERIMENT_FOLDER_NAME = ${EXPERIMENT_FOLDER_NAME}
 CONTROLLER_NAME_PREFIX = ${CONTROLLER_NAME_PREFIX}
-
+FULL_MODEL = ${FULL_MODEL}
 
 
 SEARCH_TYPE = phased

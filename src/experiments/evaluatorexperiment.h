@@ -229,7 +229,7 @@ namespace NEAT {
             timer.stop();
 
             // Fittest is not evaluated.
-            if(!fittest || (best->eval.fitness > fittest->eval.fitness)) {
+            if(!fittest || (best->eval.fitness > fittest->eval.fitness+ 1e-60)) {
                 save_best_network = true;
                 fittest = pop->make_copy(best->population_index);
             }

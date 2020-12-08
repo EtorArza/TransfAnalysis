@@ -82,7 +82,6 @@ bool check_if_all_ranks_are_the_same(vector<int> surviving_candidates, double **
     {
         all_values[i] = ranks[surviving_candidates[i]];
     }
-
     bool res = are_all_values_the_same_in_matrix(all_values, surviving_candidates.size(), current_n_of_evals);
     delete[] all_values;
     return res;
@@ -110,9 +109,7 @@ void execute_multi(class NEAT::Network **nets_, NEAT::OrganismEvaluation *result
 
         zero_initialize_matrix(f_values, nnets + 1, row_length);
         zero_initialize_matrix(f_value_ranks, nnets + 1, row_length);
-
-
-
+        int initial_seed;
 
         double *tmp_order = new double[nnets+1];
         // evaluate the individuals
@@ -135,6 +132,7 @@ void execute_multi(class NEAT::Network **nets_, NEAT::OrganismEvaluation *result
             surviving_candidates.push_back(inet);
         }
 
+        const int ALPHA_INDEX_TO_UPDATE_BK = 3;
 
         if (!parameters->neat_params->IS_LAST_ITERATION)
         {
@@ -148,11 +146,11 @@ void execute_multi(class NEAT::Network **nets_, NEAT::OrganismEvaluation *result
             max_evals_per_controller = MAX_EVALS_PER_CONTROLLER_NEUROEVOLUTION;
             ALPHA_INDEX = 2;
         }
-        
 
 
 
-        int initial_seed = global_rng.random_integer_uniform(INT_MAX / 10);
+
+        initial_seed = global_rng.random_integer_uniform(INT_MAX / 10);
         while (surviving_candidates.size() > target_n_controllers_left && max_evals_per_controller > current_n_of_evals)
         {
             cout << "Evaluating -> " << std::flush;
@@ -190,6 +188,9 @@ void execute_multi(class NEAT::Network **nets_, NEAT::OrganismEvaluation *result
             if (!are_all_ranks_the_same)
             {
                 F_race_iteration(f_value_ranks, surviving_candidates, current_n_of_evals, ALPHA_INDEX);
+            }else
+            {
+                 cout << "The controllers behave the same." << std::flush;
             }
 
             cout << ", perc_discarded: " << (double)(nnets - surviving_candidates.size()) / (double)(nnets);
@@ -223,8 +224,10 @@ void execute_multi(class NEAT::Network **nets_, NEAT::OrganismEvaluation *result
         progress_bar bar(max_evals_per_controller);
         
         current_n_of_evals = 0;
-        bool test_result = false;
-        while (!test_result && current_n_of_evals < max_evals_per_controller)
+        bool test_result = true;
+        n_evals_each_it = n_evals_each_it * (max_evals_per_controller / n_evals_each_it / 4);
+
+        while (test_result && current_n_of_evals < max_evals_per_controller)
         {
             #pragma omp parallel for num_threads(parameters->neat_params->N_OF_THREADS) schedule(dynamic,1)
             for (int i = 0; i < n_evals_each_it; i++)
@@ -246,11 +249,14 @@ void execute_multi(class NEAT::Network **nets_, NEAT::OrganismEvaluation *result
             if (check_if_all_ranks_are_the_same(surviving_candidates, f_value_ranks, current_n_of_evals))
             {
                 test_result = false;
-                cout << "The controllers behave the same.";
+                cout << "The controllers behave the same." << std::flush;
                 break;
             }
-
-            test_result = is_A_larger_than_B_sign_test(f_value_ranks[best_current_iteration_index], f_value_ranks[nnets], current_n_of_evals, 2);
+            // cout << "best this gen ->";
+            // PrintArray(f_value_ranks[best_current_iteration_index], current_n_of_evals);
+            // cout << "best last gen ->";
+            // PrintArray(f_value_ranks[nnets], current_n_of_evals);
+            test_result = is_A_larger_than_B_sign_test(f_value_ranks[best_current_iteration_index], f_value_ranks[nnets], current_n_of_evals, ALPHA_INDEX_TO_UPDATE_BK);
             //cout << "test_result: " << test_result << endl;
         }
         bar.end();
@@ -258,14 +264,14 @@ void execute_multi(class NEAT::Network **nets_, NEAT::OrganismEvaluation *result
 
 
         convert_f_values_to_ranks(surviving_candidates, f_values, f_value_ranks, current_n_of_evals);
-        double avg_perf_best_last = Average(f_value_ranks[nnets], current_n_of_evals);
-        double avg_perf_best_current = Average(f_value_ranks[best_current_iteration_index], current_n_of_evals);
+        double avg_perf_best_last = Average(f_value_ranks[nnets], current_n_of_evals) - 1;
+        double avg_perf_best_current = Average(f_value_ranks[best_current_iteration_index], current_n_of_evals) - 1;
         tmp_order[best_current_iteration_index] = 10e20;
         
 
         parameters->neat_params->BEST_FITNESS_TRAIN = 1.0;
 
-        cout << "(best this gen, best last gen) -> (" << avg_perf_best_current << ", " << avg_perf_best_last << ")";
+        cout << "(best this gen, best last gen) -> (" << avg_perf_best_current << ", " << avg_perf_best_last << ")" << ", higher is better";
 
         if (test_result)
         {
@@ -285,9 +291,17 @@ void execute_multi(class NEAT::Network **nets_, NEAT::OrganismEvaluation *result
 
 
         multiply_array_with_value(tmp_order, 1.0 / (double)(nnets - 1), (int)nnets);
+        double best_rank = tmp_order[best_current_iteration_index];
+
+        // if there are ties in the best score, without this correction, there might be 'fake' new best scores
+        for (int i = 0; i < nnets; i++)
+        {
+            if (tmp_order[i] == best_rank)
+            {
+                tmp_order[i] = 1.0;
+            }
+        }        
         multiply_array_with_value(tmp_order, 1.0 + ((double)parameters->neat_params->N_TIMES_BEST_FITNESS_IMPROVED_TRAIN / 1000.0), (int)nnets);
-
-
 
 
 

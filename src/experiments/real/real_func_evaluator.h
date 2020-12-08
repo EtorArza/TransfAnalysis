@@ -26,7 +26,10 @@ namespace REAL_FUNC
         MOMENTUM = 0,
         G_BEST = 1,
         L_BEST = 2,
-        __output_N = 3,
+        AVERAGE = 3,
+        RANDOM = 4,
+        __output_N = 5,
+        __output_N_reduced_model = 3,
     };
 
 }

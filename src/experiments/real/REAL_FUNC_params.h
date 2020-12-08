@@ -19,7 +19,8 @@ namespace REAL_FUNC{
 
         int MAX_SOLVER_FE;
         int SOLVER_POPSIZE;
-        
+        bool FULL_MODEL;
+
         // TRAIN PARAMS TO BE SPECIFIED IN CONFIG FILE//
         std::vector<int>* PROBLEM_INDEX_LIST; 
         std::vector<int>* PROBLEM_DIM_LIST; 

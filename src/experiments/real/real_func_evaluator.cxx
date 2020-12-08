@@ -223,14 +223,7 @@ double FitnessFunction_real_func(class NEAT::CpuNetwork *net_original, int probl
     return res;
 }
 
-void pow_5(double *vec)
-{
-    int n_out = REAL_FUNC::__output_N;
-    for (size_t i = 0; i < n_out; i++)
-    {
-        vec[i] = pow(vec[i], 5);
-    }
-}
+
 
 namespace REAL_FUNC
 {
@@ -335,7 +328,8 @@ namespace NEAT
         parameters->prob_name = reader.Get("Global", "PROBLEM_NAME", "UNKNOWN");
         parameters->MODE = reader.Get("Global", "MODE", "UNKNOWN");
         parameters->SOLVER_POPSIZE = reader.GetInteger("Global", "SOLVER_POPSIZE", -1);
-
+        parameters->MAX_SOLVER_FE = reader.GetInteger("Global", "MAX_SOLVER_FE", -1);
+        parameters->FULL_MODEL = reader.GetBoolean("Global", "FULL_MODEL", false);
 
         if (parameters->MODE == "train")
         {
@@ -358,7 +352,6 @@ namespace NEAT
 
 
 
-            parameters->MAX_SOLVER_FE = reader.GetInteger("Global", "MAX_SOLVER_FE", -1);
 
             if (neat_params->EXPERIMENT_FOLDER_NAME == "UNKNOWN")
             {
@@ -427,7 +420,6 @@ namespace NEAT
             //const char * prob_name = "permu";
             //Experiment *exp = Experiment::get(prob_name);
 
-            parameters->MAX_SOLVER_FE = reader.GetInteger("Global", "MAX_SOLVER_FE", -1);
             parameters->CONTROLLER_PATH = reader.Get("Global", "CONTROLLER_PATH", "UNKNOWN");
             parameters->N_REPS = reader.GetInteger("Global", "N_REPS", -1);
             parameters->N_EVALS = reader.GetInteger("Global", "N_EVALS", -1);
@@ -487,7 +479,7 @@ namespace NEAT
 
             if (parameters->COMPUTE_RESPONSE)
             {
-                net.start_recording_response(pow_5);
+                net.start_recording_response();
             }
 
             double *v_of_f_values = new double[parameters->N_EVALS];

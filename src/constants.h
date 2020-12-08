@@ -1,12 +1,13 @@
 #pragma once
+#include <limits.h>
 
-#define MAX_EVALS_PER_CONTROLLER_NEUROEVOLUTION 512
-#define EVAL_MIN_STEP 32
+#define MAX_EVALS_PER_CONTROLLER_NEUROEVOLUTION 2160
+#define EVAL_MIN_STEP 72
 
 #define MAX(A, B) ((A > B) ? A : B)
 #define MIN(A, B) ((A < B) ? A : B)
 
-#define SMALLEST_POSITIVE_DOUBLE  0.0000001
+#define SMALLEST_POSITIVE_DOUBLE  10e-70
 
 #define TEMP_double_ARRAY_SIZE 30
 

@@ -32,11 +32,13 @@ N_EVALS = {N_EVALS}
 N_REPS = {N_REPS}
 ;CONTROLLER_PATH = {CONTROLLER_PATH}trained_with_all_problems_best.controller
 
-CONTROLLER_PATH = {CONTROLLER_PATH}LeaveOutF_{PROBLEM_INDEX}_best.controller
-
+;CONTROLLER_PATH = {CONTROLLER_PATH}LeaveOutF_{PROBLEM_INDEX}_best.controller
+;CONTROLLER_PATH = {CONTROLLER_PATH}TrainOnlyInF_{PROBLEM_INDEX}_best.controller
+;CONTROLLER_PATH = {CONTROLLER_PATH}trained_with_all_problems_false_best.controller
+CONTROLLER_PATH = {CONTROLLER_PATH}trained_with_all_problems_true_best.controller
 
 PRINT_POSITIONS = false
-
+FULL_MODEL = true
 
 SOLVER_POPSIZE = {SOLVER_POPSIZE}
 

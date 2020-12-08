@@ -23,7 +23,7 @@ void CPopulation::init_class(MultidimBenchmarkFF *problem, RandomNumberGenerator
     assert(problem->GetProblemSize() > 0);
     assert(parameters->MAX_SOLVER_FE > 0);
 
-
+    this->full_model = parameters->FULL_MODEL;
     this->rng = rng;
     this->problem = problem;
     this->popsize = parameters->SOLVER_POPSIZE;
@@ -33,8 +33,12 @@ void CPopulation::init_class(MultidimBenchmarkFF *problem, RandomNumberGenerator
     genome_best = new double[n];
     f_best = -DBL_MAX;
     GenerateRandomRealvec_0_1(this->genome_best, n, this->rng);
+    average_solution_in_population = new double[n];
+    templ_double_array0_of_size_n = new double[n];
     templ_double_array1_of_size_n = new double[n];
     templ_double_array2_of_size_n = new double[n];
+    templ_double_array3_of_size_n = new double[n];
+    templ_double_array4_of_size_n = new double[n];
     templ_double_array1_of_size_POPSIZE = new double[this->popsize];
     templ_double_array2_of_size_POPSIZE = new double[this->popsize];
 
@@ -111,10 +115,17 @@ CPopulation::~CPopulation()
     pop_info=NULL;
     delete[] genome_best;
     genome_best=NULL;
+    delete[] average_solution_in_population;
     delete[] templ_double_array1_of_size_n;
     delete[] templ_double_array2_of_size_n;
-    templ_double_array1_of_size_n=NULL;
-    templ_double_array2_of_size_n=NULL;
+    delete[] templ_double_array3_of_size_n;
+    delete[] templ_double_array4_of_size_n;
+    average_solution_in_population = NULL;
+    templ_double_array0_of_size_n = NULL;
+    templ_double_array1_of_size_n = NULL;
+    templ_double_array2_of_size_n = NULL;
+    templ_double_array3_of_size_n = NULL;
+    templ_double_array4_of_size_n = NULL;
     delete[] templ_double_array1_of_size_POPSIZE;
     templ_double_array1_of_size_POPSIZE=NULL;
     delete[] templ_double_array2_of_size_POPSIZE;
@@ -147,28 +158,40 @@ void CPopulation::apply_neat_output_to_individual_i(double *output_neat, int i)
 
     #define MAX_COMPONENT_STEP_SIZE 1
 
-    
+    GenerateRandomRealvec_0_1(templ_double_array4_of_size_n, n, this->rng);
+
     for (int j = 0; j < n; j++)
     {
         templ_double_array1_of_size_n[j] = m_individuals[i]->genome_best[j] - m_individuals[i]->genome[j];
         templ_double_array2_of_size_n[j] = this->genome_best[j] - m_individuals[i]->genome[j];
+        templ_double_array3_of_size_n[j] = this->average_solution_in_population[j] - m_individuals[i]->genome[j];
+        templ_double_array4_of_size_n[j] -= m_individuals[i]->genome[j];
     }
 
 
     normalize_vector_L1(m_individuals[i]->momentum, n);
     normalize_vector_L1(templ_double_array1_of_size_n, m_individuals[i]->n);
     normalize_vector_L1(templ_double_array2_of_size_n, m_individuals[i]->n);
-
-
+    normalize_vector_L1(templ_double_array3_of_size_n, m_individuals[i]->n);
+    normalize_vector_L1(templ_double_array4_of_size_n, m_individuals[i]->n);
 
     for (int j = 0; j < n; j++)
     {
         m_individuals[i]->momentum[j] = MAX_COMPONENT_STEP_SIZE * 
         (
-            m_individuals[i]->momentum[j] *  pow(output_neat[REAL_FUNC::MOMENTUM],5) +
-            templ_double_array1_of_size_n[j] * pow(output_neat[REAL_FUNC::L_BEST],5) + 
-            templ_double_array2_of_size_n[j] * pow(output_neat[REAL_FUNC::G_BEST],5) 
+            m_individuals[i]->momentum[j] *  output_neat[REAL_FUNC::MOMENTUM] +
+            templ_double_array1_of_size_n[j] * output_neat[REAL_FUNC::L_BEST] + 
+            templ_double_array2_of_size_n[j] * output_neat[REAL_FUNC::G_BEST] 
         );
+        if (this->full_model)
+        {
+            m_individuals[i]->momentum[j] += MAX_COMPONENT_STEP_SIZE *
+            (
+                templ_double_array3_of_size_n[j] * output_neat[REAL_FUNC::AVERAGE] +
+                templ_double_array4_of_size_n[j] * output_neat[REAL_FUNC::RANDOM]
+            );
+        }
+        
     }
 
 
@@ -285,16 +308,16 @@ void CPopulation::comp_RELATIVE_DIST_TO_AVERAGE()
 {
     for (int j = 0; j < n; j++)
     {
-        templ_double_array1_of_size_n[j] = 0.0;
+        average_solution_in_population[j] = 0.0;
         for (int i = 0; i < this->popsize; i++)
         {
-            templ_double_array1_of_size_n[j] += m_individuals[i]->genome[j];
+            average_solution_in_population[j] += m_individuals[i]->genome[j];
         }
-        templ_double_array1_of_size_n[j] /= (double) this->popsize;
+        average_solution_in_population[j] /= (double)this->popsize;
     }
     for (int i = 0; i < this->popsize; i++)
     {
-        templ_double_array2_of_size_POPSIZE[i] = l1_distance(templ_double_array1_of_size_n, m_individuals[i]->genome, n) / ((double)n);
+        templ_double_array2_of_size_POPSIZE[i] = l1_distance(average_solution_in_population, m_individuals[i]->genome, n) / ((double)n);
         pop_info[i][REAL_FUNC::ABSOLUTE_DIST_TO_AVERAGE] = templ_double_array2_of_size_POPSIZE[i];
     }
 

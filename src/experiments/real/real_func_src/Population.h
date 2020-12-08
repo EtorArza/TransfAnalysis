@@ -35,7 +35,8 @@ public:
   int popsize;
   int max_evals;
 
- 	double f_best;
+  bool full_model = false;
+  double f_best;
 	double* genome_best;
 
   void Print();
@@ -78,8 +79,12 @@ private:
 
 
   MultidimBenchmarkFF * problem;
+  double *average_solution_in_population;
+  double *templ_double_array0_of_size_n;
   double *templ_double_array1_of_size_n;
   double *templ_double_array2_of_size_n;
+  double *templ_double_array3_of_size_n;
+  double *templ_double_array4_of_size_n;
   double *templ_double_array1_of_size_POPSIZE;
   double *templ_double_array2_of_size_POPSIZE;
   double relative_time();

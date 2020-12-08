@@ -23,6 +23,7 @@
 #include <vector>
 #include "asa032.hpp"
 #include "constants.h"
+#include "sign_test_critical_values.h"
 
 
 
@@ -634,6 +635,8 @@ void RandomNumberGenerator::seed(int seed){
     this->x = (unsigned long) seed;
     this->y=362436069UL; 
     this->z=521288629UL;
+    xorshf96();
+    x+=1;
     xorshf96();
 }
 
@@ -1865,25 +1868,59 @@ bool is_A_larger_than_B_sign_test(double* A, double* B, int length, int ALPHA_IN
     {
         return false;
     }
+
+
     
 
-    double p_value = p_sign_test(n, statistic);
+    int *critical_values;
 
-    double ALPHA;
-    double Z_THRESH;
-
-    //cout << p_value << endl;
-
-    load_statistical_sigificant_parameters_given_alpha_index(ALPHA_INDEX, ALPHA, Z_THRESH);
-
-    if (p_value < ALPHA)
+    if (ALPHA_INDEX == 0)
     {
-        return true;
+        critical_values = crittical_values_p_equals_5e_minus_2;
+    }
+    else if(ALPHA_INDEX == 1)
+    {
+        critical_values = crittical_values_p_equals_1e_minus_2;
+    }
+    else if(ALPHA_INDEX == 2)
+    {
+        critical_values = crittical_values_p_equals_5e_minus_3;
+    }
+    else if (ALPHA_INDEX == 3) // 1 - ((1-0.00005) ^ 1000) < 0.05, this means that repeating the test 1e3 times with alpha = 5e-5 has a total alpha lower than 0.05 
+    {
+        critical_values = crittical_values_p_equals_5e_minus_5;
     }else
     {
-        return false;
+        cout << "ALPHA INDEX = " << ALPHA_INDEX << " not supported in one sided sign test" << endl;
+        exit(1);
     }
+    
 
+
+
+
+    if (n <= 10000)
+    {
+        if (statistic <= critical_values[n])
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+    else
+    {   // (double) n * (double) critical_values[10000] / (double) 10000) is an LOWER bound of the critical value for n > 10000
+        if ((double)statistic <= (double)n * (double)critical_values[10000] / (double)10000)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
 }
 
 

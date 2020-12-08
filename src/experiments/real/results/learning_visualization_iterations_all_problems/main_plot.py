@@ -5,15 +5,16 @@ from tqdm import tqdm as tqdm
 from sklearn.preprocessing import StandardScaler
 
 SEED=2
-NEAT_POPSIZE=512
 SOLVER_POPSIZE=20
 MAX_SOLVER_FE=50000
 DIM=10
 N_EVALS = 100
 N_REPS = 1
 THREADS = 7
-CONTROLLER_PATH = 'src/experiments/real/results/learning_visualization_iterations_all_problems/all_controllers_new/'
+CONTROLLER_PATH = 'src/experiments/real/results/learning_visualization_iterations_all_problems/all_controllers/'
+CONTROLLER_PREFIX = 'trained_with_all_problems_true'
 N_PROBLEMS = 10
+FULL_MODEL = "true"
 
 
 instance_list=[1,2,3,4,5,6,7,8,9,11]
@@ -35,6 +36,8 @@ def write_conf_file(SOLVER_POPSIZE,PROBLEM_INDEX,PROBLEM_DIM,X_LOWER_LIM,X_UPPER
         "N_REPS":N_REPS,
         "THREADS":THREADS,
         "GEN_INDEX":str(GEN_INDEX).zfill(9),
+        "FULL_MODEL": FULL_MODEL,
+        "CONTROLLER_PREFIX": CONTROLLER_PREFIX,
     }
 
     tmp_ini_file_string = """
@@ -46,14 +49,14 @@ THREADS = {THREADS}
 N_EVALS = {N_EVALS}
 N_REPS = {N_REPS}
 
-CONTROLLER_PATH = {CONTROLLER_PATH}/trained_with_all_problems_gen_{GEN_INDEX}.controller
+CONTROLLER_PATH = {CONTROLLER_PATH}/{CONTROLLER_PREFIX}_gen_{GEN_INDEX}.controller
 
 
 PRINT_POSITIONS = false
 
 
 SOLVER_POPSIZE = {SOLVER_POPSIZE}
-
+FULL_MODEL = {FULL_MODEL}
 
 PROBLEM_INDEX = {PROBLEM_INDEX}
 PROBLEM_DIM = {PROBLEM_DIM}
