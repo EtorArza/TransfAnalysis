@@ -3,3 +3,8 @@
 	modifications to be applied to the solutions.	The learned neural network controller 
 	maps the state of the optimization process and the operations to be applied to the 
 	population at each generation.
+
+	Requirements:
+	libubsan0
+	GCC
+	Make
