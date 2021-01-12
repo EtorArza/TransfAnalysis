@@ -2308,23 +2308,26 @@ double float_reminder(double x, double divisor){
 }
 
 void progress_bar::step(){
-    #define NUMBER_OF_PROGRESS_DOTS 15
+    #define NUMBER_OF_PROGRESS_DOTS 10
     
+    mut.lock();
+    int step = current_steps;
+    current_steps++;
+    mut.unlock();
+
     //int NUMBER_OF_PROGRESS_DOTS = min(MAX_NUMBER_OF_PROGRESS_DOTS, max_steps / 10);
 
-    double last_reminder = float_reminder((double) current_steps-1, (double) NUMBER_OF_PROGRESS_DOTS);
-    double current_reminder = float_reminder((double) current_steps, (double) NUMBER_OF_PROGRESS_DOTS);
-    double next_reminder = float_reminder((double) current_steps+1, (double) NUMBER_OF_PROGRESS_DOTS);
+    double last_reminder = float_reminder((double) NUMBER_OF_PROGRESS_DOTS * (step-1), (double) this->max_steps );
+    double current_reminder = float_reminder((double) NUMBER_OF_PROGRESS_DOTS * step, (double) this->max_steps);
 
-    if ( (int) (NUMBER_OF_PROGRESS_DOTS * current_steps) / max_steps > (int) (NUMBER_OF_PROGRESS_DOTS * (current_steps-1)) / max_steps )
+    if ( last_reminder > current_reminder)
     {
         std::cout << "." << std::flush;
     }
-    this->current_steps++;
 }
 
 void progress_bar::end(){
-    std::cout << "]" << " " << this->timer.toc() << "(s)" << std::flush;
+    std::cout << "]" << " " << this->timer.toc() << " s" << std::flush;
 }
 
 void progress_bar::restart(int n){
