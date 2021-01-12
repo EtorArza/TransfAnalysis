@@ -1073,6 +1073,8 @@ int max_steps;
 int current_steps;
 bool printed_bracket = false;
 stopwatch timer;
+std::mutex mut;
+
 
 progress_bar(int n);
 ~progress_bar();
