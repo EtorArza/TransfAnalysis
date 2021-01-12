@@ -34,17 +34,22 @@ DEPENDS=${OBJECTS:%.o=%.d}
 DEPENDS+=${CUDA_OBJECTS:%.o=%.d}
 
 ifeq (${DEVMODE}, true)
-	OPT=-O0 
-	OPENMP=-fopenmp
-	NVCC_FLAGS=-G -g 
+	OPT=-O0
+	NVCC_FLAGS=-G -g
 	UBSAN=-fsanitize=undefined
 else
 	OPT=-O3
-	OPENMP=-fopenmp
 	MISC_FLAGS=-DNDEBUG
 	UBSAN=
 
 endif
+
+ifeq (${PARALELLIZE}, true)
+	OPENMP=-fopenmp
+else
+	OPENMP=
+endif
+
 
 ifeq (${HIPATIA}, true)
 	DEFINES+=-DHIPATIA
