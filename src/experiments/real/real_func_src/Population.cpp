@@ -116,6 +116,7 @@ CPopulation::~CPopulation()
     delete[] genome_best;
     genome_best=NULL;
     delete[] average_solution_in_population;
+    delete[] templ_double_array0_of_size_n;
     delete[] templ_double_array1_of_size_n;
     delete[] templ_double_array2_of_size_n;
     delete[] templ_double_array3_of_size_n;
