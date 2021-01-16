@@ -4,7 +4,11 @@
 	maps the state of the optimization process and the operations to be applied to the 
 	population at each generation.
 
-	Requirements:
-	libubsan0
-	GCC
-	Make
+	Installing Requirements:
+
+```bash
+	sudo apt install libubsan0
+	sudo apt install gcc
+	sudo apt install make
+	sudo apt install g++
+```
