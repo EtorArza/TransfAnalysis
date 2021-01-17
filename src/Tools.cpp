@@ -2376,8 +2376,7 @@ vector<string> split_string(string str, string token){
 vector<int> from_comma_sep_values_in_string_to_int_vector(string str)
 {
     auto splitted_string = split_string(str, ",");
-    vector<int> res;
-    res.resize(splitted_string.size());
+    vector<int> res(splitted_string.size());
     for (int i = 0; i < res.size(); i++)
     {
         res[i] = atoi(splitted_string[i].c_str());
