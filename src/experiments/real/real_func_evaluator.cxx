@@ -24,6 +24,20 @@
 using namespace std;
 // #define COUNTER
 
+
+
+MultidimBenchmarkFF *load_problem(int problem_index, int dim, double x_lower_lim, double x_upper_lim)
+{   
+    if (problem_index == 10)
+    {
+        std::cout << "ERROR: Problem index 10 requires seed for randomly generated instance." << endl;
+        exit(1);
+    }
+    
+    return load_problem(problem_index, dim, x_lower_lim, x_upper_lim, 2);
+}
+
+
 MultidimBenchmarkFF *load_problem(int problem_index, int dim, double x_lower_lim, double x_upper_lim, int seed_randomly_generated_instance)
 {
     MultidimBenchmarkFF *problem;
