@@ -39,6 +39,8 @@ namespace REAL_FUNC
     struct Evaluator;
 }
 
+class MultidimBenchmarkFF;
+MultidimBenchmarkFF *load_problem(int problem_index, int dim, double x_lower_lim, double x_upper_lim, int seed_randomly_generated_instance);
 
 namespace NEAT
 {
