@@ -40,7 +40,7 @@ namespace REAL_FUNC
 }
 
 class MultidimBenchmarkFF;
-MultidimBenchmarkFF *load_problem(int problem_index, int dim, double x_lower_lim, double x_upper_lim, int seed_randomly_generated_instance);
+MultidimBenchmarkFF *load_problem(int problem_index, int dim, double x_lower_lim, double x_upper_lim, int seed_randomly_generated_instance=2);
 
 namespace NEAT
 {
