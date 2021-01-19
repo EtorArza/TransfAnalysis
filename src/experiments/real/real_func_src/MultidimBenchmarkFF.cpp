@@ -5,23 +5,43 @@
 #include "generator.h"
 #include <omp.h>
 #include <unistd.h>
-MultidimBenchmarkFF::MultidimBenchmarkFF(int dim, double x_lower_lim, double x_upper_lim)
+MultidimBenchmarkFF::MultidimBenchmarkFF(int problem_index, int dim, double x_lower_lim, double x_upper_lim, int SEED, bool ROTATE)
 {
     this->dim = dim;
     rng = new RandomNumberGenerator();
     temp_vect_1 = new double[this->dim];
     this->x_lower_lim = x_lower_lim;
     this->x_upper_lim = x_upper_lim;
+
+    if (ROTATE)
+    {
+        this->getRandomRotationMatrix(SEED);
+        this->rotate = true;
+    }
+    else
+    {
+        this->rotate = false;
+    }
     if (x_lower_lim >= x_upper_lim)
     {
         cout << "\n Error in MultidimBenchmarkFF, x_lims = (" << x_lower_lim << ", " << x_upper_lim << ") not correct.\n" <<endl;
         exit(1);
     }
+
+
+
+
 }
 
 
 MultidimBenchmarkFF::~MultidimBenchmarkFF()
 {
+    if (R != nullptr)
+    {
+        delete_matrix(R, this->dim);
+        R = nullptr;
+    }
+    
     if (!this->rng_deleted)
     {
         delete this->rng;
@@ -29,6 +49,10 @@ MultidimBenchmarkFF::~MultidimBenchmarkFF()
     }
     delete[] temp_vect_1;
 }
+
+
+
+
 
 
 void MultidimBenchmarkFF::load_rng(RandomNumberGenerator *rng)
@@ -45,13 +69,36 @@ int MultidimBenchmarkFF::GetProblemSize() { return this->dim; }
 
 
 double MultidimBenchmarkFF::Fitness_Func_0_1(double* x_vec_0_1){
+
+    double local_tmp_vec[this->dim]; 
+
+    if (rotate)
+    {
+        rotate_x_given_R(x_vec_0_1, local_tmp_vec);
+    }else
+    {
+        copy_array(local_tmp_vec, x_vec_0_1, this->dim);
+    }
+    
+
+
+
     for (int i = 0; i < this->dim; i++)
     {   
         assert(x_vec_0_1[i] > -0.0000001);
         assert(x_vec_0_1[i] < 1.0000001);
-        temp_vect_1[i] = this->get_x_lim_lower() + x_vec_0_1[i] * (this->get_x_lim_upper() - this->get_x_lim_lower());
+        local_tmp_vec[i] = this->get_x_lim_lower() + x_vec_0_1[i] * (this->get_x_lim_upper() - this->get_x_lim_lower());
     }
-    return - this->FitnessFunc(temp_vect_1); // we need the - sign because we are considering minimmization problems.
+
+
+
+
+
+
+
+    
+
+    return - this->FitnessFunc(local_tmp_vec); // we need the - sign because we are considering minimmization problems.
 }
 
 
@@ -240,7 +287,7 @@ double F9::FitnessFunc(double* x_vec){
 
 
 static int current_jobs_with_this_seed = 0;
-F10::F10(int dim, double x_lower_lim, double x_upper_lim, int seed) : MultidimBenchmarkFF(dim, x_lower_lim, x_upper_lim)
+F11::F11(int problem_index, int dim, double x_lower_lim, double x_upper_lim, int SEED, bool ROTATE)  : MultidimBenchmarkFF(problem_index, dim, x_lower_lim, x_upper_lim, SEED, ROTATE)
 {
     char config_path[] = "src/experiments/real/real_func_src/jani_ronkkonen_problem_generator/quad_function.dat";
 
@@ -255,13 +302,13 @@ F10::F10(int dim, double x_lower_lim, double x_upper_lim, int seed) : MultidimBe
             static int current_seed = -1;
             if (current_jobs_with_this_seed == 0)
             {
-                g_seeded_initialize(config_path, seed, dim);
-                current_seed = seed;
+                g_seeded_initialize(config_path, SEED, dim);
+                current_seed = SEED;
                 current_dim = dim;
                 current_jobs_with_this_seed++;
                 repeat = false;
             }
-            else if(current_seed == seed && current_dim == dim)
+            else if(current_seed == SEED && current_dim == dim)
             {
                 current_jobs_with_this_seed++;
                 repeat = false;
@@ -283,7 +330,7 @@ F10::F10(int dim, double x_lower_lim, double x_upper_lim, int seed) : MultidimBe
 };
 
 
-F10::~F10()
+F11::~F11()
 {
     #pragma omp critical(adshfafoiadfoak)
     {
@@ -293,7 +340,7 @@ F10::~F10()
 };
 
 
-double F10::FitnessFunc(double* x_vec)
+double F11::FitnessFunc(double* x_vec)
 {
     return g_calculate(x_vec);
 }
@@ -301,7 +348,7 @@ double F10::FitnessFunc(double* x_vec)
 
 
 // Rosembrock EZ
-double F11::FitnessFunc(double* x_vec){
+double F10::FitnessFunc(double* x_vec){
     
     double res = 0;
 
@@ -312,3 +359,145 @@ double F11::FitnessFunc(double* x_vec){
     return res;
 
 }
+
+
+void MultidimBenchmarkFF::getRandomRotationMatrix(int SEED)
+{
+
+    if (this->R==nullptr)
+    {
+        zero_initialize_matrix(R, this->dim, this->dim);
+    }
+
+
+  double scalar=0, line[this->dim], norm=0;
+  int i,j,k;
+  RandomNumberGenerator local_rng = RandomNumberGenerator();
+  local_rng.seed(SEED);
+  
+  for (i=0;i<this->dim;i++){		
+    /*random values for matrix R:s i:th row, first step*/
+    for (j=0;j<this->dim;j++)
+      R[i][j]=local_rng.random_0_1_double();		 
+    
+    /*second step*/
+    /*if j<=i, the line must be 0*/
+    for(k=0;k<this->dim;k++)		
+      line[k]=0.0;
+    
+    for(j=0;j<i;j++){
+      scalar=0;/*scalar product*/
+      for(k=0;k<this->dim;k++)				
+	scalar=scalar+R[i][k]*R[j][k];			
+      for(k=0;k<this->dim;k++)			
+	line[k]=line[k]+scalar*R[j][k];			
+    }
+    for(k=0;k<this->dim;k++)		
+      R[i][k]=R[i][k]-line[k];
+    
+    /*third step*/
+    norm=0;
+    for(k=0;k<this->dim;k++)			
+      norm=norm+R[i][k]*R[i][k];
+    
+    norm=sqrt(norm);
+    for(k=0;k<this->dim;k++)		
+      R[i][k]=R[i][k]/norm;					
+  }
+//   /*We generate the transpose of R*/
+//   for(i=0;i<this->dim;i++) 
+//     for(j=0;j<this->dim;j++)
+//       RT[i][j]=R[j][i]; 
+}
+
+void MultidimBenchmarkFF::rotate_x_given_R(double *res_x_rotated, double *x)
+{
+    int i, j;
+    const int const_dim = this->dim;
+
+    if (x == res_x_rotated) // create temporal array, if result and x are the same
+    {
+        double tmp[const_dim];
+        for (i = 0; i < const_dim; i++)
+        {
+            tmp[i] = 0;
+            for (j = 0; j < const_dim; j++)
+                tmp[i] = tmp[i] + R[i][j] * x[j];
+        }
+        for (i = 0; i < const_dim; i++)
+            x[i] = tmp[i];
+    }
+    else
+    {
+        for (i = 0; i < const_dim; i++)
+        {
+            res_x_rotated[i] = 0;
+        }
+        for (i = 0; i < const_dim; i++)
+        {
+            for (j = 0; j < const_dim; j++)
+                res_x_rotated[i] += R[i][j] * x[j];
+        }
+    }
+}
+
+MultidimBenchmarkFF *load_problem(int problem_index, int dim, double x_lower_lim, double x_upper_lim)
+{   
+    if (problem_index == 11)
+    {
+        std::cout << "ERROR: Problem index 11 requires seed for randomly generated instance." << endl;
+        exit(1);
+    }
+    
+    return load_problem(problem_index, dim, x_lower_lim, x_upper_lim, 2, false);
+}
+
+
+MultidimBenchmarkFF *load_problem(int problem_index, int dim, double x_lower_lim, double x_upper_lim, int SEED, bool ROTATE)
+{
+    MultidimBenchmarkFF *problem;
+    switch (problem_index)
+    {
+    case 1:
+        problem = new F1(problem_index, dim, x_lower_lim, x_upper_lim, SEED, ROTATE);
+        break;
+    case 2:
+        problem = new F2(problem_index, dim, x_lower_lim, x_upper_lim, SEED, ROTATE);
+        break;
+    case 3:
+        problem = new F3(problem_index, dim, x_lower_lim, x_upper_lim, SEED, ROTATE);
+        break;
+    case 4:
+        problem = new F4(problem_index, dim, x_lower_lim, x_upper_lim, SEED, ROTATE);
+        break;
+    case 5:
+        problem = new F5(problem_index, dim, x_lower_lim, x_upper_lim, SEED, ROTATE);
+        break;
+    case 6:
+        problem = new F6(problem_index, dim, x_lower_lim, x_upper_lim, SEED, ROTATE);
+        break;
+    case 7:
+        problem = new F7(problem_index, dim, x_lower_lim, x_upper_lim, SEED, ROTATE);
+        break;
+    case 8:
+        problem = new F8(problem_index, dim, x_lower_lim, x_upper_lim, SEED, ROTATE);
+        break;
+    case 9:
+        problem = new F9(problem_index, dim, x_lower_lim, x_upper_lim, SEED, ROTATE);
+        break;
+    case 10:
+        problem = new F10(problem_index, dim, x_lower_lim, x_upper_lim, SEED, ROTATE);
+        break;
+    case 11:
+        problem = new F11(problem_index, dim, x_lower_lim, x_upper_lim, SEED, ROTATE);
+        break;
+    default:
+        cout << "Incorrect problem index, only integers between 1 and 8 allowed. problem_index = " << problem_index << "  was provided." << endl;
+        std::exit(1);
+        break;
+    }
+    return problem;
+}
+
+
+

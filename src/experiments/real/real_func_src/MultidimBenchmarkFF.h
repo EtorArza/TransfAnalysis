@@ -19,34 +19,45 @@ class MultidimBenchmarkFF
 
 
   public:
-	MultidimBenchmarkFF(int dim, double x_lower_lim, double x_upper_lim);
+	MultidimBenchmarkFF(int problem_index, int dim, double x_lower_lim, double x_upper_lim, int SEED, bool ROTATE);
 	virtual ~MultidimBenchmarkFF() = 0;
     int GetProblemSize();
     double Fitness_Func_0_1(double* x_vec_0_1);
     void Evaluate(CIndividual* indiv);
-    virtual double FitnessFunc(double* x_vec) = 0;
+
     void load_rng(RandomNumberGenerator* rng);
     RandomNumberGenerator* rng;
+    double ** R = nullptr;
+
+    // get random rotation matrix.
+    void getRandomRotationMatrix(int SEED);
 
   protected:
 
+    // rotate x given rotation matrix R. x and res_x_rotated can point to the same address.
+    void rotate_x_given_R(double *res_x_rotated, double *x);
     double* temp_vect_1;
     double get_x_lim_upper();
     double get_x_lim_lower();
     int dim;
     bool rng_deleted = false;
+    bool rotate = false;
 
   private:
+    virtual double FitnessFunc(double* x_vec) = 0;
     double x_upper_lim;
     double x_lower_lim;
 
 
 };
 
+MultidimBenchmarkFF* load_problem(int problem_index, int dim, double x_lower_lim, double x_upper_lim);
+MultidimBenchmarkFF* load_problem(int problem_index, int dim, double x_lower_lim, double x_upper_lim, int SEED, bool ROTATE);
+
 class F1 : public MultidimBenchmarkFF
 {
 public:
-    F1(int dim, double x_lower_lim, double x_upper_lim) : MultidimBenchmarkFF(dim, x_lower_lim, x_upper_lim){};
+    F1(int problem_index, int dim, double x_lower_lim, double x_upper_lim, int SEED, bool ROTATE) : MultidimBenchmarkFF(problem_index, dim, x_lower_lim, x_upper_lim, SEED, ROTATE){};
     ~F1(){};
     double FitnessFunc(double *x_vec);
 };
@@ -54,7 +65,7 @@ public:
 class F2 : public MultidimBenchmarkFF
 {
 public:
-    F2(int dim, double x_lower_lim, double x_upper_lim) : MultidimBenchmarkFF(dim, x_lower_lim, x_upper_lim){};
+    F2(int problem_index, int dim, double x_lower_lim, double x_upper_lim, int SEED, bool ROTATE) : MultidimBenchmarkFF(problem_index, dim, x_lower_lim, x_upper_lim, SEED, ROTATE){};
     ~F2(){};
     double FitnessFunc(double *x_vec);
 };
@@ -62,7 +73,7 @@ public:
 class F3 : public MultidimBenchmarkFF
 {
 public:
-    F3(int dim, double x_lower_lim, double x_upper_lim) : MultidimBenchmarkFF(dim, x_lower_lim, x_upper_lim){};
+    F3(int problem_index, int dim, double x_lower_lim, double x_upper_lim, int SEED, bool ROTATE) : MultidimBenchmarkFF(problem_index, dim, x_lower_lim, x_upper_lim, SEED, ROTATE){};
     ~F3(){};
     double FitnessFunc(double *x_vec);
 };
@@ -70,7 +81,7 @@ public:
 class F4 : public MultidimBenchmarkFF
 {
 public:
-    F4(int dim, double x_lower_lim, double x_upper_lim) : MultidimBenchmarkFF(dim, x_lower_lim, x_upper_lim){};
+    F4(int problem_index, int dim, double x_lower_lim, double x_upper_lim, int SEED, bool ROTATE) : MultidimBenchmarkFF(problem_index, dim, x_lower_lim, x_upper_lim, SEED, ROTATE){};
     ~F4(){};
     double FitnessFunc(double *x_vec);
 };
@@ -78,7 +89,7 @@ public:
 class F5 : public MultidimBenchmarkFF
 {
 public:
-    F5(int dim, double x_lower_lim, double x_upper_lim) : MultidimBenchmarkFF(dim, x_lower_lim, x_upper_lim){};
+    F5(int problem_index, int dim, double x_lower_lim, double x_upper_lim, int SEED, bool ROTATE) : MultidimBenchmarkFF(problem_index, dim, x_lower_lim, x_upper_lim, SEED, ROTATE){};
     ~F5(){};
     double FitnessFunc(double *x_vec);
 };
@@ -86,7 +97,7 @@ public:
 class F6 : public MultidimBenchmarkFF
 {
 public:
-    F6(int dim, double x_lower_lim, double x_upper_lim) : MultidimBenchmarkFF(dim, x_lower_lim, x_upper_lim){};
+    F6(int problem_index, int dim, double x_lower_lim, double x_upper_lim, int SEED, bool ROTATE) : MultidimBenchmarkFF(problem_index, dim, x_lower_lim, x_upper_lim, SEED, ROTATE){};
     ~F6(){};
     double FitnessFunc(double *x_vec);
 };
@@ -94,7 +105,7 @@ public:
 class F7 : public MultidimBenchmarkFF
 {
 public:
-    F7(int dim, double x_lower_lim, double x_upper_lim) : MultidimBenchmarkFF(dim, x_lower_lim, x_upper_lim){};
+    F7(int problem_index, int dim, double x_lower_lim, double x_upper_lim, int SEED, bool ROTATE) : MultidimBenchmarkFF(problem_index, dim, x_lower_lim, x_upper_lim, SEED, ROTATE){};
     ~F7(){};
     double FitnessFunc(double *x_vec);
 };
@@ -102,7 +113,7 @@ public:
 class F8 : public MultidimBenchmarkFF
 {
 public:
-    F8(int dim, double x_lower_lim, double x_upper_lim) : MultidimBenchmarkFF(dim, x_lower_lim, x_upper_lim){};
+    F8(int problem_index, int dim, double x_lower_lim, double x_upper_lim, int SEED, bool ROTATE) : MultidimBenchmarkFF(problem_index, dim, x_lower_lim, x_upper_lim, SEED, ROTATE){};
     ~F8(){};
     double FitnessFunc(double *x_vec);
 };
@@ -110,26 +121,26 @@ public:
 class F9 : public MultidimBenchmarkFF
 {
 public:
-    F9(int dim, double x_lower_lim, double x_upper_lim) : MultidimBenchmarkFF(dim, x_lower_lim, x_upper_lim){};
+    F9(int problem_index, int dim, double x_lower_lim, double x_upper_lim, int SEED, bool ROTATE) : MultidimBenchmarkFF(problem_index, dim, x_lower_lim, x_upper_lim, SEED, ROTATE){};
     ~F9(){};
     double FitnessFunc(double *x_vec);
 };
 
-class F10 : public MultidimBenchmarkFF
+class F11 : public MultidimBenchmarkFF
 {
 public:
 
-    F10(int dim, double x_lower_lim, double x_upper_lim, int seed);
-    ~F10();
+    F11(int problem_index, int dim, double x_lower_lim, double x_upper_lim, int SEED, bool ROTATE);
+    ~F11();
     double FitnessFunc(double *x_vec);
 };
 
 
-class F11 : public MultidimBenchmarkFF
+class F10 : public MultidimBenchmarkFF
 {
 public:
-    F11(int dim, double x_lower_lim, double x_upper_lim) : MultidimBenchmarkFF(dim, x_lower_lim, x_upper_lim){};
-    ~F11(){};
+    F10(int problem_index, int dim, double x_lower_lim, double x_upper_lim, int SEED, bool ROTATE) : MultidimBenchmarkFF(problem_index, dim, x_lower_lim, x_upper_lim, SEED, ROTATE){};
+    ~F10(){};
     double FitnessFunc(double *x_vec);
 };
 

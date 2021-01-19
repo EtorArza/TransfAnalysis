@@ -26,77 +26,12 @@ using namespace std;
 
 
 
-MultidimBenchmarkFF *load_problem(int problem_index, int dim, double x_lower_lim, double x_upper_lim)
-{   
-    if (problem_index == 10)
-    {
-        std::cout << "ERROR: Problem index 10 requires seed for randomly generated instance." << endl;
-        exit(1);
-    }
-    
-    return load_problem(problem_index, dim, x_lower_lim, x_upper_lim, 2);
-}
-
-
-MultidimBenchmarkFF *load_problem(int problem_index, int dim, double x_lower_lim, double x_upper_lim, int seed_randomly_generated_instance)
-{
-    MultidimBenchmarkFF *problem;
-    switch (problem_index)
-    {
-    case 1:
-        problem = new F1(dim, x_lower_lim, x_upper_lim);
-        break;
-    case 2:
-        problem = new F2(dim, x_lower_lim, x_upper_lim);
-        break;
-    case 3:
-        problem = new F3(dim, x_lower_lim, x_upper_lim);
-        break;
-    case 4:
-        problem = new F4(dim, x_lower_lim, x_upper_lim);
-        break;
-    case 5:
-        problem = new F5(dim, x_lower_lim, x_upper_lim);
-        break;
-    case 6:
-        problem = new F6(dim, x_lower_lim, x_upper_lim);
-        break;
-    case 7:
-        problem = new F7(dim, x_lower_lim, x_upper_lim);
-        break;
-    case 8:
-        problem = new F8(dim, x_lower_lim, x_upper_lim);
-        break;
-    case 9:
-        problem = new F9(dim, x_lower_lim, x_upper_lim);
-        break;
-    case 10:
-        problem = new F10(dim, x_lower_lim, x_upper_lim, seed_randomly_generated_instance);
-        break;
-    case 11:
-        problem = new F11(dim, x_lower_lim, x_upper_lim);
-        break;
-    default:
-        cout << "Incorrect problem index, only integers between 1 and 8 allowed. problem_index = " << problem_index << "  was provided." << endl;
-        std::exit(1);
-        break;
-    }
-    return problem;
-}
-
 double FitnessFunction_real_func(class NEAT::CpuNetwork *net_original, int problem_index, int dim, int n_evals, int seed, REAL_FUNC::params *parameters)
 {
 
     double *v_of_fitness;
     MultidimBenchmarkFF *problem;
-    if (problem_index == 10)
-    {
-        problem = load_problem(problem_index, dim, parameters->X_LOWER_LIM, parameters->X_UPPER_LIM, seed);
-    }
-    else
-    {
-        problem = load_problem(problem_index, dim, parameters->X_LOWER_LIM, parameters->X_UPPER_LIM);
-    }
+    problem = load_problem(problem_index, dim, parameters->X_LOWER_LIM, parameters->X_UPPER_LIM, seed, true);
     
      
 
@@ -105,7 +40,6 @@ double FitnessFunction_real_func(class NEAT::CpuNetwork *net_original, int probl
     NEAT::CpuNetwork tmp_net = *net_original;
     NEAT::CpuNetwork *net = &tmp_net;
 
-    double best_first_it;
 
     pop = new CPopulation(problem, parameters);
     problem->load_rng(pop->rng);
@@ -145,7 +79,6 @@ double FitnessFunction_real_func(class NEAT::CpuNetwork *net_original, int probl
 #endif
         pop->rng->seed(seed + n_of_repetitions_completed);
         pop->Reset();
-        best_first_it = pop->f_best;
         int F_evals = -1;
 
         while (!pop->terminated)
