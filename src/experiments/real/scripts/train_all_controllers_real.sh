@@ -23,7 +23,7 @@ MAX_SOLVER_FE=200000
 MAX_TRAIN_ITERATIONS=800
 FULL_MODEL="false"
 
-instance_list="[1,2,3,4,5,6,7,8,9,11,1,2,3,4,5,6,7,8,9,11]"
+instance_list="[1,2,3,4,5,6,7,8,9,10,1,2,3,4,5,6,7,8,9,10]"
 dim_list="[10,10,10,10,10,10,10,10,10,10,30,30,30,30,30,30,30,30,30,30]"
 lower_list="[-10,-10,-5,-5.12,-15,-600,-5,-15,-100,-2.048,-10,-10,-5,-5.12,-15,-600,-5,-15,-100,-2.048]"
 upper_list="[5,10,10,5,30,600,10,30,100,2.048,5,10,10,5,30,600,10,30,100,2.048]"
@@ -40,7 +40,7 @@ echo "this part not executed"
 
 # Leave one out cross validation
 j=-1
-for instance_index in 1 2 3 4 5 6 7 8 9 11; do
+for instance_index in 1 2 3 4 5 6 7 8 9 10; do
     i=$((i+1))
     j=$((j+1))
 
@@ -60,7 +60,7 @@ done
 
 # Train in one
 j=-1
-for instance_index in 1 2 3 4 5 6 7 8 9 11; do
+for instance_index in 1 2 3 4 5 6 7 8 9 10; do
     i=$((i+1))
     j=$((j+1))
 
