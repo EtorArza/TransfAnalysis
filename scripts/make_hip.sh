@@ -18,7 +18,8 @@ SRC_DIR=`pwd`
 cat > Makefile.conf <<EOF
 ENABLE_CUDA=false
 DEVMODE=false
-CFLAGS=-fopenmp -std=c++11 -pthread -Wall -DNDEBUG
+CFLAGS= -std=c++11 -pthread -Wall
+PARALELLIZE=true
 
 HIPATIA=true
 PFM_LD_FLAGS=

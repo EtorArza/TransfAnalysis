@@ -16,19 +16,14 @@ C_SOURCES=$(shell find src/ -name "*.c")
 
 OBJECTS=${SOURCES:src/%.cpp=obj/cpp/%.o}
 OBJECTS+=${C_SOURCES:src/%.c=obj/c/%.o}
+OBJECTS+=${CXX_SOURCES:src/%.cxx=obj/cpp/cxx/%.o}
+
 
 LIBS=-lgomp
 DEFINES=
 
-ifeq (${ENABLE_CUDA}, true)
-	CUDA_SOURCES=$(shell find src -name "*.cu")
-	CUDA_OBJECTS=${CUDA_SOURCES:src/%.cu=obj/cu/%.o}
-	CUDA_OBJECTS+=${CXX_SOURCES:src/%.cxx=obj/cu/cxx/%.o}
-	LIBS+=-lcudart
-	DEFINES+=-DENABLE_CUDA
-else
-	OBJECTS+=${CXX_SOURCES:src/%.cxx=obj/cpp/cxx/%.o}
-endif
+
+
 
 DEPENDS=${OBJECTS:%.o=%.d}
 DEPENDS+=${CUDA_OBJECTS:%.o=%.d}
@@ -38,7 +33,7 @@ ifeq (${DEVMODE}, true)
 	NVCC_FLAGS=-G -g
 	UBSAN=-fsanitize=undefined
 else
-	OPT=-O3
+	OPT=-O3 -funroll-loops
 	MISC_FLAGS=-DNDEBUG
 	UBSAN=
 
@@ -49,7 +44,7 @@ ifeq (${PARALELLIZE}, true)
 else
 	OPENMP=
 endif
-
+CFLAGS+=${PARALELLIZE}
 
 ifeq (${HIPATIA}, true)
 	DEFINES+=-DHIPATIA
@@ -76,33 +71,9 @@ clean:
 src/util/std.h.gch: src/util/std.h Makefile.conf Makefile
 	g++ ${CC_FLAGS} -std=c++11 $< -o $@
 
-ifeq (${ENABLE_CUDA}, true)
-
-obj/cu/cxx/%.o: src/%.cxx Makefile.conf Makefile
-	@mkdir -p $(shell dirname $@)
-	${CC_CUDA} -c -x cu $< -o $@
-
-obj/cu/cxx/%.d: src/%.cxx
-	@mkdir -p $(dir $@)
-	@${CC_CUDA} -M -x cu $< > $@.tmp
-	@cat $@.tmp | sed 's,.*\.o[[:space:]]*:,$@:,g' | sed 's,\.d,\.o,' > $@
-	@rm $@.tmp
-
-obj/cu/%.o: src/%.cu Makefile.conf Makefile
-	@mkdir -p $(shell dirname $@)
-	${CC_CUDA} -c $< -o $@
-
-obj/cu/%.d: src/%.cu
-	@mkdir -p $(dir $@)
-	@${CC_CUDA} -M $< > $@.tmp
-	@cat $@.tmp | sed 's,.*\.o[[:space:]]*:,$@:,g' | sed 's,\.d,\.o,' > $@
-	@rm $@.tmp
-
-else
 obj/cpp/cxx/%.o: src/%.cxx Makefile.conf Makefile
 	@mkdir -p $(shell dirname $@)
 	g++ ${CC_FLAGS}  -std=c++11 -MMD $< -o $@
-endif
 
 obj/cpp/%.o: src/%.cpp Makefile.conf Makefile src/util/std.h.gch
 	@mkdir -p $(shell dirname $@)

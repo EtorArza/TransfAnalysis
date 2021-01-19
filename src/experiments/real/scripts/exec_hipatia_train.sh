@@ -4,8 +4,8 @@
 #SBATCH --error=err/slurm_err_%j.txt
 #SBATCH --ntasks=1 # number of tasks
 #SBATCH --ntasks-per-node=1 #number of tasks per node
-#SBATCH --mem=72G
-#SBATCH --cpus-per-task=72 # number of CPUs
+#SBATCH --mem=64G
+#SBATCH --cpus-per-task=32 # number of CPUs
 #SBATCH --time=1-05:30:00 #Walltime
 #SBATCH -p large
 
@@ -49,8 +49,10 @@ cd $SCRATCH_JOB
 cat > Makefile.conf <<EOF
 ENABLE_CUDA=false
 DEVMODE=false
-CFLAGS=-fopenmp -std=c++11 -pthread
+CFLAGS= -std=c++11 -pthread -Wall
+PARALELLIZE=true
 
+HIPATIA=true
 PFM_LD_FLAGS=
 PFM_NVCC_CCBIN=
 EOF
@@ -69,7 +71,7 @@ PROBLEM_NAME = real_func
 [NEAT]
 MAX_TRAIN_TIME = 86400
 POPSIZE = 500
-THREADS = 72
+THREADS = 32
 N_EVALS = 4
 N_REEVALS_TOP_5_PERCENT = 1
 N_EVALS_TO_UPDATE_BK = 200
