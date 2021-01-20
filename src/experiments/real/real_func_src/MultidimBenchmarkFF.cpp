@@ -74,7 +74,7 @@ double MultidimBenchmarkFF::Fitness_Func_0_1(double* x_vec_0_1){
 
     if (rotate)
     {
-        rotate_x_given_R(x_vec_0_1, local_tmp_vec);
+        rotate_x_given_R(local_tmp_vec, x_vec_0_1);
     }else
     {
         copy_array(local_tmp_vec, x_vec_0_1, this->dim);
