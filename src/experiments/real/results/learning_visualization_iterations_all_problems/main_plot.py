@@ -6,11 +6,11 @@ from sklearn.preprocessing import StandardScaler
 
 SEED=2
 SOLVER_POPSIZE=20
-MAX_SOLVER_FE=50000
+MAX_SOLVER_FE=200000
 DIM=10
-N_EVALS = 100
-N_REPS = 1
-THREADS = 7
+N_EVALS = 100 # N of repetitions averaged
+N_REPS = 1 # N of averaged repetitions repeated
+THREADS = 16
 CONTROLLER_PATH = 'src/experiments/real/results/learning_visualization_iterations_all_problems/all_controllers/'
 CONTROLLER_PREFIX = 'trained_with_all_problems_true'
 N_PROBLEMS = 10

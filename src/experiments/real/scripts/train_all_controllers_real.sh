@@ -19,7 +19,7 @@ EXPERIMENT_FOLDER_NAME="src/experiments/real/results/comparison_other_pso/contro
 SEED=2
 NEAT_POPSIZE=1000
 SOLVER_POPSIZE=20
-MAX_SOLVER_FE=100000
+MAX_SOLVER_FE=200000
 MAX_TRAIN_ITERATIONS=500
 FULL_MODEL="NULL" # need to select this 
 
