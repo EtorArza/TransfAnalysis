@@ -198,29 +198,33 @@ void CPopulation::apply_neat_output_to_individual_i(double *output_neat, int i)
 
 
 
-    // clip momentum  between -1 and 1
+    // // clip momentum  between -1 and 1
+    // for (int j = 0; j < n; j++)
+    // {
+    //     m_individuals[i]->momentum[j] = max(m_individuals[i]->momentum[j], -1.0);
+    //     m_individuals[i]->momentum[j] = min(m_individuals[i]->momentum[j], 1.0);
+    // }
+
+    // // clip values between 0 and 1
+    // for (int j = 0; j < n; j++)
+    // {   
+    //     m_individuals[i]->genome[j] = max(m_individuals[i]->genome[j], 0.0);
+    //     m_individuals[i]->genome[j] = min(m_individuals[i]->genome[j], 1.0);
+    // }
+
+
+    // clip momentum between (-K_V_MAX , K_V_MAX), do not clip m_individuals[i]->genome[j] as suggested in 'A Cooperative approach to particle swarm optimization'
+    double K_V_MAX = 0.1;
     for (int j = 0; j < n; j++)
     {
-        m_individuals[i]->momentum[j] = max(m_individuals[i]->momentum[j], -1.0);
-        m_individuals[i]->momentum[j] = min(m_individuals[i]->momentum[j], 1.0);
+        m_individuals[i]->momentum[j] = max(m_individuals[i]->momentum[j], -K_V_MAX);
+        m_individuals[i]->momentum[j] = min(m_individuals[i]->momentum[j], K_V_MAX);
     }
-
 
     sum_arrays(m_individuals[i]->genome, m_individuals[i]->genome, m_individuals[i]->momentum, n);
 
 
 
-    m_individuals[i]->amount_clipped_last_it = 0.0;
-    // clip values between 0 and 1
-    for (int j = 0; j < n; j++)
-    {   
-        // double non_clipped_value = m_individuals[i]->genome[j];
-        m_individuals[i]->genome[j] = max(m_individuals[i]->genome[j], 0.0);
-        m_individuals[i]->genome[j] = min(m_individuals[i]->genome[j], 1.0);
-        // m_individuals[i]->amount_clipped_last_it += abs(non_clipped_value - m_individuals[i]->genome[j]);
-    }
-
-    //cout << m_individuals[i]->amount_clipped_last_it << endl;
 
     this->problem->Evaluate(m_individuals[i]);
 
