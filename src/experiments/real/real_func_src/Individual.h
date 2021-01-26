@@ -54,7 +54,6 @@ public:
 	double f_best;
 	double* genome_best;
 	double* momentum;
-	double amount_clipped_last_it = 0;
 
 	// pop_info
 	double relative_pos = 0;
