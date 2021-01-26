@@ -54,7 +54,7 @@ X_UPPER_LIM = {X_UPPER_LIM}
     with open("tmp_conf_file.ini","w") as f:
         f.writelines(tmp_ini_file_string)
     
-
+results = []
 def record_results(METHOD_SHORTNAME,SOLVER_POPSIZE,PROBLEM_INDEX,PROBLEM_DIM,MAX_SOLVER_FE,X_LOWER_LIM,X_UPPER_LIM,F_COMPETITION):
     write_conf_file(METHOD_SHORTNAME, SOLVER_POPSIZE, PROBLEM_INDEX,
                     PROBLEM_DIM, MAX_SOLVER_FE, X_LOWER_LIM, X_UPPER_LIM, F_COMPETITION)
@@ -64,10 +64,14 @@ def record_results(METHOD_SHORTNAME,SOLVER_POPSIZE,PROBLEM_INDEX,PROBLEM_DIM,MAX
         res = f.readline().strip()
     res_list = eval("["+str(F_COMPETITION)+","+res+"]") # file="coparison_result.txt")
     print(METHOD_SHORTNAME, MAX_SOLVER_FE, SOLVER_POPSIZE, (X_LOWER_LIM,X_UPPER_LIM), "{:.4e}".format(res_list[0]), "{:.4e}".format(-res_list[1][0][0]), res_list[1][1], PROBLEM_DIM, sep=",")
+    results.append([METHOD_SHORTNAME, MAX_SOLVER_FE, SOLVER_POPSIZE, (X_LOWER_LIM,X_UPPER_LIM), "{:.4e}".format(res_list[0]), "{:.4e}".format(-res_list[1][0][0]), res_list[1][1], PROBLEM_DIM])
     subprocess.run("rm result.txt",shell=True)
 
 
-
+def string_number_to_tex_format(string_number_in_scientific_notation):
+    pieces = string_number_in_scientific_notation.split("e")
+    exponent = str(int(pieces[1]))
+    return "$" + pieces[0] + "\cdot 10^{" + exponent + "}$"
 
 
 df = pd.read_csv("src/experiments/real/results/comparison_other_pso/comparison_other_pso_methods.csv")
@@ -97,5 +101,11 @@ for row_index, row in df.iterrows():
             record_results(METHOD_SHORTNAME,SOLVER_POPSIZE,PROBLEM_INDEX,PROBLEM_DIM,MAX_SOLVER_FE,X_LOWER_LIM,X_UPPER_LIM,F_COMPETITION)
     
 
-        
+
+for i in range(len(results)):
+    results[i][4] = string_number_to_tex_format(results[i][4])
+    results[i][5] = string_number_to_tex_format(results[i][5])
+
+
+print("\n".join(["  &  ".join([str(item) for item in el]) for el in results]))        
 
