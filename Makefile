@@ -44,7 +44,6 @@ ifeq (${PARALELLIZE}, true)
 else
 	OPENMP=
 endif
-CFLAGS+=${PARALELLIZE}
 
 ifeq (${HIPATIA}, true)
 	DEFINES+=-DHIPATIA
