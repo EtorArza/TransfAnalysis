@@ -51,8 +51,9 @@ int main(int argc, char *argv[])
     // cout << n*n / 2 << endl;
     // exit(1);
 
+    // // Rokkonen plot function
     // char config_path[] = "src/experiments/real/real_func_src/jani_ronkkonen_problem_generator/quad_function.dat";
-    // g_seeded_initialize(config_path, 178, 2);
+    // g_seeded_initialize(config_path, 501, 2);
     // double x[2] = {stod(argv[1]),stod(argv[2])}; 
     // cout << g_calculate(x) << endl;
     // exit(0);
