@@ -70,9 +70,26 @@ def record_results(METHOD_SHORTNAME,SOLVER_POPSIZE,PROBLEM_INDEX,PROBLEM_DIM,MAX
 
 def string_number_to_tex_format(string_number_in_scientific_notation):
     pieces = string_number_in_scientific_notation.split("e")
-    exponent = str(int(pieces[1]))
-    return "$" + pieces[0] + "\cdot 10^{" + exponent + "}$"
+    exponent = str(abs(int(pieces[1])))
+    sign = "+" if int(pieces[1]) >= 0 else "-"
+    return "$" + pieces[0] + "\cdot 10^{" + sign + exponent + "}$"
 
+def get_two_numbers_to_text_highlight_smallest(string_number_in_scientific_notation1, string_number_in_scientific_notation2):
+    num1 = float(string_number_in_scientific_notation1)
+    num2 = float(string_number_in_scientific_notation2)
+
+    comp = ""
+    if num1 < num2:
+        comp = "$<$"
+    elif num1 >  num2:
+        comp = "$>$"
+    else:
+        comp = "$=$"
+    
+    string_number_in_scientific_notation1 =  string_number_to_tex_format(string_number_in_scientific_notation1)
+    string_number_in_scientific_notation2 =  string_number_to_tex_format(string_number_in_scientific_notation2)
+
+    return string_number_in_scientific_notation1 + " & " + comp + " & " + string_number_in_scientific_notation2
 
 df = pd.read_csv("src/experiments/real/results/comparison_other_pso/comparison_other_pso_methods.csv")
 
@@ -101,11 +118,17 @@ for row_index, row in df.iterrows():
             record_results(METHOD_SHORTNAME,SOLVER_POPSIZE,PROBLEM_INDEX,PROBLEM_DIM,MAX_SOLVER_FE,X_LOWER_LIM,X_UPPER_LIM,F_COMPETITION)
     
 
-
 for i in range(len(results)):
-    results[i][4] = string_number_to_tex_format(results[i][4])
-    results[i][5] = string_number_to_tex_format(results[i][5])
+    results[i][4] = str(results[i][4])
+    results[i][5] = str(results[i][5])
 
 
-print("\n".join(["  &  ".join([str(item) for item in el]) for el in results]))        
 
+list_of_tex_friendly_rows = ["  &  ".join(['F'+str(el[6]),get_two_numbers_to_text_highlight_smallest(el[4],el[5])])+r" \\" for el in results]
+
+print_color = False
+for line in list_of_tex_friendly_rows:
+    print_color = not print_color
+    if print_color:
+        print(r"\rowcolor{LightCyan}")
+    print(line)
