@@ -8,8 +8,6 @@ COMPILE_JOB_ID=`sbatch --parsable scripts/make_hip.sh --exclude=n[001-004,017-01
 SRCDIR=`pwd`
 
 
-OPTIMIZATION_TIME=0.1
-
 if false; then
 echo "this part not executed"
 # ... Code I want to skip here ...
@@ -30,7 +28,7 @@ N_EVALS=1000
 MAX_TRAIN_ITERATIONS=200
 
 standard_NEAT_POPSIZE=128
-standard_NLO=20
+standard_NLO=10
 standard_DIM=10
 standard_SOLVER_POPSIZE=20
 standard_MAX_SOLVER_FE=10000
@@ -53,7 +51,7 @@ MAX_SOLVER_FE_ARRAY=()
 
 
 i=-1
-for NLO_train in 1 4 16 64; do
+for NLO_train in 2 4 6 8 10 12 14 16 18 20 22 24 26 28 30 32 34 36 38 40; do
     i=$((i+1))
 
     NEAT_POPSIZE_ARRAY+=("${standard_NEAT_POPSIZE}")
@@ -79,7 +77,7 @@ SOLVER_POPSIZE_ARRAY=$(to_list "${SOLVER_POPSIZE_ARRAY[@]}")
 MAX_SOLVER_FE_ARRAY=$(to_list "${MAX_SOLVER_FE_ARRAY[@]}")
 
 
-
+# launch training and get JOB_ID to queue test to launch only after training is complete
 TRAINING_JOB_ID=`sbatch --parsable --dependency=afterok:${COMPILE_JOB_ID} --export=MAX_TRAIN_ITERATIONS=${MAX_TRAIN_ITERATIONS},NEAT_POPSIZE_ARRAY=$NEAT_POPSIZE_ARRAY,CONTROLLER_NAME_PREFIX_ARRAY=$CONTROLLER_NAME_PREFIX_ARRAY,EXPERIMENT_FOLDER_NAME_ARRAY=$EXPERIMENT_FOLDER_NAME_ARRAY,SEED_ARRAY=$SEED_ARRAY,PROBLEM_NLO_ARRAY=$PROBLEM_NLO_ARRAY,PROBLEM_DIM_ARRAY=$PROBLEM_DIM_ARRAY,SOLVER_POPSIZE_ARRAY=$SOLVER_POPSIZE_ARRAY,MAX_SOLVER_FE_ARRAY=$MAX_SOLVER_FE_ARRAY --array=0-$i src/experiments/real/scripts/hip_train_array_random_problem.sl`
 
 
@@ -96,8 +94,8 @@ PROBLEM_DIM_ARRAY=()
 SOLVER_POPSIZE_ARRAY=()
 MAX_SOLVER_FE_ARRAY=()
 i=-1
-for NLO_train in 1 4 16 64; do
-    for NLO_test in 1 4 16 64; do
+for NLO_train in 2 4 6 8 10 12 14 16 18 20 22 24 26 28 30 32 34 36 38 40; do
+    for NLO_test in 2 4 6 8 10 12 14 16 18 20 22 24 26 28 30 32 34 36 38 40; do
         i=$((i+1))
 
         NEAT_POPSIZE_ARRAY+=("${standard_NEAT_POPSIZE}")
@@ -143,7 +141,7 @@ MAX_SOLVER_FE_ARRAY=()
 
 
 i=-1
-for DIM_train in 2 10 50; do
+for DIM_train in 2 4 6 8 10 12 14 16 18 20 22 24 26 28 30 32 34 36 38 40; do
     i=$((i+1))
 
     NEAT_POPSIZE_ARRAY+=("${standard_NEAT_POPSIZE}")
@@ -186,8 +184,8 @@ PROBLEM_DIM_ARRAY=()
 SOLVER_POPSIZE_ARRAY=()
 MAX_SOLVER_FE_ARRAY=()
 i=-1
-for DIM_train in 1 8 64; do
-    for DIM_test in 1 8 64; do
+for DIM_train in 2 4 6 8 10 12 14 16 18 20 22 24 26 28 30 32 34 36 38 40; do
+    for DIM_test in 2 4 6 8 10 12 14 16 18 20 22 24 26 28 30 32 34 36 38 40; do
         i=$((i+1))
 
         NEAT_POPSIZE_ARRAY+=("${standard_NEAT_POPSIZE}")

@@ -98,7 +98,7 @@ mkdir -p src/experiments/real/real_func_src/jani_ronkkonen_problem_generator/
 cat > src/experiments/real/real_func_src/jani_ronkkonen_problem_generator/quad_function.dat <<EOF
 1
 1
-4
+${PROBLEM_DIM}
 1
 2
 1
