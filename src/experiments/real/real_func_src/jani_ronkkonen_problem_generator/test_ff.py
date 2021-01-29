@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 from mpl_toolkits import mplot3d 
 import subprocess
 from tqdm import tqdm as tqdm
+from joblib import Parallel, delayed
 
 N_INTERVALS = 200
 x_lower_lim = 0
@@ -40,7 +41,8 @@ print(xx)
 print(np.stack((xx,yy)).T)
 
 
-z = np.array([random_quadratic(item) for item in tqdm(np.stack((xx,yy)).T)]) + 1
+list_of_rows = Parallel(n_jobs=16)(delayed(random_quadratic)(item) for item in tqdm(np.stack((xx,yy)).T))
+z = np.array(list_of_rows) + 1
 
 print(len(xx), len(yy), len(z))
 
