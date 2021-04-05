@@ -176,6 +176,18 @@ void CPopulation::apply_neat_output_to_individual_i(double *output_neat, int i)
     normalize_vector_L1(templ_double_array3_of_size_n, m_individuals[i]->n);
     normalize_vector_L1(templ_double_array4_of_size_n, m_individuals[i]->n);
 
+    // comment to disable pow3 to output to smooth out near 0
+    int n_outputs = REAL_FUNC::__output_N;
+    if (this->full_model = false)
+    {
+        n_outputs = REAL_FUNC::__output_N_reduced_model;
+    }
+    for (size_t i = 0; i < n_outputs; i++)
+    {
+        output_neat[i] = pow(output_neat[i], 3);
+    }
+    
+
     for (int j = 0; j < n; j++)
     {
         m_individuals[i]->momentum[j] = MAX_COMPONENT_STEP_SIZE * 
