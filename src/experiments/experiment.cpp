@@ -73,6 +73,18 @@ void convert_f_values_to_ranks(vector<int> surviving_candidates, double **f_valu
     }
 }
 
+void convert_f_values_to_negative_inverse_ranks_squared(vector<int> surviving_candidates, double **f_values, double **ranks, int current_n_of_evals)
+{
+    convert_f_values_to_ranks(surviving_candidates, f_values, ranks, current_n_of_evals);
+    for (int i = 0; i < surviving_candidates.size(); i++)
+    {
+        for (int j = 0; j < current_n_of_evals; j++)
+        {
+            ranks[surviving_candidates[i]][j] = - pow(surviving_candidates.size() - ranks[surviving_candidates[i]][j] + 1, 2);
+        }
+    }
+}
+
 bool check_if_all_ranks_are_the_same(vector<int> surviving_candidates, double **ranks, int current_n_of_evals)
 {
     double **all_values;
@@ -175,7 +187,7 @@ void execute_multi(class NEAT::Network **nets_, NEAT::OrganismEvaluation *result
             cout << ", ";
             current_n_of_evals += n_evals_each_it;
 
-            convert_f_values_to_ranks(surviving_candidates, f_values, f_value_ranks, current_n_of_evals);
+            convert_f_values_to_negative_inverse_ranks_squared(surviving_candidates, f_values, f_value_ranks, current_n_of_evals);
 
 
             for (auto &&inet : surviving_candidates)
@@ -245,7 +257,7 @@ void execute_multi(class NEAT::Network **nets_, NEAT::OrganismEvaluation *result
                 f_values[nnets][f_value_sample_index] = FitnessFunction(net, seed, instance_index, parameters);
             }
             current_n_of_evals += n_evals_each_it;
-            convert_f_values_to_ranks(surviving_candidates, f_values, f_value_ranks, current_n_of_evals);
+            convert_f_values_to_negative_inverse_ranks_squared(surviving_candidates, f_values, f_value_ranks, current_n_of_evals);
             if (check_if_all_ranks_are_the_same(surviving_candidates, f_value_ranks, current_n_of_evals))
             {
                 test_result = false;
@@ -263,7 +275,7 @@ void execute_multi(class NEAT::Network **nets_, NEAT::OrganismEvaluation *result
         cout << endl;
 
 
-        convert_f_values_to_ranks(surviving_candidates, f_values, f_value_ranks, current_n_of_evals);
+        convert_f_values_to_negative_inverse_ranks_squared(surviving_candidates, f_values, f_value_ranks, current_n_of_evals);
         double avg_perf_best_last = Average(f_value_ranks[nnets], current_n_of_evals) - 1;
         double avg_perf_best_current = Average(f_value_ranks[best_current_iteration_index], current_n_of_evals) - 1;
         tmp_order[best_current_iteration_index] = 10e20;
