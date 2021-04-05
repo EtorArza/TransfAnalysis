@@ -85,9 +85,9 @@ double MultidimBenchmarkFF::Fitness_Func_0_1(double* x_vec_0_1){
 
     for (int i = 0; i < this->dim; i++)
     {   
-        assert(x_vec_0_1[i] > -0.0000001);
-        assert(x_vec_0_1[i] < 1.0000001);
-        local_tmp_vec[i] = this->get_x_lim_lower() + x_vec_0_1[i] * (this->get_x_lim_upper() - this->get_x_lim_lower());
+        // assert(x_vec_0_1[i] > -0.0000001);
+        // assert(x_vec_0_1[i] < 1.0000001);
+        local_tmp_vec[i] = this->get_x_lim_lower() + min(1.0,max(0.0,x_vec_0_1[i])) * (this->get_x_lim_upper() - this->get_x_lim_lower());
     }
 
 
