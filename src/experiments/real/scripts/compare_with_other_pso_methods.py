@@ -106,7 +106,7 @@ for row_index, row in df.iterrows():
         PROBLEM_DIM = int(row[0].split("|")[0])
         MAX_SOLVER_FE = int(row[0].split("|")[1])
         SOLVER_POPSIZE = int(row[0].split("|")[2])
-        N_REPS = int(row[0].split("|")[3])
+        N_REPS = 1 #int(row[0].split("|")[3])
         for col_index in range(1,len(row)):
             PROBLEM_INDEX = col_index # first problem is in col 1, and the problem index is 1 too.
             if  df.isnull().iloc[(problem_lims_row_index,PROBLEM_INDEX)]:

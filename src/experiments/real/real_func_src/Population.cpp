@@ -169,7 +169,7 @@ void CPopulation::apply_neat_output_to_individual_i(double *output_neat, int i)
         templ_double_array4_of_size_n[j] -= m_individuals[i]->genome[j];
     }
 
-
+    // comment to disable normalization
     normalize_vector_L1(m_individuals[i]->momentum, n);
     normalize_vector_L1(templ_double_array1_of_size_n, m_individuals[i]->n);
     normalize_vector_L1(templ_double_array2_of_size_n, m_individuals[i]->n);

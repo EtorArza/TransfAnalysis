@@ -7,12 +7,12 @@ COMPILE_JOB_ID=`sbatch --parsable scripts/make_hip.sh --exclude=n[001-004,017-01
 
 SRCDIR=`pwd`
 
-
+# #region Not executed
 if false; then
 echo "this part not executed"
 # ... Code I want to skip here ...
 fi
-
+# #endregion
 
 
 

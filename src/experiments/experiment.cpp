@@ -144,20 +144,10 @@ void execute_multi(class NEAT::Network **nets_, NEAT::OrganismEvaluation *result
             surviving_candidates.push_back(inet);
         }
 
-        const int ALPHA_INDEX_TO_UPDATE_BK = 3;
-
-        if (!parameters->neat_params->IS_LAST_ITERATION)
-        {
-            target_n_controllers_left = 1;
-            max_evals_per_controller = MAX_EVALS_PER_CONTROLLER_NEUROEVOLUTION;
-            ALPHA_INDEX = 2;
-        }
-        else
-        {
-            target_n_controllers_left = 1;
-            max_evals_per_controller = MAX_EVALS_PER_CONTROLLER_NEUROEVOLUTION;
-            ALPHA_INDEX = 2;
-        }
+        const int ALPHA_INDEX_TO_UPDATE_BK = 2;
+        target_n_controllers_left = 1;
+        max_evals_per_controller = MAX_EVALS_PER_CONTROLLER_NEUROEVOLUTION;
+        ALPHA_INDEX = 2;
 
 
 
