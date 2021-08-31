@@ -1,10 +1,14 @@
 import pandas as pd
 import subprocess
+import sys
 
 CONTROLLER_PATH = "src/experiments/real/results/comparison_other_pso/controllers_trained_on_all_problems/top_controllers/"
 N_EVALS = 30
 THREADS = 7
 
+if len(sys.argv) != 2:
+    print("ERROR: One argument required, the path to the controller to be tested.")
+    exit(1)
 
 def write_conf_file(METHOD_SHORTNAME,SOLVER_POPSIZE,PROBLEM_INDEX,PROBLEM_DIM,MAX_SOLVER_FE,X_LOWER_LIM,X_UPPER_LIM,F_COMPETITION, N_REPS):
 
@@ -15,7 +19,7 @@ def write_conf_file(METHOD_SHORTNAME,SOLVER_POPSIZE,PROBLEM_INDEX,PROBLEM_DIM,MA
         "MAX_SOLVER_FE":MAX_SOLVER_FE,
         "X_LOWER_LIM":X_LOWER_LIM,
         "X_UPPER_LIM":X_UPPER_LIM,
-        "CONTROLLER_PATH":CONTROLLER_PATH,
+        "CONTROLLER_PATH":sys.argv[1],
         "N_EVALS":N_EVALS,
         "N_REPS":N_REPS,
         "THREADS":THREADS,
@@ -29,12 +33,7 @@ PROBLEM_NAME = real_func
 THREADS = {THREADS}
 N_EVALS = {N_EVALS}
 N_REPS = {N_REPS}
-;CONTROLLER_PATH = {CONTROLLER_PATH}trained_with_all_problems_best.controller
-
-;CONTROLLER_PATH = {CONTROLLER_PATH}LeaveOutF_{PROBLEM_INDEX}_best.controller
-;CONTROLLER_PATH = {CONTROLLER_PATH}TrainOnlyInF_{PROBLEM_INDEX}_best.controller
-;CONTROLLER_PATH = {CONTROLLER_PATH}trained_with_all_problems_false_best.controller
-CONTROLLER_PATH = {CONTROLLER_PATH}trained_with_all_problems_true_best.controller
+CONTROLLER_PATH = {CONTROLLER_PATH}
 
 PRINT_POSITIONS = false
 FULL_MODEL = true
