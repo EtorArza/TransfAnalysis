@@ -2421,3 +2421,16 @@ bool are_all_values_the_same_in_matrix(double **matrix, int m, int n)
     }
     return true;
 }
+
+long long gcd(long long int a, long long int b){        
+    if(b==0)
+        return a;
+    return gcd(b,a%b);
+}
+
+long long lcm(long long int a,long long int b){     
+    if(a>b)
+        return (a/gcd(a,b))*b;
+    else
+        return (b/gcd(a,b))*a;    
+} 

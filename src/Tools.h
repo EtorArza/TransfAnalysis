@@ -1124,3 +1124,6 @@ void delete_matrix(T** &matrix, int m)
 }
 
 bool are_all_values_the_same_in_matrix(double **matrix, int m, int n);
+
+long long gcd(long long int a, long long int b);
+long long lcm(long long int a, long long int b);
