@@ -24,6 +24,7 @@ public:
     // Global variables //
     double BEST_FITNESS_TRAIN;
     double N_TIMES_BEST_FITNESS_IMPROVED_TRAIN;
+    double N_ITERATIONS_WITHOUT_FITNESS_IMPROVED;
     std::string EXPERIMENT_FOLDER_NAME;
     std::string CONTROLLER_NAME_PREFIX;
     bool DELETE_PREV_EXPERIMENT_FOLDER;

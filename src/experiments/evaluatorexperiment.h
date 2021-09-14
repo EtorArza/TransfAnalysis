@@ -112,6 +112,7 @@ namespace NEAT {
             int gen = 0;
             neat_params->BEST_FITNESS_TRAIN = -DBL_MAX;
             neat_params->N_TIMES_BEST_FITNESS_IMPROVED_TRAIN = 0;
+            neat_params->N_ITERATIONS_WITHOUT_FITNESS_IMPROVED = 0;
 
 
             neat_params->IS_LAST_ITERATION = false;
