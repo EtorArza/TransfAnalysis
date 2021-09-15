@@ -115,12 +115,16 @@ void execute_multi(class NEAT::Network **nets_, NEAT::OrganismEvaluation *result
         NEAT::CpuNetwork **nets = (NEAT::CpuNetwork **)nets_;
         double **f_values;
         double **f_value_ranks;
-        const int n_evals_each_it_discarding_most = max(n_instances, 10); 
+
+        const int n_surviving_candidates_are_considered_many = 10;
+        const int n_evals_each_it_discarding_most_with_many_surviving_candidates = 10; 
+        const int n_evals_each_it_discarding_most_with_few_surviving_candidates = 72; 
+
         int optimal_evals_each_it = (int) MAX_EVALS_PER_CONTROLLER_NEUROEVOLUTION / 8 - ((MAX_EVALS_PER_CONTROLLER_NEUROEVOLUTION / 8) % lcm(n_instances, parameters->neat_params->N_OF_THREADS));
         const int n_evals_each_it_chosing_between_two = max(optimal_evals_each_it, 64);
         int target_n_controllers_left = 1;
         int ALPHA_INDEX = 2;
-        int row_length =  MAX_EVALS_PER_CONTROLLER_NEUROEVOLUTION + n_evals_each_it_chosing_between_two*2 + n_evals_each_it_discarding_most*2;
+        int row_length =  MAX_EVALS_PER_CONTROLLER_NEUROEVOLUTION + n_evals_each_it_chosing_between_two*2 + n_evals_each_it_discarding_most_with_many_surviving_candidates*2 + n_evals_each_it_discarding_most_with_few_surviving_candidates*2;
 
         zero_initialize_matrix(f_values, nnets + 1, row_length);
         zero_initialize_matrix(f_value_ranks, nnets + 1, row_length);
@@ -145,19 +149,31 @@ void execute_multi(class NEAT::Network **nets_, NEAT::OrganismEvaluation *result
         }
 
 
-
-
-
         initial_seed = global_rng.random_integer_uniform(INT_MAX / 10);
+
+
+
+        int n_evals_each_it;
         while (surviving_candidates.size() > target_n_controllers_left && MAX_EVALS_PER_CONTROLLER_NEUROEVOLUTION > current_n_of_evals)
         {
             cout << "Evaluating -> " << std::flush;
             //cout << endl << "inet" << "," << "f_value_sample_index" << "," << "instance_index" << "," << "seed" << endl;
 
             int n_surviving_candidates = surviving_candidates.size();
-            progress_bar bar(n_surviving_candidates* n_evals_each_it_discarding_most);
+
+            if (n_surviving_candidates > n_surviving_candidates_are_considered_many)
+            {
+                n_evals_each_it = n_evals_each_it_discarding_most_with_many_surviving_candidates;
+            }
+            else
+            {
+                n_evals_each_it = n_evals_each_it_discarding_most_with_few_surviving_candidates;
+            }
+            
+
+            progress_bar bar(n_surviving_candidates* n_evals_each_it);
             #pragma omp parallel for num_threads(parameters->neat_params->N_OF_THREADS) schedule(dynamic,1)
-            for (int i = 0; i < n_surviving_candidates * n_evals_each_it_discarding_most; i++)
+            for (int i = 0; i < n_surviving_candidates * n_evals_each_it; i++)
             {
                 int inet = surviving_candidates[i % n_surviving_candidates];
                 int f_value_sample_index = i / n_surviving_candidates + current_n_of_evals;
@@ -171,7 +187,7 @@ void execute_multi(class NEAT::Network **nets_, NEAT::OrganismEvaluation *result
             }
             bar.end();
             cout << ", ";
-            current_n_of_evals += n_evals_each_it_discarding_most;
+            current_n_of_evals += n_evals_each_it;
 
             convert_f_values_to_negative_inverse_ranks_squared(surviving_candidates, f_values, f_value_ranks, current_n_of_evals);
 
@@ -284,7 +300,7 @@ void execute_multi(class NEAT::Network **nets_, NEAT::OrganismEvaluation *result
         {
             cout << ", " 
             << parameters->neat_params->N_ITERATIONS_WITHOUT_FITNESS_IMPROVED 
-            << "it since last best found";
+            << " it since last best found";
             parameters->neat_params->N_ITERATIONS_WITHOUT_FITNESS_IMPROVED++;
         }
         
