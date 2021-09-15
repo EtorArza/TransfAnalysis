@@ -101,7 +101,7 @@ bool check_if_all_ranks_are_the_same(vector<int> surviving_candidates, double **
 
 void execute_multi(class NEAT::Network **nets_, NEAT::OrganismEvaluation *results, size_t nnets, int n_instances, FF_type FitnessFunction, NEAT::CpuNetwork *&best_network, base_params *parameters)
 {
-        int n_evals_each_it = max(n_instances, 16);
+
 
         if (n_instances == 0)
         {
@@ -115,8 +115,12 @@ void execute_multi(class NEAT::Network **nets_, NEAT::OrganismEvaluation *result
         NEAT::CpuNetwork **nets = (NEAT::CpuNetwork **)nets_;
         double **f_values;
         double **f_value_ranks;
-
-        int row_length =  MAX_EVALS_PER_CONTROLLER_NEUROEVOLUTION + 2*n_evals_each_it;
+        const int n_evals_each_it_discarding_most = max(n_instances, 10); 
+        int optimal_evals_each_it = (int) MAX_EVALS_PER_CONTROLLER_NEUROEVOLUTION / 8 - ((MAX_EVALS_PER_CONTROLLER_NEUROEVOLUTION / 8) % lcm(n_instances, parameters->neat_params->N_OF_THREADS));
+        const int n_evals_each_it_chosing_between_two = max(optimal_evals_each_it, 64);
+        int target_n_controllers_left = 1;
+        int ALPHA_INDEX = 2;
+        int row_length =  MAX_EVALS_PER_CONTROLLER_NEUROEVOLUTION + n_evals_each_it_chosing_between_two*2 + n_evals_each_it_discarding_most*2;
 
         zero_initialize_matrix(f_values, nnets + 1, row_length);
         zero_initialize_matrix(f_value_ranks, nnets + 1, row_length);
@@ -132,8 +136,6 @@ void execute_multi(class NEAT::Network **nets_, NEAT::OrganismEvaluation *result
 
 
         int current_n_of_evals = 0;
-        int target_n_controllers_left = 1;
-        int ALPHA_INDEX = 2;
 
         vector<int> surviving_candidates;
 
@@ -153,9 +155,9 @@ void execute_multi(class NEAT::Network **nets_, NEAT::OrganismEvaluation *result
             //cout << endl << "inet" << "," << "f_value_sample_index" << "," << "instance_index" << "," << "seed" << endl;
 
             int n_surviving_candidates = surviving_candidates.size();
-            progress_bar bar(n_surviving_candidates* n_evals_each_it);
+            progress_bar bar(n_surviving_candidates* n_evals_each_it_discarding_most);
             #pragma omp parallel for num_threads(parameters->neat_params->N_OF_THREADS) schedule(dynamic,1)
-            for (int i = 0; i < n_surviving_candidates * n_evals_each_it; i++)
+            for (int i = 0; i < n_surviving_candidates * n_evals_each_it_discarding_most; i++)
             {
                 int inet = surviving_candidates[i % n_surviving_candidates];
                 int f_value_sample_index = i / n_surviving_candidates + current_n_of_evals;
@@ -169,7 +171,7 @@ void execute_multi(class NEAT::Network **nets_, NEAT::OrganismEvaluation *result
             }
             bar.end();
             cout << ", ";
-            current_n_of_evals += n_evals_each_it;
+            current_n_of_evals += n_evals_each_it_discarding_most;
 
             convert_f_values_to_negative_inverse_ranks_squared(surviving_candidates, f_values, f_value_ranks, current_n_of_evals);
 
@@ -221,13 +223,11 @@ void execute_multi(class NEAT::Network **nets_, NEAT::OrganismEvaluation *result
         
         current_n_of_evals = 0;
         bool test_result = true;
-        n_evals_each_it = MAX_EVALS_PER_CONTROLLER_NEUROEVOLUTION / 4 - (MAX_EVALS_PER_CONTROLLER_NEUROEVOLUTION / 4) % lcm(n_instances, parameters->neat_params->N_OF_THREADS); 
-        n_evals_each_it = max(n_evals_each_it, 64);
 
         while (test_result && current_n_of_evals < MAX_EVALS_PER_CONTROLLER_NEUROEVOLUTION)
         {
             #pragma omp parallel for num_threads(parameters->neat_params->N_OF_THREADS) schedule(dynamic,1)
-            for (int i = 0; i < n_evals_each_it; i++)
+            for (int i = 0; i < n_evals_each_it_chosing_between_two; i++)
             {
                 bar.step();
                 int instance_index =  i % n_instances;
@@ -241,7 +241,7 @@ void execute_multi(class NEAT::Network **nets_, NEAT::OrganismEvaluation *result
                 net = best_network;
                 f_values[nnets][f_value_sample_index] = FitnessFunction(net, seed, instance_index, parameters);
             }
-            current_n_of_evals += n_evals_each_it;
+            current_n_of_evals += n_evals_each_it_chosing_between_two;
             convert_f_values_to_negative_inverse_ranks_squared(surviving_candidates, f_values, f_value_ranks, current_n_of_evals);
             if (check_if_all_ranks_are_the_same(surviving_candidates, f_value_ranks, current_n_of_evals))
             {
