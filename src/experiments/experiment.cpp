@@ -120,8 +120,8 @@ void execute_multi(class NEAT::Network **nets_, NEAT::OrganismEvaluation *result
         const int n_evals_each_it_discarding_most_with_many_surviving_candidates = 10; 
         const int n_evals_each_it_discarding_most_with_few_surviving_candidates = 72; 
 
-        int optimal_evals_each_it = (int) MAX_EVALS_PER_CONTROLLER_NEUROEVOLUTION / 8 - ((MAX_EVALS_PER_CONTROLLER_NEUROEVOLUTION / 8) % lcm(n_instances, parameters->neat_params->N_OF_THREADS));
-        const int n_evals_each_it_chosing_between_two = max(optimal_evals_each_it, 64);
+        const int optimal_evals_each_it = (int) MAX_EVALS_PER_CONTROLLER_NEUROEVOLUTION / 4 - ((MAX_EVALS_PER_CONTROLLER_NEUROEVOLUTION / 4) % lcm(n_instances, parameters->neat_params->N_OF_THREADS));
+        const int n_evals_each_it_chosing_between_two = max(max(optimal_evals_each_it, 72), n_instances);
         int target_n_controllers_left = 1;
         int ALPHA_INDEX = 2;
         int row_length =  MAX_EVALS_PER_CONTROLLER_NEUROEVOLUTION + n_evals_each_it_chosing_between_two*2 + n_evals_each_it_discarding_most_with_many_surviving_candidates*2 + n_evals_each_it_discarding_most_with_few_surviving_candidates*2;
