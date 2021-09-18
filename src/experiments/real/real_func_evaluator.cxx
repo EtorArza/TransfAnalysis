@@ -23,7 +23,7 @@
 
 using namespace std;
 // #define COUNTER
-
+#define CURRICULUM_LEARNING
 
 
 double FitnessFunction_real_func(class NEAT::CpuNetwork *net_original, int problem_index, int dim, int n_evals, int seed, REAL_FUNC::params *parameters)
@@ -179,7 +179,24 @@ namespace REAL_FUNC
 // fitness function in sequential order
 double FitnessFunction(NEAT::CpuNetwork *net, int seed, int instance_index, base_params *parameters)
 {
+
     REAL_FUNC::params tmp_params = *static_cast<REAL_FUNC::params*>(parameters);
+    #ifdef CURRICULUM_LEARNING
+        const double min_progress = 0.001;
+        #ifdef HIPATIA
+            double progress = (double) get_runtime_hipatia() / (double) neat_params->MAX_TRAIN_TIME; 
+        #else
+            double progress = (double) parameters->neat_params->global_timer.toc() / (double) parameters->neat_params->MAX_TRAIN_TIME;
+        #endif
+        double max_evals = tmp_params.MAX_SOLVER_FE * (min(pow(progress, 4.0),1.0) + min_progress)/(1+min_progress); 
+        tmp_params.MAX_SOLVER_FE = max((int) max_evals, tmp_params.SOLVER_POPSIZE * 10);
+        static int counter = 0;
+        counter++;
+        if (counter % 10000 == 0)
+        {
+            cout << "\n[N evals: " << tmp_params.MAX_SOLVER_FE << "]" <<endl;
+        }
+    #endif 
     tmp_params.PROBLEM_INDEX = (*tmp_params.PROBLEM_INDEX_LIST)[instance_index];
     tmp_params.PROBLEM_DIM = (*tmp_params.PROBLEM_DIM_LIST)[instance_index];
     tmp_params.X_LOWER_LIM = (*tmp_params.X_LOWER_LIST)[instance_index];
