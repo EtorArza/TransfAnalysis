@@ -184,7 +184,7 @@ double FitnessFunction(NEAT::CpuNetwork *net, int seed, int instance_index, base
     #ifdef CURRICULUM_LEARNING
         const double min_progress = 0.001;
         #ifdef HIPATIA
-            double progress = (double) get_runtime_hipatia() / (double) neat_params->MAX_TRAIN_TIME; 
+            double progress = (double) get_runtime_hipatia() / (double) parameters->neat_params->MAX_TRAIN_TIME; 
         #else
             double progress = (double) parameters->neat_params->global_timer.toc() / (double) parameters->neat_params->MAX_TRAIN_TIME;
         #endif
