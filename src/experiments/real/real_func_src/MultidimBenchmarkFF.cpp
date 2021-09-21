@@ -287,7 +287,7 @@ double F9::FitnessFunc(double* x_vec){
 
 
 static int current_jobs_with_this_seed = 0;
-F11::F11(int problem_index, int dim, double x_lower_lim, double x_upper_lim, int SEED, bool ROTATE)  : MultidimBenchmarkFF(problem_index, dim, x_lower_lim, x_upper_lim, SEED, ROTATE)
+FRandomlyGenerated::FRandomlyGenerated(int problem_index, int dim, double x_lower_lim, double x_upper_lim, int SEED, bool ROTATE)  : MultidimBenchmarkFF(problem_index, dim, x_lower_lim, x_upper_lim, SEED, ROTATE)
 {
     char config_path[] = "src/experiments/real/real_func_src/jani_ronkkonen_problem_generator/quad_function.dat";
 
@@ -330,7 +330,7 @@ F11::F11(int problem_index, int dim, double x_lower_lim, double x_upper_lim, int
 };
 
 
-F11::~F11()
+FRandomlyGenerated::~FRandomlyGenerated()
 {
     #pragma omp critical(adshfafoiadfoak)
     {
@@ -340,7 +340,7 @@ F11::~F11()
 };
 
 
-double F11::FitnessFunc(double* x_vec)
+double FRandomlyGenerated::FitnessFunc(double* x_vec)
 {
     return g_calculate(x_vec);
 }
@@ -458,6 +458,9 @@ MultidimBenchmarkFF *load_problem(int problem_index, int dim, double x_lower_lim
     MultidimBenchmarkFF *problem;
     switch (problem_index)
     {
+    case 0:
+        problem = new FRandomlyGenerated(problem_index, dim, x_lower_lim, x_upper_lim, SEED, ROTATE);
+        break;
     case 1:
         problem = new F1(problem_index, dim, x_lower_lim, x_upper_lim, SEED, ROTATE);
         break;
@@ -487,9 +490,6 @@ MultidimBenchmarkFF *load_problem(int problem_index, int dim, double x_lower_lim
         break;
     case 10:
         problem = new F10(problem_index, dim, x_lower_lim, x_upper_lim, SEED, ROTATE);
-        break;
-    case 11:
-        problem = new F11(problem_index, dim, x_lower_lim, x_upper_lim, SEED, ROTATE);
         break;
     default:
         cout << "Incorrect problem index, only integers between 1 and 8 allowed. problem_index = " << problem_index << "  was provided." << endl;

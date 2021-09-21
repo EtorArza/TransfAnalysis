@@ -54,6 +54,16 @@ class MultidimBenchmarkFF
 MultidimBenchmarkFF* load_problem(int problem_index, int dim, double x_lower_lim, double x_upper_lim);
 MultidimBenchmarkFF* load_problem(int problem_index, int dim, double x_lower_lim, double x_upper_lim, int SEED, bool ROTATE);
 
+class FRandomlyGenerated : public MultidimBenchmarkFF
+{
+public:
+
+    FRandomlyGenerated(int problem_index, int dim, double x_lower_lim, double x_upper_lim, int SEED, bool ROTATE);
+    ~FRandomlyGenerated();
+    double FitnessFunc(double *x_vec);
+};
+
+
 class F1 : public MultidimBenchmarkFF
 {
 public:
@@ -125,16 +135,6 @@ public:
     ~F9(){};
     double FitnessFunc(double *x_vec);
 };
-
-class F11 : public MultidimBenchmarkFF
-{
-public:
-
-    F11(int problem_index, int dim, double x_lower_lim, double x_upper_lim, int SEED, bool ROTATE);
-    ~F11();
-    double FitnessFunc(double *x_vec);
-};
-
 
 class F10 : public MultidimBenchmarkFF
 {
