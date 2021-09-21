@@ -116,15 +116,10 @@ void execute_multi(class NEAT::Network **nets_, NEAT::OrganismEvaluation *result
         double **f_values;
         double **f_value_ranks;
 
-        const int n_surviving_candidates_are_considered_many = 72;
-        const int n_evals_each_it_discarding_most_with_many_surviving_candidates = 10; 
-        const int n_evals_each_it_discarding_most_with_few_surviving_candidates = 72; 
-
-        const int optimal_evals_each_it = (int) MAX_EVALS_PER_CONTROLLER_COMPARE_AGAINST_BEST_FOUND / 4 - ((MAX_EVALS_PER_CONTROLLER_COMPARE_AGAINST_BEST_FOUND / 4) % lcm(n_instances, parameters->neat_params->N_OF_THREADS));
-        const int n_evals_each_it_chosing_between_two = max(max(optimal_evals_each_it, 72), n_instances);
-        int target_n_controllers_left = 1;
         int ALPHA_INDEX = 2;
-        int row_length =  max(MAX_EVALS_PER_CONTROLLER_COMPARE_AGAINST_BEST_FOUND, MAX_EVALS_PER_CONTROLLER_SELECTION) + n_evals_each_it_chosing_between_two*2 + n_evals_each_it_discarding_most_with_many_surviving_candidates*2 + n_evals_each_it_discarding_most_with_few_surviving_candidates*2;
+        int target_n_controllers_left = 1;
+        int row_length =  MAX_EVALS_PER_CONTROLLER;
+        int n_evals_each_it = n_instances;
 
         zero_initialize_matrix(f_values, nnets + 1, row_length);
         zero_initialize_matrix(f_value_ranks, nnets + 1, row_length);
@@ -153,22 +148,12 @@ void execute_multi(class NEAT::Network **nets_, NEAT::OrganismEvaluation *result
 
 
 
-        int n_evals_each_it;
-        while (surviving_candidates.size() > target_n_controllers_left && MAX_EVALS_PER_CONTROLLER_SELECTION > current_n_of_evals)
+        while (surviving_candidates.size() > target_n_controllers_left && MAX_EVALS_PER_CONTROLLER > current_n_of_evals)
         {
             cout << "Evaluating -> " << std::flush;
             //cout << endl << "inet" << "," << "f_value_sample_index" << "," << "instance_index" << "," << "seed" << endl;
 
             int n_surviving_candidates = surviving_candidates.size();
-
-            if (n_surviving_candidates > n_surviving_candidates_are_considered_many)
-            {
-                n_evals_each_it = n_evals_each_it_discarding_most_with_many_surviving_candidates;
-            }
-            else
-            {
-                n_evals_each_it = n_evals_each_it_discarding_most_with_few_surviving_candidates;
-            }
             
 
             progress_bar bar(n_surviving_candidates* n_evals_each_it);
@@ -235,15 +220,15 @@ void execute_multi(class NEAT::Network **nets_, NEAT::OrganismEvaluation *result
         surviving_candidates.push_back(nnets);
         
         cout << "Reevaluating best -> ";
-        progress_bar bar(MAX_EVALS_PER_CONTROLLER_COMPARE_AGAINST_BEST_FOUND);
+        progress_bar bar(MAX_EVALS_PER_CONTROLLER);
         
         current_n_of_evals = 0;
         bool test_result = true;
 
-        while (test_result && current_n_of_evals < MAX_EVALS_PER_CONTROLLER_COMPARE_AGAINST_BEST_FOUND)
+        while (test_result && current_n_of_evals < MAX_EVALS_PER_CONTROLLER)
         {
             #pragma omp parallel for num_threads(parameters->neat_params->N_OF_THREADS) schedule(dynamic,1)
-            for (int i = 0; i < n_evals_each_it_chosing_between_two; i++)
+            for (int i = 0; i < MAX_EVALS_PER_CONTROLLER; i++)
             {
                 bar.step();
                 int instance_index =  i % n_instances;
@@ -257,7 +242,7 @@ void execute_multi(class NEAT::Network **nets_, NEAT::OrganismEvaluation *result
                 net = best_network;
                 f_values[nnets][f_value_sample_index] = FitnessFunction(net, seed, instance_index, parameters);
             }
-            current_n_of_evals += n_evals_each_it_chosing_between_two;
+            current_n_of_evals += MAX_EVALS_PER_CONTROLLER;
             convert_f_values_to_negative_inverse_ranks_squared(surviving_candidates, f_values, f_value_ranks, current_n_of_evals);
             if (check_if_all_ranks_are_the_same(surviving_candidates, f_value_ranks, current_n_of_evals))
             {

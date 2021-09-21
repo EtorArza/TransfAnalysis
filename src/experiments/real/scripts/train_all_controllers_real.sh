@@ -17,10 +17,10 @@ SRCDIR=`pwd`
 ######################## LOOCV TRAINING #################################
 EXPERIMENT_FOLDER_NAME="src/experiments/real/results/comparison_other_pso/controllers_trained_on_all_problems"
 SEED=2
-NEAT_POPSIZE=1000
+NEAT_POPSIZE=500
 SOLVER_POPSIZE=20
-MAX_SOLVER_FE=200000
-MAX_TRAIN_ITERATIONS=50000000
+MAX_SOLVER_FE=20000
+MAX_TRAIN_ITERATIONS=500
 MAX_TRAIN_TIME=345600 # 4 days
 FULL_MODEL="NULL" # need to select this 
 

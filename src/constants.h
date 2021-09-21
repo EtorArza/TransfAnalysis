@@ -1,8 +1,7 @@
 #pragma once
 #include <limits.h>
 
-#define MAX_EVALS_PER_CONTROLLER_SELECTION 200
-#define MAX_EVALS_PER_CONTROLLER_COMPARE_AGAINST_BEST_FOUND 2000
+#define MAX_EVALS_PER_CONTROLLER 2000
 
 
 #define MAX(A, B) ((A > B) ? A : B)

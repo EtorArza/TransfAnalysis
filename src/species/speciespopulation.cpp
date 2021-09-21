@@ -239,14 +239,12 @@ void SpeciesPopulation::next_generation() {
             highest_last_changed=0;
             new_highest_fitness = true;
 
-            printf("NEW POPULATION (ADJUSTED) RECORD FITNESS: %lg, delta=%lg @ gen=%d\n",
-                   highest_fitness, highest_fitness - old_highest, generation);
+            //printf("NEW POPULATION (ADJUSTED) RECORD FITNESS: %lg, delta=%lg @ gen=%d\n", highest_fitness, highest_fitness - old_highest, generation);
         } else {
             ++highest_last_changed;
             new_highest_fitness = false;
 
-            printf("%zu generations since last population (adjusted) fitness record: %lg\n",
-                   size_t(highest_last_changed), highest_fitness);
+            //printf("%zu generations since last population (adjusted) fitness record: %lg\n", size_t(highest_last_changed), highest_fitness);
         }
     }
 

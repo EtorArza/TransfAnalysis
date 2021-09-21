@@ -178,7 +178,7 @@ void CPopulation::apply_neat_output_to_individual_i(double *output_neat, int i)
 
     // comment to disable pow3 to output to smooth out near 0
     int n_outputs = REAL_FUNC::__output_N;
-    if (this->full_model = false)
+    if (!this->full_model)
     {
         n_outputs = REAL_FUNC::__output_N_reduced_model;
     }
