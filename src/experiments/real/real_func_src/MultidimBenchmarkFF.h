@@ -51,8 +51,7 @@ class MultidimBenchmarkFF
 
 };
 
-MultidimBenchmarkFF* load_problem_with_default_lims(int problem_index, int dim);
-MultidimBenchmarkFF* load_problem(int problem_index, int dim, double x_lower_lim, double x_upper_lim);
+MultidimBenchmarkFF* load_problem_with_default_lims(int problem_index, int dim,  int SEED, bool ROTATE);
 MultidimBenchmarkFF* load_problem(int problem_index, int dim, double x_lower_lim, double x_upper_lim, int SEED, bool ROTATE);
 
 class FRandomlyGenerated : public MultidimBenchmarkFF

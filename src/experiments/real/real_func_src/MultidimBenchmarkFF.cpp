@@ -589,20 +589,11 @@ void MultidimBenchmarkFF::rotate_x_given_R(double *res_x_rotated, double *x)
     }
 }
 
-MultidimBenchmarkFF *load_problem(int problem_index, int dim, double x_lower_lim, double x_upper_lim)
-{   
-    if (problem_index == 0)
-    {
-        std::cout << "ERROR: Randomly initialized problem requires seed for randomly generated instance." << endl;
-        exit(1);
-    }
-    
-    return load_problem(problem_index, dim, x_lower_lim, x_upper_lim, 2, false);
-}
 
 
 
-MultidimBenchmarkFF* load_problem_with_default_lims(int problem_index, int dim)
+
+MultidimBenchmarkFF* load_problem_with_default_lims(int problem_index, int dim,  int SEED, bool ROTATE)
 {
 
     // Sphere (bowl-shaped) [-5.12,5.12]
@@ -626,6 +617,10 @@ MultidimBenchmarkFF* load_problem_with_default_lims(int problem_index, int dim)
 
     switch (problem_index)
     {
+    case 0:
+        x_lower_lim = 0;
+        x_upper_lim = 1;
+        break;
     case 1:
         x_lower_lim = -5.12;
         x_upper_lim = 5.12;
@@ -697,7 +692,7 @@ MultidimBenchmarkFF* load_problem_with_default_lims(int problem_index, int dim)
     }
 
 
-    return load_problem(problem_index, dim, x_lower_lim, x_upper_lim);
+    return load_problem(problem_index, dim, x_lower_lim, x_upper_lim, SEED, ROTATE);
 
 
 }
