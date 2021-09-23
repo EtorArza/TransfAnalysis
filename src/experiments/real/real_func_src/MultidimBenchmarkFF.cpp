@@ -131,7 +131,7 @@ void MultidimBenchmarkFF::Evaluate(CIndividual *indiv)
 
 
 
-// Sphere
+// Sphere (bowl-shaped) [-5.12,5.12]
 double F1::FitnessFunc(double* x_vec){
     double res = 0;
     for (int i = 0; i < dim; i++)
@@ -142,8 +142,67 @@ double F1::FitnessFunc(double* x_vec){
 }
 
 
-// Dixon & price
+// ROTATED HYPER-ELLIPSOID (bowl-shaped) [-65.536, 65.536]
 double F2::FitnessFunc(double* x_vec){
+    double res = 0;
+    double sum_of_x_j = 0;
+    for (int i = 0; i < dim; i++)
+    {   
+        sum_of_x_j += x_vec[i] * x_vec[i];
+        res += x_vec[i] * x_vec[i];
+    }
+    return res;
+}
+
+
+// TRID FUNCTION (bowl-shaped) [-4, 4]
+double F3::FitnessFunc(double* x_vec){
+    double res = 0;
+    double sum_of_x_j = 0;
+
+	
+    double sum1 = 0;
+    double sum2 = 0;
+ 
+    for (int i = 0; i < dim; i++)
+    {   
+        sum1 += pow(x_vec[i]-1,2);
+    }
+
+    for (int i = 1; i < dim; i++)
+    {   
+        sum2 += x_vec[i]*x_vec[i-1];
+    }
+
+    return sum1 - sum2;
+}
+
+
+// PERM FUNCTION 0, D, BETA (bowl-shaped) [-2, 2]
+double F4::FitnessFunc(double* x_vec){
+    double res = 0;
+    double sum_of_x_j = 0;
+
+	double b = 10;
+    double outer = 0;
+
+    for (int i=1; i<= dim;i++)
+    {
+       double inner = 0;
+        for (int j=1; j<= dim;j++)
+        {
+            double xj = x_vec[j - 1];
+            inner = inner + (j+b)*(pow(xj,i)-pow(1/j,i));
+        }
+        outer = outer + pow(inner,2);
+    }
+    return outer;
+}
+ 
+
+
+// Dixon & price (valley-shaped) [-10,10]
+double F5::FitnessFunc(double* x_vec){
     double res = (x_vec[0] - 1.0) * (x_vec[0] - 1.0);
     for (int i = 2; i <= dim; i++)
     {
@@ -153,9 +212,73 @@ double F2::FitnessFunc(double* x_vec){
 }
 
 
+// Rosenbrock (valley-shaped) [-5, 10]
+double F6::FitnessFunc(double* x_vec){
+    double res = 0.0;
 
-// Zakharov
-double F3::FitnessFunc(double* x_vec){
+    for (int i = 0; i < dim-1; i++)
+    {
+        res += 100.0 * 
+        (x_vec[i]*x_vec[i] - x_vec[i+1]) * 
+        (x_vec[i]*x_vec[i] - x_vec[i+1]) + 
+        (x_vec[i] - 1.0) * 
+        (x_vec[i] - 1.0);
+    }
+
+    return res;
+}
+
+
+// six hump cammel funcion (valley-shaped) [-3,3]
+double F7::FitnessFunc(double* x_vec){
+    double res = 0;
+    double tmp;
+    if(dim != 2)
+    {
+        cout << "\nERROR: cammel function is only available when dim = 2." << endl;
+        exit(1);
+    }
+
+    double x1 = x_vec[0];
+    double x2 = x_vec[1];
+	
+  res += (4-2.1*pow(x1,2)+pow(x1,4)/3) * pow(x1,2);
+  res+= x1*x2;
+  res+= (-4+4*pow(x2,2)) * pow(x2,2);
+	
+
+   return res;
+}
+
+
+// three hump cammel funcion (valley-shaped) [-5,5]
+double F8::FitnessFunc(double* x_vec){
+    double res = 0;
+    double tmp;
+    if(dim != 2)
+    {
+        cout << "\nERROR: cammel function is only available when dim = 2." << endl;
+        exit(1);
+    }
+
+    double x1 = x_vec[0];
+    double x2 = x_vec[1];
+	
+    res+= 2*pow(x1,2);
+    res+= -1.05*pow(x1,4);
+    res+= pow(x1,6) / 6;
+    res+= x1*x2;
+    res+= pow(x2,2);
+	
+
+   return res;
+}
+
+
+
+
+// Zakharov (plate-shaped) [-5, 10]
+double F9::FitnessFunc(double* x_vec){
     double val_1 = 0.0;
     double val_2 = 0.0;
     
@@ -173,8 +296,77 @@ double F3::FitnessFunc(double* x_vec){
 }
 
 
-// Rastrigin
-double F4::FitnessFunc(double* x_vec){
+
+
+// booth function (plate-shaped) [-10, 10]
+double F10::FitnessFunc(double* x_vec){
+    double res = 0;
+    double tmp;
+    if(dim != 2)
+    {
+        cout << "\nERROR: cammel function is only available when dim = 2." << endl;
+        exit(1);
+    }
+
+    double x1 = x_vec[0];
+    double x2 = x_vec[1];
+	
+
+
+    res += pow(x1 + 2*x2 - 7,2);
+    res += pow(2*x1 + x2 - 5,2);
+
+
+   return res;
+}
+
+
+// matyas function (plate-shaped) [-10, 10]
+double F11::FitnessFunc(double* x_vec){
+    double res = 0;
+    double tmp;
+    if(dim != 2)
+    {
+        cout << "\nERROR: cammel function is only available when dim = 2." << endl;
+        exit(1);
+    }
+
+    double x1 = x_vec[0];
+    double x2 = x_vec[1];
+	
+    res = 0.26*(x1*x1 + x2*x2) - 0.48*x1*x2;
+
+   return res;
+}
+
+
+// MCCORMICK function (plate-shaped) [-3, 4]
+double F12::FitnessFunc(double* x_vec){
+    double res = 0;
+    double tmp;
+    if(dim != 2)
+    {
+        cout << "\nERROR: cammel function is only available when dim = 2." << endl;
+        exit(1);
+    }
+
+    double x1 = x_vec[0];
+    double x2 = x_vec[1];
+	
+    res += sin(x1+x2);
+    res += pow(x1 -x2,2);
+    res += -1.5*x1 +2.5*x2 +1;
+    return res;
+}
+
+
+
+
+
+
+
+// Rastrigin (many local optima) [-5.12, 5.12]
+double F13::FitnessFunc(double* x_vec){
     double res = (double) 10 * dim;
 
     for (int i = 0; i < dim; i++)
@@ -186,8 +378,8 @@ double F4::FitnessFunc(double* x_vec){
 }
 
 
-// Levy
-double F5::FitnessFunc(double* x_vec){
+// Levy (many local optima) [-10, 10]
+double F14::FitnessFunc(double* x_vec){
     double w_1 = 1.0 + (x_vec[0] - 1.0)/4.0;
     double res = sin(M_PI * w_1) * sin(M_PI * w_1);
 
@@ -206,8 +398,8 @@ double F5::FitnessFunc(double* x_vec){
 
 
 
-// Griewank
-double F6::FitnessFunc(double* x_vec){
+// Griewank (many local optima) [-600,600]
+double F15::FitnessFunc(double* x_vec){
     double val_1 = 0.0;
     for (int i = 0; i < dim; i++)
     {
@@ -227,27 +419,10 @@ double F6::FitnessFunc(double* x_vec){
 }
 
 
-// Rosenbrock
-double F7::FitnessFunc(double* x_vec){
-    double res = 0.0;
-
-    for (int i = 0; i < dim-1; i++)
-    {
-        res += 100.0 * 
-        (x_vec[i]*x_vec[i] - x_vec[i+1]) * 
-        (x_vec[i]*x_vec[i] - x_vec[i+1]) + 
-        (x_vec[i] - 1.0) * 
-        (x_vec[i] - 1.0);
-    }
 
 
-
-    return res;
-}
-
-
-// Ackley
-double F8::FitnessFunc(double* x_vec){
+// Ackley (many local optima) [-32.768, 32.768]
+double F16::FitnessFunc(double* x_vec){
     double sum_1 = 0.0;
     double sum_2 = 0.0;
 
@@ -269,21 +444,6 @@ double F8::FitnessFunc(double* x_vec){
     return 20.0 + exp(1) + sum_1 + sum_2;
 }
 
-// Quadratic
-double F9::FitnessFunc(double* x_vec){
-    double res = 0;
-    double tmp;
-    for (int i = 0; i < dim; i++)
-    {
-        tmp = 0;
-        for (int j = 0; j < i+1; j++)
-        {
-            tmp += x_vec[j];
-        }
-        res += tmp * tmp;
-    }
-    return res;
-}
 
 
 static int current_jobs_with_this_seed = 0;
@@ -347,18 +507,6 @@ double FRandomlyGenerated::FitnessFunc(double* x_vec)
 
 
 
-// Rosembrock EZ
-double F10::FitnessFunc(double* x_vec){
-    
-    double res = 0;
-
-    for (int i = 1; i <= dim/2; i++)
-    {
-        res += (100.0*pow(x_vec[2*i - 1]- x_vec[2*i -2]* x_vec[2*i -2],2) + pow(1.0 - x_vec[2*i -2],2)  );
-    }
-    return res;
-
-}
 
 
 void MultidimBenchmarkFF::getRandomRotationMatrix(int SEED)
@@ -443,9 +591,9 @@ void MultidimBenchmarkFF::rotate_x_given_R(double *res_x_rotated, double *x)
 
 MultidimBenchmarkFF *load_problem(int problem_index, int dim, double x_lower_lim, double x_upper_lim)
 {   
-    if (problem_index == 11)
+    if (problem_index == 0)
     {
-        std::cout << "ERROR: Problem index 11 requires seed for randomly generated instance." << endl;
+        std::cout << "ERROR: Randomly initialized problem requires seed for randomly generated instance." << endl;
         exit(1);
     }
     
@@ -491,6 +639,25 @@ MultidimBenchmarkFF *load_problem(int problem_index, int dim, double x_lower_lim
     case 10:
         problem = new F10(problem_index, dim, x_lower_lim, x_upper_lim, SEED, ROTATE);
         break;
+    case 11:
+        problem = new F11(problem_index, dim, x_lower_lim, x_upper_lim, SEED, ROTATE);
+        break;
+    case 12:
+        problem = new F12(problem_index, dim, x_lower_lim, x_upper_lim, SEED, ROTATE);
+        break;
+    case 13:
+        problem = new F13(problem_index, dim, x_lower_lim, x_upper_lim, SEED, ROTATE);
+        break;
+    case 14:
+        problem = new F14(problem_index, dim, x_lower_lim, x_upper_lim, SEED, ROTATE);
+        break;
+    case 15:
+        problem = new F15(problem_index, dim, x_lower_lim, x_upper_lim, SEED, ROTATE);
+        break;
+    case 16:
+        problem = new F16(problem_index, dim, x_lower_lim, x_upper_lim, SEED, ROTATE);
+        break;
+
     default:
         cout << "Incorrect problem index, only integers between 1 and 8 allowed. problem_index = " << problem_index << "  was provided." << endl;
         std::exit(1);
