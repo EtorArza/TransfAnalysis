@@ -138,7 +138,7 @@ double F1::FitnessFunc(double* x_vec){
     {
         res += x_vec[i] * x_vec[i];
     }
-    return res;
+    return -res;
 }
 
 
@@ -151,7 +151,7 @@ double F2::FitnessFunc(double* x_vec){
         sum_of_x_j += x_vec[i] * x_vec[i];
         res += x_vec[i] * x_vec[i];
     }
-    return res;
+    return -res;
 }
 
 
@@ -173,8 +173,8 @@ double F3::FitnessFunc(double* x_vec){
     {   
         sum2 += x_vec[i]*x_vec[i-1];
     }
-
-    return sum1 - sum2;
+    res = sum1 - sum2;
+    return -1000 - res ; // make sure it is negative
 }
 
 
@@ -196,7 +196,8 @@ double F4::FitnessFunc(double* x_vec){
         }
         outer = outer + pow(inner,2);
     }
-    return outer;
+    res = outer;
+    return -res;    
 }
  
 
@@ -208,7 +209,7 @@ double F5::FitnessFunc(double* x_vec){
     {
         res += (double) i * (2.0 * x_vec[i-1] * x_vec[i-1] - x_vec[i-2]) * (2.0 * x_vec[i-1] * x_vec[i-1] - x_vec[i-2]);
     }
-    return res;
+    return -  res;
 }
 
 
@@ -225,7 +226,7 @@ double F6::FitnessFunc(double* x_vec){
         (x_vec[i] - 1.0);
     }
 
-    return res;
+    return -res;
 }
 
 
@@ -247,7 +248,7 @@ double F7::FitnessFunc(double* x_vec){
   res+= (-4+4*pow(x2,2)) * pow(x2,2);
 	
 
-   return res;
+   return -1000 - res;
 }
 
 
@@ -271,7 +272,7 @@ double F8::FitnessFunc(double* x_vec){
     res+= pow(x2,2);
 	
 
-   return res;
+   return -1000 - res;
 }
 
 
@@ -279,6 +280,7 @@ double F8::FitnessFunc(double* x_vec){
 
 // Zakharov (plate-shaped) [-5, 10]
 double F9::FitnessFunc(double* x_vec){
+    double res = 0;
     double val_1 = 0.0;
     double val_2 = 0.0;
     
@@ -292,7 +294,8 @@ double F9::FitnessFunc(double* x_vec){
         val_2 += (0.5 * i * x_vec[i-1]); 
     }
 
-    return val_1 + (val_2 * val_2) + (val_2 * val_2 * val_2 * val_2);
+    res = val_1 + (val_2 * val_2) + (val_2 * val_2 * val_2 * val_2);
+    return -res;
 }
 
 
@@ -317,7 +320,7 @@ double F10::FitnessFunc(double* x_vec){
     res += pow(2*x1 + x2 - 5,2);
 
 
-   return res;
+   return -res;
 }
 
 
@@ -336,7 +339,7 @@ double F11::FitnessFunc(double* x_vec){
 	
     res = 0.26*(x1*x1 + x2*x2) - 0.48*x1*x2;
 
-   return res;
+   return -res;
 }
 
 
@@ -356,7 +359,7 @@ double F12::FitnessFunc(double* x_vec){
     res += sin(x1+x2);
     res += pow(x1 -x2,2);
     res += -1.5*x1 +2.5*x2 +1;
-    return res;
+    return -1000 - res;
 }
 
 
@@ -374,7 +377,7 @@ double F13::FitnessFunc(double* x_vec){
         res += x_vec[i] * x_vec[i] - 10.0 * cos(2.0 * M_PI * x_vec[i]);
     }
 
-    return res;
+    return -res;
 }
 
 
@@ -393,7 +396,7 @@ double F14::FitnessFunc(double* x_vec){
 
     res += (w_d - 1.0) * (w_d - 1.0) * (1.0 + pow(sin(2.0 * M_PI * w_d), 2.0));
 
-    return res;
+    return -res;
 }
 
 
@@ -415,7 +418,7 @@ double F15::FitnessFunc(double* x_vec){
 
     double res = 1.0 + val_1 - val_2;
 
-    return res;
+    return -res;
 }
 
 
@@ -423,6 +426,7 @@ double F15::FitnessFunc(double* x_vec){
 
 // Ackley (many local optima) [-32.768, 32.768]
 double F16::FitnessFunc(double* x_vec){
+    double res = 0;
     double sum_1 = 0.0;
     double sum_2 = 0.0;
 
@@ -440,8 +444,8 @@ double F16::FitnessFunc(double* x_vec){
 
     sum_2 = -exp(sum_2 / (double) dim);
 
-
-    return 20.0 + exp(1) + sum_1 + sum_2;
+    res = 20.0 + exp(1) + sum_1 + sum_2;
+    return -res;
 }
 
 
