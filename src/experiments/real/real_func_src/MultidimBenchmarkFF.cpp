@@ -601,6 +601,109 @@ MultidimBenchmarkFF *load_problem(int problem_index, int dim, double x_lower_lim
 }
 
 
+
+MultidimBenchmarkFF* load_problem_with_default_lims(int problem_index, int dim)
+{
+
+    // Sphere (bowl-shaped) [-5.12,5.12]
+    // ROTATED HYPER-ELLIPSOID (bowl-shaped) [-65.536, 65.536]
+    // TRID FUNCTION (bowl-shaped) [-4.0, 4.0]
+    // PERM FUNCTION 0, D, BETA (bowl-shaped) [-2.0, 2.0]
+    // Dixon & price (valley-shaped) [-10.0,10.0]
+    // Rosenbrock (valley-shaped) [-5.0, 10.0]
+    // six hump cammel funcion (valley-shaped) [-3.0,3.0]
+    // three hump cammel funcion (valley-shaped) [-5.0,5.0]
+    // Zakharov (plate-shaped) [-5.0, 10.0]
+    // booth function (plate-shaped) [-10.0, 10.0]
+    // matyas function (plate-shaped) [-10.0, 10.0]
+    // MCCORMICK function (plate-shaped) [-3.0, 4.0]
+    // Rastrigin (many local optima) [-5.12, 5.12]
+    // Levy (many local optima) [-10.0, 10.0]
+    // Griewank (many local optima) [-600.0,600.0]
+    // Ackley (many local optima) [-32.768, 32.768]
+    double x_lower_lim;
+    double x_upper_lim;
+
+    switch (problem_index)
+    {
+    case 1:
+        x_lower_lim = -5.12;
+        x_upper_lim = 5.12;
+        break;
+    case 2:
+        x_lower_lim = -65.536;
+        x_upper_lim = 65.536;
+        break;
+    case 3:
+        x_lower_lim = -4.0;
+        x_upper_lim = 4.0;
+        break;
+    case 4:
+        x_lower_lim = -2.0;
+        x_upper_lim = 2.0;
+        break;
+    case 5:
+        x_lower_lim = -10.0;
+        x_upper_lim = 10.0;
+        break;
+    case 6:
+        x_lower_lim = -5.0;
+        x_upper_lim = 10.0;
+        break;
+    case 7:
+        x_lower_lim = -3.0;
+        x_upper_lim = 3.0;
+        break;
+    case 8:
+        x_lower_lim = -5.0;
+        x_upper_lim = 5.0;
+        break;
+    case 9:
+        x_lower_lim = -5.0;
+        x_upper_lim = 10.0;
+        break;
+    case 10:
+        x_lower_lim = -10.0;
+        x_upper_lim = 10.0;
+        break;
+    case 11:
+        x_lower_lim = -10.0;
+        x_upper_lim = 10.0;
+        break;
+    case 12:
+        x_lower_lim = -3.0;
+        x_upper_lim = 4.0;
+        break;
+    case 13:
+        x_lower_lim = -5.12;
+        x_upper_lim = 5.12;
+        break;
+    case 14:
+        x_lower_lim = -10.0;
+        x_upper_lim = 10.0;
+        break;
+    case 15:
+        x_lower_lim = -600.0;
+        x_upper_lim = 600.0;
+        break;
+    case 16:
+        x_lower_lim = -32.768;
+        x_upper_lim = 32.768;
+        break;
+    default:
+        cout << "Incorrect problem index, only integers between 1 and 16 allowed. problem_index = " << problem_index << "  was provided." << endl;
+        std::exit(1);
+        break;
+    }
+
+
+    return load_problem(problem_index, dim, x_lower_lim, x_upper_lim);
+
+
+}
+
+
+
 MultidimBenchmarkFF *load_problem(int problem_index, int dim, double x_lower_lim, double x_upper_lim, int SEED, bool ROTATE)
 {
     MultidimBenchmarkFF *problem;
@@ -659,7 +762,7 @@ MultidimBenchmarkFF *load_problem(int problem_index, int dim, double x_lower_lim
         break;
 
     default:
-        cout << "Incorrect problem index, only integers between 1 and 8 allowed. problem_index = " << problem_index << "  was provided." << endl;
+        cout << "Incorrect problem index, only integers between 0 and 16 allowed. problem_index = " << problem_index << "  was provided." << endl;
         std::exit(1);
         break;
     }
