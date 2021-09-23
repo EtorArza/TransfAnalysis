@@ -119,7 +119,7 @@ void execute_multi(class NEAT::Network **nets_, NEAT::OrganismEvaluation *result
         int ALPHA_INDEX = 2;
         int target_n_controllers_left = 1;
         int row_length =  MAX_EVALS_PER_CONTROLLER;
-        int n_evals_each_it = n_instances;
+        int n_evals_each_it = 32;
 
         zero_initialize_matrix(f_values, nnets + 1, row_length);
         zero_initialize_matrix(f_value_ranks, nnets + 1, row_length);
@@ -150,8 +150,8 @@ void execute_multi(class NEAT::Network **nets_, NEAT::OrganismEvaluation *result
 
         while (surviving_candidates.size() > target_n_controllers_left && MAX_EVALS_PER_CONTROLLER > current_n_of_evals)
         {
-            cout << "Evaluating -> " << std::flush;
-            //cout << endl << "inet" << "," << "f_value_sample_index" << "," << "instance_index" << "," << "seed" << endl;
+            cout << "Evaluating -> " ;
+            //cout << "\n" << "inet" << "," << "f_value_sample_index" << "," << "instance_index" << "," << "seed" << "\n";
 
             int n_surviving_candidates = surviving_candidates.size();
             
@@ -194,7 +194,7 @@ void execute_multi(class NEAT::Network **nets_, NEAT::OrganismEvaluation *result
 
             cout << ", perc_discarded: " << (double)(nnets - surviving_candidates.size()) / (double)(nnets);
             cout << ", " << surviving_candidates.size() << " left.";
-            cout << endl;
+            cout << "\n";
 
             if (are_all_ranks_the_same)
             {
@@ -255,10 +255,10 @@ void execute_multi(class NEAT::Network **nets_, NEAT::OrganismEvaluation *result
             // cout << "best last gen ->";
             // PrintArray(f_value_ranks[nnets], current_n_of_evals);
             test_result = is_A_larger_than_B_sign_test(f_value_ranks[best_current_iteration_index], f_value_ranks[nnets], current_n_of_evals, ALPHA_INDEX);
-            //cout << "test_result: " << test_result << endl;
+            //cout << "test_result: " << test_result << "\n";
         }
         bar.end();
-        cout << endl;
+        cout << "\n";
 
 
         convert_f_values_to_negative_inverse_ranks_squared(surviving_candidates, f_values, f_value_ranks, current_n_of_evals);
