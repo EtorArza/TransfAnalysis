@@ -110,7 +110,11 @@ double FitnessFunction_real_func(class NEAT::CpuNetwork *net_original, int probl
 
         if (problem->Fitness_Func_0_1(pop->genome_best) > 0.000001)
         {
-            cout << "Error, positive fitness detected.";
+            cout << "Error, positive fitness detected.\n";
+            cout << "genome-> " ;
+            PrintArray(pop->genome_best, pop->n);
+            cout << endl;
+            cout << "Fitness -> " << problem->Fitness_Func_0_1(pop->genome_best) << endl;
             std::exit(1);
         }
 

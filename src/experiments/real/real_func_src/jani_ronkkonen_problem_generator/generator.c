@@ -191,7 +191,7 @@ double g_calculate(double *x)
   g_check_pointer(x);
   g_check_status();
   feval++;
-  return fptr.ptr_calculate(x);
+  return -fptr.ptr_calculate(x);
 }
 
 double g_dummy_calculate(double *x)

@@ -97,8 +97,8 @@ double MultidimBenchmarkFF::Fitness_Func_0_1(double* x_vec_0_1){
 
 
     
-
-    return - this->FitnessFunc(local_tmp_vec); // we need the - sign because we are considering minimmization problems.
+    // Maximization is assumed in MultidimBenchmarkFF problems.
+    return this->FitnessFunc(local_tmp_vec); 
 }
 
 
