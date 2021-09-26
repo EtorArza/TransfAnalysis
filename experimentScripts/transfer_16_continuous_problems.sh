@@ -2,7 +2,7 @@
 
 source scripts/array_to_string_functions.sh
 
-TEST_RESULT_FOLDER_NAME="experiment_results/transfer_16_continuous_problems/resultsl"
+TEST_RESULT_FOLDER_NAME="experiment_results/transfer_16_continuous_problems/results"
 EXPERIMENT_FOLDER_NAME="experiment_results/transfer_16_continuous_problems/controllers"
 
 mkdir -p $TEST_RESULT_FOLDER_NAME
