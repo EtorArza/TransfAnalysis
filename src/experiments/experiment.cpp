@@ -118,8 +118,8 @@ void execute_multi(class NEAT::Network **nets_, NEAT::OrganismEvaluation *result
 
         int ALPHA_INDEX = 2;
         int target_n_controllers_left = 1;
-        int row_length =  MAX_EVALS_PER_CONTROLLER;
         int n_evals_each_it = 32;
+        int row_length =  MAX_EVALS_PER_CONTROLLER + 2*n_evals_each_it;
 
         zero_initialize_matrix(f_values, nnets + 1, row_length);
         zero_initialize_matrix(f_value_ranks, nnets + 1, row_length);
