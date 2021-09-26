@@ -189,7 +189,7 @@ void execute_multi(class NEAT::Network **nets_, NEAT::OrganismEvaluation *result
                 F_race_iteration(f_value_ranks, surviving_candidates, current_n_of_evals, ALPHA_INDEX);
             }else
             {
-                 cout << "The controllers behave the same." << std::flush;
+                 cout << "The controllers behave the same.";
             }
 
             cout << ", perc_discarded: " << (double)(nnets - surviving_candidates.size()) / (double)(nnets);
@@ -247,7 +247,7 @@ void execute_multi(class NEAT::Network **nets_, NEAT::OrganismEvaluation *result
             if (check_if_all_ranks_are_the_same(surviving_candidates, f_value_ranks, current_n_of_evals))
             {
                 test_result = false;
-                cout << "The controllers behave the same." << std::flush;
+                cout << "The controllers behave the same.";
                 break;
             }
             // cout << "best this gen ->";
