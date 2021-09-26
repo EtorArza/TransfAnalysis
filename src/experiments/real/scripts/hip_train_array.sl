@@ -6,8 +6,8 @@
 #SBATCH --ntasks-per-node=1 #number of tasks per node
 #SBATCH --mem=64G
 #SBATCH --cpus-per-task=16 # number of CPUs
-#SBATCH --time=0-06:00:00 #Walltime
-#SBATCH -p medium
+#SBATCH --time=5-00:00:00 #Walltime
+#SBATCH -p large
 #SBATCH --exclude=n[001-004]
 
 
