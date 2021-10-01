@@ -75,9 +75,9 @@ def return_results(SOLVER_POPSIZE,PROBLEM_INDEX,PROBLEM_DIM,X_LOWER_LIM,X_UPPER_
     write_conf_file(SOLVER_POPSIZE,PROBLEM_INDEX,PROBLEM_DIM,X_LOWER_LIM,X_UPPER_LIM,GEN_INDEX)
     subprocess.run("./neat tmp_conf_file.ini > /dev/null",shell=True)
     # subprocess.run("./neat tmp_conf_file.ini",shell=True)
-    with open("result.txt","r") as f:
+    with open("score.txt","r") as f:
         res = f.readline().strip()
-    subprocess.run("rm result.txt",shell=True)
+    subprocess.run("rm score.txt",shell=True)
     return eval(res)[0][0]
 
 

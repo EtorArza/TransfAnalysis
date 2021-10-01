@@ -502,7 +502,7 @@ namespace NEAT
 
             string result_string = result_string_stream.str();
 
-            append_line_to_file("result.txt", result_string);
+            append_line_to_file("score.txt", result_string);
 
             return;
         }

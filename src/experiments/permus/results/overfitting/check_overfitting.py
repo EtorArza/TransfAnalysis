@@ -31,7 +31,7 @@ PROBLEM_PATH = $2 ;
 """
 
 for controller_directory in os.listdir(directory_of_controller_directories):
-    os.system("touch result.txt && rm result.txt")
+    os.system("touch score.txt && rm score.txt")
     label = controller_directory
     controller_directory = directory_of_controller_directories + controller_directory + "/"
     print(controller_directory)
@@ -44,7 +44,7 @@ for controller_directory in os.listdir(directory_of_controller_directories):
         os.system("./neat tmp.ini")
         
     lines = []
-    with open("result.txt", "r") as f:
+    with open("score.txt", "r") as f:
         for line in f:
             print(line)
             lines += [eval(line.strip("\n"))]

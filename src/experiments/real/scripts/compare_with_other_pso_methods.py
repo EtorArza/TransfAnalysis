@@ -58,12 +58,12 @@ def record_results(METHOD_SHORTNAME,SOLVER_POPSIZE,PROBLEM_INDEX,PROBLEM_DIM,MAX
                     PROBLEM_DIM, MAX_SOLVER_FE, X_LOWER_LIM, X_UPPER_LIM, F_COMPETITION, N_REPS)
     subprocess.run("./neat tmp_conf_file.ini > /dev/null",shell=True)
     # subprocess.run("./neat tmp_conf_file.ini",shell=True)
-    with open("result.txt","r") as f:
+    with open("score.txt","r") as f:
         res = f.readline().strip()
-    res_list = eval("["+str(F_COMPETITION)+","+res+"]") # file="coparison_result.txt")
+    res_list = eval("["+str(F_COMPETITION)+","+res+"]") # file="coparison_score.txt")
     print(METHOD_SHORTNAME, MAX_SOLVER_FE, SOLVER_POPSIZE, (X_LOWER_LIM,X_UPPER_LIM), "{:.4e}".format(res_list[0]), "{:.4e}".format(-res_list[1][0][0]), res_list[1][1], PROBLEM_DIM, N_REPS, sep=",")
     results.append([METHOD_SHORTNAME, MAX_SOLVER_FE, SOLVER_POPSIZE, (X_LOWER_LIM,X_UPPER_LIM), "{:.4e}".format(res_list[0]), "{:.4e}".format(-res_list[1][0][0]), res_list[1][1], PROBLEM_DIM])
-    subprocess.run("rm result.txt",shell=True)
+    subprocess.run("rm score.txt",shell=True)
 
 
 def string_number_to_tex_format(string_number_in_scientific_notation):

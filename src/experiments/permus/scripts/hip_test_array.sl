@@ -101,8 +101,8 @@ srun neat "tmp.ini"
 date
 
 
-#cat "result.txt" >> "$SRCDIR/$5"
-cat "result.txt" >> "${TMP_RES_PATH}/score_journal_out_${SLURM_JOB_ID}.txt"
+#cat "score.txt" >> "$SRCDIR/$5"
+cat "score.txt" >> "${TMP_RES_PATH}/score_journal_out_${SLURM_JOB_ID}.txt"
 
 #cat "responses.txt" >> "$SRCDIR/src/experiments/permus/results/analyze_outputs/responses_journal.txt"
 cat "responses.txt" >> "${TMP_RES_PATH}/responses_journal_${SLURM_JOB_ID}.txt"

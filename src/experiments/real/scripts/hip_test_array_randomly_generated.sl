@@ -156,7 +156,7 @@ mkdir $TMP_RES_PATH -p
 echo "[${EXP_NAME},${PROBLEM_NLO},${PROBLEM_DIM},${SOLVER_POPSIZE},${MAX_SOLVER_FE}]" >> "${TMP_RES_PATH}/score_journal_out_${SLURM_JOB_ID}.txt"
 echo "[${EXP_NAME},${PROBLEM_NLO},${PROBLEM_DIM},${SOLVER_POPSIZE},${MAX_SOLVER_FE}]" >> "${TMP_RES_PATH}/responses_journal_${SLURM_JOB_ID}.txt"
 
-cat "result.txt" >> "${TMP_RES_PATH}/score_journal_out_${SLURM_JOB_ID}.txt"
+cat "score.txt" >> "${TMP_RES_PATH}/score_journal_out_${SLURM_JOB_ID}.txt"
 cat "responses.txt" >> "${TMP_RES_PATH}/responses_journal_${SLURM_JOB_ID}.txt"
 
 cd ..
