@@ -25,6 +25,8 @@ MAX_SOLVER_FE=20000
 MAX_TRAIN_ITERATIONS=200
 MAX_TRAIN_TIME=99999999999
 FULL_MODEL="false"
+DIM=2 # some benchmark functions are only defined for DIM=2 
+
 
 instance_list="[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16]"
 dim_list=`python -c "print([2]*16);"`
@@ -48,7 +50,6 @@ fi
 # Leave one out of each type cross validation
 j=-1
 n_instances_of_each_type=4
-DIM=2 # some benchmark functions are only defined for DIM=2 
 for instance_index in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16; do
     i=$((i+1))
     j=$((j+1))
