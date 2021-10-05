@@ -474,12 +474,8 @@ namespace NEAT
             result_string_stream << "" << parameters->PROBLEM_INDEX << ","
                                  << std::setprecision(8)
                                  << std::flush
-                                 << "(" << parameters->X_LOWER_LIM << "," << parameters->X_UPPER_LIM << "),"
-                                 << std::setprecision(30)
-                                 << std::flush
-
-                                 << parameters->PROBLEM_DIM << ",\""
                                  << parameters->CONTROLLER_PATH << "\","
+                                 << parameters->PROBLEM_DIM << ",\""
                                  << parameters->N_EVALS
                                  << "]"
                                  << endl;
