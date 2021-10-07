@@ -174,7 +174,7 @@ double F3::FitnessFunc(double* x_vec){
         sum2 += x_vec[i]*x_vec[i-1];
     }
     res = sum1 - sum2;
-    return -1000 - res ; // make sure it is negative
+    return -2 - res ; // make sure it is negative
 }
 
 
@@ -248,7 +248,7 @@ double F7::FitnessFunc(double* x_vec){
   res+= (-4+4*pow(x2,2)) * pow(x2,2);
 	
 
-   return -1000 - res;
+   return -1.0317 - res;
 }
 
 
@@ -272,7 +272,7 @@ double F8::FitnessFunc(double* x_vec){
     res+= pow(x2,2);
 	
 
-   return -1000 - res;
+   return - res;
 }
 
 
@@ -359,7 +359,7 @@ double F12::FitnessFunc(double* x_vec){
     res += sin(x1+x2);
     res += pow(x1 -x2,2);
     res += -1.5*x1 +2.5*x2 +1;
-    return -1000 - res;
+    return -1.9134 - res;
 }
 
 
