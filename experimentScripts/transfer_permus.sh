@@ -8,17 +8,17 @@ COMPILE_JOB_ID=`sbatch --parsable scripts/make_hip.sh`
 SRCDIR=`pwd`
 
 
-OPTIMIZATION_TIME=0.1
+MAX_SOLVER_FE=20000
 
 if false; then
 echo "this part not executed"
 # ... Code I want to skip here ...
+fi
 
 
 
 ######################## PERMUPROBLEMS TRANSFER #################################
-EXPERIMENT_FOLDER_NAME="src/experiments/permus/results/4by4_permu_problems"
-
+EXPERIMENT_FOLDER_NAME="experimentResults/transfer_permus_problems/controllers"
 
 PROBLEM_TYPE_ARRAY=()
 PROBLEM_PATH_ARRAY=()
@@ -26,7 +26,7 @@ POPSIZE_ARRAY=()
 CONTROLLER_NAME_PREFIX_ARRAY=()
 EXPERIMENT_FOLDER_NAME_ARRAY=()
 SEED_ARRAY=()
-MAX_SOLVER_TIME_ARRAY=()
+MAX_SOLVER_FE_ARRAY=()
 
 i=-1
 for PROBLEM_TYPE in "qap" "tsp" "pfsp" "lop"; do
@@ -41,7 +41,7 @@ for PROBLEM_TYPE in "qap" "tsp" "pfsp" "lop"; do
         CONTROLLER_NAME_PREFIX_ARRAY+=("${CONTROLLER_NAME_PREFIX}")
         EXPERIMENT_FOLDER_NAME_ARRAY+=("${SRCDIR}/${EXPERIMENT_FOLDER_NAME}")
         SEED_ARRAY+=("2")
-        MAX_SOLVER_TIME_ARRAY+=("${OPTIMIZATION_TIME}")
+        MAX_SOLVER_FE_ARRAY+=("${MAX_SOLVER_FE}")
     done
 done
 
@@ -54,19 +54,19 @@ POPSIZE_ARRAY=$(to_list "${POPSIZE_ARRAY[@]}")
 CONTROLLER_NAME_PREFIX_ARRAY=$(to_list "${CONTROLLER_NAME_PREFIX_ARRAY[@]}")
 EXPERIMENT_FOLDER_NAME_ARRAY=$(to_list "${EXPERIMENT_FOLDER_NAME_ARRAY[@]}")
 SEED_ARRAY=$(to_list "${SEED_ARRAY[@]}")
-MAX_SOLVER_TIME_ARRAY=$(to_list "${MAX_SOLVER_TIME_ARRAY[@]}")
+MAX_SOLVER_FE_ARRAY=$(to_list "${MAX_SOLVER_FE_ARRAY[@]}")
 
 
 
-TRAINING_JOB_ID=`sbatch --parsable --dependency=afterok:${COMPILE_JOB_ID} --export=PROBLEM_TYPE_ARRAY=$PROBLEM_TYPE_ARRAY,PROBLEM_PATH_ARRAY=$PROBLEM_PATH_ARRAY,CONTROLLER_NAME_PREFIX_ARRAY=$CONTROLLER_NAME_PREFIX_ARRAY,EXPERIMENT_FOLDER_NAME_ARRAY=$EXPERIMENT_FOLDER_NAME_ARRAY,SEED_ARRAY=$SEED_ARRAY,POPSIZE_ARRAY=$POPSIZE_ARRAY,MAX_SOLVER_TIME_ARRAY=$MAX_SOLVER_TIME_ARRAY --array=0-$i src/experiments/permus/scripts/hip_train_array.sl`
+TRAINING_JOB_ID=`sbatch --parsable --dependency=afterok:${COMPILE_JOB_ID} --export=PROBLEM_TYPE_ARRAY=$PROBLEM_TYPE_ARRAY,PROBLEM_PATH_ARRAY=$PROBLEM_PATH_ARRAY,CONTROLLER_NAME_PREFIX_ARRAY=$CONTROLLER_NAME_PREFIX_ARRAY,EXPERIMENT_FOLDER_NAME_ARRAY=$EXPERIMENT_FOLDER_NAME_ARRAY,SEED_ARRAY=$SEED_ARRAY,POPSIZE_ARRAY=$POPSIZE_ARRAY,MAX_SOLVER_FE_ARRAY=$MAX_SOLVER_FE_ARRAY --array=0-$i src/experiments/permus/scripts/hip_train_array_16_continuous.sl`
 
 
 
 
 
 COMPUTE_RESPONSE="true"
-SCORE_PATH="src/experiments/permus/results/4by4_permu_problems/result_score_transfer_permuproblem.txt"
-RESPONSE_PATH="src/experiments/permus/results/4by4_permu_problems/result_response_transfer_permuproblem.txt"
+SCORE_PATH="experimentResults/transfer_permus_problems/results/score.txt"
+RESPONSE_PATH="experimentResults/transfer_permus_problems/results/response.txt"
 TMP_RES_PATH=${SRCDIR}/"tmp"/$(dirname ${SCORE_PATH})
 N_REPS=1
 N_EVALS=10000
@@ -77,7 +77,7 @@ for PROBLEM_TYPE_TRAIN in "qap" "tsp" "pfsp" "lop"; do
     CONTROLLER_ARRAY=()
     PROBLEM_TYPE_ARRAY=()
     PROBLEM_PATH_ARRAY=()
-    MAX_SOLVER_TIME_ARRAY=()
+    MAX_SOLVER_FE_ARRAY=()
 
     i=-1
     for PROBLEM_PATH_TRAIN in "src/experiments/permus/instances/transfer_permuproblems/${PROBLEM_TYPE_TRAIN}/"*; do
@@ -98,17 +98,17 @@ for PROBLEM_TYPE_TRAIN in "qap" "tsp" "pfsp" "lop"; do
                 CONTROLLER_ARRAY+=("${EXPERIMENT_FOLDER_NAME}/top_controllers/${CONTROLLER_NAME_PREFIX}_best.controller")
                 PROBLEM_TYPE_ARRAY+=("${PROBLEM_TYPE_TEST}")
                 PROBLEM_PATH_ARRAY+=("${PROBLEM_PATH_TEST}")
-                MAX_SOLVER_TIME_ARRAY+=("${OPTIMIZATION_TIME}")
+                MAX_SOLVER_FE_ARRAY+=("${MAX_SOLVER_FE}")
             done
         done
     done
     CONTROLLER_ARRAY=$(to_list "${CONTROLLER_ARRAY[@]}")
     PROBLEM_TYPE_ARRAY=$(to_list "${PROBLEM_TYPE_ARRAY[@]}")
     PROBLEM_PATH_ARRAY=$(to_list "${PROBLEM_PATH_ARRAY[@]}")
-    MAX_SOLVER_TIME_ARRAY=$(to_list "${MAX_SOLVER_TIME_ARRAY[@]}")
+    MAX_SOLVER_FE_ARRAY=$(to_list "${MAX_SOLVER_FE_ARRAY[@]}")
 
 
-    TESTING_JOB_ID=$TESTING_JOB_ID:`sbatch --dependency=afterok:${TRAINING_JOB_ID} --parsable  --export=CONTROLLER_ARRAY=${CONTROLLER_ARRAY},PROBLEM_TYPE_ARRAY=${PROBLEM_TYPE_ARRAY},PROBLEM_PATH_ARRAY=${PROBLEM_PATH_ARRAY},MAX_SOLVER_TIME_ARRAY=${MAX_SOLVER_TIME_ARRAY},COMPUTE_RESPONSE=${COMPUTE_RESPONSE},TMP_RES_PATH=${TMP_RES_PATH},N_REPS=${N_REPS},N_EVALS=${N_EVALS} --array=0-$i src/experiments/permus/scripts/hip_test_array.sl`
+    TESTING_JOB_ID=$TESTING_JOB_ID:`sbatch --dependency=afterok:${TRAINING_JOB_ID} --parsable  --export=CONTROLLER_ARRAY=${CONTROLLER_ARRAY},PROBLEM_TYPE_ARRAY=${PROBLEM_TYPE_ARRAY},PROBLEM_PATH_ARRAY=${PROBLEM_PATH_ARRAY},MAX_SOLVER_FE_ARRAY=${MAX_SOLVER_FE_ARRAY},COMPUTE_RESPONSE=${COMPUTE_RESPONSE},TMP_RES_PATH=${TMP_RES_PATH},N_REPS=${N_REPS},N_EVALS=${N_EVALS} --array=0-$i src/experiments/permus/scripts/hip_test_array.sl`
 
 done
 
@@ -118,10 +118,9 @@ sbatch --dependency=afterok$TESTING_JOB_ID --export=SCORE_PATH=${SCORE_PATH},RES
 
 
 
-fi
 
 ######################### QAP TRANSFER ##########################
-EXPERIMENT_FOLDER_NAME="src/experiments/permus/results/transfer_qap_with_cut_instances"
+EXPERIMENT_FOLDER_NAME="experimentResults/transfer_permus_qap/results/controllers"
 
 
 
@@ -132,7 +131,7 @@ CONTROLLER_NAME_PREFIX_ARRAY=()
 EXPERIMENT_FOLDER_NAME_ARRAY=()
 CONTROLLER_ARRAY=()
 SEED_ARRAY=()
-MAX_SOLVER_TIME_ARRAY=()
+MAX_SOLVER_FE_ARRAY=()
 
 i=-1
 for PROBLEM_PATH in "src/experiments/permus/instances/transfer_qap_cut_instances/"*; do
@@ -147,7 +146,7 @@ for PROBLEM_PATH in "src/experiments/permus/instances/transfer_qap_cut_instances
     EXPERIMENT_FOLDER_NAME_ARRAY+=("${SRCDIR}/${EXPERIMENT_FOLDER_NAME}")
     CONTROLLER_ARRAY+=("${EXPERIMENT_FOLDER_NAME}/top_controllers/${CONTROLLER_NAME_PREFIX}_best.controller")
     SEED_ARRAY+=("2")
-    MAX_SOLVER_TIME_ARRAY+=("${OPTIMIZATION_TIME}")
+    MAX_SOLVER_FE_ARRAY+=("${OPTIMIZATION_TIME}")
 done
 
 
@@ -161,10 +160,10 @@ CONTROLLER_NAME_PREFIX_ARRAY=$(to_list "${CONTROLLER_NAME_PREFIX_ARRAY[@]}")
 EXPERIMENT_FOLDER_NAME_ARRAY=$(to_list "${EXPERIMENT_FOLDER_NAME_ARRAY[@]}")
 CONTROLLER_ARRAY=$(to_list "${CONTROLLER_ARRAY[@]}")
 SEED_ARRAY=$(to_list "${SEED_ARRAY[@]}")
-MAX_SOLVER_TIME_ARRAY=$(to_list "${MAX_SOLVER_TIME_ARRAY[@]}")
+MAX_SOLVER_FE_ARRAY=$(to_list "${MAX_SOLVER_FE_ARRAY[@]}")
 
 
-TRAINING_JOB_ID=`sbatch --parsable --dependency=afterok:${COMPILE_JOB_ID} --export=PROBLEM_TYPE_ARRAY=$PROBLEM_TYPE_ARRAY,PROBLEM_PATH_ARRAY=$PROBLEM_PATH_ARRAY,CONTROLLER_NAME_PREFIX_ARRAY=$CONTROLLER_NAME_PREFIX_ARRAY,EXPERIMENT_FOLDER_NAME_ARRAY=$EXPERIMENT_FOLDER_NAME_ARRAY,SEED_ARRAY=$SEED_ARRAY,POPSIZE_ARRAY=$POPSIZE_ARRAY,MAX_SOLVER_TIME_ARRAY=$MAX_SOLVER_TIME_ARRAY --array=0-$i src/experiments/permus/scripts/hip_train_array.sl`
+TRAINING_JOB_ID=`sbatch --parsable --dependency=afterok:${COMPILE_JOB_ID} --export=PROBLEM_TYPE_ARRAY=$PROBLEM_TYPE_ARRAY,PROBLEM_PATH_ARRAY=$PROBLEM_PATH_ARRAY,CONTROLLER_NAME_PREFIX_ARRAY=$CONTROLLER_NAME_PREFIX_ARRAY,EXPERIMENT_FOLDER_NAME_ARRAY=$EXPERIMENT_FOLDER_NAME_ARRAY,SEED_ARRAY=$SEED_ARRAY,POPSIZE_ARRAY=$POPSIZE_ARRAY,MAX_SOLVER_FE_ARRAY=$MAX_SOLVER_FE_ARRAY --array=0-$i src/experiments/permus/scripts/hip_train_array_16_continuous.sl`
 
 
 
@@ -181,7 +180,7 @@ N_EVALS=10000
 CONTROLLER_ARRAY=()
 PROBLEM_TYPE_ARRAY=()
 PROBLEM_PATH_ARRAY=()
-MAX_SOLVER_TIME_ARRAY=()
+MAX_SOLVER_FE_ARRAY=()
 
 i=-1
 for PROBLEM_PATH_TRAIN in "src/experiments/permus/instances/transfer_qap_cut_instances/"*; do
@@ -200,17 +199,17 @@ for PROBLEM_PATH_TRAIN in "src/experiments/permus/instances/transfer_qap_cut_ins
         CONTROLLER_ARRAY+=("${EXPERIMENT_FOLDER_NAME}/top_controllers/${CONTROLLER_NAME_PREFIX}_best.controller")
         PROBLEM_TYPE_ARRAY+=("qap")
         PROBLEM_PATH_ARRAY+=("${PROBLEM_PATH_TEST}")
-        MAX_SOLVER_TIME_ARRAY+=("${OPTIMIZATION_TIME}")
+        MAX_SOLVER_FE_ARRAY+=("${OPTIMIZATION_TIME}")
     done
 done
 
 CONTROLLER_ARRAY=$(to_list "${CONTROLLER_ARRAY[@]}")
 PROBLEM_TYPE_ARRAY=$(to_list "${PROBLEM_TYPE_ARRAY[@]}")
 PROBLEM_PATH_ARRAY=$(to_list "${PROBLEM_PATH_ARRAY[@]}")
-MAX_SOLVER_TIME_ARRAY=$(to_list "${MAX_SOLVER_TIME_ARRAY[@]}")
+MAX_SOLVER_FE_ARRAY=$(to_list "${MAX_SOLVER_FE_ARRAY[@]}")
 
 
-TESTING_JOB_ID=`sbatch --dependency=afterok:${TRAINING_JOB_ID} --parsable --export=CONTROLLER_ARRAY=${CONTROLLER_ARRAY},PROBLEM_TYPE_ARRAY=${PROBLEM_TYPE_ARRAY},PROBLEM_PATH_ARRAY=${PROBLEM_PATH_ARRAY},MAX_SOLVER_TIME_ARRAY=${MAX_SOLVER_TIME_ARRAY},COMPUTE_RESPONSE=${COMPUTE_RESPONSE},TMP_RES_PATH=${TMP_RES_PATH},N_REPS=${N_REPS},N_EVALS=${N_EVALS} --array=0-$i src/experiments/permus/scripts/hip_test_array.sl`
+TESTING_JOB_ID=`sbatch --dependency=afterok:${TRAINING_JOB_ID} --parsable --export=CONTROLLER_ARRAY=${CONTROLLER_ARRAY},PROBLEM_TYPE_ARRAY=${PROBLEM_TYPE_ARRAY},PROBLEM_PATH_ARRAY=${PROBLEM_PATH_ARRAY},MAX_SOLVER_FE_ARRAY=${MAX_SOLVER_FE_ARRAY},COMPUTE_RESPONSE=${COMPUTE_RESPONSE},TMP_RES_PATH=${TMP_RES_PATH},N_REPS=${N_REPS},N_EVALS=${N_EVALS} --array=0-$i src/experiments/permus/scripts/hip_test_array.sl`
 
 
 
