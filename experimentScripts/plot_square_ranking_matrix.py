@@ -9,20 +9,29 @@ import random
 import fnmatch
 import matplotlib
 
-# save in figures local folder
-save_fig_path = "/home/paran/Dropbox/BCAM/NEAT_code/src/experiments/permus/results/4by4_permu_problems/figures/"
 # save_fig_path = "/home/paran/Dropbox/BCAM/02_NEAT_permus/paper/images/permu_problems_transfer/"
+
+save_fig_paths = [
+#"/home/paran/Dropbox/BCAM/NEAT_code/src/experiments/permus_multi/results/qap_cut_multi_vs_mono/score_multi_instance_cut_qap.txt",
+"experimentResults/transfer_permus_qap/results/figures/",
+"experimentResults/transfer_permus_qap/results/figures/",
+"experimentResults/transfer_permus_qap/results/figures/",
+"experimentResults/transfer_permus_problems/results/figures/",
+"experimentResults/transfer_permus_problems/results/figures/",
+"experimentResults/transfer_permus_problems/results/figures/",
+"experimentResults/transfer_16_continuous_problems/results/figures/"
+]
 
 
 txt_paths = [
-#"/home/paran/Dropbox/BCAM/NEAT_code/src/experiments/permus_multi/results/qap_cut_multi_vs_mono/score_multi_instance_cut_qap.txt",
-"/home/paran/Dropbox/BCAM/NEAT_code/src/experiments/permus/results/4by4_permu_problems/result_score_transfer_permuproblem_0_1s_2h.txt",
-"/home/paran/Dropbox/BCAM/NEAT_code/src/experiments/permus/results/4by4_permu_problems/result_score_transfer_permuproblem_0_25s_1h.txt",
-"/home/paran/Dropbox/BCAM/NEAT_code/src/experiments/permus/results/4by4_permu_problems/result_score_transfer_permuproblem_0_1s_12h.txt",
-"/home/paran/Dropbox/BCAM/NEAT_code/src/experiments/permus/results/transfer_qap_with_cut_instances/result_score_transfer_qap_0_1s_2h.txt",
-"/home/paran/Dropbox/BCAM/NEAT_code/src/experiments/permus/results/transfer_qap_with_cut_instances/result_score_transfer_qap_0_25s_1h.txt",
-"/home/paran/Dropbox/BCAM/NEAT_code/src/experiments/permus/results/transfer_qap_with_cut_instances/result_score_transfer_qap_0_1s_12h.txt",
-"/home/paran/Dropbox/BCAM/NEAT_code/src/experiments/permus/results/transfer_qap_with_cut_instances/result_score_transfer_qap_0_1s_12h_7instances.txt"
+#"src/experiments/permus_multi/results/qap_cut_multi_vs_mono/score_multi_instance_cut_qap.txt",
+"src/experiments/permus/results/4by4_permu_problems/result_score_transfer_permuproblem_0_1s_2h.txt",
+"src/experiments/permus/results/4by4_permu_problems/result_score_transfer_permuproblem_0_25s_1h.txt",
+"src/experiments/permus/results/4by4_permu_problems/result_score_transfer_permuproblem_0_1s_12h.txt",
+"src/experiments/permus/results/transfer_qap_with_cut_instances/result_score_transfer_qap_0_1s_2h.txt",
+"src/experiments/permus/results/transfer_qap_with_cut_instances/result_score_transfer_qap_0_25s_1h.txt",
+"src/experiments/permus/results/transfer_qap_with_cut_instances/result_score_transfer_qap_0_1s_12h.txt",
+"experimentResults/transfer_16_continuous_problems/results/score.txt"
 ]
 
 
@@ -34,11 +43,14 @@ transfer_exp_list =[
 "QAP",
 "QAP",
 "QAP",
-"QAP"
+"LOO16",
 ]
 
-for input_txt, transfer_exp in zip(txt_paths, transfer_exp_list):
-    
+i = 0
+for input_txt, transfer_exp, save_fig_path in zip(txt_paths, transfer_exp_list, save_fig_paths):
+    if i < 5:
+        i += 1
+        continue
 
 
 
@@ -63,6 +75,14 @@ for input_txt, transfer_exp in zip(txt_paths, transfer_exp_list):
                 type_name = type_name[0] + "_" + type_name[1]
             return type_name
 
+    elif transfer_exp == "LOO16":
+        PROBLEM_TYPES = ["bowl", "valley", "plate","multiopt"]
+        def get_type(instance_name):
+            problem_index = int(instance_name.strip("_"))
+            type_name = PROBLEM_TYPES[(problem_index - 1) // 4]
+            return type_name
+
+
     print(input_txt.split("/")[-1])
 
 
@@ -78,15 +98,36 @@ for input_txt, transfer_exp in zip(txt_paths, transfer_exp_list):
 
     with open(input_txt) as f:
         for line in f:
-            line = eval(line)
-            score = line[0][0]
 
-            train_name = line[2].split("/")[-1].split("_best.controlle")[-2]
-            test_name = line[1].split("/")[-1]
+            # Continuous LOO16 
+            if transfer_exp == "LOO16":
+                if "Only" in line:
+                    continue
+                line = line.split(",")
+                line = [el.strip("[]") for el in line]
+                train_name = "_"+str(line[2].split("LeaveOutF_")[1].split("_best.controller")[0])+"_"
+                test_name = "_"+str(line[1])+"_"
+                score = float(line[0])
+                # Its leave one out, so LeaveOutF_6_best.controller was actually trained in the rest of the problems of the same type (5 7 8).
+                # This means that the controller can be tested in problems of different type or the problem left out. 
+                if get_type(train_name) == get_type(test_name) and train_name != test_name:
+                    continue
+
+            # PERMUS (both qap and permuproblems)
+            else:
+                line = eval(line)
+                train_name = line[2].split("/")[-1].split("_best.controlle")[-2]
+                test_name = line[1].split("/")[-1]
+                # Dont test the controller in an instance, when that instance was used to train it.
+                if train_name in test_name:
+                    continue
+                score = line[0][0]
+
 
             train_type = get_type(train_name)
             test_type = get_type(test_name)
 
+            # print("train_type",train_type, "test_type", test_type)
 
 
             new_row_df = pd.DataFrame([[score, train_name, test_name, train_type, test_type]], 
@@ -107,7 +148,11 @@ for input_txt, transfer_exp in zip(txt_paths, transfer_exp_list):
 
 
     def get_row_index(data_frame, train_name, test_name):
-        return data_frame[(data_frame["train_name"] == train_name) & (data_frame["test_name"] == test_name)].index[0]
+        element = data_frame[(data_frame["train_name"] == train_name) & (data_frame["test_name"] == test_name)]
+        if len(element)==0:
+            return None
+        else:
+            return element.index[0]
 
 
 
@@ -116,41 +161,40 @@ for input_txt, transfer_exp in zip(txt_paths, transfer_exp_list):
 
     pos = 0
     neg = 0
+    print(data_frame)
     for idx in data_frame.index:
         row = data_frame.loc[idx,:]
         train_name = row["train_name"]
         test_name = row["test_name"]
 
-        norm_score = data_frame.iloc[get_row_index(data_frame, test_name, test_name)]["score"]
+        # # Cannot compute this because we are removed the scores where the same problem was used to train and test. 
+        # norm_score = data_frame.iloc[get_row_index(data_frame, test_name, test_name)]["score"]
 
         sub_data_frame_with_certain_test_instance = data_frame[data_frame["test_name"] == test_name]
         
         average_score = mean(sub_data_frame_with_certain_test_instance["score"])
         stdev_score = stdev(sub_data_frame_with_certain_test_instance["score"])
         ranks = sub_data_frame_with_certain_test_instance["score"].rank(ascending=False)
-
+        ranks = ranks - 1
+        ranks = ranks / max(ranks)
         indx_in_selected = sub_data_frame_with_certain_test_instance["score"][sub_data_frame_with_certain_test_instance["score"]==data_frame.iloc[get_row_index(data_frame, train_name, test_name)]["score"]].index[0]
 
-        if norm_score > row["score"]:
-            pos += 1
-        else:
-            neg += 1
-        transferability.append(    (norm_score - row["score"]) / abs(norm_score)    ) # as defined on the paper
+        
+        # transferability.append(    (norm_score - row["score"]) / abs(norm_score)    ) # as defined on the paper
         # transferability.append(    (row["score"] - average_score) / stdev_score    )
-        # transferability.append(ranks[indx_in_selected])
+        transferability.append(ranks[indx_in_selected])
 
 
-
-    print (pos / (pos + neg) * 100 , "%")
+    #     if norm_score > row["score"]:
+    #             pos += 1
+    #         else:
+    #             neg += 1
+    # print (pos / (pos + neg) * 100 , "%")
 
 
     data_frame.insert(1, "transferability", transferability, False) 
 
 
-    # discard if train is contained in test
-    rows_to_keep = [False if data_frame.iloc[i]["test_name"] in data_frame.iloc[i]["train_name"] else True for i in range(data_frame.shape[0])]
-    data_frame = data_frame[rows_to_keep]
-    data_frame.reset_index(inplace=True, drop=True) 
 
 
     # Average by instance type
@@ -173,9 +217,9 @@ for input_txt, transfer_exp in zip(txt_paths, transfer_exp_list):
 
     for train_name in get_train_instances(data_frame):
         for test_name in get_test_instances(data_frame):
-            if test_name in train_name:
-                continue
             index = get_row_index(data_frame, train_name, test_name)
+            if index is None:
+                continue
             transf = data_frame.iloc[index]["transferability"]
             type_train = data_frame.iloc[index]["train_type"]
             type_test = data_frame.iloc[index]["test_type"]
@@ -185,7 +229,7 @@ for input_txt, transfer_exp in zip(txt_paths, transfer_exp_list):
     transfer_result = transfer_result.applymap(mean)
 
     pd.set_option('display.max_rows', 1000)
-    # print(transfer_result)
+    print(transfer_result)
     # print(data_frame[data_frame["test_type"] == "tsp"])
 
 
