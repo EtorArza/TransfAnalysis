@@ -30,7 +30,7 @@ double FitnessFunction_real_func(class NEAT::CpuNetwork *net_original, int probl
 
     double *v_of_fitness;
     MultidimBenchmarkFF *problem;
-    problem = load_problem_with_default_lims(problem_index, dim, seed, true);
+    problem = load_problem_with_default_lims(problem_index, dim, seed, false);
 
     CPopulation *pop;
 
