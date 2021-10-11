@@ -2171,13 +2171,13 @@ bool Friedman_test_are_there_critical_diferences(double** f_values, int n_candid
     if (p > ALPHA)
     {
         cout << "Friedman H0 ";
-        cout << "T: " << T << ", df: " << df << ", Friedman p-value: " << p << std::flush;
+        cout << "T: " << T << ", df: " << df << ", Friedman p-value: " << p;
         return false;
     }
     else
     {
         cout << "Friedman H1 ";
-        cout << "T: " << T << ", df: " << df << ", Friedman p-value: " << p << std::flush;
+        cout << "T: " << T << ", df: " << df << ", Friedman p-value: " << p;
         return true;
     }
 }
@@ -2291,12 +2291,14 @@ double euclid_dist(double* array_1, double* array_2, int len) // equiv to l2 dis
 
 
 
-progress_bar::progress_bar(int n){
+progress_bar::progress_bar(int n, bool flushOut){
+    this->flushOut = flushOut;
     this->timer = stopwatch();
     this->timer.tic();
     this->max_steps = n;
     this->current_steps = 0;
-    std::cout << "[" << std::flush;
+    std::cout << "[";
+    if (flushOut) { std::cout<< std::flush;} 
 }
 
 progress_bar::~progress_bar(){
@@ -2322,19 +2324,22 @@ void progress_bar::step(){
 
     if ( last_reminder > current_reminder)
     {
-        std::cout << "." << std::flush;
+        std::cout << ".";
+        if (flushOut) {std::cout<< std::flush;}
     }
 }
 
 void progress_bar::end(){
-    std::cout << "]" << " " << this->timer.toc() << " s" << std::flush;
+    std::cout << "]" << " " << this->timer.toc() << " s";
+    if (flushOut) { std::cout<< std::flush;}
 }
 
 void progress_bar::restart(int n){
     this->timer.tic();
     this->max_steps = n;
     this->current_steps = 0;
-    std::cout << "[" << std::flush;
+    std::cout << "[";
+    if (flushOut) { std::cout<< std::flush;}
 }
 
 // https://en.wikipedia.org/wiki/Binomial_coefficient#Computing_the_value_of_binomial_coefficients

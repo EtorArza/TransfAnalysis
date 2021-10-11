@@ -102,10 +102,15 @@ bool check_if_all_ranks_are_the_same(vector<int> surviving_candidates, double **
 void execute_multi(class NEAT::Network **nets_, NEAT::OrganismEvaluation *results, size_t nnets, int n_instances, FF_type FitnessFunction, NEAT::CpuNetwork *&best_network, base_params *parameters)
 {
 
+        #ifdef HIPATIA
+        const bool flushOut = false;
+        #else
+        const bool flushOut = true;
+        #endif
 
         if (n_instances == 0)
         {
-            cout << "n_instances = 0 in permu_multi_evaluator.cxx" << endl;
+            cout << "n_instances = 0 in execute_multi()" << endl;
             exit(1);
         }
 
@@ -156,7 +161,7 @@ void execute_multi(class NEAT::Network **nets_, NEAT::OrganismEvaluation *result
             int n_surviving_candidates = surviving_candidates.size();
             
 
-            progress_bar bar(n_surviving_candidates* n_evals_each_it);
+            progress_bar bar(n_surviving_candidates* n_evals_each_it, flushOut);
             #pragma omp parallel for num_threads(parameters->neat_params->N_OF_THREADS) schedule(dynamic,1)
             for (int i = 0; i < n_surviving_candidates * n_evals_each_it; i++)
             {
@@ -220,7 +225,7 @@ void execute_multi(class NEAT::Network **nets_, NEAT::OrganismEvaluation *result
         surviving_candidates.push_back(nnets);
         
         cout << "Reevaluating best -> ";
-        progress_bar bar(MAX_EVALS_PER_CONTROLLER);
+        progress_bar bar(MAX_EVALS_PER_CONTROLLER, flushOut);
         
         current_n_of_evals = 0;
         bool test_result = true;
