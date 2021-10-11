@@ -161,8 +161,8 @@ double F3::FitnessFunc(double* x_vec){
     double sum_of_x_j = 0;
 
 	
-    double sum1 = 0;
-    double sum2 = 0;
+    double sum1 = -2;
+    double sum2 = -4;
  
     for (int i = 0; i < dim; i++)
     {   
@@ -174,7 +174,8 @@ double F3::FitnessFunc(double* x_vec){
         sum2 += x_vec[i]*x_vec[i-1];
     }
     res = sum1 - sum2;
-    return -2 - res ; // make sure it is negative
+
+    return - res ; // make sure it is negative
 }
 
 
