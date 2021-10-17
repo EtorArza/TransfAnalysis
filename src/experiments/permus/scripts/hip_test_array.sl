@@ -8,8 +8,7 @@
 #SBATCH --cpus-per-task=32 # number of CPUs
 #SBATCH --time=0-00:30:00 #Walltime
 #SBATCH -p short
-#SBATCH --exclude=n[001-004,017-018]
-#SBATCH --exclusive
+#SBATCH --exclude=n[001-004]
 
 
 
@@ -44,9 +43,9 @@ list_to_array $PROBLEM_PATH_ARRAY
 PROBLEM_PATH_ARRAY=("${BITRISE_CLI_LAST_PARSED_LIST[@]}")
 PROBLEM_PATH=${PROBLEM_PATH_ARRAY[$SLURM_ARRAY_TASK_ID]}
 
-list_to_array $MAX_SOLVER_TIME_ARRAY
-MAX_SOLVER_TIME_ARRAY=("${BITRISE_CLI_LAST_PARSED_LIST[@]}")
-MAX_SOLVER_TIME=${MAX_SOLVER_TIME_ARRAY[$SLURM_ARRAY_TASK_ID]}
+list_to_array $MAX_SOLVER_FE_ARRAY
+MAX_SOLVER_FE_ARRAY=("${BITRISE_CLI_LAST_PARSED_LIST[@]}")
+MAX_SOLVER_FE=${MAX_SOLVER_FE_ARRAY[$SLURM_ARRAY_TASK_ID]}
 
 
 
@@ -82,13 +81,13 @@ PROBLEM_NAME = permu
 
 
 THREADS = $SLURM_CPUS_PER_TASK ;
-CONTROLLER_PATH = $CONTROLLER ; 
+CONTROLLER_PATH = ${SRCDIR}/${CONTROLLER} ; 
 COMPUTE_RESPONSE = $COMPUTE_RESPONSE
 N_REPS = $N_REPS
 N_EVALS = $N_EVALS
 
 
-MAX_SOLVER_TIME = $MAX_SOLVER_TIME ; 
+MAX_SOLVER_FE = $MAX_SOLVER_FE ; 
 
 PROBLEM_TYPE = $PROBLEM_TYPE ; 
 PROBLEM_PATH = $PROBLEM_PATH ; 
@@ -100,12 +99,13 @@ date
 srun neat "tmp.ini"
 date
 
+rm neat
 
-#cat "score.txt" >> "$SRCDIR/$5"
-cat "score.txt" >> "${TMP_RES_PATH}/score_journal_out_${SLURM_JOB_ID}.txt"
+mkdir $TMP_RES_PATH -p
 
-#cat "responses.txt" >> "$SRCDIR/src/experiments/permus/results/analyze_outputs/responses_journal.txt"
-cat "responses.txt" >> "${TMP_RES_PATH}/responses_journal_${SLURM_JOB_ID}.txt"
+
+cat "score.txt" >> "${TMP_RES_PATH}/score_tmp_${SLURM_JOB_ID}.txt"
+cat "responses.txt" >> "${TMP_RES_PATH}/responses_tmp_${SLURM_JOB_ID}.txt"
 
 cd ..
 
