@@ -22,8 +22,8 @@
 #define CUTOFF_0 0.25
 
 
-#define MAX_POPSIZE 40
-#define MIN_POPSIZE 4
+#define MAX_POPSIZE 20
+#define MIN_POPSIZE 20
 
 #define MAX_TABU_LENGTH 100
 #define MIN_TABU_LENGTH 5

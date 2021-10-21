@@ -35,8 +35,8 @@ void CPopulation::init_class(PBP *problem, RandomNumberGenerator* rng, PERMU::pa
     genome_best = new int[n];
     f_best = -DBL_MAX;
 
-    indexes_to_be_removed.reserve(MAX_POPSIZE);
-    indexes_to_be_duplicated.reserve(MAX_POPSIZE);
+    // indexes_to_be_removed.reserve(MAX_POPSIZE);
+    // indexes_to_be_duplicated.reserve(MAX_POPSIZE);
 
     GenerateRandomPermutation(this->genome_best, n, this->rng);
     templ_double_array = new double[MAX_POPSIZE];
@@ -48,7 +48,7 @@ void CPopulation::init_class(PBP *problem, RandomNumberGenerator* rng, PERMU::pa
         indexes_to_be_duplicated[i] = -1;
     }
 
-    m_individuals.resize(MAX_POPSIZE);
+    // m_individuals.resize(MAX_POPSIZE);
 
     pop_info = new double *[MAX_POPSIZE];
     permus = new int *[MAX_POPSIZE]; // this contains the references to te permus in the individuals, so no initialization/destruction.
@@ -176,17 +176,17 @@ CPopulation::~CPopulation()
 
 
 void CPopulation::end_iteration(){
-    for (int i = 0; i < indexes_to_be_duplicated.size(); i++)
-    {
-        duplicate_individual_i(indexes_to_be_duplicated[i]);
-    }
-    indexes_to_be_duplicated.clear();
+    // for (int i = 0; i < indexes_to_be_duplicated.size(); i++)
+    // {
+    //     duplicate_individual_i(indexes_to_be_duplicated[i]);
+    // }
+    // indexes_to_be_duplicated.clear();
     
-    for (int i = indexes_to_be_duplicated.size() -1 ; i >= 0; i--)
-    {
-        remove_individual_i(indexes_to_be_removed[i]);
-    }
-    indexes_to_be_removed.clear();
+    // for (int i = indexes_to_be_duplicated.size() -1 ; i >= 0; i--)
+    // {
+    //     remove_individual_i(indexes_to_be_removed[i]);
+    // }
+    // indexes_to_be_removed.clear();
 
     SortPopulation();
     get_population_info();
@@ -216,15 +216,15 @@ double *CPopulation::get_neat_input_individual_i(int i)
 // Apply modifications to solution i stored in m_individuals[i] based on the oputput from the controller.
 void CPopulation::apply_neat_output_to_individual_i(double* output_neat, int i){
 
-    if (output_neat[PERMU::REMOVE_OR_CLONE] > CUTOFF_0)
-    {
-        indexes_to_be_duplicated.push_back(i);
-    }
-    else if (output_neat[PERMU::REMOVE_OR_CLONE] < - CUTOFF_0)
-    {
-        indexes_to_be_removed.push_back(i);
-        return;
-    }
+    // if (output_neat[PERMU::REMOVE_OR_CLONE] > CUTOFF_0)
+    // {
+    //     indexes_to_be_duplicated.push_back(i);
+    // }
+    // else if (output_neat[PERMU::REMOVE_OR_CLONE] < - CUTOFF_0)
+    // {
+    //     indexes_to_be_removed.push_back(i);
+    //     return;
+    // }
 
     if (output_neat[PERMU::RANDOM_REINITIALIZE] > CUTOFF_0)
     {
