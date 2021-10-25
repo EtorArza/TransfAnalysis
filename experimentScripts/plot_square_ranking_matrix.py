@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 from seaborn import clustermap
+import seaborn as sns
 from scipy.ndimage.filters import gaussian_filter
 from copy import deepcopy
 import random
@@ -48,7 +49,7 @@ transfer_exp_list =[
 
 i = 0
 for input_txt, transfer_exp, save_fig_path in zip(txt_paths, transfer_exp_list, save_fig_paths):
-    if i < 5:
+    if i < 6:
         i += 1
         continue
 
@@ -107,7 +108,7 @@ for input_txt, transfer_exp, save_fig_path in zip(txt_paths, transfer_exp_list, 
                 line = [el.strip("[]") for el in line]
                 train_name = "_"+str(line[2].split("LeaveOutF_")[1].split("_best.controller")[0])+"_"
                 test_name = "_"+str(line[1])+"_"
-                score = float(line[0])
+                score = min(0,float(line[0]))
                 # Its leave one out, so LeaveOutF_6_best.controller was actually trained in the rest of the problems of the same type (5 7 8).
                 # This means that the controller can be tested in problems of different type or the problem left out. 
                 if get_type(train_name) == get_type(test_name) and train_name != test_name:
@@ -231,6 +232,33 @@ for input_txt, transfer_exp, save_fig_path in zip(txt_paths, transfer_exp_list, 
     pd.set_option('display.max_rows', 1000)
     print(transfer_result)
     # print(data_frame[data_frame["test_type"] == "tsp"])
+
+    if transfer_exp == "LOO16":
+        print(data_frame)
+
+        for g in np.unique(data_frame["test_type"].unique()):
+            plt.scatter([int(el.strip("_")) for el in data_frame[data_frame["test_type"]==g]["train_name"]], -data_frame[data_frame["test_type"]==g]["score"],  label=g, marker="x" )
+        # plt.ylim(min(-data_frame["score"]), max(-data_frame["score"]))
+        # plt.yscale("log")
+        plt.legend(title="Test type")
+        plt.savefig("experimentResults/transfer_16_continuous_problems/results/figures/LOO16_scatter.svg")
+        plt.savefig("experimentResults/transfer_16_continuous_problems/results/figures/LOO16_scatter.pdf")
+        plt.close()
+
+        matrix_data = np.zeros((16,16))
+        for i in range(16):
+            for j in range(16):
+                train_name = "_" + str(i+1) + "_"
+                test_name = "_" + str(j+1) + "_"
+                value = data_frame[(data_frame["train_name"] == train_name) & (data_frame["test_name"] == test_name)]["transferability"]
+                
+                value = float(value) if len(value)>0 else np.NAN
+
+                matrix_data[i,j] = value
+        ax = sns.heatmap(matrix_data, linewidth=0.5)
+        plt.show()
+
+
 
 
     # print(get_score(data_frame, "N-t65d11xx_150.lop", "pr136.tsp"))
