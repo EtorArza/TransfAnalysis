@@ -143,8 +143,16 @@ double FitnessFunction_real_func(class NEAT::CpuNetwork *net_original, int probl
         cout << std::setprecision(6) << std::flush;
         result_string_stream << std::setprecision(6) << std::flush;
 
-        PrintMatrix(detailed_response[0],pop->popsize,REAL_FUNC::__output_N, result_string_stream);
-        PrintMatrix(detailed_response[1],N_OF_TIME_POSITIONS,REAL_FUNC::__output_N, result_string_stream);
+        int OUTPUT_LENGTH;
+        if (parameters->FULL_MODEL)
+        {
+            OUTPUT_LENGTH = REAL_FUNC::__output_N;
+        }else{
+            OUTPUT_LENGTH = REAL_FUNC::__output_N_reduced_model;
+        }
+
+        PrintMatrix(detailed_response[0],pop->popsize, OUTPUT_LENGTH, result_string_stream);
+        PrintMatrix(detailed_response[1],N_OF_TIME_POSITIONS, OUTPUT_LENGTH, result_string_stream);
 
 
         string result_string = result_string_stream.str();
@@ -482,6 +490,13 @@ namespace NEAT
 
             if (parameters->COMPUTE_RESPONSE)
             {
+                int OUTPUT_LENGTH;
+                if (parameters->FULL_MODEL)
+                {
+                    OUTPUT_LENGTH = REAL_FUNC::__output_N;
+                }else{
+                    OUTPUT_LENGTH = REAL_FUNC::__output_N_reduced_model;
+                }
                 double *res = new double[REAL_FUNC::__output_N];
                 net.return_average_response_and_stop_recording(res);
                 append_line_to_file(
@@ -489,7 +504,7 @@ namespace NEAT
                     "['" + parameters->CONTROLLER_PATH + "', '" +
                         to_string(parameters->PROBLEM_INDEX) + "', '" +
                         to_string(parameters->PROBLEM_DIM) + "', " +
-                        array_to_python_list_string(res, REAL_FUNC::__output_N) + "]\n");
+                        array_to_python_list_string(res, OUTPUT_LENGTH) + "]\n");
                 delete[] res;
             }
 
