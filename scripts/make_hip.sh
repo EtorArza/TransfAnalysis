@@ -38,5 +38,7 @@ ls
 
 make -j ${SLURM_CPUS_PER_TASK}
 
+./neat
+
 cp neat ${SRC_DIR}
 cp obj -r ${SRC_DIR}

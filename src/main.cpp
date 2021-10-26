@@ -113,7 +113,46 @@ int main(int argc, char *argv[])
     if (argc < 2)
     {
         cout << "Error, no configuration file provided.\n";
+        printf("double uses %d bytes in this processor/compiler.\n", sizeof(double));           // some compilers print 8
+        printf("long double uses %d bytes in this processor/compiler.\n", sizeof(long double)); // some compilers print 16
         exit(1);
+        
+        /* # check optimum of MCCORMICK function (plate-shaped)
+        long double x_vec[2] = {-0.54719755140825202904776222712079913890192983672022819519043L, -1.54719755140825202910197233574507436060230247676372528076172L};
+        int n = 10000000;
+        long double delta = 0.0000000001;
+        long double best_res = 1.9133;
+        cout << std::setprecision(60) << std::flush;
+
+        for (size_t i = 0; i < n; i++)
+        {
+            if (i % 10000 == 0)
+                cout << (double)i / (double)n << endl;
+            size_t j = i;
+
+            long double res = 0;
+
+            long double x1 = x_vec[0] + delta * (long double)((long double)i - (long double)n / 2) * 2 / (long double)n;
+            long double x2 = x_vec[1] + delta * (long double)((long double)j - (long double)n / 2) * 2 / (long double)n;
+
+            long double val1 = 0.866025403572777245327692779985895299432741012424230575561523 + sin(x1 + x2);
+            long double val2 = -1.0L                                                          + pow(x1 - x2, 2);
+            long double val3 = 2.04719755140825936980120136610139525146223604679107666015625 - 1.5L * x1 + 2.5L * x2 + 1.0L;
+
+            res = val1 + val2 + val3;
+
+            if (res < best_res)
+            {
+                best_res = res;
+                cout << x1 << ", " << x2 << endl;
+                cout << "val1 = " << val1 << endl;
+                cout << "val2 = " << val2 << endl;
+                cout << "val3 = " << val3 << endl;
+                cout << "f(x) = " << -res << endl;
+            }
+        }
+        */
+
     }
     else if (argc > 3)
     {
