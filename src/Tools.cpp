@@ -2159,7 +2159,9 @@ bool Friedman_test_are_there_critical_diferences(double** f_values, int n_candid
 
     if(T < 0)
     {
+        #ifndef HIPATIA
         cout << "T is negative\n" << std::flush;
+        #endif
     }
 
     int df = m - 1;
@@ -2167,17 +2169,20 @@ bool Friedman_test_are_there_critical_diferences(double** f_values, int n_candid
 
     
 
-
     if (p > ALPHA)
     {
-        cout << "Friedman H0 ";
-        cout << "T: " << T << ", df: " << df << ", Friedman p-value: " << p;
+        #ifndef HIPATIA
+            cout << "Friedman H0 ";
+            cout << "T: " << T << ", df: " << df << ", Friedman p-value: " << p;
+        #endif
         return false;
     }
     else
     {
-        cout << "Friedman H1 ";
-        cout << "T: " << T << ", df: " << df << ", Friedman p-value: " << p;
+        #ifndef HIPATIA
+            cout << "Friedman H1 ";
+            cout << "T: " << T << ", df: " << df << ", Friedman p-value: " << p;
+        #endif
         return true;
     }
 }

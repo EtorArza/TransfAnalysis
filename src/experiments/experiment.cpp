@@ -155,13 +155,17 @@ void execute_multi(class NEAT::Network **nets_, NEAT::OrganismEvaluation *result
 
         while (surviving_candidates.size() > target_n_controllers_left && MAX_EVALS_PER_CONTROLLER > current_n_of_evals)
         {
-            cout << "Evaluating -> " ;
+            #ifndef HIPATIA
+            cout << "Evaluating -> ";
+            #endif
             //cout << "\n" << "inet" << "," << "f_value_sample_index" << "," << "instance_index" << "," << "seed" << "\n";
 
             int n_surviving_candidates = surviving_candidates.size();
             
-
+            #ifndef HIPATIA
             progress_bar bar(n_surviving_candidates* n_evals_each_it, flushOut);
+            #endif
+
             #pragma omp parallel for num_threads(parameters->neat_params->N_OF_THREADS) schedule(dynamic,1)
             for (int i = 0; i < n_surviving_candidates * n_evals_each_it; i++)
             {
@@ -173,10 +177,14 @@ void execute_multi(class NEAT::Network **nets_, NEAT::OrganismEvaluation *result
                 int seed = initial_seed + f_value_sample_index;
 
                 f_values[inet][f_value_sample_index] = FitnessFunction(net, seed, instance_index, parameters);
-                bar.step();
+                #ifndef HIPATIA
+                    bar.step();
+                #endif
             }
-            bar.end();
-            cout << ", ";
+            #ifndef HIPATIA
+                bar.end();
+                cout << ", ";
+            #endif
             current_n_of_evals += n_evals_each_it;
 
             convert_f_values_to_negative_inverse_ranks_squared(surviving_candidates, f_values, f_value_ranks, current_n_of_evals);
@@ -194,13 +202,15 @@ void execute_multi(class NEAT::Network **nets_, NEAT::OrganismEvaluation *result
                 F_race_iteration(f_value_ranks, surviving_candidates, current_n_of_evals, ALPHA_INDEX);
             }else
             {
-                 cout << "The controllers behave the same.";
+                #ifndef HIPATIA
+                cout << "The controllers behave the same.";
+                #endif
             }
-
+            #ifndef HIPATIA
             cout << ", perc_discarded: " << (double)(nnets - surviving_candidates.size()) / (double)(nnets);
             cout << ", " << surviving_candidates.size() << " left.";
             cout << "\n";
-
+            #endif
             if (are_all_ranks_the_same)
             {
                 break;
@@ -223,10 +233,12 @@ void execute_multi(class NEAT::Network **nets_, NEAT::OrganismEvaluation *result
         surviving_candidates.clear();
         surviving_candidates.push_back(best_current_iteration_index);
         surviving_candidates.push_back(nnets);
-        
+
+        #ifndef HIPATIA
         cout << "Reevaluating best -> ";
         progress_bar bar(MAX_EVALS_PER_CONTROLLER, flushOut);
-        
+        #endif
+
         current_n_of_evals = 0;
         bool test_result = true;
 
@@ -235,7 +247,10 @@ void execute_multi(class NEAT::Network **nets_, NEAT::OrganismEvaluation *result
             #pragma omp parallel for num_threads(parameters->neat_params->N_OF_THREADS) schedule(dynamic,1)
             for (int i = 0; i < MAX_EVALS_PER_CONTROLLER; i++)
             {
-                bar.step();
+
+                #ifndef HIPATIA
+                    bar.step();
+                #endif
                 int instance_index =  i % n_instances;
                 int f_value_sample_index = i + current_n_of_evals;
                 int seed = f_value_sample_index + initial_seed;
@@ -252,7 +267,9 @@ void execute_multi(class NEAT::Network **nets_, NEAT::OrganismEvaluation *result
             if (check_if_all_ranks_are_the_same(surviving_candidates, f_value_ranks, current_n_of_evals))
             {
                 test_result = false;
-                cout << "The controllers behave the same.";
+                #ifndef HIPATIA
+                    cout << "The controllers behave the same.";
+                #endif
                 break;
             }
             // cout << "best this gen ->";
@@ -262,8 +279,10 @@ void execute_multi(class NEAT::Network **nets_, NEAT::OrganismEvaluation *result
             test_result = is_A_larger_than_B_sign_test(f_value_ranks[best_current_iteration_index], f_value_ranks[nnets], current_n_of_evals, ALPHA_INDEX);
             //cout << "test_result: " << test_result << "\n";
         }
+        #ifndef HIPATIA
         bar.end();
         cout << "\n";
+        #endif
 
 
         convert_f_values_to_negative_inverse_ranks_squared(surviving_candidates, f_values, f_value_ranks, current_n_of_evals);

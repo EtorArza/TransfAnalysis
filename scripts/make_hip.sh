@@ -16,7 +16,6 @@ mkdir ${SCRATCH_JOB}
 SRC_DIR=`pwd`
 
 cat > Makefile.conf <<EOF
-ENABLE_CUDA=false
 DEVMODE=false
 CFLAGS= -std=c++11 -pthread -Wall
 PARALELLIZE=true
