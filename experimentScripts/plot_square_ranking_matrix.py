@@ -20,6 +20,7 @@ save_fig_paths = [
 "experimentResults/transfer_permus_problems/results/figures/",
 "experimentResults/transfer_permus_problems/results/figures/",
 "experimentResults/transfer_permus_problems/results/figures/",
+"experimentResults/transfer_16_continuous_problems/results/figures/",
 "experimentResults/transfer_16_continuous_problems/results/figures/"
 ]
 
@@ -32,7 +33,8 @@ txt_paths = [
 "src/experiments/permus/results/transfer_qap_with_cut_instances/result_score_transfer_qap_0_1s_2h.txt",
 "src/experiments/permus/results/transfer_qap_with_cut_instances/result_score_transfer_qap_0_25s_1h.txt",
 "src/experiments/permus/results/transfer_qap_with_cut_instances/result_score_transfer_qap_0_1s_12h.txt",
-"experimentResults/transfer_16_continuous_problems/results/score.txt"
+"experimentResults/transfer_16_continuous_problems/results/score.txt",
+"experimentResults/transfer_16_continuous_problems/results/score.txt",
 ]
 
 
@@ -45,6 +47,7 @@ transfer_exp_list =[
 "QAP",
 "QAP",
 "LOO16",
+"Transfer16OnlyOne",
 ]
 
 i = 0
@@ -76,7 +79,7 @@ for input_txt, transfer_exp, save_fig_path in zip(txt_paths, transfer_exp_list, 
                 type_name = type_name[0] + "_" + type_name[1]
             return type_name
 
-    elif transfer_exp == "LOO16":
+    elif transfer_exp == "LOO16" or transfer_exp == "Transfer16OnlyOne":
         PROBLEM_TYPES = ["bowl", "valley", "plate","multiopt"]
         def get_type(instance_name):
             problem_index = int(instance_name.strip("_"))
@@ -100,8 +103,19 @@ for input_txt, transfer_exp, save_fig_path in zip(txt_paths, transfer_exp_list, 
     with open(input_txt) as f:
         for line in f:
 
+            # Trained only in one
+            if transfer_exp == "Transfer16OnlyOne":
+                if not "Only" in line:
+                    continue
+                line = line.split(",")
+                line = [el.strip("[]") for el in line]
+                train_name = "_"+str(line[2].split("TrainOnlyInF_")[1].split("_best.controller")[0])+"_"
+                test_name = "_"+str(line[1])+"_"
+                score = min(0,float(line[0]))
+
+
             # Continuous LOO16 
-            if transfer_exp == "LOO16":
+            elif transfer_exp == "LOO16":
                 if "Only" in line:
                     continue
                 line = line.split(",")
@@ -113,6 +127,8 @@ for input_txt, transfer_exp, save_fig_path in zip(txt_paths, transfer_exp_list, 
                 # This means that the controller can be tested in problems of different type or the problem left out. 
                 if get_type(train_name) == get_type(test_name) and train_name != test_name:
                     continue
+
+
 
             # PERMUS (both qap and permuproblems)
             else:
@@ -162,7 +178,6 @@ for input_txt, transfer_exp, save_fig_path in zip(txt_paths, transfer_exp_list, 
 
     pos = 0
     neg = 0
-    print(data_frame)
     for idx in data_frame.index:
         row = data_frame.loc[idx,:]
         train_name = row["train_name"]
@@ -194,6 +209,7 @@ for input_txt, transfer_exp, save_fig_path in zip(txt_paths, transfer_exp_list, 
 
 
     data_frame.insert(1, "transferability", transferability, False) 
+    print(data_frame[data_frame["test_name"]=="_1_"])
 
 
 
@@ -233,17 +249,9 @@ for input_txt, transfer_exp, save_fig_path in zip(txt_paths, transfer_exp_list, 
     print(transfer_result)
     # print(data_frame[data_frame["test_type"] == "tsp"])
 
-    if transfer_exp == "LOO16":
-        print(data_frame)
 
-        for g in np.unique(data_frame["test_type"].unique()):
-            plt.scatter([int(el.strip("_")) for el in data_frame[data_frame["test_type"]==g]["train_name"]], -data_frame[data_frame["test_type"]==g]["score"],  label=g, marker="x" )
-        # plt.ylim(min(-data_frame["score"]), max(-data_frame["score"]))
-        # plt.yscale("log")
-        plt.legend(title="Test type")
-        plt.savefig("experimentResults/transfer_16_continuous_problems/results/figures/LOO16_scatter.svg")
-        plt.savefig("experimentResults/transfer_16_continuous_problems/results/figures/LOO16_scatter.pdf")
-        plt.close()
+    # Make the plots
+    if transfer_exp == "LOO16" or transfer_exp == "Transfer16OnlyOne":
 
         matrix_data = np.zeros((16,16))
         for i in range(16):
@@ -255,8 +263,13 @@ for input_txt, transfer_exp, save_fig_path in zip(txt_paths, transfer_exp_list, 
                 value = float(value) if len(value)>0 else np.NAN
 
                 matrix_data[i,j] = value
-        ax = sns.heatmap(matrix_data, linewidth=0.5)
-        plt.show()
+        ax = sns.heatmap(matrix_data, linewidth=0.5, xticklabels=[str(i) for i in range(1,16+1)], yticklabels=[str(i) for i in range(1,16+1)])
+        ax.xaxis.tick_top() # x axis on top
+        ax.xaxis.set_label_position('top')
+        ax.set_xlabel("Test instance")
+        ax.set_ylabel("Training instance")
+        plt.savefig("experimentResults/transfer_16_continuous_problems/results/figures/"+transfer_exp+"_heatmap.pdf")
+        plt.close()
 
 
 
