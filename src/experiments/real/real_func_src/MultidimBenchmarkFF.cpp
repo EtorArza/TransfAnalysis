@@ -267,7 +267,6 @@ double F7::FitnessFunc(double* x_vec){
 // three hump cammel funcion (valley-shaped) [-5,5]
 double F8::FitnessFunc(double* x_vec){
     long double res = 0;
-    long double tmp;
     if(dim != 2)
     {
         cout << "\nERROR: cammel function is only available when dim = 2." << endl;
@@ -277,11 +276,15 @@ double F8::FitnessFunc(double* x_vec){
     long double x1 = x_vec[0];
     long double x2 = x_vec[1];
 	
-    res+= 2*pow(x1,2);
-    res+= -1.05L*pow(x1,4);
-    res+= pow(x1,6) / 6.0L;
+    long double x1_squared = x1 * x1;
+    long double x1_power_four = x1_squared * x1_squared;
+    long double x1_power_six = x1_power_four * x1_squared;
+
+    res+= 2.0L * x1_squared;
+    res+= -1.05L* x1_power_four;
+    res+= x1_power_six / 6.0L;
     res+= x1*x2;
-    res+= pow(x2,2);
+    res+= x2*x2;
 	
 
    return - res;
