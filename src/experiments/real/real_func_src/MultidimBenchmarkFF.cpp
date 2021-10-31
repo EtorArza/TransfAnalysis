@@ -370,13 +370,15 @@ double F12::FitnessFunc(double* x_vec){
     long double x1 = (long double) x_vec[0];
     long double x2 = (long double) x_vec[1];
 	
-    long double val1 = 0.866025403572777245327692779985895299432741012424230575561523 + sin(x1 + x2);
+    long double val1 = 0.866025403572777245327692779985895299432741012424230575561523L + sin(x1 + x2);
     long double val2 = -1.0L                                                          + pow(x1 - x2, 2);
-    long double val3 = 2.04719755140825936980120136610139525146223604679107666015625 - 1.5L * x1 + 2.5L * x2 + 1.0L;
+    long double val3 = 2.04719755140825936980120136610139525146223604679107666015625L - 1.5L * x1 + 2.5L * x2 + 1.0L;
 
+    res = val1 + val2 + val3;
 
     if (res < 0.0L)
     {
+        cout << "mccoormick" << res << endl;
         return 0.0L;
     }
            
