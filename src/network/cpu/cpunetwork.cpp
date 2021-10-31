@@ -209,8 +209,8 @@ void CpuNetwork::start_recording_response(void (*function_to_injectivize_output)
     {
         response = new double[dims.nnodes.output];
         output_copy = new double[dims.nnodes.output];
-        samples_response = new int[1];
-        samples_response[0] = 0.0;
+        samples_response = new long long int[1];
+        samples_response[0] = 0;
     }
     response_is_being_recorded = true;
     set_array_to_value(response, 0.0, dims.nnodes.output);

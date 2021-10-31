@@ -19,7 +19,7 @@ namespace NEAT {
         double* response=NULL;
         double *output_copy;
         bool response_is_being_recorded=false;
-        int *samples_response=NULL;
+        long long int *samples_response=NULL;
         bool signature_initialized=false;
         void (*function_to_injectivize_output)(double* );
 
