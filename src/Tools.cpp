@@ -635,9 +635,6 @@ void RandomNumberGenerator::seed(int seed){
     this->x = (unsigned long) seed;
     this->y=362436069UL; 
     this->z=521288629UL;
-    xorshf96();
-    x+=1;
-    xorshf96();
 }
 
 
