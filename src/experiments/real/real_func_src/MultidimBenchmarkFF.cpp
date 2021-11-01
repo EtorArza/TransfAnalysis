@@ -467,7 +467,7 @@ double F16::FitnessFunc(double* x_vec){
 
     sum_2 = -exp(sum_2 / (long double) dim);
 
-    res = 20.0L + exp(1.0L) + sum_1 + sum_2;
+    res = 20.0L + 2.7182818284590452353602874713527L + sum_1 + sum_2;
     return -res;
 }
 
