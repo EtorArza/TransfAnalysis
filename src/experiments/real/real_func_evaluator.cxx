@@ -443,7 +443,7 @@ namespace NEAT
             double *v_of_f_values = new double[parameters->N_EVALS];
 
 
-            int initial_seed = neat_params->SEED;
+            int initial_seed = global_rng.random_integer_fast(40000000, 50000000);
 
             
 

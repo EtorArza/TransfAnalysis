@@ -219,6 +219,8 @@ int main(int argc, char *argv[])
     neat_params->load_global_params(conf_file_path);
     exp->neat_params = neat_params;
     global_rng.seed(neat_params->SEED);
+    neat_params->SEED = global_rng.random_integer_fast();
+    global_rng.seed(neat_params->SEED);
     rng_t rng{neat_params->SEED};
     exp->run_given_conf_file(conf_file_path);
     delete neat_params;

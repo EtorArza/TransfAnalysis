@@ -183,7 +183,6 @@ void PermuEvaluator::read_conf_file(std::string conf_file_path)
     if (parameters->MODE == "train")
     {
 
-        parameters->SEED = reader.GetInteger("Global", "SEED", -1);
         string search_type = reader.Get("Global", "SEARCH_TYPE", "UNKOWN");
         parameters->PROBLEM_TYPE = reader.Get("Global", "PROBLEM_TYPE", "UNKOWN");
         parameters->INSTANCE_PATH = reader.Get("Global", "PROBLEM_PATH", "UNKOWN");
@@ -311,6 +310,7 @@ void PermuEvaluator::run_given_conf_file(std::string conf_file_path)
 
     read_conf_file(conf_file_path);
     parameters->neat_params = this->neat_params;
+    neat_params->SEED = global_rng.random_integer_fast();
 
     if (parameters->MODE == "train")
     {
@@ -333,11 +333,7 @@ void PermuEvaluator::run_given_conf_file(std::string conf_file_path)
         double *v_of_f_values = new double[parameters->N_EVALS];
 
         cout << std::setprecision(15);
-        RandomNumberGenerator *rng;
-        rng = new RandomNumberGenerator();
-        rng->seed();
-        int initial_seed = rng->random_integer_uniform(40000000, 50000000);
-        delete rng;
+        int initial_seed = global_rng.random_integer_fast(40000000, 50000000);
         ostringstream result_string_stream;
         result_string_stream << std::setprecision(15);
         result_string_stream << std::flush;

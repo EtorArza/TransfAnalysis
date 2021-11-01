@@ -136,6 +136,7 @@ void Permu_multiEvaluator::run_given_conf_file(std::string conf_file_path)
 
     read_conf_file(conf_file_path);
     parameters->neat_params = this->neat_params;
+    neat_params->SEED = global_rng.random_integer_fast();
 
     if (parameters->MODE == "train")
     {
