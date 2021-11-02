@@ -157,7 +157,6 @@ double *CPopulation::get_neat_input_individual_i(int i)
 void CPopulation::apply_neat_output_to_individual_i(double *output_neat, int i)
 {
 
-    #define MAX_COMPONENT_STEP_SIZE 1
 
     GenerateRandomRealvec_0_1(templ_double_array4_of_size_n, n, this->rng);
 
@@ -169,28 +168,29 @@ void CPopulation::apply_neat_output_to_individual_i(double *output_neat, int i)
         templ_double_array4_of_size_n[j] -= m_individuals[i]->genome[j];
     }
 
-    // comment to disable normalization
-    normalize_vector_L1(m_individuals[i]->momentum, n);
-    normalize_vector_L1(templ_double_array1_of_size_n, m_individuals[i]->n);
-    normalize_vector_L1(templ_double_array2_of_size_n, m_individuals[i]->n);
-    normalize_vector_L1(templ_double_array3_of_size_n, m_individuals[i]->n);
-    normalize_vector_L1(templ_double_array4_of_size_n, m_individuals[i]->n);
+    // // comment to disable normalization
+    // normalize_vector_L1(m_individuals[i]->momentum, n);
+    // normalize_vector_L1(templ_double_array1_of_size_n, m_individuals[i]->n);
+    // normalize_vector_L1(templ_double_array2_of_size_n, m_individuals[i]->n);
+    // normalize_vector_L1(templ_double_array3_of_size_n, m_individuals[i]->n);
+    // normalize_vector_L1(templ_double_array4_of_size_n, m_individuals[i]->n);
 
-    // comment to disable pow3 to output to smooth out near 0
     int n_outputs = REAL_FUNC::__output_N;
     if (!this->full_model)
     {
         n_outputs = REAL_FUNC::__output_N_reduced_model;
     }
-    for (size_t i = 0; i < n_outputs; i++)
-    {
-        output_neat[i] = pow(output_neat[i], 3);
-    }
+
+    // // comment to disable pow3 to output to smooth out near 0
+    // for (size_t i = 0; i < n_outputs; i++)
+    // {
+    //     output_neat[i] = pow(output_neat[i], 3);
+    // }
     
 
     for (int j = 0; j < n; j++)
     {
-        m_individuals[i]->momentum[j] = MAX_COMPONENT_STEP_SIZE * 
+        m_individuals[i]->momentum[j] =  
         (
             m_individuals[i]->momentum[j] *  output_neat[REAL_FUNC::MOMENTUM] +
             templ_double_array1_of_size_n[j] * output_neat[REAL_FUNC::L_BEST] + 
@@ -198,7 +198,7 @@ void CPopulation::apply_neat_output_to_individual_i(double *output_neat, int i)
         );
         if (this->full_model)
         {
-            m_individuals[i]->momentum[j] += MAX_COMPONENT_STEP_SIZE *
+            m_individuals[i]->momentum[j] += 
             (
                 templ_double_array3_of_size_n[j] * output_neat[REAL_FUNC::AVERAGE] +
                 templ_double_array4_of_size_n[j] * output_neat[REAL_FUNC::RANDOM]
