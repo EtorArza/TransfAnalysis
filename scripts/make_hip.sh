@@ -32,7 +32,7 @@ cp -v Makefile.conf ${SCRATCH_JOB}/
 
 cd ${SCRATCH_JOB}
 
-echo "ls: " -n
+echo "ls: "
 ls
 
 make -j ${SLURM_CPUS_PER_TASK}
@@ -40,4 +40,3 @@ make -j ${SLURM_CPUS_PER_TASK}
 ./neat
 
 cp neat ${SRC_DIR}
-cp obj -r ${SRC_DIR}
