@@ -187,10 +187,10 @@ void CPopulation::apply_neat_output_to_individual_i(double *output_neat, int i)
     //     output_neat[i] = pow(output_neat[i], 3);
     // }
     
-
+    // Need to multiply output by 2, because the network is between -2 and 2.
     for (int j = 0; j < n; j++)
     {
-        m_individuals[i]->momentum[j] =  
+        m_individuals[i]->momentum[j] =  2.0*
         (
             m_individuals[i]->momentum[j] *  output_neat[REAL_FUNC::MOMENTUM] +
             templ_double_array1_of_size_n[j] * output_neat[REAL_FUNC::L_BEST] + 
@@ -198,7 +198,7 @@ void CPopulation::apply_neat_output_to_individual_i(double *output_neat, int i)
         );
         if (this->full_model)
         {
-            m_individuals[i]->momentum[j] += 
+            m_individuals[i]->momentum[j] += 2.0*
             (
                 templ_double_array3_of_size_n[j] * output_neat[REAL_FUNC::AVERAGE] +
                 templ_double_array4_of_size_n[j] * output_neat[REAL_FUNC::RANDOM]
@@ -226,7 +226,7 @@ void CPopulation::apply_neat_output_to_individual_i(double *output_neat, int i)
 
 
     // clip momentum between (-K_V_MAX , K_V_MAX), do not clip m_individuals[i]->genome[j] as suggested in 'A Cooperative approach to particle swarm optimization'
-    double K_V_MAX = 0.1;
+    double K_V_MAX = 0.5;
     for (int j = 0; j < n; j++)
     {
         m_individuals[i]->momentum[j] = max(m_individuals[i]->momentum[j], -K_V_MAX);

@@ -4,8 +4,8 @@
 #SBATCH --error=out/slurm_%A_%a_err.txt
 #SBATCH --ntasks=1 # number of tasks
 #SBATCH --ntasks-per-node=1 #number of tasks per node
-#SBATCH --mem=8G
-#SBATCH --cpus-per-task=16 # number of CPUs
+#SBATCH --mem=64G
+#SBATCH --cpus-per-task=32 # number of CPUs
 #SBATCH --time=30-00:00:00 #Walltime
 #SBATCH -p xlarge
 #SBATCH --exclude=n[001-004]

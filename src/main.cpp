@@ -82,6 +82,7 @@ int main(int argc, char *argv[])
     using namespace std;
     using namespace NEAT;
 
+    /*
     cout << "\n---------- BEGIN LICENCE DISCLAIMER----------\n";
     cout << "The neuroevolution algorithm is based in accneat. Although some small changes \n";
     cout << "have been made, most of the NEAT algorithm remains unchanged.\n"
@@ -103,6 +104,7 @@ int main(int argc, char *argv[])
     cout << "To keep the licence stuff as painless as possible, the software part writen by \n";
     cout << "Etor Arza is distributed with APACHE LICENCE 2.0.\n\n";
     cout << "----------END LICENCE DISCLAIMER----------\n\n\n\n\n\n";
+    */
 
 #ifndef NDEBUG
     cout << "WARNING: Debug mode. Assertions enabled." << endl;
@@ -115,42 +117,62 @@ int main(int argc, char *argv[])
         cout << "Error, no configuration file provided.\n";
         printf("double uses %d bytes in this processor/compiler.\n", sizeof(double));           // some compilers print 8
         printf("long double uses %d bytes in this processor/compiler.\n", sizeof(long double)); // some compilers print 16
-        exit(1);
         
-        /* # check optimum of MCCORMICK function (plate-shaped)
-        long double x_vec[2] = {-0.54719755140825202904776222712079913890192983672022819519043L, -1.54719755140825202910197233574507436060230247676372528076172L};
-        int n = 10000000;
-        long double delta = 0.0000000001;
-        long double best_res = 1.9133;
-        cout << std::setprecision(60) << std::flush;
+        // #define dim 20
+        // double x_vec[dim] = {0.6757571658, 0.5135890549, 0.4608551431, 0.4998168102, 0.5278000325, 0.5246639005, 0.3951178248, 0.5214761316, 0.6219129204, 0.6766302005, 0.6855895844, 0.7734823387, 0.6537444534, 0.4777864059, 0.6669242475, 0.7482358173, 0.5883391772, 0.6494809372, 0.8319084066, 0.6674026026};
+        // F3 rosembrock_test = F3(3, dim, 0.0, 10.0, 2438989325, false);
+        // long double res = rosembrock_test.FitnessFunc(x_vec);
 
-        for (size_t i = 0; i < n; i++)
+
+        /*
+        // check optimum of langermann function (multiopt)
+        #define dim 6
+        double x_vec[dim] = {6.069882998, 8.680343392, 6.733060222, 8.120919558, 8.626602718, 10.45409736};
+        double x_vec_copy[dim];
+
+        for (size_t i = 0; i < dim; i++)
         {
-            if (i % 10000 == 0)
-                cout << (double)i / (double)n << endl;
-            size_t j = i;
+            x_vec_copy[i] = x_vec[i];
+        }
+        
 
-            long double res = 0;
+        long double delta = 0.01;
+        long double best_res = -10000;
+        cout << std::setprecision(60) << std::flush;
+        F7 rosembrock_test = F7(7, dim, 0.0, 10.0, 2438989325, false);
+        long double res = 0;
 
-            long double x1 = x_vec[0] + delta * (long double)((long double)i - (long double)n / 2) * 2 / (long double)n;
-            long double x2 = x_vec[1] + delta * (long double)((long double)j - (long double)n / 2) * 2 / (long double)n;
+        // double x[3] = {1.0,1.0,1.2};
+        // cout << rosembrock_test.FitnessFunc(x);
 
-            long double val1 = 0.866025403572777245327692779985895299432741012424230575561523 + sin(x1 + x2);
-            long double val2 = -1.0L                                                          + pow(x1 - x2, 2);
-            long double val3 = 2.04719755140825936980120136610139525146223604679107666015625 - 1.5L * x1 + 2.5L * x2 + 1.0L;
+        long unsigned int i = 0;
+        while(true)
+        {   
+            i++;
+            if (i % 100000 == 0)
+            {
+                i = 0;
+                cout << "-" << std::flush;
+            }
 
-            res = val1 + val2 + val3;
+            for (size_t s = 0; s < dim; s++)
+            {
+                x_vec_copy[s] = x_vec[s] + delta/(double)2*((double)random() / (double) RAND_MAX);
+            }
+        
 
-            if (res < best_res)
+            res = rosembrock_test.FitnessFunc(x_vec_copy);
+
+            if (res > best_res || best_res==-10000)
             {
                 best_res = res;
-                cout << x1 << ", " << x2 << endl;
-                cout << "val1 = " << val1 << endl;
-                cout << "val2 = " << val2 << endl;
-                cout << "val3 = " << val3 << endl;
-                cout << "f(x) = " << -res << endl;
+                cout << endl;
+                cout << "x = ";
+                PrintArray(x_vec_copy, dim);
+                cout << "f(x) = " << res << endl;
             }
         }
+        exit(1);
         */
 
     }

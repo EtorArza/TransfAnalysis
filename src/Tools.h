@@ -68,7 +68,7 @@ void PrintArray(T *array, int length)
     for (int i = 0; i < length; i++)
     {
         cout << std::setprecision(10);
-        cout << array[i] << " ";
+        cout << array[i] << ", ";
     }
     cout << " " << endl;
 }
@@ -1128,3 +1128,34 @@ bool are_all_values_the_same_in_matrix(double **matrix, int m, int n);
 
 long long gcd(long long int a, long long int b);
 long long lcm(long long int a, long long int b);
+
+template <class T>
+T FastPow(T x, int n)
+{
+    T res = x;
+    if (n == 0)
+    {
+        return (T) 1;
+    }
+    if (n == 1)
+    {
+        return x;
+    }
+
+    int i = 2;
+    int j = 1;
+    while (i <= n)
+    {
+        res *= res;
+        j = i;
+        i *= i;
+    }
+
+    while (j < n)
+    {
+        j++;
+        res *= x ;
+    }
+    
+    return res;
+}

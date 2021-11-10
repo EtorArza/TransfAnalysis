@@ -4,11 +4,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 from seaborn import clustermap
 import seaborn as sns
-from scipy.ndimage.filters import gaussian_filter
-from copy import deepcopy
 import random
 import fnmatch
 import matplotlib
+import subprocess
 
 # save_fig_path = "/home/paran/Dropbox/BCAM/02_NEAT_permus/paper/images/permu_problems_transfer/"
 
@@ -20,7 +19,7 @@ save_fig_paths = [
 "experimentResults/transfer_permus_problems/results/figures/",
 "experimentResults/transfer_permus_problems/results/figures/",
 "experimentResults/transfer_permus_problems/results/figures/",
-"experimentResults/transfer_16_continuous_problems/results/figures/",
+# "experimentResults/transfer_16_continuous_problems/results/figures/",
 "experimentResults/transfer_16_continuous_problems/results/figures/"
 ]
 
@@ -33,7 +32,7 @@ txt_paths = [
 "src/experiments/permus/results/transfer_qap_with_cut_instances/result_score_transfer_qap_0_1s_2h.txt",
 "src/experiments/permus/results/transfer_qap_with_cut_instances/result_score_transfer_qap_0_25s_1h.txt",
 "src/experiments/permus/results/transfer_qap_with_cut_instances/result_score_transfer_qap_0_1s_12h.txt",
-"experimentResults/transfer_16_continuous_problems/results/score.txt",
+# "experimentResults/transfer_16_continuous_problems/results/score.txt",
 "experimentResults/transfer_16_continuous_problems/results/score.txt",
 ]
 
@@ -46,7 +45,7 @@ transfer_exp_list =[
 "QAP",
 "QAP",
 "QAP",
-"LOO16",
+# "LOO16",
 "Transfer16OnlyOne",
 ]
 
@@ -55,6 +54,8 @@ for input_txt, transfer_exp, save_fig_path in zip(txt_paths, transfer_exp_list, 
     if i < 6:
         i += 1
         continue
+
+    subprocess.run(f"mkdir -p {save_fig_path}", shell=True) # write out into log.txt
 
 
 
@@ -80,10 +81,10 @@ for input_txt, transfer_exp, save_fig_path in zip(txt_paths, transfer_exp_list, 
             return type_name
 
     elif transfer_exp == "LOO16" or transfer_exp == "Transfer16OnlyOne":
-        PROBLEM_TYPES = ["bowl", "valley", "plate","multiopt"]
+        PROBLEM_TYPES = ["bowl", "multiopt"]
         def get_type(instance_name):
             problem_index = int(instance_name.strip("_"))
-            type_name = PROBLEM_TYPES[(problem_index - 1) // 4]
+            type_name = PROBLEM_TYPES[(problem_index - 1) // 6]
             return type_name
 
 
@@ -111,7 +112,7 @@ for input_txt, transfer_exp, save_fig_path in zip(txt_paths, transfer_exp_list, 
                 line = [el.strip("[]") for el in line]
                 train_name = "_"+str(line[2].split("TrainOnlyInF_")[1].split("_best.controller")[0])+"_"
                 test_name = "_"+str(line[1])+"_"
-                score = min(0,float(line[0]))
+                score = float(line[0])
 
 
             # Continuous LOO16 
@@ -122,7 +123,7 @@ for input_txt, transfer_exp, save_fig_path in zip(txt_paths, transfer_exp_list, 
                 line = [el.strip("[]") for el in line]
                 train_name = "_"+str(line[2].split("LeaveOutF_")[1].split("_best.controller")[0])+"_"
                 test_name = "_"+str(line[1])+"_"
-                score = min(0,float(line[0]))
+                score = float(line[0])
                 # Its leave one out, so LeaveOutF_6_best.controller was actually trained in the rest of the problems of the same type (5 7 8).
                 # This means that the controller can be tested in problems of different type or the problem left out. 
                 if get_type(train_name) == get_type(test_name) and train_name != test_name:
@@ -207,10 +208,8 @@ for input_txt, transfer_exp, save_fig_path in zip(txt_paths, transfer_exp_list, 
     #             neg += 1
     # print (pos / (pos + neg) * 100 , "%")
 
-
+    # Insert transferability column
     data_frame.insert(1, "transferability", transferability, False) 
-    print(data_frame[data_frame["test_name"]=="_1_"])
-
 
 
 
@@ -253,9 +252,9 @@ for input_txt, transfer_exp, save_fig_path in zip(txt_paths, transfer_exp_list, 
     # Make the plots
     if transfer_exp == "LOO16" or transfer_exp == "Transfer16OnlyOne":
 
-        matrix_data = np.zeros((16,16))
-        for i in range(16):
-            for j in range(16):
+        matrix_data = np.zeros((12,12))
+        for i in range(12):
+            for j in range(12):
                 train_name = "_" + str(i+1) + "_"
                 test_name = "_" + str(j+1) + "_"
                 value = data_frame[(data_frame["train_name"] == train_name) & (data_frame["test_name"] == test_name)]["transferability"]
@@ -263,12 +262,12 @@ for input_txt, transfer_exp, save_fig_path in zip(txt_paths, transfer_exp_list, 
                 value = float(value) if len(value)>0 else np.NAN
 
                 matrix_data[i,j] = value
-        ax = sns.heatmap(matrix_data, linewidth=0.5, xticklabels=[str(i) for i in range(1,16+1)], yticklabels=[str(i) for i in range(1,16+1)])
+        ax = sns.heatmap(matrix_data, linewidth=0.5, xticklabels=[str(i) for i in range(1,12+1)], yticklabels=[str(i) for i in range(1,12+1)])
         ax.xaxis.tick_top() # x axis on top
         ax.xaxis.set_label_position('top')
         ax.set_xlabel("Test instance")
         ax.set_ylabel("Training instance")
-        plt.savefig("experimentResults/transfer_16_continuous_problems/results/figures/"+transfer_exp+"_heatmap.pdf")
+        plt.savefig(save_fig_path+transfer_exp+"_heatmap.pdf")
         plt.close()
 
 

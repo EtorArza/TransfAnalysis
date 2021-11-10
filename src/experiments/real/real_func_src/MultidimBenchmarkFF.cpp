@@ -175,117 +175,78 @@ double F3::FitnessFunc(double* x_vec){
     }
     res = sum1 - sum2;
 
-    return - res ; // make sure it is negative
+    return - res;
 }
 
 
-// PERM FUNCTION 0, D, BETA (bowl-shaped) [-2, 2]
+// sum [log(x_i)^2] (bowl-shaped) [0.5, 3]
 double F4::FitnessFunc(double* x_vec){
     long double res = 0;
-    long double sum_of_x_j = 0;
-
-	long double b = 10.0L;
-    long double outer = 0;
-
-    for (int i=1; i<= dim;i++)
+    for (int i = 0; i < dim; i++)
     {
-       long double inner = 0;
-        for (int j=1; j<= dim;j++)
-        {
-            long double xj = (long double) x_vec[j - 1];
-            inner = inner + (j+b)*(pow(xj,i)-pow(1.0L/(long double) j,i));
-        }
-        outer = outer + pow(inner,2);
+        res += pow(log((long double) x_vec[i]), 2);
     }
-    res = outer;
     return -res;    
 }
  
 
 
-// Dixon & price (valley-shaped) [-10,10]
+// sum of different powers (bowl) [-1,1]
 double F5::FitnessFunc(double* x_vec){
-    long double res = ((long double) x_vec[0] - 1.0L) * (x_vec[0] - 1.0L);
-    for (int i = 2; i <= dim; i++)
+    long double res = 0.0L;
+
+    for (int i = 0; i < dim; i++)
     {
-        res += (long double)  i * (2.0L * (long double) x_vec[i-1] * (long double) x_vec[i-1] - (long double) x_vec[i-2]) * (2.0L * (long double) x_vec[i-1] * (long double) x_vec[i-1] - (long double) x_vec[i-2]);
-    }
-    return -  res;
-}
-
-
-// Rosenbrock (valley-shaped) [-5, 10]
-double F6::FitnessFunc(double* x_vec){
-    long double res = 0.0;
-
-    for (int i = 0; i < dim-1; i++)
-    {
-        long double x_vec_i = (long double) x_vec[i];
-        long double x_vec_i_plusone = (long double) x_vec[i+1];
-        res += 100.0L * 
-        (x_vec_i*x_vec_i - x_vec_i_plusone) * 
-        (x_vec_i*x_vec_i - x_vec_i_plusone) + 
-        (x_vec_i - 1.0L) * 
-        (x_vec_i - 1.0L);
+        res += FastPow(abs((long double)x_vec[i]), i);
     }
 
     return -res;
 }
 
 
-// six hump cammel funcion (valley-shaped) [-3,3]
-double F7::FitnessFunc(double* x_vec){
-    long double res = 0.0L;
-    long double tmp;
-    if(dim != 2)
+// sum squares (bowl) [-10, 10]
+double F6::FitnessFunc(double* x_vec){
+    long double res = 0.0;
+
+    for (int i = 0; i < dim; i++)
     {
-        cout << "\nERROR: cammel function is only available when dim = 2." << endl;
-        exit(1);
+        res += (long double) i * (long double) x_vec[i] * (long double)  x_vec[i];
     }
 
-
-    long double x1 = (long double) x_vec[0];
-    long double x2 = (long double) x_vec[1];
-
-    long double val1 =  -0.032149708373027931134565012005754880419772234745323657989502L + (4 - 2.1L * pow(x1, 2) + pow(x1, 4) / 3.0L) * pow(x1, 2);
-    long double val2 =   0.0640264858028589541966363665737027588420460233464837074279785L + x1 * x2;
-    long double val3 =   0.999751676060046327323103942941173727376735769212245941162109L + (-4 + 4 * pow(x2, 2)) * pow(x2, 2);
-
-    res += val1;
-    res += val2;
-    res += val3;
-
-    if (res < 0.0L)
-    {
-        return 0.0L;
-    }
- 
-   return -res;
+    return -res;
+    
 }
 
 
-// three hump cammel funcion (valley-shaped) [-5,5]
+// langermann (multiopt-shaped) [0,10]
+double F7::FitnessFunc(double* x_vec){
+    long double res = 0.0L;
+    long double A[5][2] = {{3.0L,5.0L},{5.0L,2.0L},{2.0L,1.0L},{1.0L,4.0L},{7.0L,9.0L}};
+    long double c[5]  = {1.0L,2.0L,5.0L,2.0L,3.0L};
+    const long double PI_L = 3.14159265358979323846264338327950288419716939937510582097494459230781640628620899862803482L;
+    const long double one_DIV_PI_L = 0.3183098861837906715377675267450287240689192914809128974953346881177935952684530701802276055325L;
+    for (size_t i = 0; i < 5; i++)
+    { 
+        long double sum_i = 0.0L;
+
+        for (int j = 0; j < dim; j++)
+        {
+            sum_i += pow((long double) x_vec[j] - A[i][j % 2], 2);
+        }
+        res += c[i] * exp(- one_DIV_PI_L * sum_i) * cos(PI_L * sum_i);
+    }
+    return  - res;    
+}
+
+// SCHWEFEL FUNCTION (multiopt) [-500,500]
 double F8::FitnessFunc(double* x_vec){
     long double res = 0;
-    if(dim != 2)
+
+    for (size_t i = 0; i < dim; i++)
     {
-        cout << "\nERROR: cammel function is only available when dim = 2." << endl;
-        exit(1);
+        res += (long double) x_vec[i] * sin(sqrt(abs(x_vec[i])));
     }
-
-    long double x1 = x_vec[0];
-    long double x2 = x_vec[1];
-	
-    long double x1_squared = x1 * x1;
-    long double x1_power_four = x1_squared * x1_squared;
-    long double x1_power_six = x1_power_four * x1_squared;
-
-    res+= 2.0L * x1_squared;
-    res+= -1.05L* x1_power_four;
-    res+= x1_power_six / 6.0L;
-    res+= x1*x2;
-    res+= x2*x2;
-	
+    
 
    return - res;
 }
@@ -293,106 +254,8 @@ double F8::FitnessFunc(double* x_vec){
 
 
 
-// Zakharov (plate-shaped) [-5, 10]
-double F9::FitnessFunc(double* x_vec){
-    long double res = 0.0L;
-    long double val_1 = 0.0L;
-    long double val_2 = 0.0L;
-    
-    for (int i = 0; i < dim; i++)
-    {
-        val_1 += (long double) x_vec[i] * (long double) x_vec[i];
-    }
-    
-    for (int i = 1; i <= dim; i++)
-    {
-        val_2 += (0.5L * (long double)i * (long double)x_vec[i-1]); 
-    }
-
-    res = val_1 + (val_2 * val_2) + (val_2 * val_2 * val_2 * val_2);
-    return -res;
-}
-
-
-
-
-// booth function (plate-shaped) [-10, 10]
-double F10::FitnessFunc(double* x_vec){
-    long double res = 0;
-    long double tmp;
-    if(dim != 2)
-    {
-        cout << "\nERROR: cammel function is only available when dim = 2." << endl;
-        exit(1);
-    }
-
-    long double x1 = (long double) x_vec[0];
-    long double x2 = (long double) x_vec[1];
-	
-
-
-    res += pow(x1 + 2*x2 - 7.0L,2);
-    res += pow(2*x1 + x2 - 5.0L,2);
-
-
-   return -res;
-}
-
-
-// matyas function (plate-shaped) [-10, 10]
-double F11::FitnessFunc(double* x_vec){
-    long double res = 0;
-    long double tmp;
-    if(dim != 2)
-    {
-        cout << "\nERROR: cammel function is only available when dim = 2." << endl;
-        exit(1);
-    }
-
-    long double x1 = x_vec[0];
-    long double x2 = x_vec[1];
-	
-    res = 0.26L*(x1*x1 + x2*x2) - 0.48L*x1*x2;
-
-   return -res;
-}
-
-
-// MCCORMICK function (plate-shaped) [-3, 4]
-double F12::FitnessFunc(double* x_vec){
-    long double res = 0;
-    if(dim != 2)
-    {
-        cout << "\nERROR: cammel function is only available when dim = 2." << endl;
-        exit(1);
-    }
-
-    long double x1 = (long double) x_vec[0];
-    long double x2 = (long double) x_vec[1];
-	
-    long double val1 = 0.866025403572777245327692779985895299432741012424230575561523L + sin(x1 + x2);
-    long double val2 = -1.0L                                                          + pow(x1 - x2, 2);
-    long double val3 = 2.04719755140825936980120136610139525146223604679107666015625L - 1.5L * x1 + 2.5L * x2 + 1.0L;
-
-    res = val1 + val2 + val3;
-
-    if (res < 0.0L)
-    {
-        cout << "mccoormick" << res << endl;
-        return 0.0L;
-    }
-           
-    return - res;
-}
-
-
-
-
-
-
-
 // Rastrigin (many local optima) [-5.12, 5.12]
-double F13::FitnessFunc(double* x_vec){
+double F9::FitnessFunc(double* x_vec){
     long double res = 10.0L * dim;
 
     for (int i = 0; i < dim; i++)
@@ -405,19 +268,19 @@ double F13::FitnessFunc(double* x_vec){
 
 
 // Levy (many local optima) [-10, 10]
-double F14::FitnessFunc(double* x_vec){
+double F10::FitnessFunc(double* x_vec){
     long double w_1 = 1.0L + ((long double) x_vec[0] - 1.0L)/4.0L;
     long double res = sin(M_PIl * w_1) * sin(M_PIl * w_1);
 
     for (int i = 0; i < dim - 1; i++)
     {
         long double w_i = 1.0L + ((long double) x_vec[i] - 1.0L)/4.0L;
-        res += (w_i - 1.0L) *(w_i - 1.0L) * (1.0L + 10.0L*sin(M_PIl * w_i + 1.0)*sin(M_PIl * w_i + 1.0));
+        res += (w_i - 1.0L) *(w_i - 1.0L) * (1.0L + 10.0L*FastPow(sin(M_PIl * w_i + 1.0),2));
     }
 
     long double w_d = 1.0L + ((long double) x_vec[dim - 1] - 1.0L)/4.0L;
 
-    res += (w_d - 1.0L) * (w_d - 1.0L) * (1.0 + pow(sin(2.0 * M_PIl * w_d), 2.0));
+    res += (w_d - 1.0L) * (w_d - 1.0L) * (1.0 + FastPow(sin(2.0 * M_PIl * w_d), 2.0));
 
     return -res;
 }
@@ -425,7 +288,7 @@ double F14::FitnessFunc(double* x_vec){
 
 
 // Griewank (many local optima) [-600,600]
-double F15::FitnessFunc(double* x_vec){
+double F11::FitnessFunc(double* x_vec){
     long double val_1 = 0.0;
     for (int i = 0; i < dim; i++)
     {
@@ -448,7 +311,7 @@ double F15::FitnessFunc(double* x_vec){
 
 
 // Ackley (many local optima) [-32.768, 32.768]
-double F16::FitnessFunc(double* x_vec){
+double F12::FitnessFunc(double* x_vec){
     long double res = 0.0L;
     long double sum_1 = 0.0L;
     long double sum_2 = 0.0L;
@@ -467,7 +330,7 @@ double F16::FitnessFunc(double* x_vec){
 
     sum_2 = -exp(sum_2 / (long double) dim);
 
-    res = 20.0L + 2.7182818284590452353602874713527L + sum_1 + sum_2;
+    res = sum_1 + sum_2;
     return -res;
 }
 
@@ -623,22 +486,18 @@ void MultidimBenchmarkFF::rotate_x_given_R(double *res_x_rotated, double *x)
 MultidimBenchmarkFF* load_problem_with_default_lims(int problem_index, int dim,  int SEED, bool ROTATE)
 {
 
-    // Sphere (bowl-shaped) [-5.12,5.12]
-    // ROTATED HYPER-ELLIPSOID (bowl-shaped) [-65.536, 65.536]
-    // TRID FUNCTION (bowl-shaped) [-4.0, 4.0]
-    // PERM FUNCTION 0, D, BETA (bowl-shaped) [-2.0, 2.0]
-    // Dixon & price (valley-shaped) [-10.0,10.0]
-    // Rosenbrock (valley-shaped) [-5.0, 10.0]
-    // six hump cammel funcion (valley-shaped) [-3.0,3.0]
-    // three hump cammel funcion (valley-shaped) [-5.0,5.0]
-    // Zakharov (plate-shaped) [-5.0, 10.0]
-    // booth function (plate-shaped) [-10.0, 10.0]
-    // matyas function (plate-shaped) [-10.0, 10.0]
-    // MCCORMICK function (plate-shaped) [-3.0, 4.0]
-    // Rastrigin (many local optima) [-5.12, 5.12]
-    // Levy (many local optima) [-10.0, 10.0]
-    // Griewank (many local optima) [-600.0,600.0]
-    // Ackley (many local optima) [-32.768, 32.768]
+    // 1)  -> Sphere (bowl-shaped) [-5.12,5.12]
+    // 2)  -> ROTATED HYPER-ELLIPSOID (bowl-shaped) [-65.536, 65.536]
+    // 3)  -> TRID FUNCTION (bowl-shaped) [-4.0, 4.0]
+    // 4)  -> sum(log(x_i)^2) (bowl-shaped) [0.5, 3.0]
+    // 5)  -> sum of different powers (bowl-shaped) [-1.0,1.0]
+    // 6)  -> sum squares (bowl-shaped) [-10.0, 10.0]
+    // 7)  -> langermann (multiopt-shaped) [0.0, 10.0]
+    // 8)  -> SCHWEFEL (multiopt-shaped) [-500.0,500.0]
+    // 9) -> Rastrigin (many local optima) [-5.12, 5.12]
+    // 10) -> Levy (many local optima) [-10.0, 10.0]
+    // 11) -> Griewank (many local optima) [-600.0,600.0]
+    // 12) -> Ackley (many local optima) [-32.768, 32.768]
     double x_lower_lim;
     double x_upper_lim;
 
@@ -661,54 +520,38 @@ MultidimBenchmarkFF* load_problem_with_default_lims(int problem_index, int dim, 
         x_upper_lim = 4.0;
         break;
     case 4:
-        x_lower_lim = -2.0;
-        x_upper_lim = 2.0;
+        x_lower_lim = 0.5;
+        x_upper_lim = 3.0;
         break;
     case 5:
+        x_lower_lim = -1.0;
+        x_upper_lim = 1.0;
+        break;
+    case 6:
         x_lower_lim = -10.0;
         x_upper_lim = 10.0;
         break;
-    case 6:
-        x_lower_lim = -5.0;
-        x_upper_lim = 10.0;
-        break;
     case 7:
-        x_lower_lim = -3.0;
-        x_upper_lim = 3.0;
+        x_lower_lim = 0.0;
+        x_upper_lim = 10.0;
         break;
     case 8:
-        x_lower_lim = -5.0;
-        x_upper_lim = 5.0;
+        x_lower_lim = -500.0;
+        x_upper_lim = 500.0;
         break;
     case 9:
-        x_lower_lim = -5.0;
-        x_upper_lim = 10.0;
+        x_lower_lim = -5.12;
+        x_upper_lim = 5.12;
         break;
     case 10:
         x_lower_lim = -10.0;
         x_upper_lim = 10.0;
         break;
     case 11:
-        x_lower_lim = -10.0;
-        x_upper_lim = 10.0;
-        break;
-    case 12:
-        x_lower_lim = -3.0;
-        x_upper_lim = 4.0;
-        break;
-    case 13:
-        x_lower_lim = -5.12;
-        x_upper_lim = 5.12;
-        break;
-    case 14:
-        x_lower_lim = -10.0;
-        x_upper_lim = 10.0;
-        break;
-    case 15:
         x_lower_lim = -600.0;
         x_upper_lim = 600.0;
         break;
-    case 16:
+    case 12:
         x_lower_lim = -32.768;
         x_upper_lim = 32.768;
         break;
@@ -770,19 +613,6 @@ MultidimBenchmarkFF *load_problem(int problem_index, int dim, double x_lower_lim
     case 12:
         problem = new F12(problem_index, dim, x_lower_lim, x_upper_lim, SEED, ROTATE);
         break;
-    case 13:
-        problem = new F13(problem_index, dim, x_lower_lim, x_upper_lim, SEED, ROTATE);
-        break;
-    case 14:
-        problem = new F14(problem_index, dim, x_lower_lim, x_upper_lim, SEED, ROTATE);
-        break;
-    case 15:
-        problem = new F15(problem_index, dim, x_lower_lim, x_upper_lim, SEED, ROTATE);
-        break;
-    case 16:
-        problem = new F16(problem_index, dim, x_lower_lim, x_upper_lim, SEED, ROTATE);
-        break;
-
     default:
         cout << "Incorrect problem index, only integers between 0 and 16 allowed. problem_index = " << problem_index << "  was provided." << endl;
         std::exit(1);
