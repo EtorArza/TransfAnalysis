@@ -152,7 +152,7 @@ void execute_multi(class NEAT::Network **nets_, NEAT::OrganismEvaluation *result
         initial_seed = global_rng.random_integer_uniform(INT_MAX / 10);
 
 
-
+        cout << "start ev" << endl;
         while (surviving_candidates.size() > target_n_controllers_left && MAX_EVALS_PER_CONTROLLER > current_n_of_evals)
         {
             #ifndef HIPATIA
@@ -226,6 +226,7 @@ void execute_multi(class NEAT::Network **nets_, NEAT::OrganismEvaluation *result
 
         int best_current_iteration_index = argmax(tmp_order, (int)nnets);
 
+        cout << "reevaluate best" << endl;
 
 
         // update best known of last iteration and this iteration

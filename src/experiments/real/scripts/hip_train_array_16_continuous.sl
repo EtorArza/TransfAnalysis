@@ -1,14 +1,15 @@
 #!/bin/bash
 ###   s b a t c h --array=1-$runs:1 $SL_FILE_NAME
-#SBATCH --output=out/slurm_%A_%a_out.txt
-#SBATCH --error=out/slurm_%A_%a_err.txt
 #SBATCH --ntasks=1 # number of tasks
 #SBATCH --ntasks-per-node=1 #number of tasks per node
-#SBATCH --mem=64G
-#SBATCH --cpus-per-task=32 # number of CPUs
-#SBATCH --time=30-00:00:00 #Walltime
-#SBATCH -p xlarge
+#SBATCH --mem=32G
+#SBATCH --cpus-per-task=16 # number of CPUs
+#SBATCH --time=5-00:00:00 #Walltime
+#SBATCH -p large
 #SBATCH --exclude=n[001-004]
+
+echo "Train ${SLURM_ARRAY_TASK_ID} start.">> $GLOBAL_LOG
+
 
 
 SCRATCH_JOB=${SCRATCH_JOB}_${SLURM_ARRAY_TASK_ID}
@@ -18,8 +19,6 @@ source scripts/array_to_string_functions.sh
 
 
 SRCDIR=`pwd`
-EXPERIMENT_CONTROLLER_FOLDER_NAME="${SRCDIR}/${EXPERIMENT_CONTROLLER_FOLDER_NAME}"
-
 
 
 
@@ -54,21 +53,21 @@ COMMA_SEPARATED_PROBLEM_DIM_LIST=${COMMA_SEPARATED_PROBLEM_DIM_LIST_ARRAY[$SLURM
 
 
 
+LOG_FILE="${LOG_DIR}/train_${COMMA_SEPARATED_PROBLEM_INDEX_LIST}_${SEED}_${COMMA_SEPARATED_PROBLEM_DIM_LIST}_${SLURM_ARRAY_TASK_ID}.txt"
 
 
 
 
+echo -n "SLURM_ARRAY_TASK_ID: " >> ${LOG_FILE}
+echo $SLURM_ARRAY_TASK_ID >> ${LOG_FILE}
 
-echo -n "SLURM_ARRAY_TASK_ID: "
-echo $SLURM_ARRAY_TASK_ID
 
-
-cp neat -v $SCRATCH_JOB
+cp neat -v $SCRATCH_JOB >> ${LOG_FILE}
 #cp src/experiments/real/real_func_src/jani_ronkkonen_problem_generator/quad_function.dat -v --parents $SCRATCH_JOB/
 
 cd $SCRATCH_JOB
 
-echo "pwd: `pwd`"
+echo "pwd: `pwd`" >> ${LOG_FILE}
 
 
 
@@ -103,15 +102,15 @@ COMMA_SEPARATED_PROBLEM_DIM_LIST = ${COMMA_SEPARATED_PROBLEM_DIM_LIST}
 EOF
 
 
-echo "---conf file begin---"
+echo "---conf file begin---" >> ${LOG_FILE}
 
 cat tmp.ini
 
-echo "---conf file end---"
+echo "---conf file end---" >> ${LOG_FILE}
 
 
-date
-srun neat "tmp.ini"
-date
+date >> ${LOG_FILE}
+srun neat "tmp.ini" >> ${LOG_FILE} 2>&1
+date >> ${LOG_FILE}
 
 rm neat

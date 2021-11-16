@@ -1,7 +1,5 @@
 #!/bin/bash
 ###   s b a t c h --array=1-$runs:1 $SL_FILE_NAME
-#SBATCH --output=out/slurm_%A_%a_out.txt
-#SBATCH --error=out/slurm_%A_%a_err.txt
 #SBATCH --ntasks=1 # number of tasks
 #SBATCH --ntasks-per-node=1 #number of tasks per node
 #SBATCH --mem=4G
@@ -10,6 +8,7 @@
 #SBATCH -p medium
 #SBATCH --exclude=n[001-004]
 
+echo "Test ${SLURM_ARRAY_TASK_ID} start.">> $GLOBAL_LOG
 
 SCRATCH_JOB=${SCRATCH_JOB}_${SLURM_ARRAY_TASK_ID}
 mkdir ${SCRATCH_JOB}
@@ -42,6 +41,7 @@ PROBLEM_DIM=${PROBLEM_DIM//"s_e_p"/$replaced_with}
 
 
 
+LOG_FILE="${LOG_DIR}/test_inproblem_${PROBLEM_INDEX}_${SEED}_${PROBLEM_DIM}_${SLURM_ARRAY_TASK_ID}.txt"
 
 
 
@@ -50,15 +50,15 @@ SRCDIR=`pwd`
 
 
 
-echo -n "SLURM_ARRAY_TASK_ID: "
-echo $SLURM_ARRAY_TASK_ID
+echo -n "SLURM_ARRAY_TASK_ID: " >> ${LOG_FILE}
+echo $SLURM_ARRAY_TASK_ID >> ${LOG_FILE}
 
 
-cp neat -v $SCRATCH_JOB
+cp neat -v $SCRATCH_JOB >> ${LOG_FILE} 2>&1
 
 cd $SCRATCH_JOB
 
-echo "pwd: `pwd`"
+echo "pwd: `pwd`" >> ${LOG_FILE}
 
 
 
@@ -74,7 +74,7 @@ PROBLEM_NAME = real_func
 THREADS = ${SLURM_CPUS_PER_TASK}
 N_EVALS = ${N_EVALS}
 N_REPS = ${N_REPS}
-CONTROLLER_PATH = ${SRCDIR}/${CONTROLLER}
+CONTROLLER_PATH = ${CONTROLLER}
 PRINT_POSITIONS = false
 
 COMPUTE_RESPONSE = true
@@ -91,20 +91,19 @@ FULL_MODEL = ${FULL_MODEL}
 EOF
 
 
-echo "---conf file begin---"
+echo "---conf file begin---" >> ${LOG_FILE}
 
-cat tmp.ini
+cat tmp.ini >> ${LOG_FILE}
 
-echo "---conf file end---"
+echo "---conf file end---" >> ${LOG_FILE}
 
 
-date
-srun neat "tmp.ini"
-date
+date >> ${LOG_FILE}
+srun neat "tmp.ini" >> ${LOG_FILE}
+date >> ${LOG_FILE}
 
 rm neat
 
-mkdir $TMP_RES_PATH -p
 
 
 # echo "[${CONTROLLER},${PROBLEM_INDEX},${PROBLEM_DIM},${SOLVER_POPSIZE},${MAX_SOLVER_FE}," >> "${TMP_RES_PATH}/score_tmp_${SLURM_JOB_ID}.txt"
@@ -115,5 +114,3 @@ cat "responses.txt" >> "${TMP_RES_PATH}/responses_tmp_${SLURM_JOB_ID}.txt"
 
 
 cd ..
-
-date

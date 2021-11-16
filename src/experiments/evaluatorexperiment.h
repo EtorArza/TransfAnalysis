@@ -217,7 +217,10 @@ namespace NEAT {
             }
             OrganismEvaluation evaluations[norgs];
             //auto tmp_params = network_evaluator->
+            cout << "execute()" << endl;
             network_evaluator->execute(nets, evaluations, norgs);
+            cout << "execute() end" << endl;
+
             Organism *best = nullptr;
             for(size_t i = 0; i < norgs; i++) {
                 Organism *org = pop->get(i);
