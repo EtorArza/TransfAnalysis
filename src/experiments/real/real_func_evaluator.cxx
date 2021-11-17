@@ -418,7 +418,7 @@ namespace NEAT
 
         read_conf_file(conf_file_path);
         parameters->neat_params = this->neat_params;
-        neat_params->SEED = global_rng.random_integer_fast();
+        neat_params->SEED = global_rng.random_integer();
 
         if (parameters->MODE == "train")
         {
@@ -444,7 +444,7 @@ namespace NEAT
             double *v_of_f_values = new double[parameters->N_EVALS];
 
 
-            int initial_seed = global_rng.random_integer_fast(40000000, 50000000);
+            uint32_t initial_seed = global_rng.random_integer();
 
             
 

@@ -56,7 +56,7 @@ void GetProblemInfo(std::string problemType, std::string filename, PBP** problem
 
 
 //#define COUNTER
-double FitnessFunction_permu(NEAT::CpuNetwork *net_original, int seed, PERMU::params* parameters)
+double FitnessFunction_permu(NEAT::CpuNetwork *net_original, uint32_t seed, PERMU::params* parameters)
 {   
     using namespace PERMU;
 
@@ -75,7 +75,7 @@ double FitnessFunction_permu(NEAT::CpuNetwork *net_original, int seed, PERMU::pa
     pop = new CPopulation(problem, parameters);
     problem->load_rng(pop->rng);
     pop->rng->seed();
-    seed = pop->rng->random_integer_fast((int) 10e8);
+    seed = pop->rng->random_integer();
 
 
     #ifdef COUNTER

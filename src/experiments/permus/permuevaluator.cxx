@@ -191,7 +191,7 @@ void PermuEvaluator::read_conf_file(std::string conf_file_path)
         if (parameters->SEED == -1)
         {
             RandomNumberGenerator tmp_rng;
-            parameters->SEED = tmp_rng.random_integer_uniform(INT_MAX);
+            parameters->SEED = tmp_rng.random_integer();
         }
         
 
@@ -310,7 +310,7 @@ void PermuEvaluator::run_given_conf_file(std::string conf_file_path)
 
     read_conf_file(conf_file_path);
     parameters->neat_params = this->neat_params;
-    neat_params->SEED = global_rng.random_integer_fast();
+    neat_params->SEED = global_rng.random_integer();
 
     if (parameters->MODE == "train")
     {
@@ -333,7 +333,7 @@ void PermuEvaluator::run_given_conf_file(std::string conf_file_path)
         double *v_of_f_values = new double[parameters->N_EVALS];
 
         cout << std::setprecision(15);
-        int initial_seed = global_rng.random_integer_fast(40000000, 50000000);
+        int initial_seed = global_rng.random_integer();
         ostringstream result_string_stream;
         result_string_stream << std::setprecision(15);
         result_string_stream << std::flush;

@@ -24,7 +24,7 @@
 #include "asa032.hpp"
 #include "constants.h"
 #include "sign_test_critical_values.h"
-
+#include "pcg_basic.h"
 
 
 
@@ -603,112 +603,40 @@ double stopwatch::getTick()
 }
 
 
-int RandomNumberGenerator::xorshf96(void)
-{ //period 2^96-1
-    unsigned long t;
-    this->x ^= this->x << 16;
-    this->x ^= this->x >> 5;
-    this->x ^= this->x << 1;
-
-    t = this->x;
-    this->x = this->y;
-    this->y = this->z;
-    this->z = t ^ this->x ^ this->y;
-    int res = abs((int) this->z % INT_MAX);
-    return res;
-}
-
 
 
 
 void RandomNumberGenerator::seed(void){
-    struct timespec ts;
-    clock_gettime(CLOCK_REALTIME, &ts);
-    y = 362436069UL;
-    this->z = 521288629UL;
-    int seed =  ts.tv_nsec; // modulus with a big number, but not too big
-    this->x = (unsigned long) seed;
-    xorshf96();
+    this->seed(time(NULL));
 }
 
-void RandomNumberGenerator::seed(int seed){
-    this->x = (unsigned long) seed;
-    this->y=362436069UL; 
-    this->z=521288629UL;
+void RandomNumberGenerator::seed(uint64_t seed){
+    pcg32_srandom_r(pcg_random, seed, seed);
+    random_integer();
 }
 
 
-std::vector<unsigned long> RandomNumberGenerator::get_state(){
-    std::vector<unsigned long> res = {x, y, z};
-    return res;
-}
-
-
-void RandomNumberGenerator::set_state(std::vector<unsigned long> seed_state){
-    x = seed_state[0];
-    y = seed_state[1];
-    z = seed_state[2];
-}
-
-
-
-// https://ericlippert.com/2013/12/16/how-much-bias-is-introduced-by-the-remainder-technique/
-int RandomNumberGenerator::random_integer_uniform(int min, int max)
+uint32_t RandomNumberGenerator::random_integer()
 {
-
-    //LOG->write("min: ", false);
-    //LOG->write(min);
-    //LOG->write("max: ", false);
-    //LOG->write(max);
-
-    if (max == 0)
-    {
-        //LOG->write("MAX WAS 0");
-        int range = min;
-        while (true)
-        {
-            int value = xorshf96();
-            if (value < RAND_MAX - RAND_MAX % range)
-            {
-
-                //LOG->write("range: ", false);
-                //LOG->write(range);
-                //LOG->write("value mod range: ", false);
-                //LOG->write(value % range);
-
-                return value % range;
-            }
-        }
-    }
-    else
-    {
-        assert(max > min);
-        int range = max - min;
-        while (true)
-        {
-            int value = xorshf96();
-            if (value < RAND_MAX - RAND_MAX % range)
-            {   
-                int res = min + (value % range);
-                assert(res < max);
-                assert(res >= min);
-                return res;
-            }
-        }
-    }
+    return pcg32_random_r(pcg_random);
 }
 
-// chooses a random integer from {0,1,2, range_max - 1}
-int RandomNumberGenerator::random_integer_uniform(int range_max)
+// choses a number from {min, min+1, ... , max -1}
+uint32_t RandomNumberGenerator::random_integer(uint32_t min, uint32_t max)
+{   
+    assert(max > min);
+    random_integer(max-min) + min;
+}
+
+// chooses a random integer from {0,1,2, max - 1}
+uint32_t RandomNumberGenerator::random_integer(uint32_t max)
 {
-    return random_integer_uniform(0, range_max);
+    return pcg32_boundedrand_r(pcg_random, max);
 }
 
 double RandomNumberGenerator::random_0_1_double()
 {   
-    // cout << endl << xorshf96() << endl;
-    // cout << (double) xorshf96() / (double) INT_MAX << endl;
-    return (double) xorshf96() / (double) INT_MAX;
+    return ldexp(pcg32_random_r(pcg_random), -32);
 }
 
 RandomNumberGenerator global_rng;
@@ -918,7 +846,7 @@ void shuffle_vector(int *vec, int len, RandomNumberGenerator* rng)
 {
     for (int i = 0; i < len - 1; i++)
     {
-        int pos = rng->random_integer_fast(i, len);
+        int pos = rng->random_integer(i, len);
         //int pos = (int) (unif_rand() * (len-i) + i);
         int aux = vec[i];
         vec[i] = vec[pos];
@@ -1301,7 +1229,7 @@ void PermuTools::compute_hamming_consensus(int **permu_list, int m)
         for (int j = 0; j < n; j++)
             freq_matrix[j][permu_list[i][j]]--;
 
-    linear_assigment_problem->seedRandom(rng->x);
+    linear_assigment_problem->seedRandom(rng->random_integer() % UINT_FAST32_MAX);
     linear_assigment_problem->execute_lap(freq_matrix, lap_rows, lap_cols, lap_u, lap_v);
 
     for (int i = 0; i < n; i++)

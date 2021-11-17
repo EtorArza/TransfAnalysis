@@ -22,6 +22,7 @@
 #include <iomanip>
 #include "constants.h"
 #include <float.h>
+#include "pcg_basic.h"
 
 using std::istream;
 using std::ostream;
@@ -645,26 +646,28 @@ class RandomNumberGenerator{
 
     public:
 
-        unsigned long x, y, z;
+        pcg32_random_t *pcg_random;
+        RandomNumberGenerator() : RandomNumberGenerator(time(NULL)){};
+        RandomNumberGenerator(uint64_t SEED){
+            pcg_random = new pcg32_random_t();
+            pcg32_srandom_r(pcg_random, SEED, (intptr_t)pcg_random);
+        };
 
-        RandomNumberGenerator(){x=123456789, y=362436069, z=521288629;seed();}
-        ~RandomNumberGenerator(){};
+        ~RandomNumberGenerator(){
+            delete pcg_random;
+        };
         void seed(void);
-        void seed(int seed);
+        void seed(uint64_t seed);
 
-        std::vector<unsigned long> get_state();
-        void set_state(std::vector<unsigned long> seed_state);
-        int random_integer_fast(){return xorshf96();}
-        int random_integer_fast(int max){return xorshf96() % max;}
-        int random_integer_fast(int min, int max){return min + (xorshf96() % (max - min));}
-        int random_integer_uniform(int max);
-        int random_integer_uniform(int min, int max);
+
+        uint32_t random_integer();
+        uint32_t random_integer(uint32_t max);
+        uint32_t random_integer(uint32_t min, uint32_t max);
         double random_0_1_double();
 
         
 
 
-        int xorshf96(void);
 
 
 };

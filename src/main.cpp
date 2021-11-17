@@ -98,6 +98,7 @@ int main(int argc, char *argv[])
     cout << "Some parts of the PerMallows package by Ekhiñe Irurozki available at https://cran.r-project.org/web/packages/PerMallows/index.html (GLP licence)" << endl;
     cout << "The incomplete gamma function (asa032.cpp and asa032.hpp), by G Bhattacharjee, originally written by John Burkardt, (GNU LGPL license).\n";
     cout << "Continuous optimization problem generator, by Jani Rönkkönen, available at http://ronkkonen.com/generator/ (MIT licence)" << endl;
+    cout << "Random number generator by Melissa O'Neill, http://www.pcg-random.org"
     cout << "***\n";
 
     cout << "The original part of the source code provided here was made by Etor Arza.\n";
@@ -241,7 +242,7 @@ int main(int argc, char *argv[])
     neat_params->load_global_params(conf_file_path);
     exp->neat_params = neat_params;
     global_rng.seed(neat_params->SEED);
-    neat_params->SEED = global_rng.random_integer_fast();
+    neat_params->SEED = global_rng.random_integer();
     global_rng.seed(neat_params->SEED);
     rng_t rng{neat_params->SEED};
     exp->run_given_conf_file(conf_file_path);

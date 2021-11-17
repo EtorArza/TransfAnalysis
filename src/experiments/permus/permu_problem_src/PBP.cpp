@@ -648,11 +648,11 @@ void PBP::obtain_indexes_step_away(int *permu, int *ref_permu, int* i, int* j, P
             }
         }
         *i = arg_max;
-        *j = rng->random_integer_uniform(problem_size_PBP);
+        *j = rng->random_integer(problem_size_PBP);
         assert(*j < problem_size_PBP);
         while (*i ==*j)
         {
-            *j = rng->random_integer_uniform(problem_size_PBP);
+            *j = rng->random_integer(problem_size_PBP);
         }
         
         break;

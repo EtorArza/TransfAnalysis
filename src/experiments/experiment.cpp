@@ -128,7 +128,7 @@ void execute_multi(class NEAT::Network **nets_, NEAT::OrganismEvaluation *result
 
         zero_initialize_matrix(f_values, nnets + 1, row_length);
         zero_initialize_matrix(f_value_ranks, nnets + 1, row_length);
-        int initial_seed;
+        uint32_t initial_seed;
 
         double *tmp_order = new double[nnets+1];
         // evaluate the individuals
@@ -149,7 +149,7 @@ void execute_multi(class NEAT::Network **nets_, NEAT::OrganismEvaluation *result
         }
 
 
-        initial_seed = global_rng.random_integer_uniform(INT_MAX / 10);
+        initial_seed = global_rng.random_integer() / 100;
 
 
         cout << "start ev" << endl;
@@ -230,7 +230,7 @@ void execute_multi(class NEAT::Network **nets_, NEAT::OrganismEvaluation *result
 
 
         // update best known of last iteration and this iteration
-        initial_seed = global_rng.random_integer_uniform(INT_MAX / 10);
+        initial_seed = global_rng.random_integer() / 100;
         surviving_candidates.clear();
         surviving_candidates.push_back(best_current_iteration_index);
         surviving_candidates.push_back(nnets);

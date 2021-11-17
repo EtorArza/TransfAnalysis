@@ -27,7 +27,7 @@ namespace PERMU{
 
         std::string prob_name;
         std::string MODE;
-        int SEED;
+        uint32_t SEED;
 
     };
 
