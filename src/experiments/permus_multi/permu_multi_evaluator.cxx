@@ -38,9 +38,9 @@ namespace PERMU_MULTI
 
 
 // fitness function in sequential order
-double FitnessFunction(NEAT::CpuNetwork *net, int initial_seed, int instance_index, base_params *parameters)
+double FitnessFunction(NEAT::CpuNetwork *net, uint32_t initial_seed, int instance_index, base_params *parameters)
 {
-    int seed_seq = initial_seed;
+    uint32_t seed_seq = initial_seed;
 
     PERMU_MULTI::params_multi tmp_params = *static_cast<PERMU_MULTI::params_multi*>(parameters);
     tmp_params.INSTANCE_PATH = (*tmp_params.VECTOR_OF_INSTANCE_PATHS)[instance_index];
@@ -136,7 +136,6 @@ void Permu_multiEvaluator::run_given_conf_file(std::string conf_file_path)
 
     read_conf_file(conf_file_path);
     parameters->neat_params = this->neat_params;
-    neat_params->SEED = global_rng.random_integer();
 
     if (parameters->MODE == "train")
     {

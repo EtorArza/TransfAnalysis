@@ -174,7 +174,7 @@ void execute_multi(class NEAT::Network **nets_, NEAT::OrganismEvaluation *result
                 int instance_index =  f_value_sample_index % n_instances;
 
                 NEAT::CpuNetwork *net = nets[inet];
-                int seed = initial_seed + f_value_sample_index;
+                uint32_t seed = initial_seed + f_value_sample_index;
 
                 f_values[inet][f_value_sample_index] = FitnessFunction(net, seed, instance_index, parameters);
                 #ifndef HIPATIA
@@ -254,7 +254,7 @@ void execute_multi(class NEAT::Network **nets_, NEAT::OrganismEvaluation *result
                 #endif
                 int instance_index =  i % n_instances;
                 int f_value_sample_index = i + current_n_of_evals;
-                int seed = f_value_sample_index + initial_seed;
+                uint32_t seed = f_value_sample_index + initial_seed;
 
 
                 NEAT::CpuNetwork *net = nets[best_current_iteration_index];

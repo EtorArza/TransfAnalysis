@@ -25,7 +25,7 @@ struct Evaluator {
 
     __net_eval_decl Evaluator(){ }
 
-    __net_eval_decl double FitnessFunction(CpuNetwork* net, int initial_seed){return -DBL_MAX;}
+    __net_eval_decl double FitnessFunction(CpuNetwork* net, uint32_t initial_seed){return -DBL_MAX;}
 
     __net_eval_decl void execute(class Network **nets_, OrganismEvaluation *results, size_t nnets) { std::cout << "error, no execute defined" << endl; exit(1);}
     

@@ -187,7 +187,7 @@ namespace REAL_FUNC
 
 
 // fitness function in sequential order
-double FitnessFunction(NEAT::CpuNetwork *net, int seed, int instance_index, base_params *parameters)
+double FitnessFunction(NEAT::CpuNetwork *net, uint32_t seed, int instance_index, base_params *parameters)
 {
 
     REAL_FUNC::params tmp_params = *static_cast<REAL_FUNC::params*>(parameters);
@@ -205,7 +205,7 @@ struct Evaluator
 
     REAL_FUNC::params *parameters;
     NEAT::CpuNetwork *best_network;
-    int iteration_number = 0;
+    uint32_t iteration_number = 0;
 
     __net_eval_decl Evaluator(){};
 
@@ -418,7 +418,7 @@ namespace NEAT
 
         read_conf_file(conf_file_path);
         parameters->neat_params = this->neat_params;
-        neat_params->SEED = global_rng.random_integer();
+        cout << "seed_before: " << neat_params->SEED;
 
         if (parameters->MODE == "train")
         {

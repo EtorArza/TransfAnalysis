@@ -650,7 +650,7 @@ class RandomNumberGenerator{
         RandomNumberGenerator() : RandomNumberGenerator(time(NULL)){};
         RandomNumberGenerator(uint64_t SEED){
             pcg_random = new pcg32_random_t();
-            pcg32_srandom_r(pcg_random, SEED, (intptr_t)pcg_random);
+            pcg32_srandom_r(pcg_random, SEED, SEED);
         };
 
         ~RandomNumberGenerator(){

@@ -24,7 +24,7 @@ void neat_parameters::load_global_params(std::string conf_file_path)
     POPSIZE_NEAT = reader.GetInteger("Global", "POPSIZE", -1);
     EXPERIMENT_FOLDER_NAME = reader.Get("Global", "EXPERIMENT_FOLDER_NAME", "UNKNOWN");
     CONTROLLER_NAME_PREFIX = reader.Get("Global", "CONTROLLER_NAME_PREFIX", "UNKNOWN");
-    SEED = reader.GetInteger("Global", "SEED", 2);
+    SEED = (uint32_t) reader.GetInteger("Global", "SEED", 2);
     global_timer.tic();
     NEAT::env->pop_size = POPSIZE_NEAT;
 }

@@ -35,7 +35,7 @@ namespace NEAT {
 
 
 
-typedef double (*FF_type)(NEAT::CpuNetwork *net, int initial_seed, int instance_index, base_params *parameters);  // Declare typedef
+typedef double (*FF_type)(NEAT::CpuNetwork *net, uint32_t initial_seed, int instance_index, base_params *parameters);  // Declare typedef
 
 void convert_f_values_to_ranks(vector<int> surviving_candidates, double **f_values, double **ranks, int current_n_of_evals);
 
