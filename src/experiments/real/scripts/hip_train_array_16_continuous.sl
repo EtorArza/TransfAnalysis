@@ -2,6 +2,8 @@
 ###   s b a t c h --array=1-$runs:1 $SL_FILE_NAME
 #SBATCH --ntasks=1 # number of tasks
 #SBATCH --ntasks-per-node=1 #number of tasks per node
+#SBATCH --output=/workspace/scratch/jobs/earza/slurm_logs/slurm_%A_%a_out.txt
+#SBATCH --error=/workspace/scratch/jobs/earza/slurm_logs/slurm_%A_%a_err.txt
 #SBATCH --mem=32G
 #SBATCH --cpus-per-task=16 # number of CPUs
 #SBATCH --time=5-00:00:00 #Walltime
