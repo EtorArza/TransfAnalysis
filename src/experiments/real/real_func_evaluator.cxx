@@ -418,7 +418,7 @@ namespace NEAT
 
         read_conf_file(conf_file_path);
         parameters->neat_params = this->neat_params;
-        cout << "seed_before: " << neat_params->SEED;
+        // cout << "seed_before: " << neat_params->SEED;
 
         if (parameters->MODE == "train")
         {
