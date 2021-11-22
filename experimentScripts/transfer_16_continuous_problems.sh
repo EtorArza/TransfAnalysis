@@ -21,7 +21,7 @@ mkdir -p $EXPERIMENT_CONTROLLER_FOLDER_NAME
 mkdir -p $LOG_DIR
 mkdir -p $TMP_RES_PATH
 
-COMPILE_JOB_ID=`sbatch --parsable --export=NEAT_POPSIZE=${NEAT_POPSIZE} --exclude=n[001-004] --export=LOG_DIR=${LOG_DIR} scripts/make_hip.sh`
+COMPILE_JOB_ID=`sbatch --parsable --exclude=n[001-004] --export=LOG_DIR=${LOG_DIR} scripts/make_hip.sh`
 
 SRCDIR=`pwd`
 
