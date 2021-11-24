@@ -8,6 +8,28 @@ import random
 import fnmatch
 import matplotlib
 import subprocess
+from sklearn.datasets import make_biclusters
+from sklearn.cluster import SpectralCoclustering
+from sklearn.metrics import consensus_score
+
+# biclustering
+
+def measure_matrix_loss(matrix):
+    n = matrix.shape[0]
+    loss = 0
+    for i in range(1,n):
+        loss += abs(matrix[i,j]- matrix[i-1,j])
+        loss += abs(matrix[i,j]- matrix[i,j-1])
+        loss += abs(matrix[i,j]- matrix[i-1,j-1])
+    return loss
+
+
+def change_distance_matrix_indices(matrix, permu):
+    n = matrix.shape[0]
+    t = np.eye(n)[permu]
+    return t * permu * t
+
+
 
 # save_fig_path = "/home/paran/Dropbox/BCAM/02_NEAT_permus/paper/images/permu_problems_transfer/"
 
@@ -270,7 +292,17 @@ for input_txt, transfer_exp, save_fig_path in zip(txt_paths, transfer_exp_list, 
         plt.savefig(save_fig_path+transfer_exp+"_heatmap.pdf")
         plt.close()
 
+        # https://seaborn.pydata.org/generated/seaborn.clustermap.html -> Plot a matrix dataset as a hierarchically-clustered heatmap.
+        instance_labels = [f"{i+1}\n{'B' if i < matrix_data.shape[0]/2 else 'M'}" for i in range(matrix_data.shape[0])]
+        clust_df = pd.DataFrame(matrix_data, index=instance_labels, columns=instance_labels)
+        clust_df = clust_df.rename_axis(index="Training instance", columns="Test instance")
 
+        # with the single method, the distance from a point in space to the cluster is considered to be
+        # the minimum distance to every point in the cluster. 
+        # The cityblock metric is the L1 (taxicab or tophat) metric
+        ax = sns.clustermap(clust_df,metric='cityblock', method="single")
+        plt.savefig(save_fig_path+transfer_exp+"_clustered_"+"_heatmap.pdf")
+        plt.close()
 
 
     # print(get_score(data_frame, "N-t65d11xx_150.lop", "pr136.tsp"))
