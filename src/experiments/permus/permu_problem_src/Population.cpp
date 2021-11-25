@@ -42,13 +42,13 @@ void CPopulation::init_class(PBP *problem, RandomNumberGenerator* rng, PERMU::pa
     templ_double_array = new double[MAX_POPSIZE];
     templ_double_array2 = new double[MAX_POPSIZE];
 
-    for (int i = 0; i < MAX_POPSIZE; i++)
-    {
-        indexes_to_be_removed[i] = -1;
-        indexes_to_be_duplicated[i] = -1;
-    }
+    // for (int i = 0; i < MAX_POPSIZE; i++)
+    // {
+    //     indexes_to_be_removed[i] = -1;
+    //     indexes_to_be_duplicated[i] = -1;
+    // }
 
-    // m_individuals.resize(MAX_POPSIZE);
+    m_individuals.resize(MAX_POPSIZE);
 
     pop_info = new double *[MAX_POPSIZE];
     permus = new int *[MAX_POPSIZE]; // this contains the references to te permus in the individuals, so no initialization/destruction.

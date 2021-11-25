@@ -60,8 +60,8 @@ double FitnessFunction_permu(NEAT::CpuNetwork *net_original, uint32_t seed, PERM
 {   
     using namespace PERMU;
 
+    // cout << seed << ": ";
 
-    double *v_of_fitness;
     PERMU::CPopulation *pop;
     PERMU::PBP *problem;
 
@@ -74,8 +74,7 @@ double FitnessFunction_permu(NEAT::CpuNetwork *net_original, uint32_t seed, PERM
 
     pop = new CPopulation(problem, parameters);
     problem->load_rng(pop->rng);
-    pop->rng->seed();
-    seed = pop->rng->random_integer();
+    pop->rng->seed(seed);
 
 
     #ifdef COUNTER
@@ -91,7 +90,6 @@ double FitnessFunction_permu(NEAT::CpuNetwork *net_original, uint32_t seed, PERM
         #endif
 
 
-        pop->rng->seed(seed);
         pop->Reset();
         //std::cout << "|" << n_of_repetitions_completed << "|" << std::endl;
 
@@ -150,8 +148,8 @@ double FitnessFunction_permu(NEAT::CpuNetwork *net_original, uint32_t seed, PERM
     pop = NULL;
     delete problem;
     problem = NULL;
-    v_of_fitness = NULL;
     net = NULL;
+    // cout << res << "," << std::endl;
     return res;
 }
 

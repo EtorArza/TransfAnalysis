@@ -625,7 +625,7 @@ uint32_t RandomNumberGenerator::random_integer()
 uint32_t RandomNumberGenerator::random_integer(uint32_t min, uint32_t max)
 {   
     assert(max > min);
-    random_integer(max-min) + min;
+    return random_integer(max-min) + min;
 }
 
 // chooses a random integer from {0,1,2, max - 1}

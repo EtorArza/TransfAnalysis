@@ -12,17 +12,15 @@
 
 
 
+echo "Train ${SLURM_ARRAY_TASK_ID} start."
 
 
 SCRATCH_JOB=${SCRATCH_JOB}_${SLURM_ARRAY_TASK_ID}
 mkdir ${SCRATCH_JOB}
 
-
-
 source scripts/array_to_string_functions.sh
 
 SRCDIR=`pwd`
-EXPERIMENT_CONTROLLER_FOLDER_NAME="${SRCDIR}/${EXPERIMENT_CONTROLLER_FOLDER_NAME}"
 
 list_to_array $PROBLEM_TYPE_ARRAY
 PROBLEM_TYPE_ARRAY=("${BITRISE_CLI_LAST_PARSED_LIST[@]}")
@@ -37,12 +35,8 @@ SEED_ARRAY=("${BITRISE_CLI_LAST_PARSED_LIST[@]}")
 SEED=${SEED_ARRAY[$SLURM_ARRAY_TASK_ID]}
 
 
-list_to_array $MAX_SOLVER_FE_ARRAY
-MAX_SOLVER_FE_ARRAY=("${BITRISE_CLI_LAST_PARSED_LIST[@]}")
-MAX_SOLVER_FE=${MAX_SOLVER_FE_ARRAY[$SLURM_ARRAY_TASK_ID]}
-
-echo -n "COMMA_SEPARATED_LIST_OF_INSTANCE_PATHS_ARRAY: " 
-echo $COMMA_SEPARATED_LIST_OF_INSTANCE_PATHS_ARRAY
+echo -n "COMMA_SEPARATED_LIST_OF_INSTANCE_PATHS_ARRAY: " >> ${LOG_FILE} 
+echo $COMMA_SEPARATED_LIST_OF_INSTANCE_PATHS_ARRAY >> ${LOG_FILE}
 
 
 replaced_with=","
@@ -58,7 +52,7 @@ COMMA_SEPARATED_LIST_OF_INSTANCE_PATHS=${COMMA_SEPARATED_LIST_OF_INSTANCE_PATHS_
 
 
 echo -n "COMMA_SEPARATED_LIST_OF_INSTANCE_PATHS: " 
-echo $COMMA_SEPARATED_LIST_OF_INSTANCE_PATHS
+echo $COMMA_SEPARATED_LIST_OF_INSTANCE_PATHS 
 
 echo -n "SLURM_ARRAY_TASK_ID: "
 echo $SLURM_ARRAY_TASK_ID
@@ -70,9 +64,12 @@ ARRAY_OF_INSTANCES=("${BITRISE_CLI_LAST_PARSED_LIST[@]}")
 
 instance_path=`dirname ${ARRAY_OF_INSTANCES[0]}`
 
-echo -n "instance_path: "
-echo $instance_path
 
+
+echo -n "instance_path: " >> ${LOG_FILE}
+echo $instance_path >> ${LOG_FILE}
+
+LOG_FILE="${LOG_DIR}/train_inproblem_$(basename $instance_path)_${SEED}_${SLURM_ARRAY_TASK_ID}.txt"
 
 
 
@@ -85,7 +82,7 @@ done
 
 
 
-cp neat -v $SCRATCH_JOB
+cp neat -v $SCRATCH_JOB >> ${LOG_FILE}
 
 cd $SCRATCH_JOB
 
@@ -102,7 +99,7 @@ PROBLEM_NAME = permu_multi
 
 
 MAX_TRAIN_ITERATIONS = $MAX_TRAIN_ITERATIONS
-MAX_TRAIN_TIME = 1728000
+MAX_TRAIN_TIME = $MAX_TRAIN_TIME
 POPSIZE = $NEAT_POPSIZE
 THREADS = $SLURM_CPUS_PER_TASK
 
@@ -121,15 +118,15 @@ COMMA_SEPARATED_LIST_OF_INSTANCE_PATHS = $COMMA_SEPARATED_LIST_OF_INSTANCE_PATHS
 
 EOF
 
-echo "---conf file begin---"
+echo "---conf file begin---" >> ${LOG_FILE}
 
-cat tmp.ini
+cat tmp.ini >> ${LOG_FILE}
 
-echo "---conf file end---"
+echo "---conf file end---" >> ${LOG_FILE}
 
 
-date
-srun neat "tmp.ini"
-date
+date >> ${LOG_FILE}
+srun neat "tmp.ini" >> ${LOG_FILE} 2>&1
+date >> ${LOG_FILE}
 
 rm neat

@@ -43,9 +43,7 @@ list_to_array $PROBLEM_PATH_ARRAY
 PROBLEM_PATH_ARRAY=("${BITRISE_CLI_LAST_PARSED_LIST[@]}")
 PROBLEM_PATH=${PROBLEM_PATH_ARRAY[$SLURM_ARRAY_TASK_ID]}
 
-list_to_array $MAX_SOLVER_FE_ARRAY
-MAX_SOLVER_FE_ARRAY=("${BITRISE_CLI_LAST_PARSED_LIST[@]}")
-MAX_SOLVER_FE=${MAX_SOLVER_FE_ARRAY[$SLURM_ARRAY_TASK_ID]}
+LOG_FILE="${LOG_DIR}/test_controller_$(basename $CONTROLLER)_${SEED}_problem_$(basename $PROBLEM_PATH)_${SLURM_ARRAY_TASK_ID}.txt"
 
 
 
@@ -53,20 +51,18 @@ MAX_SOLVER_FE=${MAX_SOLVER_FE_ARRAY[$SLURM_ARRAY_TASK_ID]}
 
 
 
-
-
-echo -n "CONTROLLER: " && echo $CONTROLLER
-echo -n "PROBLEM_TYPE: " && echo $PROBLEM_TYPE
-echo -n "PROBLEM_PATH: " && echo $PROBLEM_PATH
-echo -n "TMP_RES_PATH: " && echo $TMP_RES_PATH
+echo -n "CONTROLLER: " >> ${LOG_FILE} && echo $CONTROLLER >> ${LOG_FILE}
+echo -n "PROBLEM_TYPE: " >> ${LOG_FILE} && echo $PROBLEM_TYPE >> ${LOG_FILE}
+echo -n "PROBLEM_PATH: " >> ${LOG_FILE} && echo $PROBLEM_PATH >> ${LOG_FILE}
+echo -n "TMP_RES_PATH: " >> ${LOG_FILE} && echo $TMP_RES_PATH >> ${LOG_FILE}
 
 SRCDIR=`pwd`
 
 
 mkdir $TMP_RES_PATH -p
-cp -v --parents $PROBLEM_PATH $SCRATCH_JOB
-cp -v --parents $CONTROLLER $SCRATCH_JOB 
-cp neat -v $SCRATCH_JOB 
+cp -v --parents $PROBLEM_PATH $SCRATCH_JOB >> ${LOG_FILE}
+cp -v --parents $CONTROLLER $SCRATCH_JOB  >> ${LOG_FILE}
+cp neat -v $SCRATCH_JOB  >> ${LOG_FILE}
 
 
 
@@ -81,7 +77,7 @@ PROBLEM_NAME = permu
 
 
 THREADS = $SLURM_CPUS_PER_TASK ;
-CONTROLLER_PATH = ${SRCDIR}/${CONTROLLER} ; 
+CONTROLLER_PATH = ${CONTROLLER} ; 
 COMPUTE_RESPONSE = $COMPUTE_RESPONSE
 N_REPS = $N_REPS
 N_EVALS = $N_EVALS
@@ -93,11 +89,15 @@ PROBLEM_TYPE = $PROBLEM_TYPE ;
 PROBLEM_PATH = $PROBLEM_PATH ; 
 
 EOF
+echo "---conf file begin---" >> ${LOG_FILE}
 
+cat tmp.ini >> ${LOG_FILE}
 
-date
-srun neat "tmp.ini"
-date
+echo "---conf file end---" >> ${LOG_FILE}
+
+date >> ${LOG_FILE}
+srun neat "tmp.ini" >> ${LOG_FILE} 2>&1
+date >> ${LOG_FILE}
 
 rm neat
 
@@ -108,8 +108,3 @@ cat "score.txt" >> "${TMP_RES_PATH}/score_tmp_${SLURM_JOB_ID}.txt"
 cat "responses.txt" >> "${TMP_RES_PATH}/responses_tmp_${SLURM_JOB_ID}.txt"
 
 cd ..
-
-date
-
-
-# #end
