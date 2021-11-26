@@ -1,8 +1,9 @@
 cat > Makefile.conf <<EOF
-ENABLE_CUDA=false
 DEVMODE=false
-CFLAGS=-fopenmp -std=c++11 -pthread -Wall -DNDEBUG
+CFLAGS= -std=c++11 -pthread -Wall
+PARALELLIZE=true
 
+HIPATIA=false
 PFM_LD_FLAGS=
 PFM_NVCC_CCBIN=
 EOF
