@@ -21,6 +21,7 @@ namespace PERMU{
 PBP::PBP()
 {
     rng = new RandomNumberGenerator();
+    n_evals = 0;
 }
 
 PBP::~PBP()
@@ -61,13 +62,14 @@ void PBP::initialize_variables_PBP(int problem_size)
 
 void PBP::Evaluate(CIndividual *indiv)
 {
-	double fitness = 0;
-	fitness = _Evaluate(indiv->genome);
+	double fitness;
+	fitness = Evaluate(indiv->genome);
 	indiv->f_value = fitness;
 }
 
 double PBP::Evaluate(int *genome)
-{
+{   
+    n_evals++;
 	return _Evaluate(genome);
 }
 
@@ -91,6 +93,7 @@ void PBP::apply_operator_with_fitness_update(CIndividual *indiv, int i, int j, P
 
     double delta = 0;
 
+    n_evals++;
 
     switch (operator_id)
     {
@@ -211,6 +214,7 @@ void PBP::local_search_iteration(CIndividual *indiv, PERMU::operator_t operator_
             }
             
             double delta = fitness_delta_swap(indiv, r, r+1);
+            n_evals++;
             if (delta > 0)
             {
                 tab->set_tabu(r, r+1);
@@ -231,6 +235,8 @@ void PBP::local_search_iteration(CIndividual *indiv, PERMU::operator_t operator_
                 if (i < j && !(tab->is_tabu(_random_permu1[i],_random_permu2[j]) || tab->is_tabu(_random_permu2[j],_random_permu1[i])) )
                 {
                     double delta = fitness_delta_interchange(indiv, _random_permu1[i], _random_permu2[j]);
+               		n_evals++;
+
                     if (delta > 0)
                     {
                        	//cout << "(" << _random_permu1[i] << "," << _random_permu2[j] << ")" << endl;
@@ -260,6 +266,8 @@ void PBP::local_search_iteration(CIndividual *indiv, PERMU::operator_t operator_
                         continue;
                     }
                     double delta =fitness_delta_insert(indiv, _random_permu1[i], _random_permu2[j]);
+               		n_evals++;
+
                     if (delta > 0)
                     {   
 

@@ -59,6 +59,7 @@ class PBP
 	Tabu* tab;
 	RandomNumberGenerator *rng;
 
+	int n_evals;
 
   protected:
 

@@ -186,7 +186,8 @@ void PermuEvaluator::read_conf_file(std::string conf_file_path)
         string search_type = reader.Get("Global", "SEARCH_TYPE", "UNKOWN");
         parameters->PROBLEM_TYPE = reader.Get("Global", "PROBLEM_TYPE", "UNKOWN");
         parameters->INSTANCE_PATH = reader.Get("Global", "PROBLEM_PATH", "UNKOWN");
-        parameters->MAX_SOLVER_TIME = reader.GetReal("Global", "MAX_SOLVER_TIME", -1.0);
+        parameters->MAX_SOLVER_TIME = reader.GetReal("Global", "MAX_SOLVER_TIME", 43200000.0);
+        parameters->MAX_SOLVER_FE = reader.GetInteger("Global", "MAX_SOLVER_FE", INT_MAX);
 
         if (parameters->SEED == -1)
         {
@@ -260,8 +261,8 @@ void PermuEvaluator::read_conf_file(std::string conf_file_path)
 
         parameters->PROBLEM_TYPE = reader.Get("Global", "PROBLEM_TYPE", "UNKOWN");
         parameters->INSTANCE_PATH = reader.Get("Global", "PROBLEM_PATH", "UNKOWN");
-        parameters->MAX_SOLVER_TIME = reader.GetReal("Global", "MAX_SOLVER_TIME", -1.0);
-        parameters->CONTROLLER_PATH = reader.Get("Global", "CONTROLLER_PATH", "UNKNOWN");
+        parameters->MAX_SOLVER_TIME = reader.GetReal("Global", "MAX_SOLVER_TIME", 43200000.0);
+        parameters->MAX_SOLVER_FE = reader.GetInteger("Global", "MAX_SOLVER_FE", INT_MAX);        parameters->CONTROLLER_PATH = reader.Get("Global", "CONTROLLER_PATH", "UNKNOWN");
         parameters->N_REPS = reader.GetInteger("Global", "N_REPS", -1);
         parameters->N_EVALS = reader.GetInteger("Global", "N_EVALS", -1);
         parameters->COMPUTE_RESPONSE = reader.GetBoolean("Global", "COMPUTE_RESPONSE", false);

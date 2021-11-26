@@ -31,6 +31,7 @@ void CPopulation::init_class(PBP *problem, RandomNumberGenerator* rng, PERMU::pa
     this->problem = problem;
     this->popsize = MIN_POPSIZE;
     this->MAX_SOLVER_TIME = parameters-> MAX_SOLVER_TIME;
+    this->MAX_SOLVER_FE = parameters-> MAX_SOLVER_FE;
     this->n = problem->GetProblemSize();
     genome_best = new int[n];
     f_best = -DBL_MAX;
@@ -190,7 +191,7 @@ void CPopulation::end_iteration(){
 
     SortPopulation();
     get_population_info();
-    if(timer->toc() > this->MAX_SOLVER_TIME)
+    if(timer->toc() > this->MAX_SOLVER_TIME || this->problem->n_evals > this->MAX_SOLVER_FE)
     {
         terminated = true;
     }
@@ -321,9 +322,10 @@ void CPopulation::comp_relative_position()
 
 void CPopulation::comp_relative_time()
 {
+
+    double res = max(timer->toc() / MAX_SOLVER_TIME, (double) problem->n_evals / (double) MAX_SOLVER_FE) ;
     for (int i = 0; i < this->popsize; i++)
     {
-        double res = timer->toc() / this->MAX_SOLVER_TIME;
         this->m_individuals[i]->relative_time = res;
         pop_info[i][PERMU::RELATIVE_TIME] = res;
     }
