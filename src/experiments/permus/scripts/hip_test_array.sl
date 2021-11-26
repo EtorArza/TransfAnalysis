@@ -4,8 +4,8 @@
 #SBATCH --error=/workspace/scratch/jobs/earza/slurm_logs/slurm_%A_%a_err.txt
 #SBATCH --ntasks=1 # number of tasks
 #SBATCH --ntasks-per-node=1 #number of tasks per node
-#SBATCH --mem=32G
-#SBATCH --cpus-per-task=32 # number of CPUs
+#SBATCH --mem=16G
+#SBATCH --cpus-per-task=4 # number of CPUs
 #SBATCH --time=0-00:30:00 #Walltime
 #SBATCH -p short
 #SBATCH --exclude=n[001-004]
