@@ -1,25 +1,27 @@
 from math import atanh
 from random import randint
-import sys
 import subprocess
 import numpy as np
 from tqdm import tqdm as tqdm
+import time
 
-# rm log.txt -f && cd ~/Dropbox/BCAM/02_NEAT_transferability/code/NEAT_code/ && make &&  cd .. && rsync -av --exclude=".*" NEAT_code /dev/shm/ && cd /dev/shm/NEAT_code && python experimentScripts/static_networks_grid_search.py
+# rm log.txt -f && cd ~/Dropbox/BCAM/02_NEAT_transferability/code/NEAT_code/ && make &&  cd .. && rsync -av --exclude=".*" NEAT_code /dev/shm/ && cd /dev/shm/NEAT_code && python experimentScripts/static_networks_grid_search_continuous.py
 
 result_file_path = "/home/paran/Dropbox/BCAM/02_NEAT_transferability/code/NEAT_code/experimentResults/staticNetwork/"
 subprocess.run(f"mkdir -p {result_file_path}",shell=True)
 
-
+subprocess.run("rm -f tmp_conf_file.ini",shell=True)
+subprocess.run("rm -f score.txt",shell=True)
+subprocess.run("rm -f response.txt",shell=True)
 
 
 
 SOLVER_POPSIZE=10
-MAX_SOLVER_FE=2000
-N_EVALS=20
+MAX_SOLVER_FE=1000
+N_EVALS=40
 N_EVALS_TEST=10000
-PROBLEM_DIM=2
-THREADS=4
+PROBLEM_DIM=20
+THREADS=6
 
 
 def write_static_continuous_controller(output1, output2, output3, controller_path):
@@ -104,28 +106,46 @@ def evaluate_continuous_static_controller(PROBLEM_INDEX, output1, output2, outpu
     subprocess.run("rm tmp_conf_file.ini",shell=True)
     return score
 
+if __name__ == "__main__":
 
+    n_slices = 8
+    n_rep_search = 3
+    upper_start = 0.98
+    lower_start = -0.98
+    search_interval_size = upper_start - lower_start
 
-n_slices = 20
-
-upper = 0.5
-lower = -0.5
-
-t = tqdm(total = n_slices*n_slices*n_slices*16)
-for problem_index in range(1,17):
-    best_score = -1e6
-    best_outputs_and_score = []
-    for output1 in np.linspace(lower, upper, n_slices):
-        for output2 in np.linspace(lower, upper, n_slices):
-            for output3 in np.linspace(lower, upper, n_slices):
-                t.update(1)
-                score = evaluate_continuous_static_controller(problem_index,output1,output2,output3, N_EVALS)
-                if float(score) > best_score:
-                    best_outputs_and_score = [output1, output2, output3, score]
-                    best_score = float(score)
-
-    best_outputs_and_score.append(evaluate_continuous_static_controller(problem_index,output1,output2,output3, N_EVALS_TEST))
-    with open(result_file_path+"continuous_grid_search.csv", "a") as f:
-        print(",".join([str(el) for el in best_outputs_and_score]), file=f)
+    t = tqdm(total = n_slices*n_slices*n_slices*12*n_rep_search)
+    for problem_index in range(1,13):
+        upper1 = upper_start
+        lower1 = lower_start
+        upper2 = upper_start
+        lower2 = lower_start
+        upper3 = upper_start
+        lower3 = lower_start
+        search_interval_size = upper_start - lower_start
+        best_score = -1e6
+        best_outputs_and_score = []
+        timeStart = time.time()
+        for rep_search in range(n_rep_search):
+            for output1 in np.linspace(lower1, upper1, n_slices):
+                for output2 in np.linspace(lower2, upper2, n_slices):
+                    for output3 in np.linspace(lower3, upper3, n_slices):
+                        t.update(1)
+                        score = evaluate_continuous_static_controller(problem_index,output1,output2,output3, N_EVALS)
+                        if float(score) > best_score:
+                            best_outputs_and_score = [problem_index, output1, output2, output3, score]
+                            best_score = float(score)
+            search_interval_size = search_interval_size/(n_slices-1)
+            upper1 = min( 0.98, best_outputs_and_score[1] + search_interval_size * 0.5)
+            lower1 = max(-0.98, best_outputs_and_score[1] - search_interval_size * 0.5)
+            upper2 = min( 0.98, best_outputs_and_score[2] + search_interval_size * 0.5)
+            lower2 = max(-0.98, best_outputs_and_score[2] - search_interval_size * 0.5)
+            upper3 = min( 0.98, best_outputs_and_score[3] + search_interval_size * 0.5)
+            lower3 = max(-0.98, best_outputs_and_score[3] - search_interval_size * 0.5)
+            print(upper1, lower1, " - ", upper2, lower2, " - ", upper3, lower3)
+        print(problem_index, ",", time.time() - timeStart)
+        best_outputs_and_score.append(evaluate_continuous_static_controller(problem_index,output1,output2,output3, N_EVALS_TEST))
+        with open(result_file_path+"continuous_grid_search.csv", "a") as f:
+            print(",".join([str(el) for el in best_outputs_and_score]), file=f)
 
 
