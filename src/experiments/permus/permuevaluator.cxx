@@ -187,12 +187,18 @@ void PermuEvaluator::read_conf_file(std::string conf_file_path)
         parameters->PROBLEM_TYPE = reader.Get("Global", "PROBLEM_TYPE", "UNKOWN");
         parameters->INSTANCE_PATH = reader.Get("Global", "PROBLEM_PATH", "UNKOWN");
         parameters->MAX_SOLVER_TIME = reader.GetReal("Global", "MAX_SOLVER_TIME", 43200000.0);
-        parameters->MAX_SOLVER_FE = reader.GetInteger("Global", "MAX_SOLVER_FE", INT_MAX);
+        parameters->MAX_SOLVER_FE = reader.GetInteger("Global", "MAX_SOLVER_FE", LONG_MAX);
 
         if (parameters->SEED == -1)
         {
             RandomNumberGenerator tmp_rng;
             parameters->SEED = tmp_rng.random_integer();
+        }
+
+        if(parameters->MAX_SOLVER_TIME == 43200000.0 && parameters->MAX_SOLVER_FE == LONG_MAX)
+        {
+            cout << "ERROR: No stoping criterion for permu solver. Either MAX_SOLVER_TIME or MAX_SOLVER_FE is required." << endl;
+            exit(1);
         }
         
 

@@ -17,7 +17,7 @@ namespace REAL_FUNC{
         std::string prob_name;
         std::string MODE;
 
-        int MAX_SOLVER_FE;
+        long MAX_SOLVER_FE;
         int SOLVER_POPSIZE;
         bool FULL_MODEL;
 

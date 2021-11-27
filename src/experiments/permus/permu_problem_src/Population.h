@@ -79,7 +79,7 @@ public:
 private:
 
   double MAX_SOLVER_TIME;
-  int MAX_SOLVER_FE;
+  long MAX_SOLVER_FE;
   // evaluate the whole population. Only used to initialize the population.
   void evaluate_population();
 

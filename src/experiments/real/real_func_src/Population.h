@@ -33,7 +33,7 @@ public:
   vector<CIndividual *> m_individuals;
   int n;
   int popsize;
-  int max_evals;
+  long max_evals;
 
   bool full_model = false;
   double f_best;

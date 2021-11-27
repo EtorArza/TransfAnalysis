@@ -286,8 +286,14 @@ namespace NEAT
         parameters->prob_name = reader.Get("Global", "PROBLEM_NAME", "UNKNOWN");
         parameters->MODE = reader.Get("Global", "MODE", "UNKNOWN");
         parameters->SOLVER_POPSIZE = reader.GetInteger("Global", "SOLVER_POPSIZE", -1);
-        parameters->MAX_SOLVER_FE = reader.GetInteger("Global", "MAX_SOLVER_FE", -1);
+        parameters->MAX_SOLVER_FE = reader.GetInteger("Global", "MAX_SOLVER_FE", 0);
         parameters->FULL_MODEL = reader.GetBoolean("Global", "FULL_MODEL", false);
+
+        if(parameters->MAX_SOLVER_FE == 0)
+        {
+            cout << "ERROR: No stoping criterion for the continuous solver. MAX_SOLVER_FE is required." << endl;
+            exit(1);
+        }
 
         if (parameters->MODE == "train")
         {
