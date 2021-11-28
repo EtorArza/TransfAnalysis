@@ -56,7 +56,7 @@ genomeend 431
         f.write(str_to_write)
 
 
-def write_conf_file_continuous(PROBLEM_INDEX,CONTROLLER_PATH, n_evals):
+def write_conf_file_continuous(PROBLEM_INDEX,CONTROLLER_PATH, n_evals, seed):
 
     tmp_ini_file_string = f"""
 [Global] 
@@ -87,11 +87,11 @@ MAX_SOLVER_FE = {MAX_SOLVER_FE}
         f.writelines(tmp_ini_file_string)
 
 
-def evaluate_continuous_static_controller(PROBLEM_INDEX, output1, output2, output3, n_evals):
+def evaluate_continuous_static_controller(PROBLEM_INDEX, output1, output2, output3, n_evals, seed):
 
     tmp_controller_name = f"tmp_{randint(1000000000000000000,9000000000000000000)}.controller"
     write_static_continuous_controller(output1, output2, output3, tmp_controller_name)
-    write_conf_file_continuous(PROBLEM_INDEX,tmp_controller_name, n_evals)
+    write_conf_file_continuous(PROBLEM_INDEX,tmp_controller_name, n_evals, seed)
     # subprocess.run("./neat tmp_conf_file.ini", shell=True) # print out
     # subprocess.run("./neat tmp_conf_file.ini > /dev/shm/NEAT_code/log.txt", shell=True) # write out into log.txt
     subprocess.run("./neat tmp_conf_file.ini > /dev/null", shell=True) # omit out
@@ -131,7 +131,7 @@ if __name__ == "__main__":
                 for output2 in np.linspace(lower2, upper2, n_slices):
                     for output3 in np.linspace(lower3, upper3, n_slices):
                         t.update(1)
-                        score = evaluate_continuous_static_controller(problem_index,output1,output2,output3, N_EVALS)
+                        score = evaluate_continuous_static_controller(problem_index,output1,output2,output3, N_EVALS, 73262)
                         if float(score) > best_score:
                             best_outputs_and_score = [problem_index, output1, output2, output3, score]
                             best_score = float(score)
@@ -144,7 +144,7 @@ if __name__ == "__main__":
             lower3 = max(-0.98, best_outputs_and_score[3] - search_interval_size * 0.5)
             print(upper1, lower1, " - ", upper2, lower2, " - ", upper3, lower3)
         print(problem_index, ",", time.time() - timeStart)
-        best_outputs_and_score.append(evaluate_continuous_static_controller(problem_index,output1,output2,output3, N_EVALS_TEST))
+        best_outputs_and_score.append(evaluate_continuous_static_controller(problem_index,output1,output2,output3, N_EVALS_TEST, 2))
         with open(result_file_path+"continuous_grid_search.csv", "a") as f:
             print(",".join([str(el) for el in best_outputs_and_score]), file=f)
 
