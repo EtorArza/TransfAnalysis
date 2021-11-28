@@ -59,7 +59,10 @@ class PBP
 	Tabu* tab;
 	RandomNumberGenerator *rng;
 
-	int n_evals;
+	long n_evals;
+	long n_evals_last = 0;
+  	long n_iterations_with_same_n_evals = 0;
+  
 
   protected:
 

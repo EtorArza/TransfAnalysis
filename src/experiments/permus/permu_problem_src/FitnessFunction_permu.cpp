@@ -52,6 +52,8 @@ void GetProblemInfo(std::string problemType, std::string filename, PBP** problem
     //Read the instance.
     (*problem)->Read_with_mutex(filename);
     (*problem)-> n_evals = 0;
+	(*problem)-> n_evals_last = 0;
+  	(*problem)-> n_iterations_with_same_n_evals = 0;
 
 }
 

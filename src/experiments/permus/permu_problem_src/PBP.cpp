@@ -22,6 +22,9 @@ PBP::PBP()
 {
     rng = new RandomNumberGenerator();
     n_evals = 0;
+	n_evals_last = 0;
+  	n_iterations_with_same_n_evals = 0;
+  
 }
 
 PBP::~PBP()

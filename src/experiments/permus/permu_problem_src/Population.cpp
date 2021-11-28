@@ -189,9 +189,21 @@ void CPopulation::end_iteration(){
     // }
     // indexes_to_be_removed.clear();
 
+    if (problem->n_evals == problem->n_evals_last)
+    {
+        problem->n_iterations_with_same_n_evals++;
+    }
+    else
+    {
+        problem->n_evals_last = problem->n_evals;
+        problem->n_iterations_with_same_n_evals = 0;
+    }
+    
+    
+    #define MAX_ITERATIONS_WITHOUT_EVALUATING_FITNESS 100L
     SortPopulation();
     get_population_info();
-    if(timer->toc() > this->MAX_SOLVER_TIME || this->problem->n_evals > this->MAX_SOLVER_FE)
+    if(timer->toc() > this->MAX_SOLVER_TIME || this->problem->n_evals > this->MAX_SOLVER_FE || problem->n_iterations_with_same_n_evals > MAX_ITERATIONS_WITHOUT_EVALUATING_FITNESS)
     {
         terminated = true;
     }
