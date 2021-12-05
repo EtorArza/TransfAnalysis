@@ -62,6 +62,14 @@ double CalculateGEODistance(double latitudeX, double latitudeY, double longitude
  */
 int TSP::Read2(string filename)
 {
+	{
+		std::ifstream file(filename);
+		if(!file.is_open()){
+			std::cout << "ERROR: File '" << filename << "' not found." << std::endl;
+			exit(1);
+		}
+	}
+
 	//declaration and initialization of variables.
 	bool readm_distance_matrix = false;
 	bool coordinatesData = false;
