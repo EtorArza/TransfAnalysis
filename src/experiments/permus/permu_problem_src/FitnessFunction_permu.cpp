@@ -22,8 +22,45 @@
 
 namespace PERMU{
 
+static std::vector<PBP*> problem_list = {};
+static std::vector<std::string> filenames = {};
 
+
+static std::mutex mut_load_problem;
+void _GetProblemInfo(std::string problemType, std::string filename, PBP** problem);
 void GetProblemInfo(std::string problemType, std::string filename, PBP** problem)
+{
+    mut_load_problem.lock();
+    bool loaded_cachedProblem = false;
+    for (long i = 0; i < problem_list.size(); i++)
+    {
+        
+        if (!problem_list[i]->is_being_used && filename == filenames[i])
+        {
+            (*problem) = problem_list[i];
+            (*problem)->is_being_used = true;
+            loaded_cachedProblem = true;
+            break;
+        }
+    }
+    if (!loaded_cachedProblem)
+    {
+        _GetProblemInfo(problemType, filename, problem);
+        (*problem)->is_being_used = true;
+        problem_list.push_back(*problem);
+        filenames.push_back(filename);
+        (*problem)->dbg_problem_index = problem_list.size()-1;
+    }    
+    mut_load_problem.unlock();
+    (*problem)-> n_evals = 0;
+	(*problem)-> n_evals_last = 0;
+  	(*problem)-> n_iterations_with_same_n_evals = 0;
+}
+
+
+
+
+void _GetProblemInfo(std::string problemType, std::string filename, PBP** problem)
 {
     if (problemType == "pfsp")
     {
@@ -149,8 +186,7 @@ double FitnessFunction_permu(NEAT::CpuNetwork *net_original, uint32_t seed, PERM
 
     delete pop;
     pop = NULL;
-    delete problem;
-    problem = NULL;
+    problem->is_being_used = false;
     net = NULL;
     // cout << res << "," << std::endl;
     return res;

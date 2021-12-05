@@ -20,12 +20,21 @@ namespace PERMU{
 
 PBP::PBP()
 {
-    rng = new RandomNumberGenerator();
+    this->rng = new RandomNumberGenerator();
     n_evals = 0;
 	n_evals_last = 0;
   	n_iterations_with_same_n_evals = 0;
+    rng_deleted = false;
   
 }
+
+// copy constructor
+PBP::PBP(const PBP &problem): PBP() {
+    cout << "Defining a copy constructor is not enough bc you also "<< endl;
+    cout << "need to define the copy constructor for the derived classes." << endl;
+    cout << "The matrices of the instances are initialized and are saved in the derived classes." << endl;
+}
+
 
 PBP::~PBP()
 {
@@ -34,14 +43,17 @@ PBP::~PBP()
     delete[] _random_permu3;
     if (!rng_deleted)
     {
-        delete rng;
+        delete this->rng;
     }
 }
 
 void PBP::load_rng(RandomNumberGenerator *rng){
-    delete this->rng;
+    if (!rng_deleted)
+    {
+        delete this->rng;
+        rng_deleted = true;
+    }
     this->rng = rng;
-    rng_deleted = true;
 }
 
 

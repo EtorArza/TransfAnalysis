@@ -35,7 +35,8 @@ class PBP
 
   public:
 	PBP();
-
+    PBP(const PBP &problem); // copy constructor
+	int dbg_problem_index;
 	/*
 	 * Virtual functions to be defined with each permutation problem.
 	 */
@@ -57,11 +58,12 @@ class PBP
 	int Read_with_mutex(string filename);
 	void load_rng(RandomNumberGenerator *rng);
 	Tabu* tab;
-	RandomNumberGenerator *rng;
+	RandomNumberGenerator *rng = nullptr;
 
 	long n_evals;
 	long n_evals_last = 0;
   	long n_iterations_with_same_n_evals = 0;
+	bool is_being_used = false;
   
 
   protected:
