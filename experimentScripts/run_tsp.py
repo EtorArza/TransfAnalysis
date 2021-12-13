@@ -38,6 +38,7 @@ problem_names = df["Problem Name"]
 
 problem_paths = ["src/experiments/permus/instances/tsp_instances/" + el + ".tsp" for el in problem_names]
 
+print("problem_name", "score_proposed", "other_method_score", sep=", ")
 for problem_path, problem_name, other_method_score in zip(problem_paths, problem_names, df["Wu et al."]):
     write_conf_file_continuous(problem_path, controller_path, 1, 2)
     subprocess.run("rm -f score.txt",shell=True)
