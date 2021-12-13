@@ -121,10 +121,10 @@ void execute_multi(class NEAT::Network **nets_, NEAT::OrganismEvaluation *result
         double **f_values;
         double **f_value_ranks;
 
-        int ALPHA_INDEX = 2;
+        int ALPHA_INDEX = 0;
         int target_n_controllers_left = 1;
         int n_evals_each_it = min(MAX_EVALS_PER_CONTROLLER, 32);
-        int row_length =  MAX_EVALS_PER_CONTROLLER + 2*n_evals_each_it;
+        int row_length =  MAX_EVALS_PER_CONTROLLER + 2*n_evals_each_it + MAX_EVALS_PER_CONTROLLER_REEVAL;
 
         zero_initialize_matrix(f_values, nnets + 1, row_length);
         zero_initialize_matrix(f_value_ranks, nnets + 1, row_length);
@@ -243,10 +243,10 @@ void execute_multi(class NEAT::Network **nets_, NEAT::OrganismEvaluation *result
         current_n_of_evals = 0;
         bool test_result = true;
 
-        while (test_result && current_n_of_evals < MAX_EVALS_PER_CONTROLLER)
+        while (test_result && current_n_of_evals < MAX_EVALS_PER_CONTROLLER_REEVAL)
         {
             #pragma omp parallel for num_threads(parameters->neat_params->N_OF_THREADS) schedule(dynamic,1)
-            for (int i = 0; i < MAX_EVALS_PER_CONTROLLER; i++)
+            for (int i = 0; i < MAX_EVALS_PER_CONTROLLER_REEVAL; i++)
             {
 
                 #ifndef HIPATIA
@@ -263,7 +263,7 @@ void execute_multi(class NEAT::Network **nets_, NEAT::OrganismEvaluation *result
                 net = best_network;
                 f_values[nnets][f_value_sample_index] = FitnessFunction(net, seed, instance_index, parameters);
             }
-            current_n_of_evals += MAX_EVALS_PER_CONTROLLER;
+            current_n_of_evals += MAX_EVALS_PER_CONTROLLER_REEVAL;
             convert_f_values_to_negative_inverse_ranks_squared(surviving_candidates, f_values, f_value_ranks, current_n_of_evals);
             if (check_if_all_ranks_are_the_same(surviving_candidates, f_value_ranks, current_n_of_evals))
             {
