@@ -10,8 +10,6 @@
 #SBATCH -p large
 #SBATCH --exclude=n[001-004]
 
-echo "Train ${SLURM_ARRAY_TASK_ID} start.">> $GLOBAL_LOG
-
 
 
 SCRATCH_JOB=${SCRATCH_JOB}_${SLURM_ARRAY_TASK_ID}
