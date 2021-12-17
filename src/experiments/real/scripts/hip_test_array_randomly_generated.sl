@@ -1,33 +1,22 @@
 #!/bin/bash
 ###   s b a t c h --array=1-$runs:1 $SL_FILE_NAME
-#SBATCH --output=/workspace/scratch/jobs/earza/slurm_logs/slurm_%A_%a_out.txt
-#SBATCH --error=/workspace/scratch/jobs/earza/slurm_logs/slurm_%A_%a_err.txt
 #SBATCH --ntasks=1 # number of tasks
 #SBATCH --ntasks-per-node=1 #number of tasks per node
-#SBATCH --mem=32G
-#SBATCH --cpus-per-task=32 # number of CPUs
-#SBATCH --time=0-01:30:00 #Walltime
+#SBATCH --output=/workspace/scratch/jobs/earza/slurm_logs/slurm_%A_%a_out.txt
+#SBATCH --error=/workspace/scratch/jobs/earza/slurm_logs/slurm_%A_%a_err.txt
+#SBATCH --mem=8G
+#SBATCH --cpus-per-task=4 # number of CPUs
+#SBATCH --time=5-00:00:00 #Walltime
 #SBATCH -p large
-#SBATCH --exclude=n[001-004,017-018]
-#SBATCH --exclusive
+#SBATCH --exclude=n[001-004]
 
 
 
-# # # #!/bin/bash
-# # # ###   s b a t c h --array=1-$runs:1 $SL_FILE_NAME
-# # # #SBATCH --output=out/slurm_%j.txt
-# # # #SBATCH --error=out/slurm_err_%j.txt
-# # # #SBATCH --ntasks=1 # number of tasks
-# # # #SBATCH --ntasks-per-node=1 #number of tasks per node
-# # # #SBATCH --mem=2G
-# # # #SBATCH --cpus-per-task=2 # number of CPUs
-# # # #SBATCH --time=0-00:30:00 #Walltime
-# # # #SBATCH -p short
 
 SCRATCH_JOB=${SCRATCH_JOB}_${SLURM_ARRAY_TASK_ID}
 mkdir ${SCRATCH_JOB}
 
-source scripts/array_to_string_functions.sh 
+SRCDIR=`pwd`
 
 
 list_to_array $NEAT_POPSIZE_ARRAY
@@ -68,21 +57,24 @@ MAX_SOLVER_FE=${MAX_SOLVER_FE_ARRAY[$SLURM_ARRAY_TASK_ID]}
 
 
 
-SRCDIR=`pwd`
-EXPERIMENT_FOLDER_NAME="${SRCDIR}/src/experiments/real/results/transferability"
+
+LOG_FILE="${LOG_DIR}/test_randomly_generated_${SLURM_ARRAY_TASK_ID}.txt"
 
 
 
-echo -n "SLURM_ARRAY_TASK_ID: "
-echo $SLURM_ARRAY_TASK_ID
+
+echo -n "SLURM_ARRAY_TASK_ID: " >> ${LOG_FILE}
+echo $SLURM_ARRAY_TASK_ID >> ${LOG_FILE}
 
 
-cp neat -v $SCRATCH_JOB
+cp neat -v $SCRATCH_JOB >> ${LOG_FILE}
 #cp src/experiments/real/real_func_src/jani_ronkkonen_problem_generator/quad_function.dat -v --parents $SCRATCH_JOB/
 
 cd $SCRATCH_JOB
 
-echo "pwd: `pwd`"
+echo "pwd: `pwd`" >> ${LOG_FILE}
+
+
 
 mkdir -p src/experiments/real/real_func_src/jani_ronkkonen_problem_generator/
 cat > src/experiments/real/real_func_src/jani_ronkkonen_problem_generator/quad_function.dat <<EOF
@@ -103,36 +95,32 @@ EOF
 
 cat > tmp.ini <<EOF
 
+
 [Global] 
-mode = test
+mode = train
 PROBLEM_NAME = real_func
 
 POPSIZE = ${NEAT_POPSIZE}
-THREADS =  $SLURM_CPUS_PER_TASK
-EXPERIMENT_FOLDER_NAME = ${EXPERIMENT_FOLDER_NAME}
+MAX_TRAIN_ITERATIONS = ${MAX_TRAIN_ITERATIONS}
+MAX_TRAIN_TIME = ${MAX_TRAIN_TIME}
+THREADS = ${SLURM_CPUS_PER_TASK}
+EXPERIMENT_FOLDER_NAME = ${EXPERIMENT_CONTROLLER_FOLDER_NAME}
 CONTROLLER_NAME_PREFIX = ${CONTROLLER_NAME_PREFIX}
+FULL_MODEL = ${FULL_MODEL}
 
-COMPUTE_RESPONSE = ${COMPUTE_RESPONSE}
 
-N_EVALS = ${N_EVALS}
-N_REPS = ${N_REPS}
-CONTROLLER_PATH = ${EXPERIMENT_FOLDER_NAME}/top_controllers/${CONTROLLER_NAME_PREFIX}_best.controller
-PRINT_POSITIONS = false
+SEARCH_TYPE = phased
+SEED = ${SEED}
 
-SEED = 2
+
 
 MAX_SOLVER_FE = ${MAX_SOLVER_FE}
 SOLVER_POPSIZE = ${SOLVER_POPSIZE}
 
 
 
-
-
-PROBLEM_INDEX = 11
-PROBLEM_DIM = ${PROBLEM_DIM}
-
-X_LOWER_LIM = 0
-X_UPPER_LIM = 1
+COMMA_SEPARATED_PROBLEM_INDEX_LIST = 0
+COMMA_SEPARATED_PROBLEM_DIM_LIST = ${PROBLEM_DIM}
 
 EOF
 
