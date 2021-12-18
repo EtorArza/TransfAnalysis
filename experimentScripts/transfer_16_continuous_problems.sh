@@ -1,5 +1,5 @@
 #!/bin/bash
-
+mkdir -p "/workspace/scratch/jobs/earza/slurm_logs"
 source scripts/array_to_string_functions.sh
 
 

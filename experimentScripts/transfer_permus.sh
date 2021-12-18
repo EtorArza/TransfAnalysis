@@ -1,5 +1,5 @@
 #!/bin/bash
-
+mkdir -p "/workspace/scratch/jobs/earza/slurm_logs"
 source scripts/array_to_string_functions.sh
 
 EXPERIMENT_RESULT_FOLDER_NAME="/workspace/scratch/jobs/earza/${PWD##*/}"
