@@ -193,15 +193,15 @@ void CPopulation::apply_neat_output_to_individual_i(double *output_neat, int i)
         m_individuals[i]->momentum[j] =  2.0*
         (
             m_individuals[i]->momentum[j] *  output_neat[REAL_FUNC::MOMENTUM] +
-            templ_double_array1_of_size_n[j] * output_neat[REAL_FUNC::L_BEST] + 
-            templ_double_array2_of_size_n[j] * output_neat[REAL_FUNC::G_BEST] 
+            templ_double_array1_of_size_n[j] * output_neat[REAL_FUNC::L_BEST] * this->rng->random_0_1_double() + 
+            templ_double_array2_of_size_n[j] * output_neat[REAL_FUNC::G_BEST] * this->rng->random_0_1_double()
         );
         if (this->full_model)
         {
             m_individuals[i]->momentum[j] += 2.0*
             (
-                templ_double_array3_of_size_n[j] * output_neat[REAL_FUNC::AVERAGE] +
-                templ_double_array4_of_size_n[j] * output_neat[REAL_FUNC::RANDOM]
+                templ_double_array3_of_size_n[j] * output_neat[REAL_FUNC::AVERAGE] * this->rng->random_0_1_double() +
+                templ_double_array4_of_size_n[j] * output_neat[REAL_FUNC::RANDOM]  * this->rng->random_0_1_double()
             );
         }
         
