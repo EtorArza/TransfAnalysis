@@ -11,6 +11,8 @@ import subprocess
 from sklearn.datasets import make_biclusters
 from sklearn.cluster import SpectralCoclustering
 from sklearn.metrics import consensus_score
+from scipy.cluster.hierarchy import dendrogram, linkage
+
 
 # biclustering
 
@@ -300,7 +302,10 @@ for input_txt, transfer_exp, save_fig_path in zip(txt_paths, transfer_exp_list, 
         # with the single method, the distance from a point in space to the cluster is considered to be
         # the minimum distance to every point in the cluster. 
         # The cityblock metric is the L1 (taxicab or tophat) metric
-        ax = sns.clustermap(clust_df,metric='cityblock', method="single")
+        z = linkage(clust_df, method="single", metric="cityblock", optimal_ordering=True)
+        print(z)
+        # ax = sns.clustermap(clust_df,metric='cityblock', method="single")
+        ax = sns.clustermap(clust_df, row_linkage=z, col_linkage=z)
         plt.savefig(save_fig_path+transfer_exp+"_clustered_"+"_heatmap.pdf")
         plt.close()
 
