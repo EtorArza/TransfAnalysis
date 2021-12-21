@@ -240,6 +240,7 @@ int main(int argc, char *argv[])
 
     Experiment *exp = Experiment::get(prob_name.c_str());
     neat_params->load_global_params(conf_file_path);
+    cout << "Seed: " << neat_params->SEED << endl;
     exp->neat_params = neat_params;
     global_rng.seed(neat_params->SEED);
     neat_params->SEED = global_rng.random_integer();
