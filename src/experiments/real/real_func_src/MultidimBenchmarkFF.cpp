@@ -9,17 +9,28 @@ MultidimBenchmarkFF::MultidimBenchmarkFF(int problem_index, int dim, double x_lo
 {
     this->dim = dim;
     rng = new RandomNumberGenerator();
-    rng->seed(SEED);
+    double delta1;
+    double delta2;
     temp_vect_1 = new double[this->dim];
 
-    double delta1 = rng->random_0_1_double() / 5.0; // number between 0.0 and 0.2
-    double delta2 = 1.0 - rng->random_0_1_double() / 5.0; // number between 0.8 and 0.8
 
+    if (SEED == -1)
+    {
+        rng->seed(2);
+        double delta1 = 0;
+        double delta2 = 0;
+    }
+    else
+    {
+    rng->seed(SEED);
+    double delta1 = rng->random_0_1_double() / 5.0; // number between 0.0 and 0.2
+    double delta2 = rng->random_0_1_double() / 5.0; // number between 0.8 and 0.8
+    }    
 
     
 
     this->x_lower_lim = x_lower_lim + delta1 * (x_upper_lim - x_lower_lim);
-    this->x_upper_lim = x_lower_lim + delta2 * (x_upper_lim - x_lower_lim);
+    this->x_upper_lim = x_upper_lim - delta2 * (x_upper_lim - x_lower_lim);
 
     // cout << " seed = " << SEED << ", lims = " <<  "(" << this->x_lower_lim << ", " << this->x_upper_lim << ")" << ", delta = " <<  "(" << delta1 << ", " << delta2 << ")" << endl;
 

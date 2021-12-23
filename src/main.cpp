@@ -41,6 +41,38 @@ void usage()
 
 int main(int argc, char *argv[])
 {
+
+    // evaluate continuous benchmark problems
+    if(std::string(argv[1])=="-evaluate-continuous-problem")
+    {
+        if (argc < 4)
+        {
+            cout << "For -evaluate-continuous-problem, the following format is expected to"
+            << "compute the fitness of (0.5,0.9,0.1) and (0.2,0.1,0.421) on problem 3. " << endl;
+            cout << "./neat -evaluate-continuous-problem 1 0.1,0.9,0.1 0.5,0.5,0.41" << endl;
+        }
+        
+        int problem_index = atoi(argv[2]);
+
+        for (size_t j = 3; j < argc; j++)
+        {
+            auto split_genome_string = split_string(argv[j], ",");
+            double x[300] = {0};
+            int n = split_genome_string.size();
+            MultidimBenchmarkFF* prob = load_problem_with_default_lims(problem_index, n, -1, false);
+            for (size_t i = 0; i < split_genome_string.size(); i++)
+            {
+                x[i] = atof(split_genome_string[i].c_str());
+            }
+            cout << prob->Fitness_Func_0_1(x) << " ";
+        }
+        
+
+        exit(0);
+       
+
+    }
+
     // int n = 13;
 
     // int sigma_1[n] = {5,11,2,9,4,6,0,7,8,3,10,1,12};
