@@ -107,7 +107,7 @@ for input_txt, transfer_exp, save_fig_path in zip(txt_paths, transfer_exp_list, 
     elif transfer_exp == "LOO16" or transfer_exp == "Transfer16OnlyOne":
         PROBLEM_TYPES = ["bowl", "multiopt"]
         def get_type(instance_name):
-            problem_index = int(instance_name.strip("_"))
+            problem_index = int(instance_name.split("seed")[0].strip("_"))
             type_name = PROBLEM_TYPES[(problem_index - 1) // 6]
             return type_name
 
@@ -197,6 +197,40 @@ for input_txt, transfer_exp, save_fig_path in zip(txt_paths, transfer_exp_list, 
             return element.index[0]
 
 
+    if transfer_exp == "Transfer16OnlyOne":
+        scores_dict = dict()
+        for index, row in data_frame.iterrows():
+            train_name = row["train_name"].split("seed")[0]
+            test_name = row["test_name"]
+            traintest_touple = (train_name, test_name)
+            score = row["score"]
+            scores_dict[traintest_touple] = scores_dict[traintest_touple] + [score] if traintest_touple in scores_dict else [score]    
+
+        data_frame = pd.DataFrame(columns=["score", "train_name", "test_name", "train_type", "test_type"])
+
+
+
+
+        # plot all boxplots
+        fig, ax_list = plt.subplots(6,2)
+        for test_index in range(1,13):
+            ax = ax_list.flatten()[test_index-1]
+            ax.boxplot([scores_dict[(f"_{i}_", f"_{test_index}_")] for i in range(1, 13)])
+            #ax.set_xlabel("Train problem") 
+            ax.set_title(f"Tested in problem {test_index}") 
+        fig.set_size_inches(8, 11)
+        fig.tight_layout()
+        fig.savefig(save_fig_path+"boxplot_for_each_test_instance.pdf") 
+        for (train_name, test_name), score in scores_dict.items():
+            
+            train_type = get_type(train_name)
+            test_type = get_type(test_name)
+            score = median(score)
+            new_row_df = pd.DataFrame([[score, train_name, test_name, train_type, test_type]], 
+                                columns=["score", "train_name", "test_name", "train_type", "test_type"])
+
+            data_frame = data_frame.append(new_row_df, ignore_index=True)
+    print(data_frame[(data_frame["train_name"] == "_9_") | (data_frame["test_name"] == "_9_")])
 
     # compute transferability
     transferability = []
