@@ -23,8 +23,8 @@ MultidimBenchmarkFF::MultidimBenchmarkFF(int problem_index, int dim, double x_lo
     else
     {
     rng->seed(SEED);
-    double delta1 = rng->random_0_1_double() / 5.0; // number between 0.0 and 0.2
-    double delta2 = rng->random_0_1_double() / 5.0; // number between 0.8 and 0.8
+    double delta1 = rng->random_0_1_double() / 10.0; // number between 0.0 and 0.2
+    double delta2 = rng->random_0_1_double() / 10.0; // number between 0.8 and 0.8
     }    
 
     
