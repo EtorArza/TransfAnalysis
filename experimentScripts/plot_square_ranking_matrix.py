@@ -36,49 +36,27 @@ def change_distance_matrix_indices(matrix, permu):
 # save_fig_path = "/home/paran/Dropbox/BCAM/02_NEAT_permus/paper/images/permu_problems_transfer/"
 
 save_fig_paths = [
-#"/home/paran/Dropbox/BCAM/NEAT_code/src/experiments/permus_multi/results/qap_cut_multi_vs_mono/score_multi_instance_cut_qap.txt",
-"experimentResults/transfer_permus_qap/results/figures/",
-"experimentResults/transfer_permus_qap/results/figures/",
 "experimentResults/transfer_permus_qap/results/figures/",
 "experimentResults/transfer_permus_problems/results/figures/",
-"experimentResults/transfer_permus_problems/results/figures/",
-"experimentResults/transfer_permus_problems/results/figures/",
-# "experimentResults/transfer_16_continuous_problems/results/figures/",
 "experimentResults/transfer_16_continuous_problems/results/figures/"
 ]
 
 
 txt_paths = [
-#"src/experiments/permus_multi/results/qap_cut_multi_vs_mono/score_multi_instance_cut_qap.txt",
-"src/experiments/permus/results/4by4_permu_problems/result_score_transfer_permuproblem_0_1s_2h.txt",
-"src/experiments/permus/results/4by4_permu_problems/result_score_transfer_permuproblem_0_25s_1h.txt",
-"src/experiments/permus/results/4by4_permu_problems/result_score_transfer_permuproblem_0_1s_12h.txt",
-"src/experiments/permus/results/transfer_qap_with_cut_instances/result_score_transfer_qap_0_1s_2h.txt",
-"src/experiments/permus/results/transfer_qap_with_cut_instances/result_score_transfer_qap_0_25s_1h.txt",
-"src/experiments/permus/results/transfer_qap_with_cut_instances/result_score_transfer_qap_0_1s_12h.txt",
-# "experimentResults/transfer_16_continuous_problems/results/score.txt",
+"experimentResults/transfer_permus_qap/results/score.txt",
+"experimentResults/transfer_permus_problems/results/score.txt",
 "experimentResults/transfer_16_continuous_problems/results/score.txt",
 ]
 
 
 transfer_exp_list =[
-#"QAP_MULTI",
-"PERMUPROB",
-"PERMUPROB",
-"PERMUPROB",
 "QAP",
-"QAP",
-"QAP",
-# "LOO16",
+"PERMUPROB",
 "Transfer16OnlyOne",
 ]
 
-i = 0
 for input_txt, transfer_exp, save_fig_path in zip(txt_paths, transfer_exp_list, save_fig_paths):
-    if i < 6:
-        i += 1
-        continue
-
+    
     subprocess.run(f"mkdir -p {save_fig_path}", shell=True) # write out into log.txt
 
 
@@ -230,7 +208,6 @@ for input_txt, transfer_exp, save_fig_path in zip(txt_paths, transfer_exp_list, 
                                 columns=["score", "train_name", "test_name", "train_type", "test_type"])
 
             data_frame = data_frame.append(new_row_df, ignore_index=True)
-    print(data_frame[(data_frame["train_name"] == "_9_") | (data_frame["test_name"] == "_9_")])
 
     # compute transferability
     transferability = []
@@ -278,7 +255,7 @@ for input_txt, transfer_exp, save_fig_path in zip(txt_paths, transfer_exp_list, 
 
     transfer_result = pd.DataFrame(index=type_train, columns=type_test)
 
-
+    print(transfer_result)
 
     for row in transfer_result.index:
         for col in transfer_result.columns:
