@@ -43,7 +43,7 @@ int main(int argc, char *argv[])
 {
 
     // evaluate continuous benchmark problems
-    if(std::string(argv[1])=="-evaluate-continuous-problem")
+    if(argc > 2 && std::string(argv[1])=="-evaluate-continuous-problem")
     {
         if (argc < 4)
         {
@@ -150,7 +150,7 @@ int main(int argc, char *argv[])
         cout << "Error, no configuration file provided.\n";
         printf("double uses %d bytes in this processor/compiler.\n", sizeof(double));           // some compilers print 8
         printf("long double uses %d bytes in this processor/compiler.\n", sizeof(long double)); // some compilers print 16
-        
+        exit(0);
         // #define dim 20
         // double x_vec[dim] = {0.6757571658, 0.5135890549, 0.4608551431, 0.4998168102, 0.5278000325, 0.5246639005, 0.3951178248, 0.5214761316, 0.6219129204, 0.6766302005, 0.6855895844, 0.7734823387, 0.6537444534, 0.4777864059, 0.6669242475, 0.7482358173, 0.5883391772, 0.6494809372, 0.8319084066, 0.6674026026};
         // F3 rosembrock_test = F3(3, dim, 0.0, 10.0, 2438989325, false);
