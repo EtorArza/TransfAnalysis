@@ -6,6 +6,7 @@ from matplotlib.ticker import StrMethodFormatter
 from joblib import Parallel, delayed
 
 savefig_path = "experimentResults/transfer_16_continuous_problems/results/figures/"
+subprocess.run(f"mkdir -p {savefig_path}", shell=True) # write out into log.txt
 
 
 def evaluate_cont_problem(problem_index, x, y):
