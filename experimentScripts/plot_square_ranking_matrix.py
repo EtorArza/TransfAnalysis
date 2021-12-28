@@ -199,6 +199,7 @@ for input_txt, transfer_exp, save_fig_path in zip(txt_paths, transfer_exp_list, 
         fig.set_size_inches(8, 11)
         fig.tight_layout()
         fig.savefig(save_fig_path+"boxplot_for_each_test_instance.pdf") 
+        plt.close() 
         for (train_name, test_name), score in scores_dict.items():
             
             train_type = get_type(train_name)
