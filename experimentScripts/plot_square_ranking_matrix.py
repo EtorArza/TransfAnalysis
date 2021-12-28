@@ -59,7 +59,8 @@ for input_txt, transfer_exp, save_fig_path in zip(txt_paths, transfer_exp_list, 
     
     subprocess.run(f"mkdir -p {save_fig_path}", shell=True) # write out into log.txt
 
-
+    if transfer_exp != "Transfer16OnlyOne":
+        continue
 
     if transfer_exp == "QAP":
         def get_type(instance_name):
@@ -198,7 +199,7 @@ for input_txt, transfer_exp, save_fig_path in zip(txt_paths, transfer_exp_list, 
             ax.set_title(f"Tested in problem {test_index}") 
         fig.set_size_inches(8, 11)
         fig.tight_layout()
-        fig.savefig(save_fig_path+"boxplot_for_each_test_instance.pdf") 
+        fig.savefig(save_fig_path+"boxplot_for_each_test_instance.pdf")
         plt.close() 
         for (train_name, test_name), score in scores_dict.items():
             
@@ -281,16 +282,21 @@ for input_txt, transfer_exp, save_fig_path in zip(txt_paths, transfer_exp_list, 
     transfer_result = transfer_result.applymap(mean)
 
     pd.set_option('display.max_rows', 1000)
-    print(transfer_result)
     # print(data_frame[data_frame["test_type"] == "tsp"])
 
-
     # Make the plots
-    if transfer_exp == "LOO16" or transfer_exp == "Transfer16OnlyOne":
+    if True:# transfer_exp == "LOO16" or transfer_exp == "Transfer16OnlyOne":
 
-        matrix_data = np.zeros((12,12))
-        for i in range(12):
-            for j in range(12):
+   
+        train_names = sorted(data_frame["train_name"].unique())
+        test_names = sorted(data_frame["test_name"].unique())
+
+        m = len(train_names)
+        n = len(test_names)
+
+        matrix_data = np.zeros((m,n))
+        for i in range(n):
+            for j in range(m):
                 train_name = "_" + str(i+1) + "_"
                 test_name = "_" + str(j+1) + "_"
                 value = data_frame[(data_frame["train_name"] == train_name) & (data_frame["test_name"] == test_name)]["transferability"]
