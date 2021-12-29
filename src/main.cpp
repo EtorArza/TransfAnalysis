@@ -49,7 +49,7 @@ int main(int argc, char *argv[])
         {
             cout << "For -evaluate-continuous-problem, the following format is expected to"
             << "compute the fitness of (0.5,0.9,0.1) and (0.2,0.1,0.421) on problem 3. " << endl;
-            cout << "./neat -evaluate-continuous-problem 1 0.1,0.9,0.1 0.5,0.5,0.41" << endl;
+            cout << "./neat -evaluate-continuous-problem 3 0.5,0.9,0.1 0.2,0.1,0.421" << endl;
         }
         
         int problem_index = atoi(argv[2]);
