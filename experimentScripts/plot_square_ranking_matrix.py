@@ -257,7 +257,6 @@ for input_txt, transfer_exp, save_fig_path in zip(txt_paths, transfer_exp_list, 
 
     transfer_result = pd.DataFrame(index=type_train, columns=type_test)
 
-    print(transfer_result)
 
     for row in transfer_result.index:
         for col in transfer_result.columns:
@@ -287,24 +286,32 @@ for input_txt, transfer_exp, save_fig_path in zip(txt_paths, transfer_exp_list, 
     # Make the plots
     if True:# transfer_exp == "LOO16" or transfer_exp == "Transfer16OnlyOne":
 
-   
-        train_names = sorted(data_frame["train_name"].unique())
-        test_names = sorted(data_frame["test_name"].unique())
+        def order_key(x):
+            if x.strip("_ ").isnumeric():
+                return float(x.strip("_ "))
+            else:
+                return x
+
+        train_names = sorted(data_frame["train_name"].unique(), key=order_key)
+        test_names = sorted(data_frame["test_name"].unique(), key=order_key)
+
+        nice_train_names = list(map(lambda x : x.strip("_"), train_names))
+        nice_test_names = list(map(lambda x : x.strip("_"), test_names))
 
         m = len(train_names)
         n = len(test_names)
 
         matrix_data = np.zeros((m,n))
-        for i in range(n):
-            for j in range(m):
-                train_name = "_" + str(i+1) + "_"
-                test_name = "_" + str(j+1) + "_"
+        for i in range(m):
+            for j in range(n):
+                train_name = train_names[i]
+                test_name = test_names[j]
                 value = data_frame[(data_frame["train_name"] == train_name) & (data_frame["test_name"] == test_name)]["transferability"]
                 
                 value = float(value) if len(value)>0 else np.NAN
 
                 matrix_data[i,j] = value
-        ax = sns.heatmap(matrix_data, linewidth=0.5, xticklabels=[str(i) for i in range(1,12+1)], yticklabels=[str(i) for i in range(1,12+1)])
+        ax = sns.heatmap(matrix_data, linewidth=0.5, xticklabels=nice_train_names, yticklabels=nice_test_names)
         ax.xaxis.tick_top() # x axis on top
         ax.xaxis.set_label_position('top')
         ax.set_xlabel("Test instance")
@@ -313,15 +320,14 @@ for input_txt, transfer_exp, save_fig_path in zip(txt_paths, transfer_exp_list, 
         plt.close()
 
         # https://seaborn.pydata.org/generated/seaborn.clustermap.html -> Plot a matrix dataset as a hierarchically-clustered heatmap.
-        instance_labels = [f"{i+1}\n{'B' if i < matrix_data.shape[0]/2 else 'M'}" for i in range(matrix_data.shape[0])]
-        clust_df = pd.DataFrame(matrix_data, index=instance_labels, columns=instance_labels)
+        instance_labels = [f"{i}\n{'B' if float(i) < matrix_data.shape[0]/2 else 'M'}" for i in nice_train_names]
+        clust_df = pd.DataFrame(matrix_data, index=nice_train_names, columns=nice_test_names)
         clust_df = clust_df.rename_axis(index="Training instance", columns="Test instance")
 
         # with the single method, the distance from a point in space to the cluster is considered to be
         # the minimum distance to every point in the cluster. 
         # The cityblock metric is the L1 (taxicab or tophat) metric
         z = linkage(clust_df, method="single", metric="cityblock", optimal_ordering=True)
-        print(z)
         # ax = sns.clustermap(clust_df,metric='cityblock', method="single")
         ax = sns.clustermap(clust_df, row_linkage=z, col_linkage=z)
         plt.savefig(save_fig_path+transfer_exp+"_clustered_"+"_heatmap.pdf")
