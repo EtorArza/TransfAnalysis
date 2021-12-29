@@ -30,11 +30,10 @@ SRCDIR=`pwd`
 
 
 
-SEED=2
 NEAT_POPSIZE=1000
 SOLVER_POPSIZE=10
 MAX_SOLVER_FE=1000
-MAX_TRAIN_ITERATIONS=20000
+MAX_TRAIN_ITERATIONS=5000
 MAX_TRAIN_TIME=345600
 FULL_MODEL="false"
 DIM=20
@@ -69,20 +68,21 @@ i=-1
 
 
 # Train in one
-j=-1
-for instance_index in 1 2 3 4 5 6 7 8 9 10 11 12; do
-    i=$((i+1))
-    j=$((j+1))
+for diff_SEED in 2 3 4 5 6 7 8 9 10 11; do
+    j=-1
+    for instance_index in 1 2 3 4 5 6 7 8 9 10 11 12; do
+        i=$((i+1))
+        j=$((j+1))
 
 
-    CONTROLLER_NAME_PREFIX_ARRAY+=("TrainOnlyInF_${instance_index}")
-    SEED_ARRAY+=("${SEED}")
+        CONTROLLER_NAME_PREFIX_ARRAY+=("TrainOnlyInF_${instance_index}_seed${diff_SEED}")
+        SEED_ARRAY+=("${diff_SEED}")
 
-    COMMA_SEPARATED_PROBLEM_INDEX_LIST_ARRAY+=(`python -c "print(${instance_list}[${j}])"`)
-    COMMA_SEPARATED_PROBLEM_DIM_LIST_ARRAY+=(`python -c "print(${dim_list}[${j}])"`)
-    FULL_MODEL_ARRAY+=("${FULL_MODEL}")
+        COMMA_SEPARATED_PROBLEM_INDEX_LIST_ARRAY+=(`python -c "print(${instance_list}[${j}])"`)
+        COMMA_SEPARATED_PROBLEM_DIM_LIST_ARRAY+=(`python -c "print(${dim_list}[${j}])"`)
+        FULL_MODEL_ARRAY+=("${FULL_MODEL}")
+    done
 done
-
 
 
 # # train in all
@@ -119,61 +119,63 @@ TRAIN_JOB_ID=`sbatch --parsable --dependency=afterok:${COMPILE_JOB_ID} --export=
 COMPUTE_RESPONSE="true"
 N_REPS=1
 N_EVALS=10000
-
 TESTING_JOB_ID=""
 
-CONTROLLER_ARRAY=()
-SEED_ARRAY=()
-PROBLEM_INDEX_ARRAY=()
-PROBLEM_DIM_ARRAY=()
-i=-1
-
-# # Leave one out
-# for INSTANCE_INDEX_TRAIN in 1 2 3 4 5 6 7 8 9 10 11 12;do
-#     for INSTANCE_INDEX_TEST in 1 2 3 4 5 6 7 8 9 10 11 12;do
-
-#         # skipIterationFlag=`python -c "a = ${INSTANCE_INDEX_TRAIN} == ${INSTANCE_INDEX_TEST}; a = str(a).lower(); print(a)"`
-
-#         # if [ $skipIterationFlag == true ]; then 
-#         #     continue; 
-#         # fi
-
-#         i=$((i+1))
+for diff_SEED in 2 3 4 5 6 7 8 9 10 11; do
 
 
-#         CONTROLLER_NAME_PREFIX="LeaveOutF_${INSTANCE_INDEX_TRAIN}"
+    CONTROLLER_ARRAY=()
+    SEED_ARRAY=()
+    PROBLEM_INDEX_ARRAY=()
+    PROBLEM_DIM_ARRAY=()
+    i=-1
 
-#         CONTROLLER_ARRAY+=("${EXPERIMENT_CONTROLLER_FOLDER_NAME}/top_controllers/${CONTROLLER_NAME_PREFIX}_best.controller")
-#         SEED_ARRAY+=("${SEED}")
-#         PROBLEM_INDEX_ARRAY+=("${INSTANCE_INDEX_TEST}")
-#         PROBLEM_DIM_ARRAY+=("${DIM}")
-        
-#     done
-# done
+    # # Leave one out
+    # for INSTANCE_INDEX_TRAIN in 1 2 3 4 5 6 7 8 9 10 11 12;do
+    #     for INSTANCE_INDEX_TEST in 1 2 3 4 5 6 7 8 9 10 11 12;do
 
+    #         # skipIterationFlag=`python -c "a = ${INSTANCE_INDEX_TRAIN} == ${INSTANCE_INDEX_TEST}; a = str(a).lower(); print(a)"`
 
-# Train in one
-for INSTANCE_INDEX_TRAIN in 1 2 3 4 5 6 7 8 9 10 11 12;do
-    for INSTANCE_INDEX_TEST in 1 2 3 4 5 6 7 8 9 10 11 12;do
+    #         # if [ $skipIterationFlag == true ]; then 
+    #         #     continue; 
+    #         # fi
 
-        # skipIterationFlag=`python -c "a = ${INSTANCE_INDEX_TRAIN} == ${INSTANCE_INDEX_TEST}; a = str(a).lower(); print(a)"`
-
-        # if [ $skipIterationFlag == true ]; then 
-        #     continue; 
-        # fi
-
-        i=$((i+1))
+    #         i=$((i+1))
 
 
-        CONTROLLER_NAME_PREFIX="TrainOnlyInF_${INSTANCE_INDEX_TRAIN}"
+    #         CONTROLLER_NAME_PREFIX="LeaveOutF_${INSTANCE_INDEX_TRAIN}"
 
-        CONTROLLER_ARRAY+=("${EXPERIMENT_CONTROLLER_FOLDER_NAME}/top_controllers/${CONTROLLER_NAME_PREFIX}_best.controller")
-        SEED_ARRAY+=("${SEED}")
-        PROBLEM_INDEX_ARRAY+=("${INSTANCE_INDEX_TEST}")
-        PROBLEM_DIM_ARRAY+=("${DIM}")
-        
+    #         CONTROLLER_ARRAY+=("${EXPERIMENT_CONTROLLER_FOLDER_NAME}/top_controllers/${CONTROLLER_NAME_PREFIX}_best.controller")
+    #         SEED_ARRAY+=("${SEED}")
+    #         PROBLEM_INDEX_ARRAY+=("${INSTANCE_INDEX_TEST}")
+    #         PROBLEM_DIM_ARRAY+=("${DIM}")
+            
+    #     done
+    # done
+
+
+    # Train in one
+    for INSTANCE_INDEX_TRAIN in 1 2 3 4 5 6 7 8 9 10 11 12;do
+        for INSTANCE_INDEX_TEST in 1 2 3 4 5 6 7 8 9 10 11 12;do
+
+            # skipIterationFlag=`python -c "a = ${INSTANCE_INDEX_TRAIN} == ${INSTANCE_INDEX_TEST}; a = str(a).lower(); print(a)"`
+
+            # if [ $skipIterationFlag == true ]; then 
+            #     continue; 
+            # fi
+
+            i=$((i+1))
+
+
+            CONTROLLER_NAME_PREFIX="TrainOnlyInF_${INSTANCE_INDEX_TRAIN}_seed${diff_SEED}"
+
+            CONTROLLER_ARRAY+=("${EXPERIMENT_CONTROLLER_FOLDER_NAME}/top_controllers/${CONTROLLER_NAME_PREFIX}_best.controller")
+            SEED_ARRAY+=("2") # the same seed for testing, the seed changes only for the controller name.
+            PROBLEM_INDEX_ARRAY+=("${INSTANCE_INDEX_TEST}")
+            PROBLEM_DIM_ARRAY+=("${DIM}")
+            
+        done
     done
-done
 
 
 
@@ -186,10 +188,13 @@ PROBLEM_DIM_ARRAY=$(to_list "${PROBLEM_DIM_ARRAY[@]}")
 
 
 
+# we need to launch with each seed independently, otherwise argument list too long error
+TEST_JOB_ID="${TEST_JOB_ID}:`sbatch --parsable --dependency=afterok:${TRAIN_JOB_ID} --export=CONTROLLER_ARRAY=${CONTROLLER_ARRAY},SEED_ARRAY=${SEED_ARRAY},PROBLEM_INDEX_ARRAY=${PROBLEM_INDEX_ARRAY},PROBLEM_DIM_ARRAY=${PROBLEM_DIM_ARRAY},SOLVER_POPSIZE=${SOLVER_POPSIZE},COMPUTE_RESPONSE=${COMPUTE_RESPONSE},TMP_RES_PATH=${TMP_RES_PATH},N_REPS=${N_REPS},N_EVALS=${N_EVALS},MAX_SOLVER_FE=${MAX_SOLVER_FE},FULL_MODEL=${FULL_MODEL},EXPERIMENT_CONTROLLER_FOLDER_NAME=${EXPERIMENT_CONTROLLER_FOLDER_NAME},TEST_RESULT_FOLDER_NAME=${TEST_RESULT_FOLDER_NAME},LOG_DIR=${LOG_DIR},GLOBAL_LOG=${GLOBAL_LOG} --array=0-$i src/experiments/real/scripts/hip_test_array_in_one_of_16_problems.sl`"
 
-TEST_JOB_ID=`sbatch --parsable --dependency=afterok:${TRAIN_JOB_ID} --export=CONTROLLER_ARRAY=${CONTROLLER_ARRAY},SEED_ARRAY=${SEED_ARRAY},PROBLEM_INDEX_ARRAY=${PROBLEM_INDEX_ARRAY},PROBLEM_DIM_ARRAY=${PROBLEM_DIM_ARRAY},SOLVER_POPSIZE=${SOLVER_POPSIZE},COMPUTE_RESPONSE=${COMPUTE_RESPONSE},TMP_RES_PATH=${TMP_RES_PATH},N_REPS=${N_REPS},N_EVALS=${N_EVALS},MAX_SOLVER_FE=${MAX_SOLVER_FE},FULL_MODEL=${FULL_MODEL},EXPERIMENT_CONTROLLER_FOLDER_NAME=${EXPERIMENT_CONTROLLER_FOLDER_NAME},TEST_RESULT_FOLDER_NAME=${TEST_RESULT_FOLDER_NAME},LOG_DIR=${LOG_DIR},GLOBAL_LOG=${GLOBAL_LOG} --array=0-$i src/experiments/real/scripts/hip_test_array_in_one_of_16_problems.sl`
+done
 
+echo ${TEST_JOB_ID}
 
-
-sbatch --dependency=afterok:${TEST_JOB_ID} --export=SCORE_PATH=${SCORE_PATH},RESPONSE_PATH=${RESPONSE_PATH},COMPUTE_RESPONSE=${COMPUTE_RESPONSE},TMP_RES_PATH=${TMP_RES_PATH} scripts/cat_result_files_to_exp_folder.sh
+# TEST_JOB_ID=":TEST_JOB_ID1:TEST_JOB_ID2:TEST_JOB_ID3"
+sbatch --dependency=afterok${TEST_JOB_ID} --export=SCORE_PATH=${SCORE_PATH},RESPONSE_PATH=${RESPONSE_PATH},COMPUTE_RESPONSE=${COMPUTE_RESPONSE},TMP_RES_PATH=${TMP_RES_PATH} scripts/cat_result_files_to_exp_folder.sh
 

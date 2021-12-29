@@ -59,8 +59,7 @@ for input_txt, transfer_exp, save_fig_path in zip(txt_paths, transfer_exp_list, 
     
     subprocess.run(f"mkdir -p {save_fig_path}", shell=True) # write out into log.txt
 
-    if transfer_exp != "Transfer16OnlyOne":
-        continue
+
 
     if transfer_exp == "QAP":
         def get_type(instance_name):
@@ -139,9 +138,9 @@ for input_txt, transfer_exp, save_fig_path in zip(txt_paths, transfer_exp_list, 
                 line = eval(line)
                 train_name = line[2].split("/")[-1].split("_best.controlle")[-2]
                 test_name = line[1].split("/")[-1]
-                # Dont test the controller in an instance, when that instance was used to train it.
-                if train_name in test_name:
-                    continue
+                # # Dont test the controller in an instance, when that instance was used to train it.
+                # if train_name in test_name:
+                #     continue
                 score = line[0][0]
 
 
@@ -320,13 +319,13 @@ for input_txt, transfer_exp, save_fig_path in zip(txt_paths, transfer_exp_list, 
         plt.close()
 
         # https://seaborn.pydata.org/generated/seaborn.clustermap.html -> Plot a matrix dataset as a hierarchically-clustered heatmap.
-        instance_labels = [f"{i}\n{'B' if float(i) < matrix_data.shape[0]/2 else 'M'}" for i in nice_train_names]
         clust_df = pd.DataFrame(matrix_data, index=nice_train_names, columns=nice_test_names)
         clust_df = clust_df.rename_axis(index="Training instance", columns="Test instance")
 
         # with the single method, the distance from a point in space to the cluster is considered to be
         # the minimum distance to every point in the cluster. 
         # The cityblock metric is the L1 (taxicab or tophat) metric
+        print(clust_df)
         z = linkage(clust_df, method="single", metric="cityblock", optimal_ordering=True)
         # ax = sns.clustermap(clust_df,metric='cityblock', method="single")
         ax = sns.clustermap(clust_df, row_linkage=z, col_linkage=z)
