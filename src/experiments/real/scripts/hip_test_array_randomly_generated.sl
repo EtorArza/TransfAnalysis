@@ -16,6 +16,9 @@
 SCRATCH_JOB=${SCRATCH_JOB}_${SLURM_ARRAY_TASK_ID}
 mkdir ${SCRATCH_JOB}
 
+source scripts/array_to_string_functions.sh 
+
+
 SRCDIR=`pwd`
 
 
@@ -36,17 +39,12 @@ LOG_FILE="${LOG_DIR}/test_randomly_generated_${SLURM_ARRAY_TASK_ID}.txt"
 
 
 
-echo -n "SLURM_ARRAY_TASK_ID: " >> ${LOG_FILE}
-echo $SLURM_ARRAY_TASK_ID >> ${LOG_FILE}
-
-
-cp neat -v $SCRATCH_JOB >> ${LOG_FILE}
+cp neat -v $SCRATCH_JOB
 #cp src/experiments/real/real_func_src/jani_ronkkonen_problem_generator/quad_function.dat -v --parents $SCRATCH_JOB/
 
 cd $SCRATCH_JOB
 
-echo "pwd: `pwd`" >> ${LOG_FILE}
-
+echo "pwd: `pwd`"
 
 
 mkdir -p src/experiments/real/real_func_src/jani_ronkkonen_problem_generator/
