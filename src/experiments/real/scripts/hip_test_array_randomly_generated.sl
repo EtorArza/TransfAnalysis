@@ -68,7 +68,7 @@ cat > tmp.ini <<EOF
 
 
 [Global] 
-mode = train
+mode = test
 PROBLEM_NAME = real_func
 
 POPSIZE = ${NEAT_POPSIZE}
