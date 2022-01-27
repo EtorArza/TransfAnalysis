@@ -105,6 +105,8 @@ rm neat
 
 mkdir $TMP_RES_PATH -p
 
+sed -i "s/[[:punct:]]$/,${NLO}]/" score.txt
+sed -i "s/[[:punct:]]$/,${NLO}]/" responses.txt
 
 cat "score.txt" >> "${TMP_RES_PATH}/score_tmp_${SLURM_JOB_ID}.txt"
 cat "responses.txt" >> "${TMP_RES_PATH}/responses_tmp_${SLURM_JOB_ID}.txt"
