@@ -491,7 +491,7 @@ namespace NEAT
                                  << std::setprecision(8)
                                  << std::flush
                                  << "\"" << parameters->CONTROLLER_PATH << "\","
-                                 << parameters->PROBLEM_DIM << ",\""
+                                 << parameters->PROBLEM_DIM << ","
                                  << parameters->N_EVALS
                                  << "]"
                                  << endl;
