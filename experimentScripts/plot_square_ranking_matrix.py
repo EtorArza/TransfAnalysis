@@ -329,6 +329,11 @@ for input_txt, transfer_exp, save_fig_path in zip(txt_paths, transfer_exp_list, 
         z = linkage(clust_df, method="single", metric="cityblock", optimal_ordering=True)
         # ax = sns.clustermap(clust_df,metric='cityblock', method="single")
         ax = sns.clustermap(clust_df, row_linkage=z, col_linkage=z)
+        ax.cax.set_visible(False)
+        ax.ax_row_dendrogram.set_visible(False)
+        ax.ax_col_dendrogram.set_visible(False)
+        ax.ax_row_dendrogram.set_xlim([0,0])
+        plt.tight_layout()
         plt.savefig(save_fig_path+transfer_exp+"_clustered_"+"_heatmap.pdf")
         plt.close()
 
