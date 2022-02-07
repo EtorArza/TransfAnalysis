@@ -237,14 +237,12 @@ void execute_multi(class NEAT::Network **nets_, NEAT::OrganismEvaluation *result
 
         #ifndef HIPATIA
         cout << "Reevaluating best -> ";
-        progress_bar bar(MAX_EVALS_PER_CONTROLLER, flushOut);
+        progress_bar bar(MAX_EVALS_PER_CONTROLLER_REEVAL, flushOut);
         #endif
 
         current_n_of_evals = 0;
         bool test_result = true;
 
-        while (test_result && current_n_of_evals < MAX_EVALS_PER_CONTROLLER_REEVAL)
-        {
             #pragma omp parallel for num_threads(parameters->neat_params->N_OF_THREADS) schedule(dynamic,1)
             for (int i = 0; i < MAX_EVALS_PER_CONTROLLER_REEVAL; i++)
             {
@@ -265,21 +263,12 @@ void execute_multi(class NEAT::Network **nets_, NEAT::OrganismEvaluation *result
             }
             current_n_of_evals += MAX_EVALS_PER_CONTROLLER_REEVAL;
             convert_f_values_to_negative_inverse_ranks_squared(surviving_candidates, f_values, f_value_ranks, current_n_of_evals);
-            if (check_if_all_ranks_are_the_same(surviving_candidates, f_value_ranks, current_n_of_evals))
-            {
-                test_result = false;
-                #ifndef HIPATIA
-                    cout << "The controllers behave the same.";
-                #endif
-                break;
-            }
             // cout << "best this gen ->";
             // PrintArray(f_value_ranks[best_current_iteration_index], current_n_of_evals);
             // cout << "best last gen ->";
             // PrintArray(f_value_ranks[nnets], current_n_of_evals);
             test_result = is_A_larger_than_B_sign_test(f_value_ranks[best_current_iteration_index], f_value_ranks[nnets], current_n_of_evals, ALPHA_INDEX);
             //cout << "test_result: " << test_result << "\n";
-        }
         #ifndef HIPATIA
         bar.end();
         cout << "\n";
