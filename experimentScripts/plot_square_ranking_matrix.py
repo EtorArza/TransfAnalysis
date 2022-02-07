@@ -38,7 +38,8 @@ def change_distance_matrix_indices(matrix, permu):
 save_fig_paths = [
 "experimentResults/transfer_permus_qap/results/figures/",
 "experimentResults/transfer_permus_problems/results/figures/",
-"experimentResults/transfer_16_continuous_problems/results/figures/"
+"experimentResults/transfer_16_continuous_problems/results/figures/",
+"experimentResults/transfer_generated_continuous/results/figures/",
 ]
 
 
@@ -46,6 +47,7 @@ txt_paths = [
 "experimentResults/transfer_permus_qap/results/score.txt",
 "experimentResults/transfer_permus_problems/results/score.txt",
 "experimentResults/transfer_16_continuous_problems/results/score.txt",
+"experimentResults/transfer_generated_continuous/results/score.txt",
 ]
 
 
@@ -53,6 +55,7 @@ transfer_exp_list =[
 "QAP",
 "PERMUPROB",
 "Transfer16OnlyOne",
+"transferGenerated"
 ]
 
 for input_txt, transfer_exp, save_fig_path in zip(txt_paths, transfer_exp_list, save_fig_paths):
@@ -88,6 +91,11 @@ for input_txt, transfer_exp, save_fig_path in zip(txt_paths, transfer_exp_list, 
             problem_index = int(instance_name.split("seed")[0].strip("_"))
             type_name = PROBLEM_TYPES[(problem_index - 1) // 6]
             return type_name
+
+    elif transfer_exp == "transferGenerated":
+        def get_type(instance_name):
+            return instance_name
+            
 
 
     print(input_txt.split("/")[-1])
@@ -131,10 +139,16 @@ for input_txt, transfer_exp, save_fig_path in zip(txt_paths, transfer_exp_list, 
                 if get_type(train_name) == get_type(test_name) and train_name != test_name:
                     continue
 
+            elif transfer_exp == "transferGenerated":
+                line = line.split(",")
+                line = [el.strip("[]\n") for el in line]
+                train_name = line[2].split("NLO_")[-1].split("_best.controlle")[0]
+                test_name = line[-1]
+                score = float(line[0])
 
 
             # PERMUS (both qap and permuproblems)
-            else:
+            elif transfer_exp == "QAP_MULTI" or transfer_exp == "QAP" or transfer_exp=="PERMUPROB":
                 line = eval(line)
                 train_name = line[2].split("/")[-1].split("_best.controlle")[-2]
                 test_name = line[1].split("/")[-1]
@@ -143,6 +157,9 @@ for input_txt, transfer_exp, save_fig_path in zip(txt_paths, transfer_exp_list, 
                 #     continue
                 score = line[0][0]
 
+            else:
+                print(f"ERROR: transfer_exp = {transfer_exp} not recognized!")
+                exit(1)
 
             train_type = get_type(train_name)
             test_type = get_type(test_name)
