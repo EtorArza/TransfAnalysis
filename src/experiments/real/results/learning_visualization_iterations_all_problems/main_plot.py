@@ -92,21 +92,16 @@ for instance_index, NLO, dim in zip(instance_index_list,NLO_train_list,dim_list)
     generations = [str(el.split("_gen_")[-1].split(".controller")[0]) for el in files if len(el) > 6]
 
 
-    print(generations)
-
-    results = np.zeros((len(generations), len(instance_index_list)))
+    results = np.zeros_like(generations)
     for i, gen in enumerate(tqdm(generations)):
-        results[i,j] = return_results(SOLVER_POPSIZE, instance_index, dim, gen, controller_prefix, NLO_test, SEED)
+        results[i] = return_results(SOLVER_POPSIZE, instance_index, dim, gen, controller_prefix, NLO_test, SEED)
 
 
-    results = StandardScaler().fit_transform(results)
 
-    for column, label in zip(results.T, instance_index_list):
-        print(column, np.array([int(el) for el in generations]))
-        plt.plot(np.array([int(el) for el in generations]), column, label="F"+str(label))
-
-
-    plt.legend()
-    plt.show()
-
+    plt.plot(np.array([int(el) for el in generations]), results, label="NLO="+str(nlo_train))
     print(results)
+
+
+plt.legend()
+plt.show()
+
