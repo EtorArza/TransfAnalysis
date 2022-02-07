@@ -1627,7 +1627,7 @@ void load_statistical_sigificant_parameters_given_alpha_index(int ALPHA_INDEX, d
         Z_THRESH = 1.645;
         if (critical_values_one_sided != nullptr)
         {
-            int crit_vals[10] = {INT_MAX, INT_MAX, INT_MAX, INT_MAX, INT_MAX, 15,      17,      22,      26, 29};
+            int crit_vals[10] = {-INT_MAX, -INT_MAX, -INT_MAX, -INT_MAX, -INT_MAX, 15,      17,      22,      26, 29};
             copy_array(critical_values_one_sided, crit_vals, 10);
         }
     } 
@@ -1637,7 +1637,7 @@ void load_statistical_sigificant_parameters_given_alpha_index(int ALPHA_INDEX, d
         Z_THRESH = 2.326;
         if (critical_values_one_sided != nullptr)
         {
-            int crit_vals[10] = {INT_MAX, INT_MAX, INT_MAX, INT_MAX, INT_MAX, INT_MAX, INT_MAX, 28,      34, 39};
+            int crit_vals[10] = {-INT_MAX, -INT_MAX, -INT_MAX, -INT_MAX, -INT_MAX, -INT_MAX, -INT_MAX, 28,      34, 39};
             copy_array(critical_values_one_sided, crit_vals, 10);
         }
     }
@@ -1647,7 +1647,7 @@ void load_statistical_sigificant_parameters_given_alpha_index(int ALPHA_INDEX, d
         Z_THRESH = 2.576;
         if (critical_values_one_sided != nullptr)
         {
-            int crit_vals[10] = {INT_MAX, INT_MAX, INT_MAX, INT_MAX, INT_MAX, INT_MAX, INT_MAX, INT_MAX, 36, 43};
+            int crit_vals[10] = {-INT_MAX, -INT_MAX, -INT_MAX, -INT_MAX, -INT_MAX, -INT_MAX, -INT_MAX, -INT_MAX, 36, 43};
             copy_array(critical_values_one_sided, crit_vals, 10);
         }
     }
@@ -1772,7 +1772,12 @@ double p_sign_test(int n, int y)
 }
 
 
-// the one sided sign test as defined in Conover
+// The one sided sign test as defined in Conover. 
+// Rejecting H_0 means returning true. 
+// H_1 means that A > B with higher probability.
+// Thus, when true is returned, we show statistical
+// significance of A > B. If false is returned,
+// we show nothing!!
 bool is_A_larger_than_B_sign_test(double* A, double* B, int length, int ALPHA_INDEX)
 {
     int statistic = 0;
@@ -2156,13 +2161,15 @@ void F_race_iteration(double** f_values, vector<int> &surviving_candidates, int 
 
         for (int i = 0; i < surviving_candidates.size(); i++)
         {
-            // PrintArray(reduced_f_values[i], n_samples);
             // cout << endl;
             // PrintArray(reduced_f_values[best_reduced_index], n_samples);
             // cout << endl;
+            // PrintArray(reduced_f_values[i], n_samples);
+            // cout << endl;
             // cout << "---\n";
             bool pos_hoc_test_result = is_A_larger_than_B_sign_test(reduced_f_values[best_reduced_index], reduced_f_values[i], n_samples, ALPHA_INDEX);
-
+            // std::cout << "\npos_hoc_test_result: " << pos_hoc_test_result << endl;
+            // std::cout << "\n-----------------------------------\n\n";
             // statistically significantly worse than best of generation
             if (pos_hoc_test_result)
             {
