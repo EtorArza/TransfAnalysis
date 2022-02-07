@@ -7,17 +7,19 @@ from sklearn.preprocessing import StandardScaler
 SEED=2
 SOLVER_POPSIZE=10
 MAX_SOLVER_FE=1000
+MAX_GEN=5000
 N_EVALS = 100 # N of repetitions averaged
 N_REPS = 1 # N of averaged repetitions repeated
 THREADS = 1
 CONTROLLER_PATH = '/home/paran/Dropbox/BCAM/02_NEAT_transferability/code/NEAT_code/experimentResults/transfer_generated_continuous/controllers/all_controllers'
 FULL_MODEL = "false"
 
+NLO_train_list = [2,14,40,8,24,38]
+N_CONTROLLER_TYPES_TESTED = len(NLO_train_list)
 
-instance_index_list=[0,0,0]
-dim_list = [20,20,20]
-NLO_train_list = [2,4,6]
-NLO_test_list = [4,4,4]
+instance_index_list=[0]*N_CONTROLLER_TYPES_TESTED
+dim_list = [20]*N_CONTROLLER_TYPES_TESTED
+NLO_test_list = [4]*N_CONTROLLER_TYPES_TESTED
 CONTROLLER_PREFIX_list = [f'NLO_{NLO}' for NLO in NLO_train_list]
 
 
@@ -70,17 +72,19 @@ MAX_SOLVER_FE = {MAX_SOLVER_FE}
 
 def return_results(SOLVER_POPSIZE,PROBLEM_INDEX,PROBLEM_DIM,GEN_INDEX, CONTROLLER_PREFIX, NLO, SEED):
     write_conf_file(SOLVER_POPSIZE,PROBLEM_INDEX,PROBLEM_DIM,GEN_INDEX, CONTROLLER_PREFIX, NLO, SEED)
-    #subprocess.run("./neat tmp_conf_file.ini > /dev/null",shell=True)
-    subprocess.run("./neat tmp_conf_file.ini",shell=True)
+    subprocess.run("./neat tmp_conf_file.ini > /dev/null",shell=True)
+    # subprocess.run("./neat tmp_conf_file.ini",shell=True)
     with open("score.txt","r") as f:
         res = f.readline().strip()
-    print(SOLVER_POPSIZE,PROBLEM_INDEX,PROBLEM_DIM,GEN_INDEX, CONTROLLER_PREFIX, NLO, SEED)
-    print(res)
     subprocess.run("rm score.txt",shell=True)
-    return eval(res)[0][0]
+    return float(eval(res)[0][0])
 
 j = -1
-for instance_index, NLO, dim in zip(instance_index_list,NLO_train_list,dim_list):
+fig, ax = plt.subplots()
+all_fx_values = []
+last_gen_list = []
+last_y_list = []
+for instance_index, NLO, dim in tqdm(zip(instance_index_list,NLO_train_list,dim_list), total=N_CONTROLLER_TYPES_TESTED):
     j += 1
 
     nlo_train = NLO_train_list[j]
@@ -92,16 +96,18 @@ for instance_index, NLO, dim in zip(instance_index_list,NLO_train_list,dim_list)
     generations = [str(el.split("_gen_")[-1].split(".controller")[0]) for el in files if len(el) > 6]
 
 
-    results = np.zeros_like(generations)
-    for i, gen in enumerate(tqdm(generations)):
+    results = np.zeros(len(generations)+1)
+    for i, gen in enumerate(generations):
         results[i] = return_results(SOLVER_POPSIZE, instance_index, dim, gen, controller_prefix, NLO_test, SEED)
+        all_fx_values.append(results[i])
 
+    last_gen_list.append(float(generations[-1]))
+    last_y_list.append(results[-2])
+    generations += [MAX_GEN]
+    results[-1] = results[-2]
+    ax.plot(np.array([int(el) for el in generations]), results, label="NLO="+str(nlo_train))
 
-
-    plt.plot(np.array([int(el) for el in generations]), results, label="NLO="+str(nlo_train))
-    print(results)
-
-
-plt.legend()
+ax.scatter(last_gen_list,last_y_list, c="black", label="Last update")
+ax.legend()
 plt.show()
 

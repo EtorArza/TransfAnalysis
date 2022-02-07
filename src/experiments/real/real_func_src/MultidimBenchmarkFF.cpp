@@ -360,7 +360,7 @@ double F12::FitnessFunc(double* x_vec){
 static int current_jobs_with_this_seed = 0;
 FRandomlyGenerated::FRandomlyGenerated(int problem_index, int dim, double x_lower_lim, double x_upper_lim, int SEED, bool ROTATE)  : MultidimBenchmarkFF(problem_index, dim, x_lower_lim, x_upper_lim, SEED, ROTATE)
 {
-    #define use_same_seed_every 32
+    #define use_same_seed_every 144
     char config_path[] = "src/experiments/real/real_func_src/jani_ronkkonen_problem_generator/quad_function.dat";
 
     SEED = max(2,SEED - SEED % use_same_seed_every);
