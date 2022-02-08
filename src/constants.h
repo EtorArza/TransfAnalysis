@@ -1,8 +1,8 @@
 #pragma once
 #include <limits.h>
 
-#define MAX_EVALS_PER_CONTROLLER 1
-#define MAX_EVALS_PER_CONTROLLER_REEVAL 200
+#define MAX_EVALS_PER_CONTROLLER 400
+#define MAX_EVALS_PER_CONTROLLER_REEVAL 5000
 
 
 #define MAX(A, B) ((A > B) ? A : B)

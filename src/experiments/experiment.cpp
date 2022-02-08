@@ -121,13 +121,13 @@ void execute_multi(class NEAT::Network **nets_, NEAT::OrganismEvaluation *result
         double **f_values;
         double **f_value_ranks;
 
-        int ALPHA_INDEX = 0;
-        int target_n_controllers_left = 1;
-        int n_evals_each_it = min(MAX_EVALS_PER_CONTROLLER, 32);
+        int ALPHA_INDEX = 2;
+        int target_n_controllers_left = max((int) ((double) nnets * 0.4), 1);
+        int n_evals_each_it = min(MAX_EVALS_PER_CONTROLLER, 8);
         int row_length =  MAX_EVALS_PER_CONTROLLER + 2*n_evals_each_it + MAX_EVALS_PER_CONTROLLER_REEVAL;
 
-        zero_initialize_matrix(f_values, nnets + 1, row_length);
-        zero_initialize_matrix(f_value_ranks, nnets + 1, row_length);
+        initialize_matrix_with_value(f_values, -10e10, nnets + 1, row_length);
+        initialize_matrix_with_value(f_value_ranks, - (double) nnets, nnets + 1, row_length);
         uint32_t initial_seed;
 
         double *tmp_order = new double[nnets+1];
@@ -192,7 +192,7 @@ void execute_multi(class NEAT::Network **nets_, NEAT::OrganismEvaluation *result
 
             for (auto &&inet : surviving_candidates)
             {
-                tmp_order[inet] = Average(f_value_ranks[inet], current_n_of_evals) - (double)surviving_candidates.size() * 10000000.0;
+                tmp_order[inet] = Average(f_value_ranks[inet], current_n_of_evals);
             }
 
             bool are_all_ranks_the_same = check_if_all_ranks_are_the_same(surviving_candidates, f_value_ranks, current_n_of_evals);
@@ -221,7 +221,7 @@ void execute_multi(class NEAT::Network **nets_, NEAT::OrganismEvaluation *result
 
         for (auto &&inet : surviving_candidates)
         {
-            tmp_order[inet] = Average(f_value_ranks[inet], current_n_of_evals) - (double)surviving_candidates.size() * 10000000.0;
+            tmp_order[inet] = Average(f_value_ranks[inet], current_n_of_evals);
         }
 
         int best_current_iteration_index = argmax(tmp_order, (int)nnets);
@@ -230,10 +230,11 @@ void execute_multi(class NEAT::Network **nets_, NEAT::OrganismEvaluation *result
 
 
         // update best known of last iteration and this iteration
-        initial_seed = global_rng.random_integer() / 100;
+        initial_seed = global_rng.random_integer() / 10;
         surviving_candidates.clear();
         surviving_candidates.push_back(best_current_iteration_index);
         surviving_candidates.push_back(nnets);
+        ALPHA_INDEX = 3;
 
         #ifndef HIPATIA
         cout << "Reevaluating best -> ";
