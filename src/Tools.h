@@ -1117,6 +1117,25 @@ void zero_initialize_matrix(T** &matrix, int m, int n)
     }
 }
 
+
+template<class T>
+void initialize_matrix_with_value(T** &matrix, T value, int m, int n)
+{
+    matrix = new T*[m];
+    for (int i = 0; i < m; i++)
+    {
+        matrix[i] = new T[n];
+    }
+    for (int i = 0; i < m; i++)
+    {
+        for (int j = 0; j < n; j++)
+        {
+            matrix[i][j] = value;
+        }      
+    }
+}
+
+
 template<class T>
 void delete_matrix(T** &matrix, int m)
 {
