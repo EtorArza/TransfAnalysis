@@ -11,6 +11,9 @@
 #include "Parameters.h"
 #include <chrono>
 #include <float.h>
+#include "constants.h"
+#include "speciesorganism.h"
+
 namespace NEAT {
 
 //------------------------------
@@ -110,12 +113,16 @@ namespace NEAT {
             
             
             int gen = 0;
-            neat_params->BEST_FITNESS_TRAIN = -DBL_MAX;
             neat_params->N_TIMES_BEST_FITNESS_IMPROVED_TRAIN = 0;
             neat_params->N_ITERATIONS_WITHOUT_FITNESS_IMPROVED = 0;
+            neat_params->BEST_FITNESS_THIS_REINITIALIZE = -1e80;
+            neat_params->BEST_FITNESS_TRAIN_ALL_TIME = -1e81;
 
 
             neat_params->IS_LAST_ITERATION = false;
+
+
+            Organism *best_all_time = nullptr;
 
 
             #ifdef HIPATIA
@@ -143,11 +150,18 @@ namespace NEAT {
                 static Timer timer("epoch");
                 timer.start();
 
-                if(gen != 1) {
+                if(gen != 1 && !neat_params->reinitialize_neat_for_next_generation) {
                     pop->next_generation();
                 }
 
-                evaluate();
+                // reinizialize after evaluate. In this manner, evaluate() knows reinizialization will be applied, and tests best network
+                neat_params-> reinitialize_neat_for_next_generation = false;
+                if (gen % REINITIALIZE_CONTROLLERS_EVERY_N_ITERATIONS == 0 && !neat_params->IS_LAST_ITERATION)
+                {
+                    neat_params->reinitialize_neat_for_next_generation = true;
+                    cout << "REINITITIALIZING" << endl;
+                }
+                evaluate(best_all_time);
 
                 timer.stop();
                 Timer::report();
@@ -160,25 +174,29 @@ namespace NEAT {
                     print(gen, false);
                 }
 
-                if (neat_params->IS_LAST_ITERATION)
+                if (neat_params->IS_LAST_ITERATION || neat_params->reinitialize_neat_for_next_generation)
                 {
                     print(gen, true);
                 }
-            }
 
-            {
-                Genome::Stats gstats = fittest->genome->get_stats();
-                fitness.push_back(fittest->eval.fitness);
-                nnodes.push_back(gstats.nnodes);
-                nlinks.push_back(gstats.nlinks);
+                if (neat_params->reinitialize_neat_for_next_generation)
+                {
+
+                    neat_params->N_TIMES_BEST_FITNESS_IMPROVED_TRAIN = 0;
+                    neat_params->N_ITERATIONS_WITHOUT_FITNESS_IMPROVED = 0;
+                    neat_params->BEST_FITNESS_THIS_REINITIALIZE = -1e80;
+                    int seed = rng.integer();
+                    cout << "Reinitializing population with SEED = " << seed << endl;
+                    rng_t rng_exp(seed);
+                    delete pop;
+                    delete env->genome_manager;
+                    env->genome_manager = GenomeManager::create();
+                    vector<unique_ptr<Genome>> genomes = create_seeds(rng_exp);
+                    pop = Population::create(rng_exp, genomes);
+                }
             }
             delete pop;
             delete env->genome_manager;
-
-            cout << "fitness stats: " << stats(fitness) << endl;
-            cout << "nnodes stats: " << stats(nnodes) << endl;
-            cout << "nlinks stats: " << stats(nlinks) << endl;
-
         }
 
         virtual void run_given_conf_file(std::string conf_file_path) override{
@@ -204,7 +222,7 @@ namespace NEAT {
             }
         }
 
-        void evaluate() {
+        void evaluate(Organism *&best_all_time) {
             using namespace std;
 
             static Timer timer("evaluate");
@@ -221,27 +239,35 @@ namespace NEAT {
             network_evaluator->execute(nets, evaluations, norgs);
             cout << "execute() end" << endl;
 
-            Organism *best = nullptr;
+            Organism *best_this_reinitialize = nullptr;
+
             for(size_t i = 0; i < norgs; i++) {
                 Organism *org = pop->get(i);
                 org->eval = evaluations[i];
-                if( !best || (org->eval.fitness > best->eval.fitness) ) {
-                    best = org;
+                if( best_this_reinitialize == nullptr || (org->eval.fitness > best_this_reinitialize->eval.fitness) ) 
+                {
+                    best_this_reinitialize = org;
                 }
             }
 
-            timer.stop();
-
-            // Fittest is not evaluated.
-            if(!fittest || (best->eval.fitness > fittest->eval.fitness+ 1e-60)) {
-                save_best_network = true;
-                fittest = pop->make_copy(best->population_index);
+            // If it is the first iteration, or (best fitness all time improved)
+            if (best_all_time == nullptr || neat_params->BEST_FITNESS_THIS_REINITIALIZE > neat_params->BEST_FITNESS_TRAIN_ALL_TIME)
+            {
+                cout << "BF_THIS_REINITIALIZE, BF_TRAIN_ALL_TIME = " 
+                    << neat_params->BEST_FITNESS_THIS_REINITIALIZE << ", " 
+                    << neat_params->BEST_FITNESS_TRAIN_ALL_TIME << endl;
+                cout << "new_best_found between reinits." << endl;
+                neat_params->BEST_FITNESS_TRAIN_ALL_TIME = neat_params->BEST_FITNESS_THIS_REINITIALIZE;
+                best_all_time = new SpeciesOrganism(*best_this_reinitialize->genome);;
+                SpeciesOrganism *copy = new SpeciesOrganism(*best_all_time->genome);
+                fittest = unique_ptr<Organism>(copy);
+                fittest->eval.fitness = neat_params->BEST_FITNESS_TRAIN_ALL_TIME;
             }
 
+            timer.stop();
             Genome::Stats gstats = fittest->genome->get_stats();
             cout << "fittest [" << fittest->population_index << "]"
-                 << ": fitness=" << neat_params->BEST_FITNESS_TRAIN
-                 << ", error=" << fittest->eval.error
+                 << ": fitness=" << fittest->eval.fitness
                  << ", nnodes=" << gstats.nnodes
                  << ", nlinks=" << gstats.nlinks
                  << endl;

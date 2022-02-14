@@ -79,7 +79,7 @@ bool Species::print_to_file(std::ostream &outFile) {
     //Print all the Organisms' Genomes to the outFile
     for(SpeciesOrganism *org: organisms) {
         //Put the fitness for each organism in a comment
-        outFile<<std::endl<<"/* Organism #"<<org->genome->genome_id<<" Fitness: "<<org->eval.fitness<<" Error: "<<org->eval.error<<" */"<<std::endl;
+        outFile<<std::endl<<"/* Organism #"<<org->genome->genome_id<<" Fitness: "<<org->eval.fitness<<" */"<<std::endl;
 
         org->genome->print(outFile);
     }

@@ -282,7 +282,6 @@ void execute_multi(class NEAT::Network **nets_, NEAT::OrganismEvaluation *result
         tmp_order[best_current_iteration_index] = 10e20;
         
 
-        parameters->neat_params->BEST_FITNESS_TRAIN = 1.0;
 
         cout << "(best this gen, best last gen) -> (" << avg_perf_best_current << ", " << avg_perf_best_last << ")" << ", higher is better";
 
@@ -292,7 +291,6 @@ void execute_multi(class NEAT::Network **nets_, NEAT::OrganismEvaluation *result
             parameters->neat_params->N_ITERATIONS_WITHOUT_FITNESS_IMPROVED = 0;
 
             cout << ", best replaced";
-            parameters->neat_params->BEST_FITNESS_TRAIN = 1.0;
             delete best_network;
             best_network = new NEAT::CpuNetwork(*nets[best_current_iteration_index]);
         }
@@ -328,13 +326,29 @@ void execute_multi(class NEAT::Network **nets_, NEAT::OrganismEvaluation *result
 
 
 
+        if (parameters->neat_params->reinitialize_neat_for_next_generation || parameters->neat_params->IS_LAST_ITERATION)
+        {
+            double fitness_best_this_reinitialization;
+            double fitness_best_this_reinitialization_array[N_EVALS_PER_CONTROLLER_SELECT_BEST_IN_REINITIALIZATION];
+            initial_seed = global_rng.random_integer() / 100;
+            NEAT::CpuNetwork *net_best_this_it = best_network;
+            #pragma omp parallel for num_threads(parameters->neat_params->N_OF_THREADS) schedule(dynamic,1)
+            for (int i = 0; i < N_EVALS_PER_CONTROLLER_SELECT_BEST_IN_REINITIALIZATION; i++)
+            {
+                int instance_index =  i % n_instances;
+                uint32_t seed = i + initial_seed;
+                fitness_best_this_reinitialization_array[i] = FitnessFunction(net_best_this_it, seed, instance_index, parameters);
+            }
+            fitness_best_this_reinitialization = Average(fitness_best_this_reinitialization_array, N_EVALS_PER_CONTROLLER_SELECT_BEST_IN_REINITIALIZATION);
+            parameters->neat_params->BEST_FITNESS_THIS_REINITIALIZE = fitness_best_this_reinitialization;
+        }
+
         // save scaled fitness
         for (size_t inet = 0; inet < nnets; inet++)
         {
             NEAT::OrganismEvaluation eval;
             results[inet] = eval;
             results[inet].fitness = tmp_order[inet];
-            results[inet].error = 2 - tmp_order[inet];
         }
 
         delete_matrix(f_values, nnets + 1);

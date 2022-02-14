@@ -53,8 +53,7 @@ Organism &Organism::operator=(const Organism &other) {
 
 void Organism::write(std::ostream &out) const {
     out << "/* Organism #" << population_index << " "
-        << "Fitness: " << eval.fitness << " "
-        << "Error: " << eval.error << " */" << endl;
+        << "Fitness: " << eval.fitness << " " << endl;
     genome->print(out);
 }
 

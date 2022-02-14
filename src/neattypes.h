@@ -24,9 +24,7 @@ namespace NEAT {
 
     struct OrganismEvaluation {
         real_t fitness;
-        real_t error;
-
-        void reset() {fitness = error = 0.0;}
+        void reset() {fitness = 0.0;}
     };
 
     #define __in const
