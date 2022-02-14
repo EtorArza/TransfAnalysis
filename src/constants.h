@@ -4,6 +4,8 @@
 #define MAX_EVALS_PER_CONTROLLER 400
 #define MAX_EVALS_PER_CONTROLLER_REEVAL 5000
 
+#define use_same_seed_every 72
+
 
 #define MAX(A, B) ((A > B) ? A : B)
 #define MIN(A, B) ((A < B) ? A : B)
