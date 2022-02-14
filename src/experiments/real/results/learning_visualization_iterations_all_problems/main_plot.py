@@ -8,13 +8,13 @@ SEED=2
 SOLVER_POPSIZE=10
 MAX_SOLVER_FE=1000
 MAX_GEN=5000
-N_EVALS = 100 # N of repetitions averaged
+N_EVALS = 1000 # N of repetitions averaged
 N_REPS = 1 # N of averaged repetitions repeated
 THREADS = 1
 CONTROLLER_PATH = '/home/paran/Dropbox/BCAM/02_NEAT_transferability/code/NEAT_code/experimentResults/transfer_generated_continuous/controllers/all_controllers'
 FULL_MODEL = "false"
 
-NLO_train_list = [2,14,40,8,24,38]
+NLO_train_list = [1,4,16,32]
 N_CONTROLLER_TYPES_TESTED = len(NLO_train_list)
 
 instance_index_list=[0]*N_CONTROLLER_TYPES_TESTED
