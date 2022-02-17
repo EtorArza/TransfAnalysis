@@ -159,7 +159,7 @@ namespace NEAT {
                 if (gen % REINITIALIZE_CONTROLLERS_EVERY_N_ITERATIONS == 0 && !neat_params->IS_LAST_ITERATION)
                 {
                     neat_params->reinitialize_neat_for_next_generation = true;
-                    cout << "REINITITIALIZING" << endl;
+                    cout << "reinitialize_message -> REINITITIALIZING" << endl;
                 }
                 evaluate(best_all_time);
 
@@ -186,7 +186,7 @@ namespace NEAT {
                     neat_params->N_ITERATIONS_WITHOUT_FITNESS_IMPROVED = 0;
                     neat_params->BEST_FITNESS_THIS_REINITIALIZE = -1e80;
                     int seed = rng.integer();
-                    cout << "Reinitializing population with SEED = " << seed << endl;
+                    cout << "reinitialize_message -> Reinitializing population with SEED = " << seed << endl;
                     rng_t rng_exp(seed);
                     delete pop;
                     delete env->genome_manager;
@@ -213,10 +213,12 @@ namespace NEAT {
             if (!is_last_gen)
             {
                 ofstream out(get_fittest_path(generation, "all_controllers"));
+                std::cout << "reinitialize_message -> saving in all_controllers genome with hash #" << fittest->genome->hash() << std::endl;
                 fittest->write(out);
             }
             else
             {
+                std::cout << "reinitialize_message -> saving in top_controllers genome with hash #" << fittest->genome->hash() << std::endl;
                 ofstream out(get_fittest_path(generation, "top_controllers"));
                 fittest->write(out);
             }
@@ -256,7 +258,7 @@ namespace NEAT {
                 cout << "BF_THIS_REINITIALIZE, BF_TRAIN_ALL_TIME = " 
                     << neat_params->BEST_FITNESS_THIS_REINITIALIZE << ", " 
                     << neat_params->BEST_FITNESS_TRAIN_ALL_TIME << endl;
-                cout << "new_best_found between reinits." << endl;
+                cout << "reinitialize_message -> new_best_found between reinits with hash #" << best_this_reinitialize->genome->hash() << endl;
                 neat_params->BEST_FITNESS_TRAIN_ALL_TIME = neat_params->BEST_FITNESS_THIS_REINITIALIZE;
                 best_all_time = new SpeciesOrganism(*best_this_reinitialize->genome);;
                 SpeciesOrganism *copy = new SpeciesOrganism(*best_all_time->genome);

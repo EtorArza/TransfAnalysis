@@ -31,6 +31,7 @@ namespace NEAT {
         virtual void init_phenotype(class Network &net) = 0;
 
         virtual void print(std::ostream &out) = 0;
+        virtual std::string hash() = 0;
 		virtual void verify() = 0;
 
         struct Stats {
