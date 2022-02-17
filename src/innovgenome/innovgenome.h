@@ -50,6 +50,8 @@ namespace NEAT {
 		// Dump this genome to specified file
 		virtual void print(std::ostream &out) override;
 
+		virtual std::string hash() override;
+
         void duplicate_into(InnovGenome *offspring) const;
         InnovGenome &operator=(const InnovGenome &other);
 

@@ -206,6 +206,19 @@ void InnovGenome::print(std::ostream &out) {
     out << "genomeend " << genome_id << std::endl;
 }
 
+std::string InnovGenome::hash() {
+    double res = 0;
+
+    for(auto &g: links)
+        res += g.weight();
+    
+    long unsigned int num = static_cast<long unsigned int> (res * 10000000000.0) % 890000L + 100000L;
+    std::stringstream ss;
+    ss << num;
+    return ss.str();
+}
+
+
 int InnovGenome::get_last_node_id() {
     return nodes.back().node_id + 1;
 }
