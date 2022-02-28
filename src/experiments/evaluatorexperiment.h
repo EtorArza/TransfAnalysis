@@ -54,6 +54,7 @@ namespace NEAT {
     public:
 
         bool save_best_network = false;
+        Organism *best_this_reinitialize = nullptr;
 
         typedef std::function<NetworkEvaluator *()> CreateEvaluatorFunc;
         typedef std::function< std::vector<std::unique_ptr<Genome>> (rng_t rng)> CreateSeedsFunc;
@@ -193,6 +194,7 @@ namespace NEAT {
                     env->genome_manager = GenomeManager::create();
                     vector<unique_ptr<Genome>> genomes = create_seeds(rng_exp);
                     pop = Population::create(rng_exp, genomes);
+                    best_this_reinitialize=nullptr;
                 }
             }
             delete pop;
@@ -214,7 +216,7 @@ namespace NEAT {
             {
                 ofstream out(get_fittest_path(generation, "all_controllers"));
                 std::cout << "reinitialize_message -> saving in all_controllers genome with hash #" << fittest->genome->hash() << std::endl;
-                fittest->write(out);
+                best_this_reinitialize->write(out);
             }
             else
             {
@@ -241,7 +243,6 @@ namespace NEAT {
             network_evaluator->execute(nets, evaluations, norgs);
             cout << "execute() end" << endl;
 
-            Organism *best_this_reinitialize = nullptr;
 
             for(size_t i = 0; i < norgs; i++) {
                 Organism *org = pop->get(i);
@@ -249,6 +250,7 @@ namespace NEAT {
                 if( best_this_reinitialize == nullptr || (org->eval.fitness > best_this_reinitialize->eval.fitness) ) 
                 {
                     best_this_reinitialize = org;
+                    save_best_network = true;
                 }
             }
 
