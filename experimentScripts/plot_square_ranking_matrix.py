@@ -323,8 +323,7 @@ for input_txt, transfer_exp, save_fig_path in zip(txt_paths, transfer_exp_list, 
                 train_name = train_names[i]
                 test_name = test_names[j]
                 value = data_frame[(data_frame["train_name"] == train_name) & (data_frame["test_name"] == test_name)]["transferability"]
-                
-                value = float(value) if len(value)>0 else np.NAN
+                value = value.mean() if len(value) > 0 else np.NAN
 
                 matrix_data[i,j] = value
         ax = sns.heatmap(matrix_data, linewidth=0.5, xticklabels=nice_train_names, yticklabels=nice_test_names)
