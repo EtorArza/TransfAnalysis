@@ -79,8 +79,8 @@ CONTROLLER_ARRAY=()
 SEED_ARRAY=()
 NLO_ARRAY=()
 i=-1
-for NLO_train in 1 4 16 32; do
-    for NLO_test in 1 4 16 32; do
+for NLO_train in 1 2 4 8 16 32 64; do
+    for NLO_test in 1 2 4 8 16 32 64; do
         i=$((i+1))
         CONTROLLER_NAME_PREFIX="NLO_${NLO_train}"
         CONTROLLER_ARRAY+=("${EXPERIMENT_CONTROLLER_FOLDER_NAME}/top_controllers/${CONTROLLER_NAME_PREFIX}_best.controller")
