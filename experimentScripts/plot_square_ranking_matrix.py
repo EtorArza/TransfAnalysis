@@ -12,7 +12,7 @@ from sklearn.datasets import make_biclusters
 from sklearn.cluster import SpectralCoclustering
 from sklearn.metrics import consensus_score
 from scipy.cluster.hierarchy import dendrogram, linkage
-
+import re
 
 # biclustering
 
@@ -62,7 +62,12 @@ for input_txt, transfer_exp, save_fig_path in zip(txt_paths, transfer_exp_list, 
     
     subprocess.run(f"mkdir -p {save_fig_path}", shell=True) # write out into log.txt
 
-
+    def remove_seed_from_instance_name(instance_name):
+        if 'seed' not in instance_name:
+            print("ERROR: Controller name should include _seedk_best.controller, where k is the seed used to train the controller.")
+            exit(1)
+        instance_name = re.sub(r"seed\d*_", '', instance_name)
+        return instance_name
 
     if transfer_exp == "QAP":
         def get_type(instance_name):
@@ -98,7 +103,7 @@ for input_txt, transfer_exp, save_fig_path in zip(txt_paths, transfer_exp_list, 
             
 
 
-    print(input_txt.split("/")[-1])
+    print(input_txt)
 
 
 
@@ -109,11 +114,13 @@ for input_txt, transfer_exp, save_fig_path in zip(txt_paths, transfer_exp_list, 
 
     scores = []
 
-    data_frame = pd.DataFrame(columns=["score", "train_name", "test_name", "train_type", "test_type"])
+    data_frame = pd.DataFrame(columns=["score", "train_name", "test_name", "train_type", "test_type", "train_seed"])
 
+    print(f"Reading file {input_txt}")
     with open(input_txt) as f:
         for line in f:
-
+            train_seed = line.split("seed")[-1].split("_")[0]
+            line = remove_seed_from_instance_name(line)
             # Trained only in one
             if transfer_exp == "Transfer16OnlyOne":
                 if not "Only" in line:
@@ -167,15 +174,9 @@ for input_txt, transfer_exp, save_fig_path in zip(txt_paths, transfer_exp_list, 
             # print("train_type",train_type, "test_type", test_type)
 
 
-            new_row_df = pd.DataFrame([[score, train_name, test_name, train_type, test_type]], 
-                            columns=["score", "train_name", "test_name", "train_type", "test_type"])
-
+            new_row_df = pd.DataFrame([[score, train_name, test_name, train_type, test_type, train_seed]], 
+                            columns=["score", "train_name", "test_name", "train_type", "test_type", "train_seed"])
             data_frame = data_frame.append(new_row_df, ignore_index=True)
-
-    def get_score(data_frame, train_name, test_name):
-        return float(data_frame[(data_frame["train_name"] == train_name) & (data_frame["test_name"] == test_name)]["score"])
-
-
 
     def get_train_instances(data_frame):
         return sorted(list(data_frame["train_name"].unique()), key=lambda x: x.split(".")[-1] + "_" + x.split(".")[0])
@@ -201,7 +202,7 @@ for input_txt, transfer_exp, save_fig_path in zip(txt_paths, transfer_exp_list, 
             score = row["score"]
             scores_dict[traintest_touple] = scores_dict[traintest_touple] + [score] if traintest_touple in scores_dict else [score]    
 
-        data_frame = pd.DataFrame(columns=["score", "train_name", "test_name", "train_type", "test_type"])
+        BOXPLOT_data_frame = pd.DataFrame(columns=["score", "train_name", "test_name", "train_type", "test_type"])
 
 
 
@@ -225,76 +226,64 @@ for input_txt, transfer_exp, save_fig_path in zip(txt_paths, transfer_exp_list, 
             new_row_df = pd.DataFrame([[score, train_name, test_name, train_type, test_type]], 
                                 columns=["score", "train_name", "test_name", "train_type", "test_type"])
 
-            data_frame = data_frame.append(new_row_df, ignore_index=True)
+            BOXPLOT_data_frame = data_frame.append(new_row_df, ignore_index=True)
 
     # compute transferability
-    transferability = []
 
-    pos = 0
-    neg = 0
-    for idx in data_frame.index:
-        row = data_frame.loc[idx,:]
-        train_name = row["train_name"]
-        test_name = row["test_name"]
+    all_seeds = list(data_frame["train_seed"].unique()) 
+    data_frame.insert(1, "transferability", [-1]*len(data_frame.index), False)
 
-        # # Cannot compute this because we are removed the scores where the same problem was used to train and test. 
-        # norm_score = data_frame.iloc[get_row_index(data_frame, test_name, test_name)]["score"]
+    for train_seed in all_seeds:
+        transferability = []
 
-        sub_data_frame_with_certain_test_instance = data_frame[data_frame["test_name"] == test_name]
-        
-        average_score = mean(sub_data_frame_with_certain_test_instance["score"])
-        stdev_score = stdev(sub_data_frame_with_certain_test_instance["score"])
-        ranks = sub_data_frame_with_certain_test_instance["score"].rank(ascending=False)
-        ranks = ranks - 1
-        ranks = ranks / max(ranks)
-        indx_in_selected = sub_data_frame_with_certain_test_instance["score"][sub_data_frame_with_certain_test_instance["score"]==data_frame.iloc[get_row_index(data_frame, train_name, test_name)]["score"]].index[0]
+        sub_df = data_frame[data_frame["train_seed"] == train_seed]
+        sub_df = sub_df.reset_index()
 
-        
-        # transferability.append(    (norm_score - row["score"]) / abs(norm_score)    ) # as defined on the paper
-        # transferability.append(    (row["score"] - average_score) / stdev_score    )
-        transferability.append(ranks[indx_in_selected])
+        for idx in sub_df.index:
+            row = sub_df.loc[idx,:]
+            train_name = row["train_name"]
+            test_name = row["test_name"]
 
+            # # Cannot compute this because we are removed the scores where the same problem was used to train and test. 
+            # norm_score = sub_df.iloc[get_row_index(sub_df, test_name, test_name)]["score"]
 
-    #     if norm_score > row["score"]:
-    #             pos += 1
-    #         else:
-    #             neg += 1
-    # print (pos / (pos + neg) * 100 , "%")
+            sub_sub_df_with_certain_test_instance = sub_df[sub_df["test_name"] == test_name]
+            
+            average_score = mean(sub_sub_df_with_certain_test_instance["score"])
+            stdev_score = stdev(sub_sub_df_with_certain_test_instance["score"])
+            ranks = sub_sub_df_with_certain_test_instance["score"].rank(ascending=False)
+            ranks = ranks - 1
+            ranks = ranks / max(ranks)
+            indx_in_selected = sub_sub_df_with_certain_test_instance["score"][sub_sub_df_with_certain_test_instance["score"]==sub_df.iloc[get_row_index(sub_df, train_name, test_name)]["score"]].index[0]
 
-    # Insert transferability column
-    data_frame.insert(1, "transferability", transferability, False) 
+            # transferability.append(    (norm_score - row["score"]) / abs(norm_score)    ) # as defined on the paper
+            # transferability.append(    (row["score"] - average_score) / stdev_score    )
+            transferability.append(ranks[indx_in_selected])
 
 
+        # print(data_frame.loc[data_frame['train_seed'] == train_seed, "transferability"])
+        # print(np.array(transferability), len(np.array(transferability)))
 
-    # Average by instance type
-    type_train = sorted(list(set(    [get_type(x) for x in data_frame["train_name"]]     )))
-    type_test  = sorted(list(set(    [get_type(x) for x in data_frame["test_name"]]     )))
-
-
-    transfer_result = pd.DataFrame(index=type_train, columns=type_test)
-
-
-    for row in transfer_result.index:
-        for col in transfer_result.columns:
-            transfer_result.loc[(row,col)] = list()
+        # Insert transferability column
+        data_frame.loc[data_frame['train_seed'] == train_seed, "transferability"] = np.array(transferability)
 
 
 
+        # # Average by instance type
+        # type_train = sorted(list(set(    [get_type(x) for x in sub_df["train_name"]]     )))
+        # type_test  = sorted(list(set(    [get_type(x) for x in sub_df["test_name"]]     )))
 
 
-
-    for train_name in get_train_instances(data_frame):
-        for test_name in get_test_instances(data_frame):
-            index = get_row_index(data_frame, train_name, test_name)
-            if index is None:
-                continue
-            transf = data_frame.iloc[index]["transferability"]
-            type_train = data_frame.iloc[index]["train_type"]
-            type_test = data_frame.iloc[index]["test_type"]
-            transfer_result.loc[(type_train,type_test)].append(transf)
+        # for train_name in get_train_instances(sub_df):
+        #     for test_name in get_test_instances(sub_df):
+        #         index = get_row_index(sub_df, train_name, test_name)
+        #         if index is None:
+        #             continue
+        #         transf = sub_df.iloc[index]["transferability"]
+        #         type_train = sub_df.iloc[index]["train_type"]
+        #         type_test = sub_df.iloc[index]["test_type"]
 
 
-    transfer_result = transfer_result.applymap(mean)
 
     pd.set_option('display.max_rows', 1000)
     # print(data_frame[data_frame["test_type"] == "tsp"])
@@ -361,8 +350,3 @@ for input_txt, transfer_exp, save_fig_path in zip(txt_paths, transfer_exp_list, 
     # print(get_row_index(data_frame, "N-t65d11xx_150.lop", "pr136.tsp"))
     # print(data_frame.iloc[478])
 
-
-
-
-    data = pd.DataFrame(transfer_result)
-    data.to_csv(save_fig_path + "_transferability_"+ transfer_exp + "_" + input_txt.split("/")[-1].split(".")[0] + ".csv", float_format="%.4f")
