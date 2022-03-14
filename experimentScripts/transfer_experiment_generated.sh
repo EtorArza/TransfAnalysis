@@ -34,10 +34,10 @@ SRCDIR=`pwd`
 NEAT_POPSIZE=1000
 SOLVER_POPSIZE=8
 MAX_SOLVER_FE=400
-MAX_TRAIN_ITERATIONS=5000
+MAX_TRAIN_ITERATIONS=2000
 MAX_TRAIN_TIME=345600
 FULL_MODEL="false"
-DIM=30
+DIM=25
 
 
 
@@ -49,14 +49,15 @@ NLO_ARRAY=()
 
 
 i=-1
+for train_seed in 2 3 4 5 6 7 8 9 10 11; do
 for NLO_train in 1 2 4 8 16 32 64; do
     i=$((i+1))
 
-    CONTROLLER_NAME_PREFIX_ARRAY+=("NLO_${NLO_train}")
-    SEED_ARRAY+=("${i}")
+    CONTROLLER_NAME_PREFIX_ARRAY+=("NLO_${NLO_train}_seed${train_seed}")
+    SEED_ARRAY+=("${train_seed}")
     NLO_ARRAY+=("${NLO_train}")
 done
-
+done
 
 
 
@@ -79,14 +80,16 @@ CONTROLLER_ARRAY=()
 SEED_ARRAY=()
 NLO_ARRAY=()
 i=-1
+for train_seed in 2 3 4 5 6 7 8 9 10 11; do
 for NLO_train in 1 2 4 8 16 32 64; do
     for NLO_test in 1 2 4 8 16 32 64; do
         i=$((i+1))
-        CONTROLLER_NAME_PREFIX="NLO_${NLO_train}"
+        CONTROLLER_NAME_PREFIX="NLO_${NLO_train}_seed${train_seed}"
         CONTROLLER_ARRAY+=("${EXPERIMENT_CONTROLLER_FOLDER_NAME}/top_controllers/${CONTROLLER_NAME_PREFIX}_best.controller")
         SEED_ARRAY+=("2")
         NLO_ARRAY+=("${NLO_test}")
     done
+done
 done
 
 CONTROLLER_ARRAY=$(to_list "${CONTROLLER_ARRAY[@]}")

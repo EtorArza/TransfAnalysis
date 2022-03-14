@@ -31,9 +31,9 @@ SRCDIR=`pwd`
 
 SEED=2
 NEAT_POPSIZE=1000
-SOLVER_POPSIZE=10
-MAX_SOLVER_FE=1000
-MAX_TRAIN_ITERATIONS=20000
+SOLVER_POPSIZE=8
+MAX_SOLVER_FE=400
+MAX_TRAIN_ITERATIONS=2000
 MAX_TRAIN_TIME=345600
 
 
@@ -51,19 +51,20 @@ CONTROLLER_NAME_PREFIX_ARRAY=()
 SEED_ARRAY=()
 
 i=-1
+for train_seed in 2 3 4 5 6 7 8 9 10 11; do
 for PROBLEM_TYPE in "qap" "tsp" "pfsp" "lop"; do
     for PROBLEM_PATH in "$INSTANCES_PATH/transfer_permuproblems/${PROBLEM_TYPE}/"* ; do
         i=$((i+1))
 
         CONTROLLER_NAME_PREFIX=`basename ${PROBLEM_PATH}`
-
+        CONTROLLER_NAME_PREFIX="${CONTROLLER_NAME_PREFIX}_seed${train_seed}"
         PROBLEM_TYPE_ARRAY+=("${PROBLEM_TYPE}")
         COMMA_SEPARATED_LIST_OF_INSTANCE_PATHS_ARRAY+=("${PROBLEM_PATH}")
         CONTROLLER_NAME_PREFIX_ARRAY+=("${CONTROLLER_NAME_PREFIX}")
-        SEED_ARRAY+=("2")
+        SEED_ARRAY+=("${train_seed}")
     done
 done
-
+done
 
 
 
@@ -85,6 +86,7 @@ N_EVALS=10000
 
 
 TESTING_JOB_ID=""
+for train_seed in 2 3 4 5 6 7 8 9 10 11; do
 for PROBLEM_TYPE_TRAIN in "qap" "tsp" "pfsp" "lop"; do
     CONTROLLER_ARRAY=()
     PROBLEM_TYPE_ARRAY=()
@@ -104,6 +106,7 @@ for PROBLEM_TYPE_TRAIN in "qap" "tsp" "pfsp" "lop"; do
                 i=$((i+1))
 
                 CONTROLLER_NAME_PREFIX=`basename ${PROBLEM_PATH_TRAIN}`
+                CONTROLLER_NAME_PREFIX="${CONTROLLER_NAME_PREFIX}_seed${train_seed}"
 
 
                 CONTROLLER_ARRAY+=("${EXPERIMENT_CONTROLLER_FOLDER_NAME}/top_controllers/${CONTROLLER_NAME_PREFIX}_best.controller")
@@ -120,7 +123,7 @@ for PROBLEM_TYPE_TRAIN in "qap" "tsp" "pfsp" "lop"; do
     TESTING_JOB_ID=$TESTING_JOB_ID:`sbatch --dependency=afterok:${TRAINING_JOB_ID} --parsable  --export=CONTROLLER_ARRAY=${CONTROLLER_ARRAY},PROBLEM_TYPE_ARRAY=${PROBLEM_TYPE_ARRAY},PROBLEM_PATH_ARRAY=${PROBLEM_PATH_ARRAY},MAX_SOLVER_FE=${MAX_SOLVER_FE},COMPUTE_RESPONSE=${COMPUTE_RESPONSE},TMP_RES_PATH=${TMP_RES_PATH},N_REPS=${N_REPS},N_EVALS=${N_EVALS},TEST_RESULT_FOLDER_NAME=${TEST_RESULT_FOLDER_NAME},LOG_DIR=${LOG_DIR},GLOBAL_LOG=${GLOBAL_LOG} --array=0-$i src/experiments/permus/scripts/hip_test_array.sl`
 
 done
-
+done
 
 
 sbatch --dependency=afterok$TESTING_JOB_ID --export=SCORE_PATH=${SCORE_PATH},RESPONSE_PATH=${RESPONSE_PATH},COMPUTE_RESPONSE=${COMPUTE_RESPONSE},TMP_RES_PATH=${TMP_RES_PATH} scripts/cat_result_files_to_exp_folder.sh
@@ -156,18 +159,20 @@ CONTROLLER_ARRAY=()
 SEED_ARRAY=()
 
 i=-1
+for train_seed in 2 3 4 5 6 7 8 9 10 11; do
 for PROBLEM_PATH in "$INSTANCES_PATH/transfer_qap_cut_instances/"*; do
     i=$((i+1))
 
     CONTROLLER_NAME_PREFIX=`basename ${PROBLEM_PATH}`
+    CONTROLLER_NAME_PREFIX="${CONTROLLER_NAME_PREFIX}_seed${train_seed}"
 
     PROBLEM_TYPE_ARRAY+=("qap")
     COMMA_SEPARATED_LIST_OF_INSTANCE_PATHS_ARRAY+=("${PROBLEM_PATH}")
     CONTROLLER_NAME_PREFIX_ARRAY+=("${CONTROLLER_NAME_PREFIX}")
     CONTROLLER_ARRAY+=("${EXPERIMENT_CONTROLLER_FOLDER_NAME}/top_controllers/${CONTROLLER_NAME_PREFIX}_best.controller")
-    SEED_ARRAY+=("2")
+    SEED_ARRAY+=("${train_seed}")
 done
-
+done
 
 
 
@@ -194,6 +199,7 @@ PROBLEM_TYPE_ARRAY=()
 PROBLEM_PATH_ARRAY=()
 
 i=-1
+for train_seed in 2 3 4 5 6 7 8 9 10 11; do
 for PROBLEM_PATH_TRAIN in "src/experiments/permus/instances/transfer_qap_cut_instances/"*; do
     for PROBLEM_PATH_TEST in "src/experiments/permus/instances/transfer_qap_cut_instances/"*; do
 
@@ -206,6 +212,7 @@ for PROBLEM_PATH_TRAIN in "src/experiments/permus/instances/transfer_qap_cut_ins
         i=$((i+1))
 
         CONTROLLER_NAME_PREFIX=`basename ${PROBLEM_PATH_TRAIN}`
+        CONTROLLER_NAME_PREFIX="${CONTROLLER_NAME_PREFIX}_seed${train_seed}"
 
         CONTROLLER_ARRAY+=("${EXPERIMENT_CONTROLLER_FOLDER_NAME}/top_controllers/${CONTROLLER_NAME_PREFIX}_best.controller")
         PROBLEM_TYPE_ARRAY+=("qap")
@@ -216,7 +223,7 @@ done
 CONTROLLER_ARRAY=$(to_list "${CONTROLLER_ARRAY[@]}")
 PROBLEM_TYPE_ARRAY=$(to_list "${PROBLEM_TYPE_ARRAY[@]}")
 PROBLEM_PATH_ARRAY=$(to_list "${PROBLEM_PATH_ARRAY[@]}")
-
+done
 
 TESTING_JOB_ID=`sbatch --dependency=afterok:${TRAINING_JOB_ID} --parsable --export=CONTROLLER_ARRAY=${CONTROLLER_ARRAY},PROBLEM_TYPE_ARRAY=${PROBLEM_TYPE_ARRAY},PROBLEM_PATH_ARRAY=${PROBLEM_PATH_ARRAY},MAX_SOLVER_FE=${MAX_SOLVER_FE},COMPUTE_RESPONSE=${COMPUTE_RESPONSE},TMP_RES_PATH=${TMP_RES_PATH},N_REPS=${N_REPS},N_EVALS=${N_EVALS},TEST_RESULT_FOLDER_NAME=${TEST_RESULT_FOLDER_NAME},LOG_DIR=${LOG_DIR},GLOBAL_LOG=${GLOBAL_LOG} --array=0-$i src/experiments/permus/scripts/hip_test_array.sl`
 

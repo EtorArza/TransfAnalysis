@@ -68,15 +68,15 @@ i=-1
 
 
 # Train in one
-for diff_SEED in 2 3 4 5 6 7 8 9 10 11; do
+for train_seed in 2 3 4 5 6 7 8 9 10 11; do
     j=-1
     for instance_index in 1 2 3 4 5 6 7 8 9 10 11 12; do
         i=$((i+1))
         j=$((j+1))
 
 
-        CONTROLLER_NAME_PREFIX_ARRAY+=("TrainOnlyInF_${instance_index}_seed${diff_SEED}")
-        SEED_ARRAY+=("${diff_SEED}")
+        CONTROLLER_NAME_PREFIX_ARRAY+=("TrainOnlyInF_${instance_index}_seed${train_seed}")
+        SEED_ARRAY+=("${train_seed}")
 
         COMMA_SEPARATED_PROBLEM_INDEX_LIST_ARRAY+=(`python -c "print(${instance_list}[${j}])"`)
         COMMA_SEPARATED_PROBLEM_DIM_LIST_ARRAY+=(`python -c "print(${dim_list}[${j}])"`)
@@ -121,7 +121,7 @@ N_REPS=1
 N_EVALS=10000
 TESTING_JOB_ID=""
 
-for diff_SEED in 2 3 4 5 6 7 8 9 10 11; do
+for train_seed in 2 3 4 5 6 7 8 9 10 11; do
 
 
     CONTROLLER_ARRAY=()
@@ -167,7 +167,7 @@ for diff_SEED in 2 3 4 5 6 7 8 9 10 11; do
             i=$((i+1))
 
 
-            CONTROLLER_NAME_PREFIX="TrainOnlyInF_${INSTANCE_INDEX_TRAIN}_seed${diff_SEED}"
+            CONTROLLER_NAME_PREFIX="TrainOnlyInF_${INSTANCE_INDEX_TRAIN}_seed${train_seed}"
 
             CONTROLLER_ARRAY+=("${EXPERIMENT_CONTROLLER_FOLDER_NAME}/top_controllers/${CONTROLLER_NAME_PREFIX}_best.controller")
             SEED_ARRAY+=("2") # the same seed for testing, the seed changes only for the controller name.
