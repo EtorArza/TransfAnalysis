@@ -29,7 +29,6 @@ COMPILE_JOB_ID=`sbatch --parsable --exclude=n[001-004] --export=LOG_DIR=${LOG_DI
 SRCDIR=`pwd`
 
 
-SEED=2
 NEAT_POPSIZE=1000
 SOLVER_POPSIZE=8
 MAX_SOLVER_FE=400
