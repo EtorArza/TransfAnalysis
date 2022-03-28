@@ -15,8 +15,7 @@
 echo "Train ${SLURM_ARRAY_TASK_ID} start."
 
 
-SCRATCH_JOB=${SCRATCH_JOB}_${SLURM_ARRAY_TASK_ID}
-mkdir ${SCRATCH_JOB}
+mkdir ${SCRATCH_JOB} -p
 
 source scripts/array_to_string_functions.sh
 
@@ -126,7 +125,9 @@ echo "---conf file end---" >> ${LOG_FILE}
 
 
 date >> ${LOG_FILE}
-srun neat "tmp.ini" >> ${LOG_FILE} 2>&1
+srun neat "tmp.ini" > "\dev\null" 2>> ${LOG_FILE}
+date >> ${LOG_FILE}
 date >> ${LOG_FILE}
 
 rm neat
+rm ${SCRATCH_JOB} -r

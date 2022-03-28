@@ -172,7 +172,10 @@ namespace NEAT {
                 if (save_best_network)
                 {
                     save_best_network = false;
+                    #ifndef HIPATIA
+                    // Do not save all controllers on cluster to save disk IO
                     print(gen, false);
+                    #endif
                 }
 
                 if (neat_params->IS_LAST_ITERATION || neat_params->reinitialize_neat_for_next_generation)
@@ -210,9 +213,9 @@ namespace NEAT {
 
 
     private:
-        void print(int generation, bool is_last_gen = false) {
+        void print(int generation, bool save_top_controller = false) {
             using namespace std;
-            if (!is_last_gen)
+            if (!save_top_controller)
             {
                 ofstream out(get_fittest_path(generation, "all_controllers"));
                 std::cout << "reinitialize_message -> saving in all_controllers genome with hash #" << fittest->genome->hash() << std::endl;

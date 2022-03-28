@@ -10,9 +10,6 @@
 #SBATCH -p medium
 #SBATCH --exclude=n[001-004]
 
-echo "Test ${SLURM_ARRAY_TASK_ID} start.">> $GLOBAL_LOG
-
-SCRATCH_JOB=${SCRATCH_JOB}_${SLURM_ARRAY_TASK_ID}
 mkdir ${SCRATCH_JOB}
 
 source scripts/array_to_string_functions.sh 
@@ -101,7 +98,9 @@ echo "---conf file end---" >> ${LOG_FILE}
 
 
 date >> ${LOG_FILE}
-srun neat "tmp.ini" >> ${LOG_FILE}
+date >> ${LOG_FILE}
+srun neat "tmp.ini" > "\dev\null" 2>> ${LOG_FILE}
+date >> ${LOG_FILE}
 date >> ${LOG_FILE}
 
 rm neat
@@ -114,5 +113,4 @@ rm neat
 cat "score.txt" >> "${TMP_RES_PATH}/score_tmp_${SLURM_JOB_ID}.txt"
 cat "responses.txt" >> "${TMP_RES_PATH}/responses_tmp_${SLURM_JOB_ID}.txt"
 
-
-cd ..
+rm ${SCRATCH_JOB} -r

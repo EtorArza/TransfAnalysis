@@ -98,7 +98,9 @@ echo "---conf file end---"
 
 
 date
-srun neat "tmp.ini"
+date >> ${LOG_FILE}
+srun neat "tmp.ini" > "\dev\null" 2>> ${LOG_FILE}
+date >> ${LOG_FILE}
 date
 
 rm neat
