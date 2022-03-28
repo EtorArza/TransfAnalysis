@@ -191,12 +191,14 @@ N_REPS=1
 N_EVALS=10000
 
 
+
+
+TEST_JOB_ID=""
+for train_seed in 2 3 4 5 6 7 8 9 10 11; do
+i=-1
 CONTROLLER_ARRAY=()
 PROBLEM_TYPE_ARRAY=()
 PROBLEM_PATH_ARRAY=()
-
-i=-1
-for train_seed in 2 3 4 5 6 7 8 9 10 11; do
 for PROBLEM_PATH_TRAIN in "src/experiments/permus/instances/transfer_qap_cut_instances/"*; do
     for PROBLEM_PATH_TEST in "src/experiments/permus/instances/transfer_qap_cut_instances/"*; do
 
@@ -220,13 +222,12 @@ done
 CONTROLLER_ARRAY=$(to_list "${CONTROLLER_ARRAY[@]}")
 PROBLEM_TYPE_ARRAY=$(to_list "${PROBLEM_TYPE_ARRAY[@]}")
 PROBLEM_PATH_ARRAY=$(to_list "${PROBLEM_PATH_ARRAY[@]}")
+
+# we need to launch with each seed independently, otherwise argument list too long error
+TESTING_JOB_ID="${TEST_JOB_ID}:`sbatch --dependency=afterok:${TRAINING_JOB_ID} --parsable --export=CONTROLLER_ARRAY=${CONTROLLER_ARRAY},PROBLEM_TYPE_ARRAY=${PROBLEM_TYPE_ARRAY},PROBLEM_PATH_ARRAY=${PROBLEM_PATH_ARRAY},MAX_SOLVER_FE=${MAX_SOLVER_FE},COMPUTE_RESPONSE=${COMPUTE_RESPONSE},TMP_RES_PATH=${TMP_RES_PATH},N_REPS=${N_REPS},N_EVALS=${N_EVALS},TEST_RESULT_FOLDER_NAME=${TEST_RESULT_FOLDER_NAME},LOG_DIR=${LOG_DIR} --array=0-$i src/experiments/permus/scripts/hip_test_array.sl`"
 done
 
-TESTING_JOB_ID=`sbatch --dependency=afterok:${TRAINING_JOB_ID} --parsable --export=CONTROLLER_ARRAY=${CONTROLLER_ARRAY},PROBLEM_TYPE_ARRAY=${PROBLEM_TYPE_ARRAY},PROBLEM_PATH_ARRAY=${PROBLEM_PATH_ARRAY},MAX_SOLVER_FE=${MAX_SOLVER_FE},COMPUTE_RESPONSE=${COMPUTE_RESPONSE},TMP_RES_PATH=${TMP_RES_PATH},N_REPS=${N_REPS},N_EVALS=${N_EVALS},TEST_RESULT_FOLDER_NAME=${TEST_RESULT_FOLDER_NAME},LOG_DIR=${LOG_DIR} --array=0-$i src/experiments/permus/scripts/hip_test_array.sl`
 
 
-
-
-
-sbatch --dependency=afterok:$TESTING_JOB_ID --export=SCORE_PATH=${SCORE_PATH},RESPONSE_PATH=${RESPONSE_PATH},COMPUTE_RESPONSE=${COMPUTE_RESPONSE},TMP_RES_PATH=${TMP_RES_PATH} scripts/cat_result_files_to_exp_folder.sh
+sbatch --dependency=afterok$TESTING_JOB_ID --export=SCORE_PATH=${SCORE_PATH},RESPONSE_PATH=${RESPONSE_PATH},COMPUTE_RESPONSE=${COMPUTE_RESPONSE},TMP_RES_PATH=${TMP_RES_PATH} scripts/cat_result_files_to_exp_folder.sh
 
