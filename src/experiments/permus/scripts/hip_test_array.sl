@@ -96,7 +96,7 @@ cat tmp.ini >> ${LOG_FILE}
 echo "---conf file end---" >> ${LOG_FILE}
 
 date >> ${LOG_FILE}
-srun neat "tmp.ini" > "\dev\null" 2>> ${LOG_FILE}
+srun neat "tmp.ini" > "/dev/null" 2>> ${LOG_FILE}
 date >> ${LOG_FILE}
 
 rm neat
@@ -108,3 +108,4 @@ cat "score.txt" >> "${TMP_RES_PATH}/score_tmp_${SLURM_JOB_ID}.txt"
 cat "responses.txt" >> "${TMP_RES_PATH}/responses_tmp_${SLURM_JOB_ID}.txt"
 
 cd ..
+rm ${SCRATCH_JOB} -r

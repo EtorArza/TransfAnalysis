@@ -130,8 +130,9 @@ echo "---conf file end---"
 
 date
 date >> ${LOG_FILE}
-srun neat "tmp.ini" > "\dev\null" 2>> ${LOG_FILE}
+srun neat "tmp.ini" > "/dev/null" 2>> ${LOG_FILE}
 date >> ${LOG_FILE}
 date
 
-rm neat
+cd ..
+rm ${SCRATCH_JOB} -r
