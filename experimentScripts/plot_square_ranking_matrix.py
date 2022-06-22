@@ -178,11 +178,23 @@ for input_txt, transfer_exp, save_fig_path in zip(txt_paths, transfer_exp_list, 
                             columns=["score", "train_name", "test_name", "train_type", "test_type", "train_seed"])
             data_frame = data_frame.append(new_row_df, ignore_index=True)
 
+    def sort_key(x):
+        if x.isnumeric():
+            return float(x)
+        elif x.strip("_ ").isnumeric():
+            return float(x.strip("_ "))
+        else:
+            res = ""
+            res += x.split(".")[-1]
+            res += x
+            return res
+
+
     def get_train_instances(data_frame):
-        return sorted(list(data_frame["train_name"].unique()), key=lambda x: x.split(".")[-1] + "_" + x.split(".")[0])
+        return sorted(list(data_frame["train_name"].unique()), key=sort_key)
 
     def get_test_instances(data_frame):
-        return sorted(list(data_frame["test_name"].unique()), key=lambda x: x.split(".")[-1] + "_" + x.split(".")[0])
+        return sorted(list(data_frame["test_name"].unique()), key=sort_key)
 
 
     def get_row_index(data_frame, train_name, test_name):
@@ -291,17 +303,21 @@ for input_txt, transfer_exp, save_fig_path in zip(txt_paths, transfer_exp_list, 
     # Make the plots
     if True:# transfer_exp == "LOO16" or transfer_exp == "Transfer16OnlyOne":
 
-        def order_key(x):
-            if x.strip("_ ").isnumeric():
-                return float(x.strip("_ "))
+        train_names = sorted(data_frame["train_name"].unique(), key=sort_key)
+        test_names = sorted(data_frame["test_name"].unique(), key=sort_key)
+
+        print(train_names)
+
+        def nicefyInstanceName(x: str):
+            if transfer_exp == "QAP":
+                return x.split("_")[0]
             else:
-                return x
+                return x.strip("_")
 
-        train_names = sorted(data_frame["train_name"].unique(), key=order_key)
-        test_names = sorted(data_frame["test_name"].unique(), key=order_key)
+        nice_train_names = list(map(nicefyInstanceName, train_names))
+        nice_test_names = list(map(nicefyInstanceName, test_names))
 
-        nice_train_names = list(map(lambda x : x.strip("_"), train_names))
-        nice_test_names = list(map(lambda x : x.strip("_"), test_names))
+
 
         m = len(train_names)
         n = len(test_names)
@@ -315,11 +331,14 @@ for input_txt, transfer_exp, save_fig_path in zip(txt_paths, transfer_exp_list, 
                 value = value.mean() if len(value) > 0 else np.NAN
 
                 matrix_data[i,j] = value
-        ax = sns.heatmap(matrix_data, linewidth=0.5, xticklabels=nice_train_names, yticklabels=nice_test_names)
+        #sns.set_palette(sns.color_palette("viridis", as_cmap=True))
+        ax = sns.heatmap(matrix_data, linewidth=0.5, xticklabels=nice_train_names, yticklabels=nice_test_names, vmin=0, vmax=1, )
         ax.xaxis.tick_top() # x axis on top
         ax.xaxis.set_label_position('top')
+        plt.xticks(rotation = 90)
         ax.set_xlabel("Test instance")
         ax.set_ylabel("Training instance")
+        plt.tight_layout()
         plt.savefig(save_fig_path+transfer_exp+"_heatmap.pdf")
         plt.close()
 
