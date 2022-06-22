@@ -242,6 +242,9 @@ for input_txt, transfer_exp, save_fig_path in zip(txt_paths, transfer_exp_list, 
 
     # compute transferability
 
+    if transfer_exp == "Transfer16OnlyOne":
+        print(data_frame[data_frame["train_seed"] == "2"])
+
     all_seeds = list(data_frame["train_seed"].unique()) 
     data_frame.insert(1, "transferability", [-1]*len(data_frame.index), False)
 
