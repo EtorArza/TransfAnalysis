@@ -267,6 +267,14 @@ for input_txt, transfer_exp, save_fig_path in zip(txt_paths, transfer_exp_list, 
             return element.index[0]
 
 
+    def nicefyInstanceName(x: str):
+        if transfer_exp == "Transfer16OnlyOne":
+            return "$A_{"+x.strip("_") + "}$"
+        elif transfer_exp == "QAP":
+            return x.split("_")[0]
+        else:
+            return x.strip("_")
+
     if transfer_exp == "Transfer16OnlyOne":
         scores_dict = dict()
         for index, row in data_frame.iterrows():
@@ -282,16 +290,20 @@ for input_txt, transfer_exp, save_fig_path in zip(txt_paths, transfer_exp_list, 
 
 
         # plot all boxplots
+        sns.set(font_scale = 1)
         fig, ax_list = plt.subplots(6,2)
+
         for test_index in range(1,13):
             ax = ax_list.flatten()[test_index-1]
-            ax.boxplot([scores_dict[(f"_{i}_", f"_{test_index}_")] for i in range(1, 13)])
+            ax.boxplot([scores_dict[(f"_{i}_", f"_{test_index}_")] for i in range(1, 13)], labels=[(r"$\hspace{0.1em} " if el >= 10 else r"$")+r"A_{"+ str(el) + r"}$" for el in range(1,13)])
             #ax.set_xlabel("Train problem") 
-            ax.set_title(f"Tested in problem {test_index}") 
+            ax.set_title("Tested in problem $A_{" + f"{test_index}" + "}$") 
+
         fig.set_size_inches(8, 11)
         fig.tight_layout()
         fig.savefig(save_fig_path+"boxplot_for_each_test_instance.pdf")
-        plt.close() 
+        plt.close()
+ 
         for (train_name, test_name), score in scores_dict.items():
             
             train_type = get_type(train_name)
@@ -301,6 +313,7 @@ for input_txt, transfer_exp, save_fig_path in zip(txt_paths, transfer_exp_list, 
                                 columns=["score", "train_name", "test_name", "train_type", "test_type"])
 
             BOXPLOT_data_frame = data_frame.append(new_row_df, ignore_index=True)
+    sns.set(font_scale = TEXT_SCALE)
 
     # compute transferability
 
@@ -373,12 +386,6 @@ for input_txt, transfer_exp, save_fig_path in zip(txt_paths, transfer_exp_list, 
 
         print(train_names)
 
-        def nicefyInstanceName(x: str):
-            if transfer_exp == "QAP":
-                return x.split("_")[0]
-            else:
-                return x.strip("_")
-
         nice_train_names = list(map(nicefyInstanceName, train_names))
         nice_test_names = list(map(nicefyInstanceName, test_names))
 
@@ -398,6 +405,8 @@ for input_txt, transfer_exp, save_fig_path in zip(txt_paths, transfer_exp_list, 
                 matrix_data[i,j] = value
         #sns.set_palette(sns.color_palette("viridis", as_cmap=True))
         ax = sns.heatmap(matrix_data, linewidth=0.5, xticklabels=nice_train_names, yticklabels=nice_test_names, vmin=0, vmax=1, )
+        sns.set(font_scale = TEXT_SCALE)
+
         ax.xaxis.tick_top() # x axis on top
         ax.xaxis.set_label_position('top')
         plt.xticks(rotation = 90)
@@ -418,6 +427,8 @@ for input_txt, transfer_exp, save_fig_path in zip(txt_paths, transfer_exp_list, 
         z = linkage(clust_df, method="single", metric="cityblock", optimal_ordering=True)
         # ax = sns.clustermap(clust_df,metric='cityblock', method="single")
         ax = sns.clustermap(clust_df, row_linkage=z, col_linkage=z)
+        sns.set(font_scale = TEXT_SCALE)
+
         ax.cax.set_visible(False)
         ax.ax_row_dendrogram.set_visible(False)
         ax.ax_col_dendrogram.set_visible(False)
