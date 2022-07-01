@@ -13,6 +13,68 @@ from sklearn.cluster import SpectralCoclustering
 from sklearn.metrics import consensus_score
 from scipy.cluster.hierarchy import dendrogram, linkage
 import re
+from tqdm import tqdm as tqdm
+
+
+TEXT_SCALE = 1.4
+
+def get_random_value(problem_index, dim=2):
+    rnd_x_str = ",".join([str(el) for el in np.random.random(dim)])
+    exec_res=subprocess.run(f"./neat -evaluate-continuous-problem {problem_index} {rnd_x_str}",shell=True, capture_output=True)  
+    return float(str(exec_res.stdout).strip("'b"))
+
+def rand_search(problem_index, n_sols):
+    return max((get_random_value(problem_index) for _ in range(n_sols)))
+
+
+n = 12
+nseeds = 10
+n_sols = 1
+matrix_data = np.zeros((n, n))
+matrix_data_mean = np.zeros((n, n))
+save_fig_path = "experimentResults/"
+
+
+def get_values_to_choose_from(j, n):
+    values_to_choose_from = np.array([rand_search(j, n_sols) for _ in range(n)])
+    values_to_choose_from = np.argsort(-values_to_choose_from) / (n-1)
+    return values_to_choose_from
+
+
+for j in tqdm(range(n)): # for each test
+    
+    values_to_choose_from = get_values_to_choose_from(j, n)
+    values_to_choose_from_avg = np.zeros_like(values_to_choose_from)
+    for _ in range(nseeds):
+        values_to_choose_from_avg += get_values_to_choose_from(j, n)
+    values_to_choose_from_avg /= nseeds
+
+    for i in range(n): # for each train
+        train_name = i
+        test_name = j
+        only_one_value = values_to_choose_from[i]
+        mean_value = values_to_choose_from_avg[i]
+        matrix_data[i,j] = only_one_value
+        matrix_data_mean[i,j] = mean_value
+
+for m, name in zip([matrix_data, matrix_data_mean] , ["randomsearch", "randomsearch_median_10seeds"]):
+
+    sns.set(font_scale = TEXT_SCALE)
+    #sns.set_palette(sns.color_palette("viridis", as_cmap=True))
+    tick_labels = ["$A_{" + str(el) + "}$" for el in range(1,n+1)]
+    ax = sns.heatmap(m, linewidth=0.5, xticklabels=tick_labels, yticklabels=tick_labels, vmin=0, vmax=1, )
+
+    ax.xaxis.tick_top() # x axis on top
+    ax.xaxis.set_label_position('top')
+
+    plt.xticks(rotation = 90)
+    ax.set_xlabel("Test instance")
+    ax.set_ylabel("Training instance")
+    plt.tight_layout()
+    plt.savefig(save_fig_path + name + "_heatmap.pdf")
+    plt.close()
+
+
 
 # biclustering
 
