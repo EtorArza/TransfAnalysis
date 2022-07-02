@@ -295,7 +295,7 @@ for input_txt, transfer_exp, save_fig_path in zip(txt_paths, transfer_exp_list, 
 
         for test_index in range(1,13):
             ax = ax_list.flatten()[test_index-1]
-            ax.boxplot([scores_dict[(f"_{i}_", f"_{test_index}_")] for i in range(1, 13)], labels=[(r"$\hspace{0.1em} " if el >= 10 else r"$")+r"A_{"+ str(el) + r"}$" for el in range(1,13)])
+            ax.boxplot([scores_dict[(f"_{i}_", f"_{test_index}_")] for i in range(1, 13)], labels=[ r"$"+r"A_{"+ str(el) + r"}$" for el in range(1,13)])
             #ax.set_xlabel("Train problem") 
             ax.set_title("Tested in problem $A_{" + f"{test_index}" + "}$") 
 
