@@ -16,7 +16,6 @@ import re
 from tqdm import tqdm as tqdm
 
 
-TEXT_SCALE = 1.4
 
 np.random.seed(2)
 
@@ -61,7 +60,7 @@ for j in tqdm(range(n)): # for each test
 
 for m, name in zip([matrix_data, matrix_data_mean] , ["randomsearch", "randomsearch_median_10seeds"]):
 
-    sns.set(font_scale = TEXT_SCALE)
+    sns.set(font_scale = 1.4)
     #sns.set_palette(sns.color_palette("viridis", as_cmap=True))
     tick_labels = ["$A_{" + str(el) + "}$" for el in range(1,n+1)]
     ax = sns.heatmap(m, linewidth=0.5, xticklabels=tick_labels, yticklabels=tick_labels, vmin=0, vmax=1, )
@@ -315,7 +314,7 @@ for input_txt, transfer_exp, save_fig_path in zip(txt_paths, transfer_exp_list, 
                                 columns=["score", "train_name", "test_name", "train_type", "test_type"])
 
             BOXPLOT_data_frame = data_frame.append(new_row_df, ignore_index=True)
-    sns.set(font_scale = TEXT_SCALE)
+    sns.set(font_scale = 1.4)
 
     # compute transferability
 
@@ -406,8 +405,9 @@ for input_txt, transfer_exp, save_fig_path in zip(txt_paths, transfer_exp_list, 
 
                 matrix_data[i,j] = value
         #sns.set_palette(sns.color_palette("viridis", as_cmap=True))
+        sns.set(font_scale = 1.4)
         ax = sns.heatmap(matrix_data, linewidth=0.5, xticklabels=nice_train_names, yticklabels=nice_test_names, vmin=0, vmax=1, )
-        sns.set(font_scale = TEXT_SCALE)
+
 
         ax.xaxis.tick_top() # x axis on top
         ax.xaxis.set_label_position('top')
@@ -428,10 +428,10 @@ for input_txt, transfer_exp, save_fig_path in zip(txt_paths, transfer_exp_list, 
         print(clust_df)
         z = linkage(clust_df, method="single", metric="cityblock", optimal_ordering=True)
         # ax = sns.clustermap(clust_df,metric='cityblock', method="single")
+        sns.set(font_scale = 2)
         ax = sns.clustermap(clust_df, row_linkage=z, col_linkage=z)
-        sns.set(font_scale = TEXT_SCALE)
 
-        ax.cax.set_visible(False)
+        ax.cax.set_visible(True)
         ax.ax_row_dendrogram.set_visible(False)
         ax.ax_col_dendrogram.set_visible(False)
         ax.ax_row_dendrogram.set_xlim([0,0])
