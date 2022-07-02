@@ -18,6 +18,8 @@ from tqdm import tqdm as tqdm
 
 TEXT_SCALE = 1.4
 
+np.random.seed(2)
+
 def get_random_value(problem_index, dim=2):
     rnd_x_str = ",".join([str(el) for el in np.random.random(dim)])
     exec_res=subprocess.run(f"./neat -evaluate-continuous-problem {problem_index} {rnd_x_str}",shell=True, capture_output=True)  
