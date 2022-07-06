@@ -63,7 +63,7 @@ for m, name in zip([matrix_data, matrix_data_mean] , ["randomsearch", "randomsea
     sns.set(font_scale = 1.4)
     #sns.set_palette(sns.color_palette("viridis", as_cmap=True))
     tick_labels = ["$A_{" + str(el) + "}$" for el in range(1,n+1)]
-    ax = sns.heatmap(m, linewidth=0.5, xticklabels=tick_labels, yticklabels=tick_labels, vmin=0, vmax=1, )
+    ax = sns.heatmap(m, linewidth=0.5, xticklabels=tick_labels, yticklabels=tick_labels, vmin=0, vmax=1, cmap='viridis')
 
     ax.xaxis.tick_top() # x axis on top
     ax.xaxis.set_label_position('top')
@@ -405,8 +405,14 @@ for input_txt, transfer_exp, save_fig_path in zip(txt_paths, transfer_exp_list, 
 
                 matrix_data[i,j] = value
         #sns.set_palette(sns.color_palette("viridis", as_cmap=True))
-        sns.set(font_scale = 1.4)
-        ax = sns.heatmap(matrix_data, linewidth=0.5, xticklabels=nice_train_names, yticklabels=nice_test_names, vmin=0, vmax=1, )
+
+        sns.set(font_scale={"Transfer16OnlyOne": 1.4,
+                            "transferGenerated": 1.4,
+                            "QAP": 0.7,
+                            "PERMUPROB": 0.7
+                            }[transfer_exp]
+                )
+        ax = sns.heatmap(matrix_data, linewidth=0.5, xticklabels=nice_train_names, yticklabels=nice_test_names, vmin=0, vmax=1, cmap='viridis')
 
 
         ax.xaxis.tick_top() # x axis on top
@@ -428,8 +434,18 @@ for input_txt, transfer_exp, save_fig_path in zip(txt_paths, transfer_exp_list, 
         print(clust_df)
         z = linkage(clust_df, method="single", metric="cityblock", optimal_ordering=True)
         # ax = sns.clustermap(clust_df,metric='cityblock', method="single")
-        sns.set(font_scale = 2)
-        ax = sns.clustermap(clust_df, row_linkage=z, col_linkage=z)
+        sns.set(font_scale={"Transfer16OnlyOne": 2.0,
+                            "transferGenerated": 2.0,
+                            "QAP": 1.0,
+                            "PERMUPROB": 1.0
+                            }[transfer_exp]
+                )        
+        ax = sns.clustermap(clust_df, row_linkage=z, col_linkage=z, cmap='viridis')
+        ax.ax_heatmap.xaxis.set_ticks_position('top')
+        ax.ax_heatmap.xaxis.set_label_position('top')
+        ax.ax_heatmap.yaxis.set_ticks_position('left')
+        ax.ax_heatmap.yaxis.set_label_position('left')
+        ax.ax_heatmap.tick_params(axis="x", labelrotation = 90)
 
         ax.cax.set_visible(True)
         ax.ax_row_dendrogram.set_visible(False)
