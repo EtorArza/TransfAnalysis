@@ -30,7 +30,7 @@ def rand_search(problem_index, n_sols):
 
 n = 12
 nseeds = 10
-n_sols = 1
+n_sols = 20
 matrix_data = np.zeros((n, n))
 matrix_data_mean = np.zeros((n, n))
 save_fig_path = "experimentResults/"
