@@ -20,29 +20,6 @@ save_fig_path = "experimentResults/"
 
 
 
-
-
-# biclustering
-
-def measure_matrix_loss(matrix):
-    n = matrix.shape[0]
-    loss = 0
-    for i in range(1,n):
-        loss += abs(matrix[i,j]- matrix[i-1,j])
-        loss += abs(matrix[i,j]- matrix[i,j-1])
-        loss += abs(matrix[i,j]- matrix[i-1,j-1])
-    return loss
-
-
-def change_distance_matrix_indices(matrix, permu):
-    n = matrix.shape[0]
-    t = np.eye(n)[permu]
-    return t * permu * t
-
-
-
-# save_fig_path = "/home/paran/Dropbox/BCAM/02_NEAT_permus/paper/images/permu_problems_transfer/"
-
 save_fig_paths = [
 "experimentResults/transfer_permus_qap/results/figures/",
 "experimentResults/transfer_permus_problems/results/figures/",
@@ -52,10 +29,10 @@ save_fig_paths = [
 
 
 txt_paths = [
-"experimentResults/transfer_permus_qap/results/score.txt",
-"experimentResults/transfer_permus_problems/results/score.txt",
-"experimentResults/transfer_16_continuous_problems/results/score.txt",
-"experimentResults/transfer_generated_continuous/results/score.txt",
+"experimentResults/transfer_permus_qap/results/response.txt",
+"experimentResults/transfer_permus_problems/results/response.txt",
+"experimentResults/transfer_16_continuous_problems/results/response.txt",
+"experimentResults/transfer_generated_continuous/results/response.txt",
 ]
 
 
@@ -120,9 +97,9 @@ for input_txt, transfer_exp, save_fig_path in zip(txt_paths, transfer_exp_list, 
 
 
 
-    scores = []
+    responses = []
 
-    data_frame = pd.DataFrame(columns=["score", "train_name", "test_name", "train_type", "test_type", "train_seed"])
+    data_frame = pd.DataFrame(columns=["response", "train_name", "test_name", "train_type", "test_type", "train_seed"])
 
     print(f"Reading file {input_txt}")
     with open(input_txt) as f:
@@ -133,44 +110,27 @@ for input_txt, transfer_exp, save_fig_path in zip(txt_paths, transfer_exp_list, 
             if transfer_exp == "Transfer16OnlyOne":
                 if not "Only" in line:
                     continue
-                line = line.split(",")
-                line = [el.strip("[]") for el in line]
-                train_name = "_"+str(line[2].split("TrainOnlyInF_")[1].split("_best.controller")[0])+"_"
+                line = eval(line)
+                train_name = "_"+str(line[0].split("TrainOnlyInF_")[1].split("_best.controller")[0])+"_"
                 test_name = "_"+str(line[1])+"_"
-                score = float(line[0])
-
-
-            # Continuous LOO16 
-            elif transfer_exp == "LOO16":
-                if "Only" in line:
-                    continue
-                line = line.split(",")
-                line = [el.strip("[]") for el in line]
-                train_name = "_"+str(line[2].split("LeaveOutF_")[1].split("_best.controller")[0])+"_"
-                test_name = "_"+str(line[1])+"_"
-                score = float(line[0])
-                # Its leave one out, so LeaveOutF_6_best.controller was actually trained in the rest of the problems of the same type (5 7 8).
-                # This means that the controller can be tested in problems of different type or the problem left out. 
-                if get_type(train_name) == get_type(test_name) and train_name != test_name:
-                    continue
+                response = np.array(line[-1])
 
             elif transfer_exp == "transferGenerated":
-                line = line.split(",")
-                line = [el.strip("[]\n") for el in line]
-                train_name = line[2].split("NLO_")[-1].split("_best.controlle")[0]
-                test_name = line[-1]
-                score = float(line[0])
+                line = eval(line)
+                train_name = line[0].split("NLO_")[-1].split("_best.controlle")[0]
+                test_name = str(line[-1])
+                response = np.array(line[-2])
 
 
             # PERMUS (both qap and permuproblems)
             elif transfer_exp == "QAP_MULTI" or transfer_exp == "QAP" or transfer_exp=="PERMUPROB":
                 line = eval(line)
-                train_name = line[2].split("/")[-1].split("_best.controlle")[-2]
+                train_name = line[0].split("/")[-1].split("_best.controlle")[-2]
                 test_name = line[1].split("/")[-1]
                 # # Dont test the controller in an instance, when that instance was used to train it.
                 # if train_name in test_name:
                 #     continue
-                score = line[0][0]
+                response = np.array(line[2])
 
             else:
                 print(f"ERROR: transfer_exp = {transfer_exp} not recognized!")
@@ -182,8 +142,8 @@ for input_txt, transfer_exp, save_fig_path in zip(txt_paths, transfer_exp_list, 
             # print("train_type",train_type, "test_type", test_type)
 
 
-            new_row_df = pd.DataFrame([[score, train_name, test_name, train_type, test_type, train_seed]], 
-                            columns=["score", "train_name", "test_name", "train_type", "test_type", "train_seed"])
+            new_row_df = pd.DataFrame([[response, train_name, test_name, train_type, test_type, train_seed]], 
+                            columns=["response", "train_name", "test_name", "train_type", "test_type", "train_seed"])
             data_frame = data_frame.append(new_row_df, ignore_index=True)
 
     def sort_key(x):
@@ -221,56 +181,58 @@ for input_txt, transfer_exp, save_fig_path in zip(txt_paths, transfer_exp_list, 
         else:
             return x.strip("_")
 
-    if transfer_exp == "Transfer16OnlyOne":
-        scores_dict = dict()
-        for index, row in data_frame.iterrows():
-            train_name = row["train_name"].split("seed")[0]
-            test_name = row["test_name"]
-            traintest_touple = (train_name, test_name)
-            score = row["score"]
-            scores_dict[traintest_touple] = scores_dict[traintest_touple] + [score] if traintest_touple in scores_dict else [score]    
-
-        BOXPLOT_data_frame = pd.DataFrame(columns=["score", "train_name", "test_name", "train_type", "test_type"])
-
-
-
-
-        # plot all boxplots
-        sns.set(font_scale = 1)
-        fig, ax_list = plt.subplots(6,2)
-
-        for test_index in range(1,13):
-            ax = ax_list.flatten()[test_index-1]
-            ax.boxplot([scores_dict[(f"_{i}_", f"_{test_index}_")] for i in range(1, 13)], labels=[ r"$"+r"A_{"+ str(el) + r"}$" for el in range(1,13)])
-            #ax.set_xlabel("Train problem") 
-            ax.set_title("Tested in problem $A_{" + f"{test_index}" + "}$") 
-
-        fig.set_size_inches(8, 11)
-        fig.tight_layout()
-        fig.savefig(save_fig_path+"boxplot_for_each_test_instance.pdf")
-        plt.close()
- 
-        for (train_name, test_name), score in scores_dict.items():
-            
-            train_type = get_type(train_name)
-            test_type = get_type(test_name)
-            score = median(score)
-            new_row_df = pd.DataFrame([[score, train_name, test_name, train_type, test_type]], 
-                                columns=["score", "train_name", "test_name", "train_type", "test_type"])
-
-            BOXPLOT_data_frame = data_frame.append(new_row_df, ignore_index=True)
-    sns.set(font_scale = 1.4)
-
-    # compute transferability
-
-    if transfer_exp == "Transfer16OnlyOne":
-        print(data_frame[data_frame["train_seed"] == "2"])
+    # compute average distance between responses in train/test
 
     all_seeds = list(data_frame["train_seed"].unique()) 
     data_frame.insert(1, "transferability", [-1]*len(data_frame.index), False)
 
+    distance_between_same_train_list = list()
+    distance_between_same_test_list = list()
+
+    def L1_distance_between_responses(resp1, resp2):
+        return sum(abs(resp1 - resp2))
+
+
+    train_names = sorted(data_frame["train_name"].unique(), key=sort_key)
+    test_names = sorted(data_frame["test_name"].unique(), key=sort_key)
+
+    N_distances_AVERAGED_per_instance = 500
+    np.random.seed(3)
+ 
+    # Compute avg response L1 distance between same train instances
+    for train_name in train_names:
+        for reps in range(N_distances_AVERAGED_per_instance):
+            responses = data_frame[data_frame["train_name"] == train_name]["response"]
+            r1 = np.random.choice(responses)
+            r2 = r1
+            while sum(r2) == sum(r1):
+                r2 = np.random.choice(responses) 
+            distance_between_same_train_list.append(L1_distance_between_responses(r1,r2))
+
+    distance_between_same_train = np.average(distance_between_same_train_list)
+
+
+    # Compute avg response L1 distance between same test instances
+    for test_name in test_names:
+        for reps in range(N_distances_AVERAGED_per_instance):
+            responses = data_frame[data_frame["test_name"] == test_name]["response"]
+            r1 = np.random.choice(responses)
+            r2 = r1
+            while sum(r2) == sum(r1):
+                r2 = np.random.choice(responses) 
+            distance_between_same_test_list.append(L1_distance_between_responses(r1,r2))
+
+    distance_between_same_test = np.average(distance_between_same_test_list)
+
+    print("---------")
+    print("Problem name: ", transfer_exp)
+    print("Avg L1 distance among responses TRAINED IN SAME instance:", distance_between_same_train)
+    print("Avg L1 distance among responses TESTED IN SAME instance:", distance_between_same_test)
+    print("---------")
+
+    continue
+
     for train_seed in all_seeds:
-        transferability = []
 
         sub_df = data_frame[data_frame["train_seed"] == train_seed]
         sub_df = sub_df.reset_index()
@@ -280,44 +242,12 @@ for input_txt, transfer_exp, save_fig_path in zip(txt_paths, transfer_exp_list, 
             train_name = row["train_name"]
             test_name = row["test_name"]
 
-            # # Cannot compute this because we are removed the scores where the same problem was used to train and test. 
-            # norm_score = sub_df.iloc[get_row_index(sub_df, test_name, test_name)]["score"]
+            # # Cannot compute this because we are removed the responses where the same problem was used to train and test. 
+            # norm_response = sub_df.iloc[get_row_index(sub_df, test_name, test_name)]["response"]
 
             sub_sub_df_with_certain_test_instance = sub_df[sub_df["test_name"] == test_name]
             
-            average_score = mean(sub_sub_df_with_certain_test_instance["score"])
-            stdev_score = stdev(sub_sub_df_with_certain_test_instance["score"])
-            ranks = sub_sub_df_with_certain_test_instance["score"].rank(ascending=False)
-            ranks = ranks - 1
-            ranks = ranks / max(ranks)
-            indx_in_selected = sub_sub_df_with_certain_test_instance["score"][sub_sub_df_with_certain_test_instance["score"]==sub_df.iloc[get_row_index(sub_df, train_name, test_name)]["score"]].index[0]
-
-            # transferability.append(    (norm_score - row["score"]) / abs(norm_score)    ) # as defined on the paper
-            # transferability.append(    (row["score"] - average_score) / stdev_score    )
-            transferability.append(ranks[indx_in_selected])
-
-
-        # print(data_frame.loc[data_frame['train_seed'] == train_seed, "transferability"])
-        # print(np.array(transferability), len(np.array(transferability)))
-
-        # Insert transferability column
-        data_frame.loc[data_frame['train_seed'] == train_seed, "transferability"] = np.array(transferability)
-
-
-
-        # # Average by instance type
-        # type_train = sorted(list(set(    [get_type(x) for x in sub_df["train_name"]]     )))
-        # type_test  = sorted(list(set(    [get_type(x) for x in sub_df["test_name"]]     )))
-
-
-        # for train_name in get_train_instances(sub_df):
-        #     for test_name in get_test_instances(sub_df):
-        #         index = get_row_index(sub_df, train_name, test_name)
-        #         if index is None:
-        #             continue
-        #         transf = sub_df.iloc[index]["transferability"]
-        #         type_train = sub_df.iloc[index]["train_type"]
-        #         type_test = sub_df.iloc[index]["test_type"]
+            average_response = mean(sub_sub_df_with_certain_test_instance["response"])
 
 
 
@@ -401,7 +331,7 @@ for input_txt, transfer_exp, save_fig_path in zip(txt_paths, transfer_exp_list, 
         plt.close()
 
 
-    # print(get_score(data_frame, "N-t65d11xx_150.lop", "pr136.tsp"))
+    # print(get_response(data_frame, "N-t65d11xx_150.lop", "pr136.tsp"))
     # print(get_type("pr136.tsp"))
     # print(get_train_instances(data_frame))
     # print(get_test_instances(data_frame))
