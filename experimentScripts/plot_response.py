@@ -186,7 +186,9 @@ for input_txt, transfer_exp, save_fig_path in zip(txt_paths, transfer_exp_list, 
     all_seeds = list(data_frame["train_seed"].unique()) 
     data_frame.insert(1, "transferability", [-1]*len(data_frame.index), False)
 
-    distance_between_same_train_list = list()
+    distance_between_same_train_list_diff_seed = list()
+    distance_between_same_train_list_same_seed = list()
+    distance_between_both_diff_list = list()
     distance_between_same_test_list = list()
 
     def L1_distance_between_responses(resp1, resp2):
@@ -199,38 +201,86 @@ for input_txt, transfer_exp, save_fig_path in zip(txt_paths, transfer_exp_list, 
     N_distances_AVERAGED_per_instance = 500
     np.random.seed(3)
  
-    # Compute avg response L1 distance between same train instances
-    for train_name in train_names:
+    # Compute avg response L1 distance between same train instances & different train seed.
+    for train_name in tqdm(train_names):
         for reps in range(N_distances_AVERAGED_per_instance):
-            responses = data_frame[data_frame["train_name"] == train_name]["response"]
-            r1 = np.random.choice(responses)
-            r2 = r1
-            while sum(r2) == sum(r1):
-                r2 = np.random.choice(responses) 
-            distance_between_same_train_list.append(L1_distance_between_responses(r1,r2))
-
-    distance_between_same_train = np.average(distance_between_same_train_list)
+            seed1 = np.random.choice(all_seeds)
+            seed2 = np.random.choice([el for el in all_seeds if el != seed1])
+            r1_list = data_frame[(data_frame["train_name"] == train_name) & (data_frame["train_seed"] == seed1)]["response"]
+            r2_list = data_frame[(data_frame["train_name"] == train_name) & (data_frame["train_seed"] == seed2)]["response"]
+            r1 = np.random.choice(r1_list)
+            r2 = np.random.choice(r2_list)
+            distance_between_same_train_list_diff_seed.append(L1_distance_between_responses(r1,r2))
+    distance_between_same_train_diff_seed = np.average(distance_between_same_train_list_diff_seed)
 
 
     # Compute avg response L1 distance between same test instances
-    for test_name in test_names:
+    for test_name in tqdm(test_names):
         for reps in range(N_distances_AVERAGED_per_instance):
-            responses = data_frame[data_frame["test_name"] == test_name]["response"]
-            r1 = np.random.choice(responses)
-            r2 = r1
-            while sum(r2) == sum(r1):
-                r2 = np.random.choice(responses) 
+            seed1 = np.random.choice(all_seeds)
+            seed2 = np.random.choice([el for el in all_seeds if el != seed1])
+            r1_list = data_frame[(data_frame["test_name"] == test_name) & (data_frame["train_seed"] == seed1)]["response"]
+            r2_list = data_frame[(data_frame["test_name"] == test_name) & (data_frame["train_seed"] == seed2)]["response"]
+            r1 = np.random.choice(r1_list)
+            r2 = np.random.choice(r2_list)
             distance_between_same_test_list.append(L1_distance_between_responses(r1,r2))
 
     distance_between_same_test = np.average(distance_between_same_test_list)
 
+ 
+    # Compute avg response L1 distance between same train instances & same train seed.
+    for train_name in tqdm(train_names):
+        for reps in range(N_distances_AVERAGED_per_instance):
+            seed1 = np.random.choice(all_seeds)
+            seed2 = seed1
+            r1_list = data_frame[(data_frame["train_name"] == train_name) & (data_frame["train_seed"] == seed1)]["response"]
+            r2_list = data_frame[(data_frame["train_name"] == train_name) & (data_frame["train_seed"] == seed2)]["response"]
+
+            r1 = np.random.choice(r1_list)
+            r2 = np.random.choice(r2_list)
+
+            k = 0
+            while(sum(r1) == sum(r2)):
+                r2 = np.random.choice(r2_list)
+   
+
+            distance_between_same_train_list_same_seed.append(L1_distance_between_responses(r1,r2))
+    distance_between_same_train_same_seed = np.average(distance_between_same_train_list_same_seed)
+
+    # Compute avg response L1 distance between diff train instances & diff train seed.
+    for train_name in tqdm(train_names):
+        for reps in range(N_distances_AVERAGED_per_instance):
+            seed1 = np.random.choice(all_seeds)
+            seed2 = seed1
+            test_name = np.random.choice([el for el in test_names if el != train_name])
+            
+            r1_list = data_frame[(data_frame["train_name"] == train_name) & (data_frame["test_name"] == test_name) & (data_frame["train_seed"] == seed1)]["response"]
+            r2_list = data_frame[(data_frame["train_name"] != train_name) & (data_frame["test_name"] != test_name) & (data_frame["train_seed"] == seed2)]["response"]
+
+            r1 = np.random.choice(r1_list)
+            r2 = np.random.choice(r2_list)
+
+            k = 0
+            while(sum(r1) == sum(r2)):
+                r2 = np.random.choice(r2_list)
+   
+
+            distance_between_both_diff_list.append(L1_distance_between_responses(r1,r2))
+    distance_between_both_diff_same_seed = np.average(distance_between_both_diff_list)
+
+
     print("---------")
     print("Problem name: ", transfer_exp)
-    print("Avg L1 distance among responses TRAINED IN SAME instance:", distance_between_same_train)
+    print("Avg L1 distance among responses TRAINED IN SAME instance (diff train seed):", distance_between_same_train_diff_seed)
+    print("Avg L1 distance among responses TRAINED IN SAME instance (same train seed):", distance_between_same_train_same_seed)
     print("Avg L1 distance among responses TESTED IN SAME instance:", distance_between_same_test)
+    print("Avg L1 distance among responses TRAINED & TESTED IN DIFFERENT instances:", distance_between_both_diff_same_seed)
     print("---------")
 
     continue
+
+
+
 
     for train_seed in all_seeds:
 
