@@ -1,3 +1,5 @@
+from audioop import avg
+from csv import list_dialects
 from statistics import mean, variance, stdev, median
 import pandas as pd
 import numpy as np
@@ -14,7 +16,7 @@ from sklearn.metrics import consensus_score
 from scipy.cluster.hierarchy import dendrogram, linkage
 import re
 from tqdm import tqdm as tqdm
-
+import sklearn
 
 save_fig_path = "experimentResults/"
 
@@ -198,7 +200,7 @@ for input_txt, transfer_exp, save_fig_path in zip(txt_paths, transfer_exp_list, 
     train_names = sorted(data_frame["train_name"].unique(), key=sort_key)
     test_names = sorted(data_frame["test_name"].unique(), key=sort_key)
 
-    N_distances_AVERAGED_per_instance = 500
+    N_distances_AVERAGED_per_instance = 5
     np.random.seed(3)
  
     # Compute avg response L1 distance between same train instances & different train seed.
@@ -277,114 +279,77 @@ for input_txt, transfer_exp, save_fig_path in zip(txt_paths, transfer_exp_list, 
     print("Avg L1 distance among responses TRAINED & TESTED IN DIFFERENT instances:", distance_between_both_diff_same_seed)
     print("---------")
 
-    continue
+    average_response_list = []
+    for train_name in train_names:        
+        sub_df_with_certain_train_instance = data_frame[data_frame["train_name"] == train_name]
+        average_response = sum(sub_df_with_certain_train_instance["response"]) / sub_df_with_certain_train_instance["response"].size
+        average_response_list.append(average_response)
+    average_response_list = np.array([np.array(resp) for resp in average_response_list])
+    
+    def MDS_2d(response_array):
+        
+        # # MDS
+        # m =  len(list_of_responses)
+        # n =  len(list_of_responses[0])
+        # dist_matrix_dict = np.zeros((m,m))
+        # for i in range(m):
+        #     for j in range(m):
+        #         # dist_matrix_dict[i,j] = np.log(1 + hamming_dist(pop[i], pop[j])) / np.log(1+ n)
+        #         dist_matrix_dict[i,j] = L1_distance_between_responses(list_of_responses[i], list_of_responses[j])
+        # embedding = sklearn.manifold.MDS(dissimilarity="precomputed", n_components=2, n_init=3, max_iter=500, n_jobs=8)
+        # res = np.array(embedding.fit_transform(dist_matrix_dict))
+
+
+        # PCA
+        embedding = sklearn.decomposition.PCA(n_components=2)
+        res = embedding.fit_transform(response_array)
+
+        return res
 
 
 
 
-    for train_seed in all_seeds:
 
-        sub_df = data_frame[data_frame["train_seed"] == train_seed]
-        sub_df = sub_df.reset_index()
+    def plot_MDS(list_of_responses, file_name):
 
-        for idx in sub_df.index:
-            row = sub_df.loc[idx,:]
-            train_name = row["train_name"]
-            test_name = row["test_name"]
 
-            # # Cannot compute this because we are removed the responses where the same problem was used to train and test. 
-            # norm_response = sub_df.iloc[get_row_index(sub_df, test_name, test_name)]["response"]
+        df = pd.DataFrame(MDS_2d(list_of_responses))
 
-            sub_sub_df_with_certain_test_instance = sub_df[sub_df["test_name"] == test_name]
+        colors = list(matplotlib.colors.TABLEAU_COLORS)
+
+        
+        fig, ax = plt.subplots()
+
+
+        for idx, train_instance in enumerate(train_names):
+            xi = np.array(df.iloc[idx,0])
+            yi = np.array(df.iloc[idx,1])
+            ci = colors[idx % len(colors)] #color for ith feature 
+            ax.annotate(train_instance, (xi, yi), fontsize='x-small')
+
+
             
-            average_response = mean(sub_sub_df_with_certain_test_instance["response"])
+            label = None
+
+            ax.scatter(xi,yi,marker=",", color=ci, label=label)
+
+        # for idx, t_class in enumerate(trained_classes):
+        #     label = str("A = " + t_class)
+        #     ax.scatter([],[], marker=",", color=colors[idx], label=label)
 
 
 
-    pd.set_option('display.max_rows', 1000)
-    # print(data_frame[data_frame["test_type"] == "tsp"])
-
-    # Make the plots
-    if True:# transfer_exp == "LOO16" or transfer_exp == "Transfer16OnlyOne":
-
-        train_names = sorted(data_frame["train_name"].unique(), key=sort_key)
-        test_names = sorted(data_frame["test_name"].unique(), key=sort_key)
-
-        print(train_names)
-
-        nice_train_names = list(map(nicefyInstanceName, train_names))
-        nice_test_names = list(map(nicefyInstanceName, test_names))
+        ax.legend(fontsize=8, markerscale=0.5)
+        fig.tight_layout()
+        plt.show()
+        # fig.savefig(file_name)
+        # plt.close()
 
 
-
-        m = len(train_names)
-        n = len(test_names)
-
-        matrix_data = np.zeros((m,n))
-        for i in range(m):
-            for j in range(n):
-                train_name = train_names[i]
-                test_name = test_names[j]
-                value = data_frame[(data_frame["train_name"] == train_name) & (data_frame["test_name"] == test_name)]["transferability"]
-                value = value.mean() if len(value) > 0 else np.NAN
-
-                matrix_data[i,j] = value
-        #sns.set_palette(sns.color_palette("viridis", as_cmap=True))
-
-        sns.set(font_scale={"Transfer16OnlyOne": 1.4,
-                            "transferGenerated": 1.4,
-                            "QAP": 0.7,
-                            "PERMUPROB": 0.7
-                            }[transfer_exp]
-                )
-        ax = sns.heatmap(matrix_data, linewidth=0.5, xticklabels=nice_train_names, yticklabels=nice_test_names, vmin=0, vmax=1, cmap='viridis')
+    # icc { 
+    #   (train_class,test_class): [    [(train_ins0, test_ins0), (train_ins1, test_ins1), (train_ins2, test_ins2)]    ,     [response_0 , response_1, response_2]    ],  
+    #   (train_class,test_class): [    [(train_ins0, test_ins0), (train_ins1, test_ins1), (train_ins2, test_ins2)]    ,     [response_0 , response_1, response_2]    ]...
+    # } 
 
 
-        ax.xaxis.tick_top() # x axis on top
-        ax.xaxis.set_label_position('top')
-        plt.xticks(rotation = 90)
-        ax.set_xlabel("Test instance")
-        ax.set_ylabel("Training instance")
-        plt.tight_layout()
-        plt.savefig(save_fig_path+transfer_exp+"_heatmap.pdf")
-        plt.close()
-
-        # https://seaborn.pydata.org/generated/seaborn.clustermap.html -> Plot a matrix dataset as a hierarchically-clustered heatmap.
-        clust_df = pd.DataFrame(matrix_data, index=nice_train_names, columns=nice_test_names)
-        clust_df = clust_df.rename_axis(index="Training instance", columns="Test instance")
-
-        # with the single method, the distance from a point in space to the cluster is considered to be
-        # the minimum distance to every point in the cluster. 
-        # The cityblock metric is the L1 (taxicab or tophat) metric
-        print(clust_df)
-        z = linkage(clust_df, method="single", metric="cityblock", optimal_ordering=True)
-        # ax = sns.clustermap(clust_df,metric='cityblock', method="single")
-        sns.set(font_scale={"Transfer16OnlyOne": 2.0,
-                            "transferGenerated": 2.0,
-                            "QAP": 1.0,
-                            "PERMUPROB": 1.0
-                            }[transfer_exp]
-                )        
-        ax = sns.clustermap(clust_df, row_linkage=z, col_linkage=z, cmap='viridis')
-        ax.ax_heatmap.xaxis.set_ticks_position('top')
-        ax.ax_heatmap.xaxis.set_label_position('top')
-        ax.ax_heatmap.yaxis.set_ticks_position('left')
-        ax.ax_heatmap.yaxis.set_label_position('left')
-        ax.ax_heatmap.tick_params(axis="x", labelrotation = 90)
-
-        ax.cax.set_visible(True)
-        ax.ax_row_dendrogram.set_visible(False)
-        ax.ax_col_dendrogram.set_visible(False)
-        ax.ax_row_dendrogram.set_xlim([0,0])
-        plt.tight_layout()
-        plt.savefig(save_fig_path+transfer_exp+"_clustered_"+"_heatmap.pdf")
-        plt.close()
-
-
-    # print(get_response(data_frame, "N-t65d11xx_150.lop", "pr136.tsp"))
-    # print(get_type("pr136.tsp"))
-    # print(get_train_instances(data_frame))
-    # print(get_test_instances(data_frame))
-    # print(get_row_index(data_frame, "N-t65d11xx_150.lop", "pr136.tsp"))
-    # print(data_frame.iloc[478])
-
+    plot_MDS(average_response_list, save_fig_path+"PCA_response"+".pdf")
