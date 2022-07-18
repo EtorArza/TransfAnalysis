@@ -324,7 +324,15 @@ for input_txt, transfer_exp, save_fig_path in zip(txt_paths, transfer_exp_list, 
         for idx, train_instance in enumerate(train_names):
             xi = np.array(df.iloc[idx,0])
             yi = np.array(df.iloc[idx,1])
-            ci = colors[idx % len(colors)] #color for ith feature 
+            if transfer_exp == "QAP":
+                color_index = 0 if train_instance[0] == "A" else (1 if train_instance[0] == "B" else (2 if train_instance[0] == "C" else None)) 
+            elif transfer_exp == "PERMUPROB":
+                color_index = 0 if ".tsp" in train_instance else (1 if ".lop" in train_instance else (2 if ".pfsp" in train_instance else (3 if ".qap" in train_instance else None))) 
+            elif transfer_exp == "Transfer16OnlyOne":
+                color_index = 0 if train_instance in ("_6_", "_11_", "_2_", "_1_", "_5_") else (1 if train_instance in ("_8_", "_7_", "_4_", "_3_") else (2 if train_instance in ("_9_", "_10_", "_12_") else None)) 
+            else:
+                raise ValueError("transfer_exp=", transfer_exp, "not supported.")
+            ci = colors[color_index] #color for ith feature 
             ax.annotate(train_instance, (xi, yi), fontsize='x-small')
 
 
