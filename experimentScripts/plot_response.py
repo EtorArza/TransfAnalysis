@@ -282,7 +282,14 @@ for input_txt, transfer_exp, save_fig_path in zip(txt_paths, transfer_exp_list, 
     average_response_list = []
     for train_name in train_names:        
         sub_df_with_certain_train_instance = data_frame[data_frame["train_name"] == train_name]
-        average_response = sum(sub_df_with_certain_train_instance["response"]) / sub_df_with_certain_train_instance["response"].size
+        
+        # # For debugging python with interactive shell. Start interactive shell.
+        # import code; code.interact(local=locals())
+
+        response_list = np.asarray([el for el in sub_df_with_certain_train_instance["response"]])
+        # score_list = np.asarray([el for el in sub_df_with_certain_train_instance["score"]])
+
+        average_response = np.apply_along_axis(median, 0, response_list)
         average_response_list.append(average_response)
     average_response_list = np.array([np.array(resp) for resp in average_response_list])
     
@@ -299,6 +306,11 @@ for input_txt, transfer_exp, save_fig_path in zip(txt_paths, transfer_exp_list, 
         # embedding = sklearn.manifold.MDS(dissimilarity="precomputed", n_components=2, n_init=3, max_iter=500, n_jobs=8)
         # res = np.array(embedding.fit_transform(dist_matrix_dict))
 
+        # # TSNE 
+        # # https://scikit-learn.org/stable/modules/generated/sklearn.manifold.TSNE.html
+        # # https://en.wikipedia.org/wiki/T-distributed_stochastic_neighbor_embedding
+        # embedding = sklearn.manifold.TSNE(n_components=2, perplexity=5, learning_rate='auto', )
+        # res = embedding.fit_transform(response_array)
 
         # PCA
         embedding = sklearn.decomposition.PCA(n_components=2)
