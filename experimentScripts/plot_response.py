@@ -18,6 +18,12 @@ import re
 from tqdm import tqdm as tqdm
 import sklearn
 
+
+
+# Load scores from transferability.
+import plot_transferability
+
+
 save_fig_path = "experimentResults/"
 
 
@@ -45,7 +51,7 @@ transfer_exp_list =[
 "transferGenerated"
 ]
 
-for input_txt, transfer_exp, save_fig_path in zip(txt_paths, transfer_exp_list, save_fig_paths):
+for idx, input_txt, transfer_exp, save_fig_path in zip(range(len(transfer_exp_list)), txt_paths, transfer_exp_list, save_fig_paths):
     
     subprocess.run(f"mkdir -p {save_fig_path}", shell=True) # write out into log.txt
 
@@ -101,7 +107,7 @@ for input_txt, transfer_exp, save_fig_path in zip(txt_paths, transfer_exp_list, 
 
     responses = []
 
-    data_frame = pd.DataFrame(columns=["response", "train_name", "test_name", "train_type", "test_type", "train_seed"])
+    data_frame = pd.DataFrame(columns=["response", "train_name", "test_name", "train_type", "test_type", "train_seed", "score"])
 
     print(f"Reading file {input_txt}")
     with open(input_txt) as f:
@@ -143,9 +149,12 @@ for input_txt, transfer_exp, save_fig_path in zip(txt_paths, transfer_exp_list, 
 
             # print("train_type",train_type, "test_type", test_type)
 
+            score_df = plot_transferability.every_data_frame_list[idx]
+            score = score_df[(score_df["train_name"] == train_name) & (score_df["test_name"] == test_name) & (score_df["train_seed"] == train_seed)]["score"]
 
-            new_row_df = pd.DataFrame([[response, train_name, test_name, train_type, test_type, train_seed]], 
-                            columns=["response", "train_name", "test_name", "train_type", "test_type", "train_seed"])
+
+            new_row_df = pd.DataFrame([[response, train_name, test_name, train_type, test_type, train_seed, score]], 
+                            columns=["response", "train_name", "test_name", "train_type", "test_type", "train_seed", "score"])
             data_frame = data_frame.append(new_row_df, ignore_index=True)
 
     def sort_key(x):
@@ -281,15 +290,24 @@ for input_txt, transfer_exp, save_fig_path in zip(txt_paths, transfer_exp_list, 
 
     average_response_list = []
     for train_name in train_names:        
-        sub_df_with_certain_train_instance = data_frame[data_frame["train_name"] == train_name]
+        sub_df_with_certain_train_instance = data_frame[(data_frame["train_name"] == train_name) & (data_frame["test_name"] == train_name)]
         
+
+
+        response_list = np.asarray([el for el in sub_df_with_certain_train_instance["response"]])
+        score_list = np.asarray([el for el in sub_df_with_certain_train_instance["score"]])
+
         # # For debugging python with interactive shell. Start interactive shell.
         # import code; code.interact(local=locals())
 
-        response_list = np.asarray([el for el in sub_df_with_certain_train_instance["response"]])
-        # score_list = np.asarray([el for el in sub_df_with_certain_train_instance["score"]])
-
+        # Median of all reponses trained in the same problem 
         average_response = np.apply_along_axis(median, 0, response_list)
+        if transfer_exp == "QAP" or transfer_exp == "PERMUPROB":
+            average_response = average_response[:5]
+
+        # # Response of best 
+        # average_response = response_list[np.argmax(score_list)]
+
         average_response_list.append(average_response)
     average_response_list = np.array([np.array(resp) for resp in average_response_list])
     
