@@ -288,7 +288,7 @@ for idx, input_txt, transfer_exp, save_fig_path in zip(range(len(transfer_exp_li
     print("Avg L1 distance among responses TRAINED & TESTED IN DIFFERENT instances:", distance_between_both_diff_same_seed)
     print("---------")
 
-    average_response_list = []
+    median_response_list = []
     for train_name in train_names:        
         sub_df_with_certain_train_instance = data_frame[(data_frame["train_name"] == train_name) & (data_frame["test_name"] == train_name)]
         
@@ -301,15 +301,15 @@ for idx, input_txt, transfer_exp, save_fig_path in zip(range(len(transfer_exp_li
         # import code; code.interact(local=locals())
 
         # Median of all reponses trained in the same problem 
-        average_response = np.apply_along_axis(median, 0, response_list)
+        median_response = np.apply_along_axis(median, 0, response_list)
         if transfer_exp == "QAP" or transfer_exp == "PERMUPROB":
-            average_response = average_response[:5]
+            median_response = median_response[:5]
 
         # # Response of best 
-        # average_response = response_list[np.argmax(score_list)]
+        # median_response = response_list[np.argmax(score_list)]
 
-        average_response_list.append(average_response)
-    average_response_list = np.array([np.array(resp) for resp in average_response_list])
+        median_response_list.append(median_response)
+    median_response_list = np.array([np.array(resp) for resp in median_response_list])
     
     def MDS_2d(response_array):
         
@@ -390,4 +390,4 @@ for idx, input_txt, transfer_exp, save_fig_path in zip(range(len(transfer_exp_li
     # } 
 
 
-    plot_MDS(average_response_list, save_fig_path+"PCA_response"+".pdf")
+    plot_MDS(median_response_list, save_fig_path+"PCA_response"+".pdf")
