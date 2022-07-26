@@ -17,11 +17,13 @@ from scipy.cluster.hierarchy import dendrogram, linkage
 import re
 from tqdm import tqdm as tqdm
 import sklearn
+from sklearn.neighbors import KernelDensity
+from sklearn.discriminant_analysis import LinearDiscriminantAnalysis as LDA
+from scipy import stats
 
 
-
-# Load scores from transferability.
-import plot_transferability
+# # Load scores from transferability.
+# import plot_transferability
 
 
 save_fig_path = "experimentResults/"
@@ -107,7 +109,7 @@ for idx, input_txt, transfer_exp, save_fig_path in zip(range(len(transfer_exp_li
 
     responses = []
 
-    data_frame = pd.DataFrame(columns=["response", "train_name", "test_name", "train_type", "test_type", "train_seed", "score"])
+    data_frame = pd.DataFrame(columns=["response", "train_name", "test_name", "train_type", "test_type", "train_seed", "resp_diff_to_average_same_train", "resp_diff_to_global_average", "diff_higher_to_global"])
 
     print(f"Reading file {input_txt}")
     with open(input_txt) as f:
@@ -149,12 +151,13 @@ for idx, input_txt, transfer_exp, save_fig_path in zip(range(len(transfer_exp_li
 
             # print("train_type",train_type, "test_type", test_type)
 
-            score_df = plot_transferability.every_data_frame_list[idx]
-            score = score_df[(score_df["train_name"] == train_name) & (score_df["test_name"] == test_name) & (score_df["train_seed"] == train_seed)]["score"]
+            # score_df = plot_transferability.every_data_frame_list[idx]
+            # score = score_df[(score_df["train_name"] == train_name) & (score_df["test_name"] == test_name) & (score_df["train_seed"] == train_seed)]["score"]
 
+            resp_diff_to_average_same_train, resp_diff_to_global_average, diff_higher_to_global = None, None, None
 
-            new_row_df = pd.DataFrame([[response, train_name, test_name, train_type, test_type, train_seed, score]], 
-                            columns=["response", "train_name", "test_name", "train_type", "test_type", "train_seed", "score"])
+            new_row_df = pd.DataFrame([[response, train_name, test_name, train_type, test_type, train_seed, resp_diff_to_average_same_train, resp_diff_to_global_average, diff_higher_to_global]], 
+                            columns=["response", "train_name", "test_name", "train_type", "test_type", "train_seed", "resp_diff_to_average_same_train", "resp_diff_to_global_average", "diff_higher_to_global"])
             data_frame = data_frame.append(new_row_df, ignore_index=True)
 
     def sort_key(x):
@@ -288,6 +291,89 @@ for idx, input_txt, transfer_exp, save_fig_path in zip(range(len(transfer_exp_li
     print("Avg L1 distance among responses TRAINED & TESTED IN DIFFERENT instances:", distance_between_both_diff_same_seed)
     print("---------")
 
+
+    for response_index in range(data_frame.loc[0,"response"].shape[0]):
+
+        # KDE for each response
+        x_observed = np.array(list(data_frame["response"]))[:,response_index]
+        x_observed = x_observed[np.abs(stats.zscore(x_observed)) < 5].reshape(-1,1)
+
+        kde = KernelDensity(kernel='gaussian', bandwidth=0.05).fit(x_observed)
+
+        x_plot_lim_lower = min(x_observed) - (max(x_observed) - min(x_observed)) / 10
+        x_plot_lim_upper = max(x_observed) - (max(x_observed) + min(x_observed)) / 10
+
+        x_plot = np.arange(x_plot_lim_lower,x_plot_lim_upper+ 0.00000001,0.0015).reshape(-1,1)
+        y_plot = np.exp(kde.score_samples(x_plot))
+
+        fig, ax = plt.subplots()
+        ax.plot(x_plot, y_plot, label = "Density estimation")
+        ax.plot(x_observed[:, 0], -0.005 - 0.01 * np.random.random(x_observed.shape[0]), "+k", label = "Observed datapoints")
+
+        for train_name in train_names:        
+            average_response = np.apply_along_axis(mean, 0, np.asarray([el for el in data_frame[(data_frame["train_name"] == train_name) & (data_frame["test_name"] == train_name)]["response"]]))
+            ax.axvline(x=average_response[response_index],  color='r', linestyle='--', linewidth=0.5)
+        ax.plot([], [], label='Average same train problem', color='r', linestyle='--', linewidth=0.5)
+
+
+        global_avg_response = np.apply_along_axis(mean, 0, np.asarray([el for el in data_frame["response"]]))
+        ax.axvline(x=global_avg_response[response_index], label="Average all train problems", color='orange', linestyle='-.', linewidth=0.5)
+        ax.legend()
+
+
+
+        fig.savefig(save_fig_path+"kde_reponse_indx_"+str(response_index)+".pdf")
+        plt.close()
+
+
+    # # For debugging python with interactive shell. Start interactive shell.
+    # import code; code.interact(local=locals())
+    # exit(1)
+
+
+    # # Load the percentage of times that the distance to the mean response is higher to data_frame. 
+    # # When the mean is taken within the same training instance (resp_diff_to_average_same_train)
+    # # vs when the mean is the global mean of all responses (resp_diff_to_global_average).
+    # for train_name in tqdm(train_names):        
+    #     for idx_array, idx_df in enumerate(data_frame.loc[data_frame["train_name"] == train_name].index):
+    #         response = data_frame.loc[idx_df, "response"]
+    #         train_seed = data_frame.loc[idx_df, "train_seed"]
+
+    #         average_response = np.apply_along_axis(mean, 0, np.asarray([el for el in data_frame[(data_frame["train_name"] == train_name) & (data_frame["test_name"] == train_name) & (data_frame["train_seed"] != train_seed)]["response"]]))
+    #         global_avg_response = np.apply_along_axis(mean, 0, np.asarray([el for el in data_frame[(data_frame["train_name"] != train_name) | (data_frame["train_seed"] != train_seed)]["response"]]))
+    #         diff_higher_to_global = np.float64(abs(response - global_avg_response) >  abs(response - average_response))
+
+    #         data_frame.at[idx_df, 'diff_higher_to_global'] = diff_higher_to_global
+        
+    #     # # Response of best 
+    #     # median_response = response_list[np.argmax(score_list)]
+
+
+    # Load the percentage of times that the distance to the mean response is higher to data_frame. 
+    # When the mean is taken within the same training instance (resp_diff_to_average_same_train)
+    # vs when the mean is the global mean of all responses (resp_diff_to_global_average).
+    for train_name in tqdm(train_names):        
+        average_response = np.apply_along_axis(mean, 0, np.asarray([el for el in data_frame[data_frame["train_name"] == train_name]["response"]]))
+        global_avg_response = np.apply_along_axis(mean, 0, np.asarray([el for el in data_frame["response"]]))
+        for idx_array, idx_df in enumerate(data_frame.loc[data_frame["train_name"] == train_name].index):
+            response = data_frame.loc[idx_df, "response"]
+            diff_higher_to_global = np.float64(abs(global_avg_response - response) >  abs(global_avg_response - average_response))
+            data_frame.at[idx_df, 'diff_higher_to_global'] = diff_higher_to_global
+        
+        # # Response of best 
+        # median_response = response_list[np.argmax(score_list)]
+    resp_variance = np.var(np.asarray([el for el in data_frame["response"]]), axis=0)
+    print("variance: ", resp_variance)
+
+    percentage_diff_to_global_higher = np.apply_along_axis(sum, 0, data_frame["diff_higher_to_global"] / data_frame.shape[0])
+    # which_xi_selected_in_response = percentage_diff_to_global_higher < 0.45
+    # which_xi_selected_in_response = np.logical_or(percentage_diff_to_global_higher > 0.65, percentage_diff_to_global_higher < 0.35)
+    which_xi_selected_in_response = resp_variance > 1e-3
+
+    print(percentage_diff_to_global_higher,"in problem", transfer_exp)
+    print(which_xi_selected_in_response, "in problem", transfer_exp)
+
+
     median_response_list = []
     for train_name in train_names:        
         sub_df_with_certain_train_instance = data_frame[(data_frame["train_name"] == train_name) & (data_frame["test_name"] == train_name)]
@@ -295,15 +381,18 @@ for idx, input_txt, transfer_exp, save_fig_path in zip(range(len(transfer_exp_li
 
 
         response_list = np.asarray([el for el in sub_df_with_certain_train_instance["response"]])
-        score_list = np.asarray([el for el in sub_df_with_certain_train_instance["score"]])
 
         # # For debugging python with interactive shell. Start interactive shell.
         # import code; code.interact(local=locals())
 
         # Median of all reponses trained in the same problem 
         median_response = np.apply_along_axis(median, 0, response_list)
-        if transfer_exp == "QAP" or transfer_exp == "PERMUPROB":
-            median_response = median_response[:5]
+        average_response = np.apply_along_axis(mean, 0, response_list)
+
+        # the percentage of times that the distance to the mean response is higher, when the mean is taken within the same training instance vs when the mean is the global mean of all responses.
+        
+        # Select only some responses
+        median_response = median_response[:4]
 
         # # Response of best 
         # median_response = response_list[np.argmax(score_list)]
@@ -311,7 +400,7 @@ for idx, input_txt, transfer_exp, save_fig_path in zip(range(len(transfer_exp_li
         median_response_list.append(median_response)
     median_response_list = np.array([np.array(resp) for resp in median_response_list])
     
-    def MDS_2d(response_array):
+    def MDS_2d(response_array_fit, response_array_predict, target_class):
         
         # # MDS
         # m =  len(list_of_responses)
@@ -331,8 +420,15 @@ for idx, input_txt, transfer_exp, save_fig_path in zip(range(len(transfer_exp_li
         # res = embedding.fit_transform(response_array)
 
         # PCA
-        embedding = sklearn.decomposition.PCA(n_components=2)
-        res = embedding.fit_transform(response_array)
+        pca = sklearn.decomposition.PCA(n_components=2)
+        embedding = pca.fit(response_array_predict)
+        res = embedding.transform(response_array_predict)
+
+        # # https://towardsdatascience.com/dimensionality-reduction-approaches-8547c4c44334
+        # # # LDA
+        # lda = LDA(n_components=2)
+        # embedding = lda.fit(response_array_fit, target_class)
+        # res = embedding.transform(response_array_predict)
 
         return res
 
@@ -340,10 +436,10 @@ for idx, input_txt, transfer_exp, save_fig_path in zip(range(len(transfer_exp_li
 
 
 
-    def plot_MDS(list_of_responses, file_name):
+    def plot_MDS(response_array_fit, response_array_predict, target_class, file_name):
 
 
-        df = pd.DataFrame(MDS_2d(list_of_responses))
+        df = pd.DataFrame(MDS_2d(response_array_fit, response_array_predict, target_class))
 
         colors = list(matplotlib.colors.TABLEAU_COLORS)
 
@@ -379,15 +475,22 @@ for idx, input_txt, transfer_exp, save_fig_path in zip(range(len(transfer_exp_li
 
         ax.legend(fontsize=8, markerscale=0.5)
         fig.tight_layout()
-        plt.show()
-        # fig.savefig(file_name)
-        # plt.close()
+        fig.savefig(file_name)
+        plt.close()
 
 
     # icc { 
     #   (train_class,test_class): [    [(train_ins0, test_ins0), (train_ins1, test_ins1), (train_ins2, test_ins2)]    ,     [response_0 , response_1, response_2]    ],  
     #   (train_class,test_class): [    [(train_ins0, test_ins0), (train_ins1, test_ins1), (train_ins2, test_ins2)]    ,     [response_0 , response_1, response_2]    ]...
     # } 
+    avg_response_list = []
+    target_class_list = []
+    for train_name in tqdm(train_names):        
+        for train_seed in data_frame["train_seed"].unique():
+            average_response = np.apply_along_axis(mean, 0, np.asarray([el for el in data_frame[data_frame["train_name"] == train_name]["response"]]))    
+            avg_response_list.append(average_response[:4])
+            target_class_list.append(train_name)
 
 
-    plot_MDS(median_response_list, save_fig_path+"PCA_response"+".pdf")
+
+    plot_MDS(np.asarray(avg_response_list), median_response_list, np.asarray(target_class_list), save_fig_path+"PCA_response"+".pdf")
