@@ -368,7 +368,7 @@ for idx, input_txt, transfer_exp, save_fig_path in zip(range(len(transfer_exp_li
     percentage_diff_to_global_higher = np.apply_along_axis(sum, 0, data_frame["diff_higher_to_global"] / data_frame.shape[0])
     # which_xi_selected_in_response = percentage_diff_to_global_higher < 0.45
     # which_xi_selected_in_response = np.logical_or(percentage_diff_to_global_higher > 0.65, percentage_diff_to_global_higher < 0.35)
-    which_xi_selected_in_response = resp_variance > 1e-3
+    which_xi_selected_in_response = resp_variance < 1e-2
 
     print(percentage_diff_to_global_higher,"in problem", transfer_exp)
     print(which_xi_selected_in_response, "in problem", transfer_exp)
@@ -392,7 +392,7 @@ for idx, input_txt, transfer_exp, save_fig_path in zip(range(len(transfer_exp_li
         # the percentage of times that the distance to the mean response is higher, when the mean is taken within the same training instance vs when the mean is the global mean of all responses.
         
         # Select only some responses
-        median_response = median_response[:4]
+        median_response = average_response[which_xi_selected_in_response]
 
         # # Response of best 
         # median_response = response_list[np.argmax(score_list)]
@@ -413,16 +413,16 @@ for idx, input_txt, transfer_exp, save_fig_path in zip(range(len(transfer_exp_li
         # embedding = sklearn.manifold.MDS(dissimilarity="precomputed", n_components=2, n_init=3, max_iter=500, n_jobs=8)
         # res = np.array(embedding.fit_transform(dist_matrix_dict))
 
-        # # TSNE 
-        # # https://scikit-learn.org/stable/modules/generated/sklearn.manifold.TSNE.html
-        # # https://en.wikipedia.org/wiki/T-distributed_stochastic_neighbor_embedding
-        # embedding = sklearn.manifold.TSNE(n_components=2, perplexity=5, learning_rate='auto', )
-        # res = embedding.fit_transform(response_array)
+        # TSNE 
+        # https://scikit-learn.org/stable/modules/generated/sklearn.manifold.TSNE.html
+        # https://en.wikipedia.org/wiki/T-distributed_stochastic_neighbor_embedding
+        tsne = sklearn.manifold.TSNE(n_components=2, perplexity=5, learning_rate='auto', metric="l1")
+        res = tsne.fit_transform(response_array_predict)
 
-        # PCA
-        pca = sklearn.decomposition.PCA(n_components=2)
-        embedding = pca.fit(response_array_predict)
-        res = embedding.transform(response_array_predict)
+        # # PCA
+        # pca = sklearn.decomposition.PCA(n_components=2)
+        # embedding = pca.fit(response_array_fit)
+        # res = embedding.transform(response_array_predict)
 
         # # https://towardsdatascience.com/dimensionality-reduction-approaches-8547c4c44334
         # # # LDA
@@ -488,9 +488,9 @@ for idx, input_txt, transfer_exp, save_fig_path in zip(range(len(transfer_exp_li
     for train_name in tqdm(train_names):        
         for train_seed in data_frame["train_seed"].unique():
             average_response = np.apply_along_axis(mean, 0, np.asarray([el for el in data_frame[data_frame["train_name"] == train_name]["response"]]))    
-            avg_response_list.append(average_response[:4])
+            avg_response_list.append(average_response[which_xi_selected_in_response])
             target_class_list.append(train_name)
 
 
 
-    plot_MDS(np.asarray(avg_response_list), median_response_list, np.asarray(target_class_list), save_fig_path+"PCA_response"+".pdf")
+    plot_MDS(np.asarray(avg_response_list), median_response_list, np.asarray(target_class_list), save_fig_path+"PCA_response_"+transfer_exp+".pdf")
