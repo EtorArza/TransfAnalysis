@@ -1,26 +1,17 @@
-from audioop import avg
-from csv import list_dialects
 from statistics import mean, variance, stdev, median
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-from seaborn import clustermap
-import seaborn as sns
-import random
-import fnmatch
-import matplotlib
+import matplotlib.colors
 import subprocess
-from sklearn.datasets import make_biclusters
-from sklearn.cluster import SpectralCoclustering
-from sklearn.metrics import consensus_score
-from scipy.cluster.hierarchy import dendrogram, linkage
 import re
 from tqdm import tqdm as tqdm
 import sklearn
 from sklearn.neighbors import KernelDensity
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis as LDA
 from scipy import stats
-
+from sklearn import preprocessing
+from sklearn import manifold
 
 # # Load scores from transferability.
 # import plot_transferability
@@ -363,15 +354,38 @@ for idx, input_txt, transfer_exp, save_fig_path in zip(range(len(transfer_exp_li
         # # Response of best 
         # median_response = response_list[np.argmax(score_list)]
     resp_variance = np.var(np.asarray([el for el in data_frame["response"]]), axis=0)
-    print("variance: ", resp_variance)
+
+
+    avg_response_list = []
+    target_class_list = []
+    same_train_variance_list = []
+    for train_name in tqdm(train_names):
+        responses_in_same_train = []        
+        for train_seed in data_frame["train_seed"].unique():
+            average_response = np.apply_along_axis(mean, 0, np.asarray([el for el in data_frame[(data_frame["train_name"] == train_name) & (data_frame["train_seed"] == train_seed)]["response"]]))    
+            avg_response_list.append(average_response)
+            responses_in_same_train.append(average_response)
+            target_class_list.append(train_name)
+        same_train_variance_list.append(np.var(np.asarray(responses_in_same_train), axis=0))
+
+
+
+
+    resp_variance_same_train = np.mean(np.asarray(same_train_variance_list), axis=0)
+
+    print("Variance response: ", resp_variance)
+    print("Variance response (with same train): ", resp_variance_same_train)
+    print("Proportion variance: variance response / Variance response (with same train)", resp_variance / resp_variance_same_train)
+
+
 
     percentage_diff_to_global_higher = np.apply_along_axis(sum, 0, data_frame["diff_higher_to_global"] / data_frame.shape[0])
     # which_xi_selected_in_response = percentage_diff_to_global_higher < 0.45
     # which_xi_selected_in_response = np.logical_or(percentage_diff_to_global_higher > 0.65, percentage_diff_to_global_higher < 0.35)
-    which_xi_selected_in_response = resp_variance < 1e-2
+    which_xi_selected_in_response = np.array([True]*resp_variance_same_train.shape[0])
 
-    print(percentage_diff_to_global_higher,"in problem", transfer_exp)
-    print(which_xi_selected_in_response, "in problem", transfer_exp)
+    print("percentage_diff_to_global_higher: ", percentage_diff_to_global_higher,"in problem", transfer_exp)
+    print("which_xi_selected_in_response: ", which_xi_selected_in_response, "in problem", transfer_exp)
 
 
     median_response_list = []
@@ -382,8 +396,6 @@ for idx, input_txt, transfer_exp, save_fig_path in zip(range(len(transfer_exp_li
 
         response_list = np.asarray([el for el in sub_df_with_certain_train_instance["response"]])
 
-        # # For debugging python with interactive shell. Start interactive shell.
-        # import code; code.interact(local=locals())
 
         # Median of all reponses trained in the same problem 
         median_response = np.apply_along_axis(median, 0, response_list)
@@ -403,32 +415,31 @@ for idx, input_txt, transfer_exp, save_fig_path in zip(range(len(transfer_exp_li
     def MDS_2d(response_array_fit, response_array_predict, target_class):
         
         # # MDS
-        # m =  len(list_of_responses)
-        # n =  len(list_of_responses[0])
+        # m =  response_array_predict.shape[0]
         # dist_matrix_dict = np.zeros((m,m))
         # for i in range(m):
         #     for j in range(m):
         #         # dist_matrix_dict[i,j] = np.log(1 + hamming_dist(pop[i], pop[j])) / np.log(1+ n)
-        #         dist_matrix_dict[i,j] = L1_distance_between_responses(list_of_responses[i], list_of_responses[j])
+        #         dist_matrix_dict[i,j] = L1_distance_between_responses(response_array_predict[i], response_array_predict[j])
         # embedding = sklearn.manifold.MDS(dissimilarity="precomputed", n_components=2, n_init=3, max_iter=500, n_jobs=8)
         # res = np.array(embedding.fit_transform(dist_matrix_dict))
 
-        # TSNE 
-        # https://scikit-learn.org/stable/modules/generated/sklearn.manifold.TSNE.html
-        # https://en.wikipedia.org/wiki/T-distributed_stochastic_neighbor_embedding
-        tsne = sklearn.manifold.TSNE(n_components=2, perplexity=5, learning_rate='auto', metric="l1")
-        res = tsne.fit_transform(response_array_predict)
+        # # TSNE 
+        # # https://scikit-learn.org/stable/modules/generated/sklearn.manifold.TSNE.html
+        # # https://en.wikipedia.org/wiki/T-distributed_stochastic_neighbor_embedding
+        # tsne = sklearn.manifold.TSNE(n_components=2, perplexity=5, learning_rate='auto', metric="l1")
+        # res = tsne.fit_transform(response_array_predict)
 
         # # PCA
         # pca = sklearn.decomposition.PCA(n_components=2)
         # embedding = pca.fit(response_array_fit)
         # res = embedding.transform(response_array_predict)
 
-        # # https://towardsdatascience.com/dimensionality-reduction-approaches-8547c4c44334
-        # # # LDA
-        # lda = LDA(n_components=2)
-        # embedding = lda.fit(response_array_fit, target_class)
-        # res = embedding.transform(response_array_predict)
+        # https://towardsdatascience.com/dimensionality-reduction-approaches-8547c4c44334
+        # # LDA
+        lda = LDA(n_components=2)
+        embedding = lda.fit(response_array_fit, target_class)
+        res = embedding.transform(response_array_predict)
 
         return res
 
@@ -478,19 +489,16 @@ for idx, input_txt, transfer_exp, save_fig_path in zip(range(len(transfer_exp_li
         fig.savefig(file_name)
         plt.close()
 
+    # response_array_fit = preprocessing.normalize(np.asarray([el[which_xi_selected_in_response] for el in avg_response_list]))
+    # response_array_predict = preprocessing.normalize(median_response_list)
 
-    # icc { 
-    #   (train_class,test_class): [    [(train_ins0, test_ins0), (train_ins1, test_ins1), (train_ins2, test_ins2)]    ,     [response_0 , response_1, response_2]    ],  
-    #   (train_class,test_class): [    [(train_ins0, test_ins0), (train_ins1, test_ins1), (train_ins2, test_ins2)]    ,     [response_0 , response_1, response_2]    ]...
-    # } 
-    avg_response_list = []
-    target_class_list = []
-    for train_name in tqdm(train_names):        
-        for train_seed in data_frame["train_seed"].unique():
-            average_response = np.apply_along_axis(mean, 0, np.asarray([el for el in data_frame[data_frame["train_name"] == train_name]["response"]]))    
-            avg_response_list.append(average_response[which_xi_selected_in_response])
-            target_class_list.append(train_name)
+    response_array_fit = np.asarray([el[which_xi_selected_in_response] for el in avg_response_list])
+    response_array_predict = median_response_list
 
 
 
-    plot_MDS(np.asarray(avg_response_list), median_response_list, np.asarray(target_class_list), save_fig_path+"PCA_response_"+transfer_exp+".pdf")
+    # # # For debugging python with interactive shell. Start interactive shell.
+    # import code
+    # code.interact(local=locals())
+
+    plot_MDS(response_array_fit, response_array_predict, np.asarray(target_class_list), save_fig_path+"PCA_response_"+transfer_exp+".pdf")
