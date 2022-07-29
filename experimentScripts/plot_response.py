@@ -340,7 +340,6 @@ for idx, input_txt, transfer_exp, save_fig_path in zip(range(len(transfer_exp_li
         sub_df_with_certain_train_instance = data_frame[(data_frame["train_name"] == train_name)]
 
         response_list = np.asarray([el for el in sub_df_with_certain_train_instance["response"]])
-        # Median of all reponses trained in the same problem 
         median_response = np.apply_along_axis(median, 0, response_list)
         average_response = np.apply_along_axis(mean, 0, response_list)
 
@@ -389,30 +388,45 @@ for idx, input_txt, transfer_exp, save_fig_path in zip(range(len(transfer_exp_li
         df = pd.DataFrame(MDS_2d(response_array_fit, response_array_predict, target_class))
 
         colors = list(matplotlib.colors.TABLEAU_COLORS)
+        markers = ["o", "x", "^", "1"]
 
         
-        fig, ax = plt.subplots()
+        fig, ax = plt.subplots(figsize=(4.5, 3))
 
-
+        used_labels = set()
         for idx, train_instance in enumerate(train_names):
             xi = np.array(df.iloc[idx,0])
             yi = np.array(df.iloc[idx,1])
             if transfer_exp == "QAP":
-                color_index = 0 if train_instance[0] == "A" else (1 if train_instance[0] == "B" else (2 if train_instance[0] == "C" else None)) 
+                color_index = {"A":0, "B":1, "C":2}[train_instance[0]]
+                label = ["Taiaxx", "Taibxx", "Sko"][color_index]
+
             elif transfer_exp == "PERMUPROB":
-                color_index = 0 if ".tsp" in train_instance else (1 if ".lop" in train_instance else (2 if ".pfsp" in train_instance else (3 if ".qap" in train_instance else None))) 
+                if ".tsp" in train_instance:
+                    color_index = 0
+                elif ".lop" in train_instance:
+                    color_index = 1
+                elif ".pfsp" in train_instance:
+                    color_index = 2
+                elif ".qap" in train_instance:
+                    color_index = 3
+                label = ["TSP", "LOP", "PFSP", "QAP"][color_index]
+
             elif transfer_exp == "Transfer16OnlyOne":
                 color_index = 0 if train_instance in ("_6_", "_11_", "_2_", "_1_", "_5_") else (1 if train_instance in ("_8_", "_7_", "_4_", "_3_") else (2 if train_instance in ("_9_", "_10_", "_12_") else None)) 
+                label = "Cluster " + str(color_index+1)
             else:
                 raise ValueError("transfer_exp=", transfer_exp, "not supported.")
             ci = colors[color_index] #color for ith feature 
-            ax.annotate(train_instance, (xi, yi), fontsize='x-small')
+            ma = markers[color_index]
+            # ax.annotate(train_instance, (xi, yi), fontsize='x-small')
 
+            if label not in used_labels:
+                used_labels.add(label)
+            else:        
+                label = None
 
-            
-            label = None
-
-            ax.scatter(xi,yi,marker=",", color=ci, label=label)
+            ax.scatter(xi,yi,marker=ma, color=ci, label=label)
 
         # for idx, t_class in enumerate(trained_classes):
         #     label = str("A = " + t_class)
@@ -420,7 +434,7 @@ for idx, input_txt, transfer_exp, save_fig_path in zip(range(len(transfer_exp_li
 
 
 
-        ax.legend(fontsize=8, markerscale=0.5)
+        ax.legend(fontsize=8, markerscale=1.0)
         fig.tight_layout()
         fig.savefig(file_name)
         plt.close()
