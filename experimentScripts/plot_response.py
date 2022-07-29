@@ -321,96 +321,32 @@ for idx, input_txt, transfer_exp, save_fig_path in zip(range(len(transfer_exp_li
     # import code; code.interact(local=locals())
     # exit(1)
 
-
-    # # Load the percentage of times that the distance to the mean response is higher to data_frame. 
-    # # When the mean is taken within the same training instance (resp_diff_to_average_same_train)
-    # # vs when the mean is the global mean of all responses (resp_diff_to_global_average).
-    # for train_name in tqdm(train_names):        
-    #     for idx_array, idx_df in enumerate(data_frame.loc[data_frame["train_name"] == train_name].index):
-    #         response = data_frame.loc[idx_df, "response"]
-    #         train_seed = data_frame.loc[idx_df, "train_seed"]
-
-    #         average_response = np.apply_along_axis(mean, 0, np.asarray([el for el in data_frame[(data_frame["train_name"] == train_name) & (data_frame["test_name"] == train_name) & (data_frame["train_seed"] != train_seed)]["response"]]))
-    #         global_avg_response = np.apply_along_axis(mean, 0, np.asarray([el for el in data_frame[(data_frame["train_name"] != train_name) | (data_frame["train_seed"] != train_seed)]["response"]]))
-    #         diff_higher_to_global = np.float64(abs(response - global_avg_response) >  abs(response - average_response))
-
-    #         data_frame.at[idx_df, 'diff_higher_to_global'] = diff_higher_to_global
-        
-    #     # # Response of best 
-    #     # median_response = response_list[np.argmax(score_list)]
-
-
-    # Load the percentage of times that the distance to the mean response is higher to data_frame. 
-    # When the mean is taken within the same training instance (resp_diff_to_average_same_train)
-    # vs when the mean is the global mean of all responses (resp_diff_to_global_average).
-    for train_name in tqdm(train_names):        
-        average_response = np.apply_along_axis(mean, 0, np.asarray([el for el in data_frame[data_frame["train_name"] == train_name]["response"]]))
-        global_avg_response = np.apply_along_axis(mean, 0, np.asarray([el for el in data_frame["response"]]))
-        for idx_array, idx_df in enumerate(data_frame.loc[data_frame["train_name"] == train_name].index):
-            response = data_frame.loc[idx_df, "response"]
-            diff_higher_to_global = np.float64(abs(global_avg_response - response) >  abs(global_avg_response - average_response))
-            data_frame.at[idx_df, 'diff_higher_to_global'] = diff_higher_to_global
-        
-        # # Response of best 
-        # median_response = response_list[np.argmax(score_list)]
-    resp_variance = np.var(np.asarray([el for el in data_frame["response"]]), axis=0)
-
-
-    avg_response_list = []
+    # Get responses averaged per train and seed
+    response_list_averaged_per_train_instance_and_seed = []
     target_class_list = []
     same_train_variance_list = []
     for train_name in tqdm(train_names):
         responses_in_same_train = []        
         for train_seed in data_frame["train_seed"].unique():
             average_response = np.apply_along_axis(mean, 0, np.asarray([el for el in data_frame[(data_frame["train_name"] == train_name) & (data_frame["train_seed"] == train_seed)]["response"]]))    
-            avg_response_list.append(average_response)
+            response_list_averaged_per_train_instance_and_seed.append(average_response)
             responses_in_same_train.append(average_response)
             target_class_list.append(train_name)
         same_train_variance_list.append(np.var(np.asarray(responses_in_same_train), axis=0))
 
-
-
-
-    resp_variance_same_train = np.mean(np.asarray(same_train_variance_list), axis=0)
-
-    print("Variance response: ", resp_variance)
-    print("Variance response (with same train): ", resp_variance_same_train)
-    print("Proportion variance: variance response / Variance response (with same train)", resp_variance / resp_variance_same_train)
-
-
-
-    percentage_diff_to_global_higher = np.apply_along_axis(sum, 0, data_frame["diff_higher_to_global"] / data_frame.shape[0])
-    # which_xi_selected_in_response = percentage_diff_to_global_higher < 0.45
-    # which_xi_selected_in_response = np.logical_or(percentage_diff_to_global_higher > 0.65, percentage_diff_to_global_higher < 0.35)
-    which_xi_selected_in_response = np.array([True]*resp_variance_same_train.shape[0])
-
-    print("percentage_diff_to_global_higher: ", percentage_diff_to_global_higher,"in problem", transfer_exp)
-    print("which_xi_selected_in_response: ", which_xi_selected_in_response, "in problem", transfer_exp)
-
-
-    median_response_list = []
-    for train_name in train_names:        
-        sub_df_with_certain_train_instance = data_frame[(data_frame["train_name"] == train_name) & (data_frame["test_name"] == train_name)]
-        
-
+    # Get responses averaged per train
+    response_list_averaged_per_train_instance = []
+    for train_name in train_names:
+        sub_df_with_certain_train_instance = data_frame[(data_frame["train_name"] == train_name)]
 
         response_list = np.asarray([el for el in sub_df_with_certain_train_instance["response"]])
-
-
         # Median of all reponses trained in the same problem 
         median_response = np.apply_along_axis(median, 0, response_list)
         average_response = np.apply_along_axis(mean, 0, response_list)
 
-        # the percentage of times that the distance to the mean response is higher, when the mean is taken within the same training instance vs when the mean is the global mean of all responses.
-        
-        # Select only some responses
-        median_response = average_response[which_xi_selected_in_response]
 
-        # # Response of best 
-        # median_response = response_list[np.argmax(score_list)]
-
-        median_response_list.append(median_response)
-    median_response_list = np.array([np.array(resp) for resp in median_response_list])
+        response_list_averaged_per_train_instance.append(average_response)
+    response_list_averaged_per_train_instance = np.array([np.array(resp) for resp in response_list_averaged_per_train_instance])
     
     def MDS_2d(response_array_fit, response_array_predict, target_class):
         
@@ -489,11 +425,11 @@ for idx, input_txt, transfer_exp, save_fig_path in zip(range(len(transfer_exp_li
         fig.savefig(file_name)
         plt.close()
 
-    # response_array_fit = preprocessing.normalize(np.asarray([el[which_xi_selected_in_response] for el in avg_response_list]))
-    # response_array_predict = preprocessing.normalize(median_response_list)
+    # response_array_fit = preprocessing.normalize(np.asarray([el[which_xi_selected_in_response] for el in response_list_averaged_per_train_instance_and_seed]))
+    # response_array_predict = preprocessing.normalize(response_list_averaged_per_train_instance)
 
-    response_array_fit = np.asarray([el[which_xi_selected_in_response] for el in avg_response_list])
-    response_array_predict = median_response_list
+    response_array_fit = np.asarray([el for el in response_list_averaged_per_train_instance_and_seed])
+    response_array_predict = response_list_averaged_per_train_instance
 
 
 
