@@ -8,14 +8,13 @@ subprocess.run(f"mkdir -p {result_file_path}",shell=True)
 
 # rm log.txt -f && cd ~/Dropbox/BCAM/02_NEAT_transferability/code/NEAT_code/ && make &&  cd .. && rsync -av --exclude=".*" NEAT_code /dev/shm/ && cd /dev/shm/NEAT_code && python experimentScripts/visualize_network_response_change.py
 
-SOLVER_POPSIZE=10
-MAX_SOLVER_FE=1000
-N_EVALS=20
-N_EVALS_TEST=100
+SOLVER_POPSIZE=8
+MAX_SOLVER_FE=400
+N_EVALS=2000
 PROBLEM_DIM=20
 THREADS=1
 
-
+PROBLEM_INDEX=1
 
 
 def read_matrices(file_path):
@@ -54,10 +53,10 @@ def plot_from_detailed_response(savefile_prefix):
         plt.plot(np.array(range(1, data.shape[0]+1)), data[:,1], label="GBest")
         plt.plot(np.array(range(1, data.shape[0]+1)), data[:,2], label="LBest")
         plt.xlabel(x_label)
-        plt.ylim((np.min(data), np.max(data)))
+        plt.ylim((-2.1,2.1))
         plt.legend()
         plt.tight_layout()
-        plt.savefig(result_file_path + savefile_prefix + "_" + x_label + "_detailedoutput.pdf")
+        plt.savefig(result_file_path + savefile_prefix + "_" + x_label.replace(" ", "_") + "_detailedoutput.pdf")
         plt.close()
 
 
@@ -109,9 +108,7 @@ def run_with_controller_continuous(PROBLEM_INDEX, CONTROLLER_PATH, PRINT_POSITIO
 
 if __name__ == "__main__":
     
-    controller_path = "experimentResults/transfer_16_continuous_problems/controllers/top_controllers/TrainOnlyInF_1_best.controller"
-    PROBLEM_INDEX = 1
-
+    controller_path = f"experimentResults/transfer_16_continuous_problems/controllers/top_controllers/TrainOnlyInF_{PROBLEM_INDEX}_seed2_best.controller"
     run_with_controller_continuous(PROBLEM_INDEX, controller_path)
-    plot_from_detailed_response(f"problem_{PROBLEM_INDEX}")
+    plot_from_detailed_response(f"problem_{PROBLEM_INDEX}_popsize_{SOLVER_POPSIZE}_maxsolverfe_{MAX_SOLVER_FE}")
     subprocess.run("rm -f responses.txt",shell=True)    
