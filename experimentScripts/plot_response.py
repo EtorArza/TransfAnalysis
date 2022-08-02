@@ -1,4 +1,5 @@
 from statistics import mean, variance, stdev, median
+from joblib import PrintTime
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -347,7 +348,7 @@ for idx, input_txt, transfer_exp, save_fig_path in zip(range(len(transfer_exp_li
         response_list_averaged_per_train_instance.append(average_response)
     response_list_averaged_per_train_instance = np.array([np.array(resp) for resp in response_list_averaged_per_train_instance])
     
-    def MDS_2d(response_array_fit, response_array_predict, target_class):
+    def MDS_2d(response_array_fit, response_array_predict, target_class, method):
         
         # # MDS
         # m =  response_array_predict.shape[0]
@@ -365,27 +366,28 @@ for idx, input_txt, transfer_exp, save_fig_path in zip(range(len(transfer_exp_li
         # tsne = sklearn.manifold.TSNE(n_components=2, perplexity=5, learning_rate='auto', metric="l1")
         # res = tsne.fit_transform(response_array_predict)
 
-        # # PCA
-        # pca = sklearn.decomposition.PCA(n_components=2)
-        # embedding = pca.fit(response_array_fit)
-        # res = embedding.transform(response_array_predict)
+        if method == "PCA":
+            pca = sklearn.decomposition.PCA(n_components=2)
+            embedding = pca.fit(response_array_fit)
+            res = embedding.transform(response_array_predict)
 
-        # https://towardsdatascience.com/dimensionality-reduction-approaches-8547c4c44334
-        # # LDA
-        lda = LDA(n_components=2)
-        embedding = lda.fit(response_array_fit, target_class)
-        res = embedding.transform(response_array_predict)
-
+        elif method == "LDA":
+            # https://towardsdatascience.com/dimensionality-reduction-approaches-8547c4c44334
+            lda = LDA(n_components=2)
+            embedding = lda.fit(response_array_fit, target_class)
+            res = embedding.transform(response_array_predict)
+        else:
+            raise ValueError(f"Method {method} not recognized.")
         return res
 
 
 
 
 
-    def plot_MDS(response_array_fit, response_array_predict, target_class, file_name):
+    def plot_MDS(response_array_fit, response_array_predict, target_class, file_name, method):
 
 
-        df = pd.DataFrame(MDS_2d(response_array_fit, response_array_predict, target_class))
+        df = pd.DataFrame(MDS_2d(response_array_fit, response_array_predict, target_class, method))
 
         colors = list(matplotlib.colors.TABLEAU_COLORS)
         markers = ["o", "x", "^", "1"]
@@ -416,21 +418,19 @@ for idx, input_txt, transfer_exp, save_fig_path in zip(range(len(transfer_exp_li
                 color_index = 0 if train_instance in ("_6_", "_11_", "_2_", "_1_", "_5_") else (1 if train_instance in ("_8_", "_7_", "_4_", "_3_") else (2 if train_instance in ("_9_", "_10_", "_12_") else None)) 
                 label = "Cluster " + str(color_index+1)
             else:
-                raise ValueError("transfer_exp=", transfer_exp, "not supported.")
+
+                color_index = 0
+                label = None
+                ax.annotate(train_instance, (xi, yi), fontsize='x-small')
             ci = colors[color_index] #color for ith feature 
             ma = markers[color_index]
-            # ax.annotate(train_instance, (xi, yi), fontsize='x-small')
-
+                
             if label not in used_labels:
                 used_labels.add(label)
             else:        
                 label = None
 
             ax.scatter(xi,yi,marker=ma, color=ci, label=label)
-
-        # for idx, t_class in enumerate(trained_classes):
-        #     label = str("A = " + t_class)
-        #     ax.scatter([],[], marker=",", color=colors[idx], label=label)
 
 
 
@@ -451,4 +451,7 @@ for idx, input_txt, transfer_exp, save_fig_path in zip(range(len(transfer_exp_li
     # import code
     # code.interact(local=locals())
 
-    plot_MDS(response_array_fit, response_array_predict, np.asarray(target_class_list), save_fig_path+"PCA_response_"+transfer_exp+".pdf")
+    plot_MDS(response_array_predict, response_array_predict, np.asarray(target_class_list), save_fig_path+"PCA_only_predict_response_"+transfer_exp+".pdf", method="PCA")
+    plot_MDS(response_array_fit, response_array_predict, np.asarray(target_class_list), save_fig_path+"PCA_fit_and_predict_response_"+transfer_exp+".pdf", method="PCA")
+    # plot_MDS(response_array_predict, response_array_predict, np.asarray(train_names), save_fig_path+"LDA_only_predict_response_"+transfer_exp+".pdf", method="LDA")
+    plot_MDS(response_array_fit, response_array_predict, np.asarray(target_class_list), save_fig_path+"LDA_fit_and_predict_response_"+transfer_exp+".pdf", method="LDA")
