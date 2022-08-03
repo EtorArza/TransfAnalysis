@@ -3,7 +3,8 @@ from matplotlib import pyplot as plt
 import subprocess
 
 
-result_file_path = "experimentResults/visualize_network_response_change/"
+result_file_path = "experimentResults/visualize_network_response_change/figures"
+controller_path_folder = "experimentResults/visualize_network_response_change/controllers/top_controllers"
 subprocess.run(f"mkdir -p {result_file_path}",shell=True)
 
 # rm log.txt -f && cd ~/Dropbox/BCAM/02_NEAT_transferability/code/NEAT_code/ && make &&  cd .. && rsync -av --exclude=".*" NEAT_code /dev/shm/ && cd /dev/shm/NEAT_code && python experimentScripts/visualize_network_response_change.py
@@ -56,12 +57,11 @@ def plot_from_detailed_response(savefile_prefix):
         plt.ylim((-2.1,2.1))
         plt.legend()
         plt.tight_layout()
-        plt.savefig(result_file_path + savefile_prefix + "_" + x_label.replace(" ", "_") + "_detailedoutput.pdf")
+        plt.savefig(result_file_path + "/" + savefile_prefix + "_" + x_label.replace(" ", "_") + "_detailedoutput.pdf")
         plt.close()
 
 
 def write_conf_file_continuous(PROBLEM_INDEX,CONTROLLER_PATH, PRINT_POSITIONS):
-
     tmp_ini_file_string = f"""
 [Global] 
 mode = test
@@ -108,7 +108,14 @@ def run_with_controller_continuous(PROBLEM_INDEX, CONTROLLER_PATH, PRINT_POSITIO
 
 if __name__ == "__main__":
     
-    controller_path = f"experimentResults/transfer_16_continuous_problems/controllers/top_controllers/TrainOnlyInF_{PROBLEM_INDEX}_seed2_best.controller"
-    run_with_controller_continuous(PROBLEM_INDEX, controller_path)
-    plot_from_detailed_response(f"problem_{PROBLEM_INDEX}_popsize_{SOLVER_POPSIZE}_maxsolverfe_{MAX_SOLVER_FE}")
-    subprocess.run("rm -f responses.txt",shell=True)    
+    import os
+    controller_filename_list = [f for f in os.listdir("./"+controller_path_folder)]
+    for controller_name in controller_filename_list:
+        controller_path = controller_path_folder + "/" + controller_name
+        MAX_SOLVER_FE = int(controller_name.split("MAXSOLVERFE_")[-1].split("_")[0])
+        SOLVER_POPSIZE = int(controller_name.split("SOLVERPOPSIZE_")[-1].split("_")[0])
+        run_with_controller_continuous(PROBLEM_INDEX, controller_path)
+        plot_from_detailed_response(f"problem_{PROBLEM_INDEX}_popsize_{SOLVER_POPSIZE}_maxsolverfe_{MAX_SOLVER_FE}")
+        subprocess.run("rm -f responses.txt",shell=True)
+        subprocess.run("rm -f responses.txt",shell=True)    
+        subprocess.run("rm -f responses.txt",shell=True)
