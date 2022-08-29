@@ -279,7 +279,9 @@ for input_txt, transfer_exp, save_fig_path in zip(txt_paths, transfer_exp_list, 
             if transfer_exp == "Transfer16OnlyOne":
                 return "$A_{"+x.strip("_") + "}$"
             elif transfer_exp == "QAP":
-                return x.split("_")[0]
+                name = x.split("_")[0]
+                new_name = name[0] + str(["A","B","C"].index(name[0]) * 7 + int(name[1]))
+                return new_name
             else:
                 return x.strip("_")
 
