@@ -140,7 +140,7 @@ namespace NEAT {
                 
                 gen++;
                 cout << "\n ---- \n\n";
-                cout << "Gen " << gen-1 << " / " << neat_params->MAX_TRAIN_ITERATIONS << ", progress: " << progress << endl;	
+                cout << "Gen " << gen-1 << " / " << neat_params->MAX_TRAIN_ITERATIONS << "\n";
                 #ifdef HIPATIA
                 cout << "Time left:" << ((double) neat_params->MAX_TRAIN_TIME - get_runtime_hipatia()) / 60.0 / 60.0 << "h" << endl;
                 #else
