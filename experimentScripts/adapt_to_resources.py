@@ -4,20 +4,16 @@ import subprocess
 from tqdm import tqdm as tqdm
 import pandas as pd
 
-result_file_path = "experimentResults/visualize_network_response_change/figures"
-controller_path_folder = "experimentResults/visualize_network_response_change/controllers/top_controllers"
-res_csv_file = "experimentResults/visualize_network_response_change/comparison_diff_params.csv"
+result_file_path = "experimentResults/adapt_to_resources/figures"
+controller_path_folder = "experimentResults/adapt_to_resources/controllers/top_controllers"
+res_csv_file = "experimentResults/adapt_to_resources/comparison_diff_params.csv"
 subprocess.run(f"mkdir -p {result_file_path}",shell=True)
 
-# rm log.txt -f && cd ~/Dropbox/BCAM/02_NEAT_transferability/code/NEAT_code/ && make &&  cd .. && rsync -av --exclude=".*" NEAT_code /dev/shm/ && cd /dev/shm/NEAT_code && python experimentScripts/visualize_network_response_change.py
+# rm log.txt -f && cd ~/Dropbox/BCAM/02_NEAT_transferability/code/NEAT_code/ && make &&  cd .. && rsync -av --exclude=".*" NEAT_code /dev/shm/ && cd /dev/shm/NEAT_code && python experimentScripts/adapt_to_resources.py
 
-SOLVER_POPSIZE=8
-MAX_SOLVER_FE=400
+SOLVER_POPSIZE=16
 N_EVALS=2000
-PROBLEM_DIM=20
-THREADS=1
-
-PROBLEM_INDEX=1
+PROBLEM_DIM=12
 
 
 def read_matrices(file_path):
@@ -114,23 +110,14 @@ if __name__ == "__main__":
     controller_filename_list = [f for f in os.listdir("./"+controller_path_folder)]
     print("Instance list:\n", "\n".join(controller_filename_list))
 
-    for controller_name in tqdm(controller_filename_list):
-        controller_path = controller_path_folder + "/" + controller_name
-        solver_popsize = int(controller_name.split("SOLVERPOPSIZE_")[-1].split("_")[0])
-        max_solver_fe = int(controller_name.split("MAXSOLVERFE_")[-1].split("_")[0])
-        run_with_controller_continuous(PROBLEM_INDEX, solver_popsize, max_solver_fe, controller_path)
-        plot_from_detailed_response(f"problem_{PROBLEM_INDEX}_popsize_{SOLVER_POPSIZE}_maxsolverfe_{MAX_SOLVER_FE}")
-        subprocess.run("rm -f responses.txt",shell=True)
-        subprocess.run("rm -f responses.txt",shell=True)    
-        subprocess.run("rm -f responses.txt",shell=True)
     
     df = pd.DataFrame()
     for i in tqdm(range(8)):
-        max_solver_fe_controller = [400, 6400, 400, 6400, 1600, 1600, 1600, 1600][i]
-        max_solver_fe_problem =    [400, 400, 6400, 6400, 1600, 1600, 1600, 1600][i]
-        popsize_controller =       [16, 16, 16, 16, 8, 128,8, 128][i]
-        popsize_problem =          [16, 16, 16, 16, 8, 8, 128, 128][i]
-        controller_name = f"TrainOnlyInF_1_seed2_MAXSOLVERFE_{max_solver_fe_controller}_SOLVERPOPSIZE_{popsize_controller}_best.controller"
+        max_solver_fe_controller = [400, 6400, 400, 6400, ][i]
+        max_solver_fe_problem =    [400, 400, 6400, 6400, ][i]
+        popsize_controller =       [16, 16, 16, 16,       ][i]
+        popsize_problem =          [16, 16, 16, 16,       ][i]
+        controller_name = f"TrainOnlyInF_1_seed2_MAXSOLVERFE_{max_solver_fe_controller}_best.controller"
         controller_path = controller_path_folder + "/" + controller_name
         for problem_index in range(1,13):
             score = run_with_controller_continuous(problem_index, popsize_problem, max_solver_fe_problem, controller_path)

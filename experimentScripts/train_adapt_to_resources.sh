@@ -8,36 +8,35 @@ EXPERIMENT_RESULT_FOLDER_NAME="/workspace/scratch/jobs/earza/${PWD##*/}"
 echo "Results saved on: $EXPERIMENT_RESULT_FOLDER_NAME"
 
 
-TEST_RESULT_FOLDER_NAME="$EXPERIMENT_RESULT_FOLDER_NAME/experimentResults/visualize_network_response_change/results"
-EXPERIMENT_CONTROLLER_FOLDER_NAME="$EXPERIMENT_RESULT_FOLDER_NAME/experimentResults/visualize_network_response_change/controllers"
+TEST_RESULT_FOLDER_NAME="$EXPERIMENT_RESULT_FOLDER_NAME/experimentResults/adapt_to_resources/results"
+EXPERIMENT_CONTROLLER_FOLDER_NAME="$EXPERIMENT_RESULT_FOLDER_NAME/experimentResults/adapt_to_resources/controllers"
 LOG_DIR="$EXPERIMENT_RESULT_FOLDER_NAME/logs"
 SCORE_PATH="$TEST_RESULT_FOLDER_NAME/score.txt"
 RESPONSE_PATH="$TEST_RESULT_FOLDER_NAME/response.txt"
 TMP_RES_PATH=$EXPERIMENT_RESULT_FOLDER_NAME/"tmp"/$(dirname ${SCORE_PATH})
+INSTANCES_PATH="$EXPERIMENT_RESULT_FOLDER_NAME/instances"
+
 
 mkdir -p $TEST_RESULT_FOLDER_NAME
 mkdir -p $EXPERIMENT_CONTROLLER_FOLDER_NAME
 mkdir -p $LOG_DIR
 mkdir -p $TMP_RES_PATH
 
+cp -f -r -v "src/experiments/permus/instances/" "$INSTANCES_PATH/"
+
+
 COMPILE_JOB_ID=`sbatch --parsable --exclude=n[001-004] --export=LOG_DIR=${LOG_DIR} scripts/make_hip.sh`
 
 SRCDIR=`pwd`
 
 
-
-
-
-
 NEAT_POPSIZE=1000
-MAX_TRAIN_ITERATIONS=1000
+MAX_TRAIN_ITERATIONS=2000
 MAX_TRAIN_TIME=345600
 FULL_MODEL="false"
 DIM=20
-
-
-SOLVER_POPSIZE_ARRAY=(8   32   128  16  16   16)
-MAX_SOLVER_FE_ARRAY=(1600 1600 1600 400 1600 6400)
+SOLVER_POPSIZE=8
+MAX_SOLVER_FE_ARRAY=(400 6400)
 
 
 
@@ -48,9 +47,9 @@ dim_list=`python -c "print([${DIM}]*12);"`
 
 
 
-# Train in one
+# Continuous
 train_seed=2
-for param_index in 0 1 2 3 4 5 6 7; do
+for param_index in 0 1; do
     j=-1
     CONTROLLER_NAME_PREFIX_ARRAY=()
     SEED_ARRAY=()
@@ -63,11 +62,10 @@ for param_index in 0 1 2 3 4 5 6 7; do
 
 
 
-        SOLVER_POPSIZE="${SOLVER_POPSIZE_ARRAY[param_index]}"
         MAX_SOLVER_FE="${MAX_SOLVER_FE_ARRAY[param_index]}"
 
 
-        CONTROLLER_NAME_PREFIX_ARRAY+=("TrainOnlyInF_${instance_index}_seed${train_seed}_MAXSOLVERFE_${MAX_SOLVER_FE}_SOLVERPOPSIZE_${SOLVER_POPSIZE}")
+        CONTROLLER_NAME_PREFIX_ARRAY+=("TrainOnlyInF_${instance_index}_seed${train_seed}_MAXSOLVERFE_${MAX_SOLVER_FE}")
         SEED_ARRAY+=("${train_seed}")
         COMMA_SEPARATED_PROBLEM_INDEX_LIST_ARRAY+=(`python -c "print(${instance_list}[${j}])"`)
         COMMA_SEPARATED_PROBLEM_DIM_LIST_ARRAY+=(`python -c "print(${dim_list}[${j}])"`)
@@ -90,18 +88,37 @@ for param_index in 0 1 2 3 4 5 6 7; do
 done
 
 
-# # train in all
-# for FULL_MODEL_WHICH in "${FULL_MODEL}"; do
 
-# i=$((i+1))
-# CONTROLLER_NAME_PREFIX_ARRAY+=("trained_with_all_problems_${FULL_MODEL_WHICH}")
-# SEED_ARRAY+=("${SEED}")
-# COMMA_SEPARATED_PROBLEM_INDEX_LIST_ARRAY+=(`python -c "a = ${instance_list}; a = [str(el) for el in a]; print('s_e_p'.join(a))"`)
-# COMMA_SEPARATED_PROBLEM_DIM_LIST_ARRAY+=(`python -c "a = ${dim_list}; a = [str(el) for el in a]; print('s_e_p'.join(a))"`)
-# FULL_MODEL_ARRAY+=("${FULL_MODEL_WHICH}")
 
-# done
 
+# Permus
+train_seed=2
+PROBLEM_TYPE="tsp"
+PROBLEM_PATH="$INSTANCES_PATH/transfer_permuproblems/tsp/ch130.tsp"
+
+for param_index in 0 1; do
+    i=0
+    PROBLEM_TYPE_ARRAY=()
+    CONTROLLER_NAME_PREFIX_ARRAY=()
+    SEED_ARRAY=()
+    
+    PROBLEM_TYPE_ARRAY+=("${PROBLEM_TYPE}")
+    COMMA_SEPARATED_LIST_OF_INSTANCE_PATHS_ARRAY+=("${PROBLEM_PATH}")
+    CONTROLLER_NAME_PREFIX_ARRAY+=("Permus_seed${train_seed}_MAXSOLVERFE_${MAX_SOLVER_FE}")
+    SEED_ARRAY+=("${train_seed}")
+    MAX_SOLVER_FE="${MAX_SOLVER_FE_ARRAY[param_index]}"
+
+
+    SEED_ARRAY=$(to_list "${SEED_ARRAY[@]}")
+    PROBLEM_TYPE_ARRAY=$(to_list "${PROBLEM_TYPE_ARRAY[@]}")
+    COMMA_SEPARATED_LIST_OF_INSTANCE_PATHS_ARRAY=$(to_list "${COMMA_SEPARATED_LIST_OF_INSTANCE_PATHS_ARRAY[@]}")
+    CONTROLLER_NAME_PREFIX_ARRAY=$(to_list "${CONTROLLER_NAME_PREFIX_ARRAY[@]}")
+
+
+    TRAINING_JOB_ID=`sbatch --parsable --dependency=afterok:${COMPILE_JOB_ID} --export=PROBLEM_TYPE_ARRAY=$PROBLEM_TYPE_ARRAY,COMMA_SEPARATED_LIST_OF_INSTANCE_PATHS_ARRAY=$COMMA_SEPARATED_LIST_OF_INSTANCE_PATHS_ARRAY,SEED_ARRAY=$SEED_ARRAY,NEAT_POPSIZE=$NEAT_POPSIZE,MAX_SOLVER_FE=$MAX_SOLVER_FE,SOLVER_POPSIZE=$SOLVER_POPSIZE,MAX_TRAIN_ITERATIONS=$MAX_TRAIN_ITERATIONS,MAX_TRAIN_TIME=$MAX_TRAIN_TIME,EXPERIMENT_CONTROLLER_FOLDER_NAME=${EXPERIMENT_CONTROLLER_FOLDER_NAME},TEST_RESULT_FOLDER_NAME=${TEST_RESULT_FOLDER_NAME},LOG_DIR=${LOG_DIR},CONTROLLER_NAME_PREFIX_ARRAY=${CONTROLLER_NAME_PREFIX_ARRAY} --array=0-$i src/experiments/permus_multi/scripts/hip_train_multi_array.sl`
+
+
+done
 
 
 

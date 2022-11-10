@@ -2,19 +2,19 @@ import numpy as np
 from matplotlib import pyplot as plt
 from matplotlib.animation import FuncAnimation
 from tqdm import tqdm as tqdm
-import visualize_network_response_change
+import adapt_to_resources
 
 
 plt.style.use('seaborn-pastel')
 
 
 
-visualize_network_response_change.SOLVER_POPSIZE=10
-visualize_network_response_change.MAX_SOLVER_FE=1000
-visualize_network_response_change.N_EVALS=1
-visualize_network_response_change.N_EVALS_TEST=1
-visualize_network_response_change.PROBLEM_DIM=2
-visualize_network_response_change.THREADS=1
+adapt_to_resources.SOLVER_POPSIZE=10
+adapt_to_resources.MAX_SOLVER_FE=1000
+adapt_to_resources.N_EVALS=1
+adapt_to_resources.N_EVALS_TEST=1
+adapt_to_resources.PROBLEM_DIM=2
+adapt_to_resources.THREADS=1
 
 
 
@@ -31,7 +31,7 @@ if __name__ == "__main__":
     controller_path = "experimentResults/transfer_16_continuous_problems/controllers/top_controllers/TrainOnlyInF_1_best.controller"
     PROBLEM_INDEX = 1
 
-    visualize_network_response_change.run_with_controller_continuous(PROBLEM_INDEX, controller_path, PRINT_POSITIONS=True)
+    adapt_to_resources.run_with_controller_continuous(PROBLEM_INDEX, controller_path, PRINT_POSITIONS=True)
 
     positions = []
     with open("positions.txt", "r") as f:
