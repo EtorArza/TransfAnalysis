@@ -21,7 +21,6 @@ namespace PERMU{
 
 class PBP;
 class PermuTools;
-class Tabu;
 
 
 
@@ -96,12 +95,6 @@ private:
   void load_local_opt();
   void comp_order_sparsity(bool first_time);
   
-  // Individual i is duplicated only if there is enough space. Additionally, the popsize is updated consecuently.
-  void duplicate_individual_i(int i);
-  
-  // Individual only removed if there is enough space.
-  void remove_individual_i(int i);
-
   void random_reinitialize_individual_i(int i);
 
   

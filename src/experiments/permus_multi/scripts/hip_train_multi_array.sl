@@ -34,8 +34,6 @@ SEED_ARRAY=("${BITRISE_CLI_LAST_PARSED_LIST[@]}")
 SEED=${SEED_ARRAY[$SLURM_ARRAY_TASK_ID]}
 
 
-echo -n "COMMA_SEPARATED_LIST_OF_INSTANCE_PATHS_ARRAY: " >> ${LOG_FILE} 
-echo $COMMA_SEPARATED_LIST_OF_INSTANCE_PATHS_ARRAY >> ${LOG_FILE}
 
 
 replaced_with=","
@@ -65,12 +63,12 @@ instance_path=`dirname ${ARRAY_OF_INSTANCES[0]}`
 
 
 
-echo -n "instance_path: " >> ${LOG_FILE}
-echo $instance_path >> ${LOG_FILE}
+
 
 LOG_FILE="${LOG_DIR}/train_inproblem_$(basename $instance_path)_${SEED}_${SLURM_ARRAY_TASK_ID}.txt"
 
-
+echo -n "instance_path: " >> ${LOG_FILE}
+echo $instance_path >> ${LOG_FILE}
 
 mkdir -p "$SCRATCH_JOB/$instance_path"
 
@@ -109,6 +107,7 @@ CONTROLLER_NAME_PREFIX = $CONTROLLER_NAME_PREFIX
 EXPERIMENT_FOLDER_NAME = $EXPERIMENT_CONTROLLER_FOLDER_NAME
 
 MAX_SOLVER_FE = $MAX_SOLVER_FE
+SOLVER_POPSIZE = $SOLVER_POPSIZE
 
 
 PROBLEM_TYPE = $PROBLEM_TYPE

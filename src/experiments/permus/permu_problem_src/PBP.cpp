@@ -13,7 +13,6 @@
 #include "Parameters.h"
 #include <assert.h>
 #include "../permuevaluator.h"
-#include "Tabu.h"
 #include <limits.h>
 
 namespace PERMU{
@@ -101,7 +100,6 @@ int PBP::Read_with_mutex(string filename){
 void PBP::apply_operator_with_fitness_update(CIndividual *indiv, int i, int j, PERMU::operator_t operator_id, double accept_or_reject_worse)
 {   
 
-    this->tab = indiv->tab;
     if(i==j || j==-1){
         return;
     }
@@ -135,7 +133,6 @@ void PBP::apply_operator_with_fitness_update(CIndividual *indiv, int i, int j, P
 
 void PBP::apply_operator_with_fitness_update(CIndividual *indiv, double delta, int i, int j, PERMU::operator_t operator_id, double accept_or_reject_worse)
 {
-    this->tab = indiv->tab;
 
     using namespace PERMU;
 
@@ -203,7 +200,6 @@ void PBP::apply_operator_with_fitness_update(CIndividual *indiv, double delta, i
 
 void PBP::local_search_iteration(CIndividual *indiv, PERMU::operator_t operator_id)
 {
-    this->tab = indiv->tab;
 
     if (indiv->is_local_optimum[operator_id])
     {
@@ -223,16 +219,12 @@ void PBP::local_search_iteration(CIndividual *indiv, PERMU::operator_t operator_
             {
                 continue;
             }
-            if (tab->is_tabu(r, r+1))
-            {
-                continue;
-            }
+
             
             double delta = fitness_delta_swap(indiv, r, r+1);
             n_evals++;
             if (delta > 0)
             {
-                tab->set_tabu(r, r+1);
                 apply_operator_with_fitness_update(indiv, delta, r, r+1, operator_id);
                 assert(abs(indiv->f_value - _Evaluate(indiv->genome)) < 0.0001);
                 return;
@@ -247,7 +239,7 @@ void PBP::local_search_iteration(CIndividual *indiv, PERMU::operator_t operator_
         {
             for (int j = 0; j < this->problem_size_PBP; j++)
             {
-                if (i < j && !(tab->is_tabu(_random_permu1[i],_random_permu2[j]) || tab->is_tabu(_random_permu2[j],_random_permu1[i])) )
+                if (i < j)
                 {
                     double delta = fitness_delta_interchange(indiv, _random_permu1[i], _random_permu2[j]);
                		n_evals++;
@@ -255,7 +247,6 @@ void PBP::local_search_iteration(CIndividual *indiv, PERMU::operator_t operator_
                     if (delta > 0)
                     {
                        	//cout << "(" << _random_permu1[i] << "," << _random_permu2[j] << ")" << endl;
-                        tab->set_tabu(_random_permu1[i],_random_permu2[j]);
                         assert(isPermutation(indiv->genome, problem_size_PBP));
                         apply_operator_with_fitness_update(indiv, delta, _random_permu1[i], _random_permu2[j], operator_id);
                         assert(isPermutation(indiv->genome, problem_size_PBP));
@@ -276,10 +267,6 @@ void PBP::local_search_iteration(CIndividual *indiv, PERMU::operator_t operator_
             {
                 if (i != j && (_random_permu2[j] - _random_permu1[i]) != 1)
                 {
-                    if (tab->is_tabu(_random_permu1[i], _random_permu2[j]))
-                    {
-                        continue;
-                    }
                     double delta =fitness_delta_insert(indiv, _random_permu1[i], _random_permu2[j]);
                		n_evals++;
 
@@ -287,7 +274,6 @@ void PBP::local_search_iteration(CIndividual *indiv, PERMU::operator_t operator_
                     {   
 
                         //cout << "peep ";
-                        tab->set_tabu(_random_permu1[i], _random_permu2[j]);
                        	// cout << "(" << i << "," << j << ")" << endl;
                        	// cout << "(" << _random_permu1[i] << "," << _random_permu2[j] << ")" << endl;
                         
@@ -690,16 +676,8 @@ void PBP::obtain_indexes_step_away(int *permu, int *ref_permu, int* i, int* j, P
 
 
 void PBP::move_indiv_towards_reference(CIndividual* indiv, int* ref_permu, PERMU::operator_t operator_id, double accept_or_reject_worse){
-    this->tab = indiv->tab;
     int i,j;
     obtain_indexes_step_towards(indiv->genome, ref_permu, &i, &j, operator_id);
-    if (tab->is_tabu(i,j))
-    {
-        return;
-    }else
-    {
-        tab->set_tabu(i,j);
-    }
     // std::cout << "(" << i << "," << j << ")" << endl;
     apply_operator_with_fitness_update(indiv, i, j, operator_id, accept_or_reject_worse);
     assert(abs(indiv->f_value - _Evaluate(indiv->genome)) < 0.0001);
@@ -708,18 +686,10 @@ void PBP::move_indiv_towards_reference(CIndividual* indiv, int* ref_permu, PERMU
 
 
 void PBP::move_indiv_away_reference(CIndividual* indiv, int* ref_permu, PERMU::operator_t operator_id, double accept_or_reject_worse){
-    this->tab = indiv->tab;
     int i,j;
     obtain_indexes_step_away(indiv->genome, ref_permu, &i, &j, operator_id);
     // std::cout << "(" << i << "," << j << ")" << endl;
 
-    if (tab->is_tabu(i,j))
-    {
-        return;
-    }else
-    {
-        tab->set_tabu(i,j);
-    }
 
     apply_operator_with_fitness_update(indiv, i, j, operator_id, accept_or_reject_worse);
     assert(abs(indiv->f_value - _Evaluate(indiv->genome)) < 0.0001);

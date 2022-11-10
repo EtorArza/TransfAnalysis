@@ -27,9 +27,7 @@ namespace PERMU{
         DISTANCE = 5,
         SPARSITY = 6,
         ORDER_SPARSITY = 7,
-        RELATIVE_POPSIZE = 8,
-        RELATIVE_TABU_SIZE = 9,
-        __sensor_N = 10,
+        __sensor_N = 8,
     };
 
     const int N_PERMU_REFS = 5;
@@ -39,16 +37,13 @@ namespace PERMU{
         O_ID_EXCH = EXCH + 1,
         O_ID_INSERT = INSERT + 1,
         accept_or_reject_worse = 4,
-        TABU = 5,
-        CHANGE_TABU_SIZE = 6,
-        REMOVE_OR_CLONE = 7,
-        RANDOM_REINITIALIZE = 8,
-        c_hamming_consensus = 9,
-        c_kendall_consensus = 10,
-        c_pers_best = 11,
-        c_best_known = 12,
-        c_above = 13,
-        __output_N = 14,
+        RANDOM_REINITIALIZE = 5,
+        c_hamming_consensus = 6,
+        c_kendall_consensus = 7,
+        c_pers_best = 8,
+        c_best_known = 9,
+        c_above = 10,
+        __output_N = 11,
     };
 
 

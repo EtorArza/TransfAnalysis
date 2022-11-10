@@ -2,7 +2,6 @@
 #include "MultidimBenchmarkFF.h"
 #include "Parameters.h"
 #include "Tools.h"
-#include "Tabu.h"
 #include "../real_func_evaluator.h"
 #include "../REAL_FUNC_params.h"
 #include <assert.h>

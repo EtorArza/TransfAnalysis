@@ -10,7 +10,6 @@
 #include "PBP.h"
 #include "Parameters.h"
 #include "Tools.h"
-#include "Tabu.h"
 #include "../permuevaluator.h"
 #include <assert.h>
 #include <float.h>
@@ -29,38 +28,32 @@ namespace PERMU{
 void CPopulation::init_class(PBP *problem, RandomNumberGenerator* rng, PERMU::params* parameters){
     this->rng = rng;
     this->problem = problem;
-    this->popsize = MIN_POPSIZE;
+    this->popsize = parameters->SOLVER_POPSIZE;
     this->MAX_SOLVER_TIME = parameters-> MAX_SOLVER_TIME;
     this->MAX_SOLVER_FE = parameters-> MAX_SOLVER_FE;
     this->n = problem->GetProblemSize();
     genome_best = new int[n];
     f_best = -DBL_MAX;
 
-    // indexes_to_be_removed.reserve(MAX_POPSIZE);
-    // indexes_to_be_duplicated.reserve(MAX_POPSIZE);
 
     GenerateRandomPermutation(this->genome_best, n, this->rng);
-    templ_double_array = new double[MAX_POPSIZE];
-    templ_double_array2 = new double[MAX_POPSIZE];
+    templ_double_array = new double[this->popsize];
+    templ_double_array2 = new double[this->popsize];
 
-    // for (int i = 0; i < MAX_POPSIZE; i++)
-    // {
-    //     indexes_to_be_removed[i] = -1;
-    //     indexes_to_be_duplicated[i] = -1;
-    // }
 
-    m_individuals.resize(MAX_POPSIZE);
 
-    pop_info = new double *[MAX_POPSIZE];
-    permus = new int *[MAX_POPSIZE]; // this contains the references to te permus in the individuals, so no initialization/destruction.
+    m_individuals.resize(this->popsize);
+
+    pop_info = new double *[this->popsize];
+    permus = new int *[this->popsize]; // this contains the references to te permus in the individuals, so no initialization/destruction.
 
     //Initialize population with random solutions
-    for (int i = 0; i < MAX_POPSIZE; i++)
+    for (int i = 0; i < this->popsize; i++)
     {
         m_individuals[i] = new CIndividual(n, this->rng);
     }
 
-    for (int i = 0; i < MAX_POPSIZE; i++)
+    for (int i = 0; i < this->popsize; i++)
     {
         pop_info[i] = new double[PERMU::__sensor_N];
     }
@@ -88,14 +81,13 @@ CPopulation::CPopulation(PBP *problem, RandomNumberGenerator* rng, PERMU::params
 void CPopulation::Reset(){
     f_best = -DBL_MAX;
     GenerateRandomPermutation(this->genome_best, n, rng);
-    for (int i = 0; i < MAX_POPSIZE; i++)
+    for (int i = 0; i < this->popsize; i++)
     {   
         auto tmp = std::vector<double>();
         std::swap(tmp, m_individuals[i]->activation);
         m_individuals[i]->reset(rng);
         std::swap(tmp, m_individuals[i]->activation);
     }
-    this->popsize = MIN_POPSIZE;
     terminated = false;
     timer->tic();
     evaluate_population();
@@ -114,26 +106,6 @@ void CPopulation::copy_individual_i_into_indiv_j(int i, int j)
     m_individuals[j]->f_value =  m_individuals[i]->f_value;
 }
 
-void CPopulation::duplicate_individual_i(int i)
-{
-    if (popsize < MAX_POPSIZE)
-    {
-        copy_individual_i_into_indiv_j(i,popsize);
-        popsize++;
-    }
-}
-
-void CPopulation::remove_individual_i(int i)
-{
-    if (popsize < MIN_POPSIZE)
-    {
-        for (int k = i; k < popsize; k++)
-        {
-            swap(m_individuals[k], m_individuals[i]);
-        }
-        popsize--;
-    }
-}
 
 void CPopulation::random_reinitialize_individual_i(int i)
 {
@@ -146,11 +118,11 @@ void CPopulation::random_reinitialize_individual_i(int i)
  */
 CPopulation::~CPopulation()
 {
-    for (int i = 0; i < MAX_POPSIZE; i++)
+    for (int i = 0; i < this->popsize; i++)
     {
         delete[] pop_info[i];
     }
-    for (int i = 0; i < MAX_POPSIZE; i++)
+    for (int i = 0; i < this->popsize; i++)
     {
         delete m_individuals[i];
     }
@@ -247,7 +219,6 @@ void CPopulation::apply_neat_output_to_individual_i(double* output_neat, int i){
 
 
     double accept_or_reject_worse = output_neat[PERMU::accept_or_reject_worse];
-    m_individuals[i]->tab->tabu_coef_neat = output_neat[(int) PERMU::TABU];
 
     if
     (
@@ -269,14 +240,6 @@ void CPopulation::apply_neat_output_to_individual_i(double* output_neat, int i){
 
     }
 
-    if (output_neat[PERMU::CHANGE_TABU_SIZE] > CUTOFF_0)
-    {
-        m_individuals[i]->tab->increase_tabu_size();
-    }
-    else if (output_neat[PERMU::CHANGE_TABU_SIZE] < -CUTOFF_0)
-    {
-        m_individuals[i]->tab->decrease_tabu_size();
-    }
 
 }
 
@@ -314,11 +277,6 @@ void CPopulation::get_population_info(){
     comp_sparsity(false);
     comp_order_sparsity(false);
     load_local_opt();
-    for (int i = 0; i < popsize; i++)
-    {
-        pop_info[i][PERMU::RELATIVE_POPSIZE] = (double) (this->popsize - MIN_POPSIZE) / (double) MAX_POPSIZE ;
-        pop_info[i][PERMU::RELATIVE_TABU_SIZE] = m_individuals[i]->tab->return_current_relative_tabu_size();
-    }
 }
 
 

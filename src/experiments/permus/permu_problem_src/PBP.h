@@ -25,7 +25,6 @@ namespace PERMU{
 
 using std::string;
 using std::stringstream;
-class Tabu;
 
 
 class PBP
@@ -57,7 +56,6 @@ class PBP
 	double Evaluate(int *genome); // update the f_value of the individuals.
 	int Read_with_mutex(string filename);
 	void load_rng(RandomNumberGenerator *rng);
-	Tabu* tab;
 	RandomNumberGenerator *rng = nullptr;
 
 	long n_evals;

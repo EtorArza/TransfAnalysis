@@ -38,6 +38,7 @@ int LOP::Read(string filename)
 	ifstream indata;
 	indata.open(filename.c_str(), ios::in);
 	int num = 0;
+	n = 0;
 	while (!indata.eof())
 	{
 
@@ -62,6 +63,11 @@ int LOP::Read(string filename)
 				data = data + ' ' + line;
 		}
 		num++;
+		if (n < 2)
+		{
+			std::cout << "Error, problem size < 2. Instance file " << filename.c_str() << " not loaded correctly." << std::endl;
+			exit(1);
+		}
 	}
 	indata.close();
 

@@ -5,7 +5,7 @@ from tqdm import tqdm as tqdm
 from sklearn.preprocessing import StandardScaler
 
 SEED=2
-SOLVER_POPSIZE=10
+SOLVER_POPSIZE=8
 MAX_SOLVER_FE=1000
 MAX_GEN=5000
 N_EVALS = 1000 # N of repetitions averaged

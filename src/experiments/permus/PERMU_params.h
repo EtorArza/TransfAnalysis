@@ -14,9 +14,8 @@ namespace PERMU{
         // PARAMETERS TO BE SPECIFIED IN CONFIG FILE//
         double MAX_SOLVER_TIME;
         long MAX_SOLVER_FE;
-        int POPSIZE;
+        int SOLVER_POPSIZE;
         int N_EVALS;
-        int TABU_LENGTH;
         std::string INSTANCE_PATH;
         std::string PROBLEM_TYPE;
 

@@ -28,9 +28,4 @@
 #define CUTOFF_0 0.25
 
 
-#define MAX_POPSIZE 10
-#define MIN_POPSIZE 10
-
-#define MAX_TABU_LENGTH 100
-#define MIN_TABU_LENGTH 5
 #define LENGTH_CHANGE_STEP 5

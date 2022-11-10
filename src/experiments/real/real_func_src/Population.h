@@ -6,7 +6,6 @@
 #include "../REAL_FUNC_params.h"
 class MultidimBenchmarkFF;
 class RandomNumberGenerator;
-class Tabu;
 
 
 class CPopulation

@@ -15,7 +15,6 @@
 #include <limits.h>
 #include <iostream>
 #include "Tools.h"
-#include "Tabu.h"
 #include "../permuevaluator.h"
 
 
@@ -58,7 +57,6 @@ public:
 	bool is_local_optimum[PERMU::N_OPERATORS] = {false, false, false}; // is_local_optimum[OPERATOR_ID] contains if it is optimum or not.
 	double f_best;
 	int* genome_best;
-	Tabu* tab;
 
 
 	// pop_info

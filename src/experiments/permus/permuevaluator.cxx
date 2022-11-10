@@ -77,12 +77,10 @@ void make_output_behaviour_mapping_more_injective(double *output)
 
     if (output[PERMU::RANDOM_REINITIALIZE] > CUTOFF_0)
     {
-        double R_or_clone_output = move_to_0_minusone_or_one(output[PERMU::REMOVE_OR_CLONE]);
         for (int i = 0; i < PERMU::__output_N; i++)
         {
             output[i] = 0.0;
         }
-        output[PERMU::REMOVE_OR_CLONE] = R_or_clone_output;
         output[PERMU::RANDOM_REINITIALIZE] = 1.0;
         return;
     }
@@ -92,9 +90,6 @@ void make_output_behaviour_mapping_more_injective(double *output)
 
 
 
-    output[PERMU::TABU] = abs((double)move_to_0_minusone_or_one(output[PERMU::TABU]));
-    output[PERMU::RELATIVE_TABU_SIZE] = 0.0;
-    output[PERMU::REMOVE_OR_CLONE] = move_to_0_minusone_or_one(output[PERMU::REMOVE_OR_CLONE]);
 
     int nonzero_index = argmax(output + POS_FIRS_OPERATOR, PERMU::N_OPERATORS) + POS_FIRS_OPERATOR;
     for (int i = POS_FIRS_OPERATOR; i < POS_FIRS_OPERATOR + PERMU::N_OPERATORS; i++)
@@ -179,6 +174,7 @@ void PermuEvaluator::read_conf_file(std::string conf_file_path)
 
     parameters->MODE = reader.Get("Global", "MODE", "UNKNOWN");
     parameters->prob_name = reader.Get("Global", "PROBLEM_NAME", "UNKNOWN");
+    parameters->SOLVER_POPSIZE = reader.GetInteger("Global", "SOLVER_POPSIZE", 8);
 
     if (parameters->MODE == "train")
     {
@@ -268,7 +264,8 @@ void PermuEvaluator::read_conf_file(std::string conf_file_path)
         parameters->PROBLEM_TYPE = reader.Get("Global", "PROBLEM_TYPE", "UNKOWN");
         parameters->INSTANCE_PATH = reader.Get("Global", "PROBLEM_PATH", "UNKOWN");
         parameters->MAX_SOLVER_TIME = reader.GetReal("Global", "MAX_SOLVER_TIME", 43200000.0);
-        parameters->MAX_SOLVER_FE = reader.GetInteger("Global", "MAX_SOLVER_FE", INT_MAX);        parameters->CONTROLLER_PATH = reader.Get("Global", "CONTROLLER_PATH", "UNKNOWN");
+        parameters->MAX_SOLVER_FE = reader.GetInteger("Global", "MAX_SOLVER_FE", INT_MAX);
+        parameters->CONTROLLER_PATH = reader.Get("Global", "CONTROLLER_PATH", "UNKNOWN");
         parameters->N_REPS = reader.GetInteger("Global", "N_REPS", -1);
         parameters->N_EVALS = reader.GetInteger("Global", "N_EVALS", -1);
         parameters->COMPUTE_RESPONSE = reader.GetBoolean("Global", "COMPUTE_RESPONSE", false);
