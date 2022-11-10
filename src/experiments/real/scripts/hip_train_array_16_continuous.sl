@@ -53,21 +53,20 @@ COMMA_SEPARATED_PROBLEM_DIM_LIST=${COMMA_SEPARATED_PROBLEM_DIM_LIST_ARRAY[$SLURM
 
 
 
-LOG_FILE="${LOG_DIR}/train_${COMMA_SEPARATED_PROBLEM_INDEX_LIST}_${SEED}_${COMMA_SEPARATED_PROBLEM_DIM_LIST}_${SLURM_ARRAY_TASK_ID}.txt"
 
 
 
 
-echo -n "SLURM_ARRAY_TASK_ID: " >> ${LOG_FILE}
-echo $SLURM_ARRAY_TASK_ID >> ${LOG_FILE}
+echo -n "SLURM_ARRAY_TASK_ID: "
+echo $SLURM_ARRAY_TASK_ID
 
 
-cp neat -v $SCRATCH_JOB >> ${LOG_FILE}
+cp neat -v $SCRATCH_JOB
 #cp src/experiments/real/real_func_src/jani_ronkkonen_problem_generator/quad_function.dat -v --parents $SCRATCH_JOB/
 
 cd $SCRATCH_JOB
 
-echo "pwd: `pwd`" >> ${LOG_FILE}
+echo "pwd: `pwd`"
 
 
 
@@ -102,16 +101,15 @@ COMMA_SEPARATED_PROBLEM_DIM_LIST = ${COMMA_SEPARATED_PROBLEM_DIM_LIST}
 EOF
 
 
-echo "---conf file begin---" >> ${LOG_FILE}
-
+echo "---conf file begin---" >>
 cat tmp.ini
 
-echo "---conf file end---" >> ${LOG_FILE}
+echo "---conf file end---" >>
 
 
-date >> ${LOG_FILE}
-srun neat "tmp.ini" > "/dev/null" 2>> ${LOG_FILE}
-date >> ${LOG_FILE}
+date
+srun neat "tmp.ini"
+date
 
 cd ..
 rm ${SCRATCH_JOB} -r

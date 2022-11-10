@@ -157,7 +157,7 @@ void SpeciesPopulation::next_generation() {
         }
     }
 
-	std::cout<<"Number of Species: "<<num_species<<std::endl;
+	// std::cout<<"Number of Species: "<<num_species<<std::endl;
 
 	//Use Species' ages to modify the objective fitness of organisms
 	// in other words, make it more fair for younger species
@@ -177,7 +177,7 @@ void SpeciesPopulation::next_generation() {
         total += o.adjusted_fitness;
     }
 	overall_average=total/total_organisms;
-	std::cout<<"Generation "<<generation<<": "<<"overall_average = "<<overall_average<<std::endl;
+	// std::cout<<"Generation "<<generation<<": "<<"overall_average = "<<overall_average<<std::endl;
 
 	//Now compute expected number of offspring for each individual organism
     for(SpeciesOrganism &o: orgs.curr()) {

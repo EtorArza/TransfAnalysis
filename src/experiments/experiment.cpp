@@ -152,7 +152,6 @@ void execute_multi(class NEAT::Network **nets_, NEAT::OrganismEvaluation *result
         initial_seed = global_rng.random_integer() / 100;
 
 
-        cout << "start ev" << endl;
         while (surviving_candidates.size() > target_n_controllers_left && MAX_EVALS_PER_CONTROLLER > current_n_of_evals)
         {
             #ifndef HIPATIA
@@ -226,7 +225,6 @@ void execute_multi(class NEAT::Network **nets_, NEAT::OrganismEvaluation *result
 
         int best_current_iteration_index = argmax(tmp_order, (int)nnets);
 
-        cout << "reevaluate best" << endl;
 
 
         // update best known of last iteration and this iteration
@@ -282,28 +280,32 @@ void execute_multi(class NEAT::Network **nets_, NEAT::OrganismEvaluation *result
         tmp_order[best_current_iteration_index] = 10e20;
         
 
-
+        #ifndef HIPATIA
         cout << "(best this gen, best last gen) -> (" << avg_perf_best_current << ", " << avg_perf_best_last << ")" << ", higher is better";
+        #endif
 
         if (test_result)
         {
             parameters->neat_params->N_TIMES_BEST_FITNESS_IMPROVED_TRAIN++;
             parameters->neat_params->N_ITERATIONS_WITHOUT_FITNESS_IMPROVED = 0;
 
-            cout << ", best replaced";
+            #ifndef HIPATIA
+            cout << ", best replaced" << endl;
+            #endif
             delete best_network;
             best_network = new NEAT::CpuNetwork(*nets[best_current_iteration_index]);
         }
         else
         {
+            #ifndef HIPATIA
             cout << ", " 
             << parameters->neat_params->N_ITERATIONS_WITHOUT_FITNESS_IMPROVED 
-            << " it since last best found";
+            << " it since last best found" << endl;
+            #endif
             parameters->neat_params->N_ITERATIONS_WITHOUT_FITNESS_IMPROVED++;
         }
         
 
-        cout << endl;
 
 
 

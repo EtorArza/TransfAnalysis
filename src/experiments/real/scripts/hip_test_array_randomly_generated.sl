@@ -34,7 +34,6 @@ list_to_array $NLO_ARRAY
 NLO_ARRAY=("${BITRISE_CLI_LAST_PARSED_LIST[@]}")
 NLO=${NLO_ARRAY[$SLURM_ARRAY_TASK_ID]}
 
-LOG_FILE="${LOG_DIR}/test_randomly_generated_${SLURM_ARRAY_TASK_ID}.txt"
 
 
 
@@ -98,9 +97,7 @@ echo "---conf file end---"
 
 
 date
-date >> ${LOG_FILE}
-srun neat "tmp.ini" > "/dev/null" 2>> ${LOG_FILE}
-date >> ${LOG_FILE}
+srun neat "tmp.ini"
 date
 
 rm neat

@@ -40,7 +40,6 @@ PROBLEM_DIM=${PROBLEM_DIM//"s_e_p"/$replaced_with}
 
 
 
-LOG_FILE="${LOG_DIR}/test_inproblem_${PROBLEM_INDEX}_${SEED}_${PROBLEM_DIM}_${SLURM_ARRAY_TASK_ID}.txt"
 
 
 
@@ -49,15 +48,15 @@ SRCDIR=`pwd`
 
 
 
-echo -n "SLURM_ARRAY_TASK_ID: " >> ${LOG_FILE}
-echo $SLURM_ARRAY_TASK_ID >> ${LOG_FILE}
+echo -n "SLURM_ARRAY_TASK_ID: "
+echo $SLURM_ARRAY_TASK_ID
 
 
-cp neat -v $SCRATCH_JOB >> ${LOG_FILE} 2>&1
+cp neat -v $SCRATCH_JOB 2>&1
 
 cd $SCRATCH_JOB
 
-echo "pwd: `pwd`" >> ${LOG_FILE}
+echo "pwd: `pwd`"
 
 
 
@@ -90,16 +89,16 @@ FULL_MODEL = ${FULL_MODEL}
 EOF
 
 
-echo "---conf file begin---" >> ${LOG_FILE}
+echo "---conf file begin---"
 
-cat tmp.ini >> ${LOG_FILE}
+cat tmp.ini
 
-echo "---conf file end---" >> ${LOG_FILE}
+echo "---conf file end---"
 
 
-date >> ${LOG_FILE}
-srun neat "tmp.ini" > "/dev/null" 2>> ${LOG_FILE}
-date >> ${LOG_FILE}
+date
+srun neat "tmp.ini"
+date
 
 rm neat
 

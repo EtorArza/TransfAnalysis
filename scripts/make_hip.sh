@@ -11,7 +11,6 @@
 SCRATCH_JOB="${SCRATCH_JOB}_${SLURM_ARRAY_TASK_ID}_compile_neat"
 mkdir ${SCRATCH_JOB}
 
-LOG_FILE="${LOG_DIR}/compile.txt"
 
 SRC_DIR=`pwd`
 
@@ -25,16 +24,16 @@ PFM_LD_FLAGS=
 PFM_NVCC_CCBIN=
 EOF
 
-cp -r -v src ${SCRATCH_JOB}/ >> ${LOG_FILE}
-cp -v Makefile ${SCRATCH_JOB}/ >> ${LOG_FILE}
-cp -v Makefile.conf ${SCRATCH_JOB}/ >> ${LOG_FILE}
+cp -r -v src ${SCRATCH_JOB}/ 
+cp -v Makefile ${SCRATCH_JOB}/ 
+cp -v Makefile.conf ${SCRATCH_JOB}/ 
 
 
 cd ${SCRATCH_JOB}
 
-echo "ls: " >> ${LOG_FILE}
-ls >> ${LOG_FILE}
+echo "ls: " 
+ls 
 
-make -j ${SLURM_CPUS_PER_TASK} >> ${LOG_FILE}
+make -j ${SLURM_CPUS_PER_TASK}
 
-cp -v neat ${SRC_DIR} >> ${LOG_FILE}
+cp -v neat ${SRC_DIR}

@@ -200,7 +200,7 @@ void InnovGenomeManager::finalize_generation(bool new_fittest) {
         case COMPLEXIFY:
             if( (phase_duration >= max_phase_duration) 
                 || new_fittest) {
-                cout << "phase PRUNE @ gen " << generation << endl;
+                // cout << "phase PRUNE @ gen " << generation << endl;
                 search_phase_start = generation;
                 search_phase = PRUNE;
                 max_phase_duration = 1 + int(PRUNE_PHASE_FACTOR * phase_duration);
@@ -208,7 +208,7 @@ void InnovGenomeManager::finalize_generation(bool new_fittest) {
             break;
         case PRUNE:
             if(phase_duration >= max_phase_duration) {
-                cout << "phase COMPLEXIFY @ gen " << generation << endl;
+                // cout << "phase COMPLEXIFY @ gen " << generation << endl;
                 search_phase_start = generation;
                 search_phase = COMPLEXIFY;
                 max_phase_duration = MAX_COMPLEXIFY_PHASE_DURATION;

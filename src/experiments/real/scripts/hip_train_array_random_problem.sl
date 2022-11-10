@@ -61,7 +61,6 @@ NLO_ARRAY=("${BITRISE_CLI_LAST_PARSED_LIST[@]}")
 NLO=${NLO_ARRAY[$SLURM_ARRAY_TASK_ID]}
 
 
-LOG_FILE="${LOG_DIR}/train_0_${SEED}_${DIM}_${SLURM_ARRAY_TASK_ID}.txt"
 
 
 cp neat -v $SCRATCH_JOB
@@ -129,9 +128,7 @@ echo "---conf file end---"
 
 
 date
-date >> ${LOG_FILE}
-srun neat "tmp.ini" > "/dev/null" 2>> ${LOG_FILE}
-date >> ${LOG_FILE}
+srun neat "tmp.ini"
 date
 
 cd ..

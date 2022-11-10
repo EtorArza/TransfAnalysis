@@ -65,10 +65,9 @@ instance_path=`dirname ${ARRAY_OF_INSTANCES[0]}`
 
 
 
-LOG_FILE="${LOG_DIR}/train_inproblem_$(basename $instance_path)_${SEED}_${SLURM_ARRAY_TASK_ID}.txt"
 
-echo -n "instance_path: " >> ${LOG_FILE}
-echo $instance_path >> ${LOG_FILE}
+echo -n "instance_path: " 
+echo $instance_path 
 
 mkdir -p "$SCRATCH_JOB/$instance_path"
 
@@ -79,7 +78,7 @@ done
 
 
 
-cp neat -v $SCRATCH_JOB >> ${LOG_FILE}
+cp neat -v $SCRATCH_JOB 
 
 cd $SCRATCH_JOB
 
@@ -116,16 +115,16 @@ COMMA_SEPARATED_LIST_OF_INSTANCE_PATHS = $COMMA_SEPARATED_LIST_OF_INSTANCE_PATHS
 
 EOF
 
-echo "---conf file begin---" >> ${LOG_FILE}
+echo "---conf file begin---" 
 
-cat tmp.ini >> ${LOG_FILE}
+cat tmp.ini
 
-echo "---conf file end---" >> ${LOG_FILE}
+echo "---conf file end---"
 
 
-date >> ${LOG_FILE}
-srun neat "tmp.ini" > "/dev/null" 2>> ${LOG_FILE}
-date >> ${LOG_FILE}
+date
+srun neat "tmp.ini"
+date
 
 rm neat
 cd ..

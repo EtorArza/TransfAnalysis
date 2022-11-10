@@ -139,7 +139,7 @@ namespace NEAT {
                 }
                 
                 gen++;
-                cout << "\n ---------------------------------------------------- \n\n";
+                cout << "\n ---- \n\n";
                 cout << "Gen " << gen-1 << " / " << neat_params->MAX_TRAIN_ITERATIONS << ", progress: " << progress << endl;	
                 #ifdef HIPATIA
                 cout << "Time left:" << ((double) neat_params->MAX_TRAIN_TIME - get_runtime_hipatia()) / 60.0 / 60.0 << "h" << endl;
@@ -242,9 +242,7 @@ namespace NEAT {
             }
             OrganismEvaluation evaluations[norgs];
             //auto tmp_params = network_evaluator->
-            cout << "execute()" << endl;
             network_evaluator->execute(nets, evaluations, norgs);
-            cout << "execute() end" << endl;
 
 
             for(size_t i = 0; i < norgs; i++) {
@@ -260,10 +258,13 @@ namespace NEAT {
             // If it is the first iteration, or (best fitness all time improved)
             if (best_all_time == nullptr || neat_params->BEST_FITNESS_THIS_REINITIALIZE > neat_params->BEST_FITNESS_TRAIN_ALL_TIME)
             {
+                #ifndef HIPATIA
                 cout << "BF_THIS_REINITIALIZE, BF_TRAIN_ALL_TIME = " 
-                    << neat_params->BEST_FITNESS_THIS_REINITIALIZE << ", " 
-                    << neat_params->BEST_FITNESS_TRAIN_ALL_TIME << endl;
+                     << neat_params->BEST_FITNESS_THIS_REINITIALIZE << ", " 
+                     << neat_params->BEST_FITNESS_TRAIN_ALL_TIME << endl;
                 cout << "reinitialize_message -> new_best_found between reinits with hash #" << best_this_reinitialize->genome->hash() << endl;
+                #endif
+
                 neat_params->BEST_FITNESS_TRAIN_ALL_TIME = neat_params->BEST_FITNESS_THIS_REINITIALIZE;
                 best_all_time = new SpeciesOrganism(*best_this_reinitialize->genome);;
                 SpeciesOrganism *copy = new SpeciesOrganism(*best_all_time->genome);
@@ -273,11 +274,13 @@ namespace NEAT {
 
             timer.stop();
             Genome::Stats gstats = fittest->genome->get_stats();
+            #ifndef HIPATIA
             cout << "fittest [" << fittest->population_index << "]"
                  << ": fitness=" << fittest->eval.fitness
                  << ", nnodes=" << gstats.nnodes
                  << ", nlinks=" << gstats.nlinks
                  << endl;
+            #endif
         }
 
         class Population *pop;
