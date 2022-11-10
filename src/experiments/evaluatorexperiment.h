@@ -139,12 +139,11 @@ namespace NEAT {
                 }
                 
                 gen++;
-                cout << "\n ---- \n\n";
-                cout << "Gen " << gen-1 << " / " << neat_params->MAX_TRAIN_ITERATIONS << "\n";
+                cout << "Gen " << gen-1 << " / " << neat_params->MAX_TRAIN_ITERATIONS << " | ";
                 #ifdef HIPATIA
-                cout << "Time left:" << ((double) neat_params->MAX_TRAIN_TIME - get_runtime_hipatia()) / 60.0 / 60.0 << "h" << endl;
+                cout << "Time left " << ((double) neat_params->MAX_TRAIN_TIME - get_runtime_hipatia()) / 60.0 / 60.0 << "h" << endl;
                 #else
-                cout << "Time left:" << ((double) neat_params->MAX_TRAIN_TIME - neat_params->global_timer.toc()) / 60.0 / 60.0 << "h" << endl;
+                cout << "Time left " << ((double) neat_params->MAX_TRAIN_TIME - neat_params->global_timer.toc()) / 60.0 / 60.0 << "h" << endl;
                 #endif
                 
 
