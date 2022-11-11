@@ -101,10 +101,10 @@ COMMA_SEPARATED_PROBLEM_DIM_LIST = ${COMMA_SEPARATED_PROBLEM_DIM_LIST}
 EOF
 
 
-echo "---conf file begin---" >>
+echo "---conf file begin---"
 cat tmp.ini
 
-echo "---conf file end---" >>
+echo "---conf file end---"
 
 
 date
