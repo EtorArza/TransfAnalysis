@@ -52,7 +52,6 @@ for param_index in 0 1; do
     COMMA_SEPARATED_PROBLEM_INDEX_LIST_ARRAY=()
     COMMA_SEPARATED_PROBLEM_DIM_LIST_ARRAY=()
     FULL_MODEL_ARRAY=()
-
     MAX_SOLVER_FE="${MAX_SOLVER_FE_ARRAY[param_index]}"
 
 
@@ -88,7 +87,6 @@ for param_index in 0 1; do
     COMMA_SEPARATED_PROBLEM_INDEX_LIST_ARRAY=()
     COMMA_SEPARATED_PROBLEM_DIM_LIST_ARRAY=()
     FULL_MODEL_ARRAY=()
-
     MAX_SOLVER_FE="${MAX_SOLVER_FE_ARRAY[param_index]}"
 
 
@@ -129,13 +127,15 @@ PROBLEM_PATH="$INSTANCES_PATH/transfer_permuproblems/tsp/ch130.tsp"
 for param_index in 0 1; do
     PROBLEM_TYPE_ARRAY=()
     CONTROLLER_NAME_PREFIX_ARRAY=()
+    COMMA_SEPARATED_LIST_OF_INSTANCE_PATHS_ARRAY=()
     SEED_ARRAY=()
-    
+    MAX_SOLVER_FE="${MAX_SOLVER_FE_ARRAY[param_index]}"
+
+
     PROBLEM_TYPE_ARRAY+=("${PROBLEM_TYPE}")
     COMMA_SEPARATED_LIST_OF_INSTANCE_PATHS_ARRAY+=("${PROBLEM_PATH}")
     CONTROLLER_NAME_PREFIX_ARRAY+=("Permus_seed${train_seed}_MAXSOLVERFE_${MAX_SOLVER_FE}")
     SEED_ARRAY+=("${train_seed}")
-    MAX_SOLVER_FE="${MAX_SOLVER_FE_ARRAY[param_index]}"
 
 
     SEED_ARRAY=$(to_list "${SEED_ARRAY[@]}")
@@ -158,13 +158,15 @@ PROBLEM_PATH="$INSTANCES_PATH/transfer_qap_cut_instances/A3_cut40_tai60a.qap"
 for param_index in 0 1; do
     PROBLEM_TYPE_ARRAY=()
     CONTROLLER_NAME_PREFIX_ARRAY=()
+    COMMA_SEPARATED_LIST_OF_INSTANCE_PATHS_ARRAY=()
     SEED_ARRAY=()
-    
+    MAX_SOLVER_FE="${MAX_SOLVER_FE_ARRAY[param_index]}"
+
+
     PROBLEM_TYPE_ARRAY+=("${PROBLEM_TYPE}")
     COMMA_SEPARATED_LIST_OF_INSTANCE_PATHS_ARRAY+=("${PROBLEM_PATH}")
     CONTROLLER_NAME_PREFIX_ARRAY+=("Qap_seed${train_seed}_MAXSOLVERFE_${MAX_SOLVER_FE}")
     SEED_ARRAY+=("${train_seed}")
-    MAX_SOLVER_FE="${MAX_SOLVER_FE_ARRAY[param_index]}"
 
 
     SEED_ARRAY=$(to_list "${SEED_ARRAY[@]}")
