@@ -1,7 +1,7 @@
 #!/bin/bash
 ###   s b a t c h --array=1-$runs:1 $SL_FILE_NAME
-#SBATCH --output=/workspace/scratch/jobs/earza/slurm_logs/slurm_%A_%a_out.txt
-#SBATCH --error=/workspace/scratch/jobs/earza/slurm_logs/slurm_%A_%a_err.txt
+#SBATCH --output=/workspace/scratch/jobs/earza/slurm_logs/slurm_%A_%a_%x_out.txt
+#SBATCH --error=/workspace/scratch/jobs/earza/slurm_logs/slurm_%A_%a_%x_err.txt
 #SBATCH --ntasks=1 # number of tasks
 #SBATCH --ntasks-per-node=1 #number of tasks per node
 #SBATCH --mem=16G
@@ -16,8 +16,8 @@
 
 # # #!/bin/bash
 # # ###   s b a t c h --array=1-$runs:1 $SL_FILE_NAME
-# # #SBATCH --output=out/slurm_%A_%a_out.txt
-# # #SBATCH --error=out/slurm_%A_%a_err.txt
+# # #SBATCH --output=out/slurm_%A_%a_%x_out.txt
+# # #SBATCH --error=out/slurm_%A_%a_%x_err.txt
 # # #SBATCH --ntasks=1 # number of tasks
 # # #SBATCH --ntasks-per-node=1 #number of tasks per node
 # # #SBATCH --mem=32G
