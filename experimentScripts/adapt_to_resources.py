@@ -12,9 +12,9 @@ subprocess.run(f"mkdir -p {result_file_path}",shell=True)
 
 SOLVER_POPSIZE=8
 PROBLEM_DIM=12
-N_EVALS_TEST=200
+N_EVALS_TEST=2000
 
-solver_evals = [400, 6400]
+solver_evals = [400, 1200]
 
 def read_matrices(file_path):
     result = []
@@ -157,7 +157,7 @@ if __name__ == "__main__":
 
     for problemset_idx, controller_prefix, problem_idx_or_path in zip(
             range(4), 
-            ["TrainOnlyInF_1_seed2",None,"Permus_seed2", "Qap_seed2"],
+            ["TrainOnlyInF__seed2",None,"Permus_seed2", "Qap_seed2"],
             [   list(range(1,13)), 
                 None,
                 flatten([listdir_fullpath(f"src/experiments/permus/instances/transfer_permuproblems/{prob}/") for prob in ["lop","pfsp","qap","tsp"]]),
