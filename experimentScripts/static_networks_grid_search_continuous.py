@@ -21,8 +21,8 @@ MAX_SOLVER_FE=400
 N_EVALS=40
 N_EVALS_TEST=10000
 PROBLEM_DIM=20
-THREADS=6
-
+THREADS=8
+n_slices=20
 
 def write_static_continuous_controller(output1, output2, output3, controller_path):
     assert -0.99 < output1 < 0.99
@@ -56,7 +56,23 @@ genomeend 431
         f.write(str_to_write)
 
 
-def write_conf_file_continuous(PROBLEM_INDEX,CONTROLLER_PATH, n_evals, seed):
+def write_conf_file_continuous(PROBLEM_INDEX,CONTROLLER_PATH, n_evals, seed,nlo):
+    if PROBLEM_INDEX==0:
+        with open("src/experiments/real/real_func_src/jani_ronkkonen_problem_generator/quad_function.dat", "w") as f:
+            f.writelines(
+f"""1
+1
+{PROBLEM_DIM}
+{seed}
+-1
+1
+{nlo}
+-1
+-1
+-1
+-1
+EOF
+""")
 
     tmp_ini_file_string = f"""
 [Global] 
@@ -67,7 +83,7 @@ THREADS = {THREADS}
 N_EVALS = {n_evals}
 N_REPS = 1
 CONTROLLER_PATH = {CONTROLLER_PATH}
-SEED = {n_evals}
+SEED = {seed}
 
 PRINT_POSITIONS = false
 FULL_MODEL = false
@@ -87,11 +103,11 @@ MAX_SOLVER_FE = {MAX_SOLVER_FE}
         f.writelines(tmp_ini_file_string)
 
 
-def evaluate_continuous_static_controller(PROBLEM_INDEX, output1, output2, output3, n_evals, seed):
+def evaluate_continuous_static_controller(PROBLEM_INDEX, output1, output2, output3, n_evals, seed, nlo):
 
     tmp_controller_name = f"tmp_{randint(1000000000000000000,9000000000000000000)}.controller"
     write_static_continuous_controller(output1, output2, output3, tmp_controller_name)
-    write_conf_file_continuous(PROBLEM_INDEX,tmp_controller_name, n_evals, seed)
+    write_conf_file_continuous(PROBLEM_INDEX,tmp_controller_name, n_evals, seed, nlo)
     # subprocess.run("./neat tmp_conf_file.ini", shell=True) # print out
     # subprocess.run("./neat tmp_conf_file.ini > /dev/shm/NEAT_code/log.txt", shell=True) # write out into log.txt
     subprocess.run("./neat tmp_conf_file.ini > /dev/null", shell=True) # omit out
@@ -108,14 +124,13 @@ def evaluate_continuous_static_controller(PROBLEM_INDEX, output1, output2, outpu
 
 if __name__ == "__main__":
 
-    n_slices = 8
-    n_rep_search = 3
+    n_rep_search = 1
     upper_start = 0.98
     lower_start = -0.98
     search_interval_size = upper_start - lower_start
 
     t = tqdm(total = n_slices*n_slices*n_slices*12*n_rep_search)
-    for problem_index in range(1,13):
+    for problem_index,nlo in zip([0, 0, 0, 0, 0, 0, 0] + list(range(1,13)), [64, 32, 16, 8, 4, 2, 1] + [None for _ in range(1,13)]):
         upper1 = upper_start
         lower1 = lower_start
         upper2 = upper_start
@@ -131,9 +146,10 @@ if __name__ == "__main__":
                 for output2 in np.linspace(lower2, upper2, n_slices):
                     for output3 in np.linspace(lower3, upper3, n_slices):
                         t.update(1)
-                        score = evaluate_continuous_static_controller(problem_index,output1,output2,output3, N_EVALS, 73262)
+                        score = evaluate_continuous_static_controller(problem_index,output1,output2,output3, N_EVALS, 73262,nlo)
                         if float(score) > best_score:
-                            best_outputs_and_score = [problem_index, output1, output2, output3, score]
+                            problem_index_label = problem_index if problem_index > 0 else f"nlo_{nlo}"
+                            best_outputs_and_score = [problem_index_label, output1, output2, output3, score]
                             best_score = float(score)
             search_interval_size = search_interval_size/(n_slices-1)
             upper1 = min( 0.98, best_outputs_and_score[1] + search_interval_size * 0.5)
@@ -144,7 +160,22 @@ if __name__ == "__main__":
             lower3 = max(-0.98, best_outputs_and_score[3] - search_interval_size * 0.5)
             print(upper1, lower1, " - ", upper2, lower2, " - ", upper3, lower3)
         print(problem_index, ",", time.time() - timeStart)
-        best_outputs_and_score.append(evaluate_continuous_static_controller(problem_index,output1,output2,output3, N_EVALS_TEST, 2))
+
+        test_seed = 3
+        max_seeds = 300
+        done_test=False
+        while not done_test and test_seed < max_seeds:
+            try:
+                subprocess.run("rm -f tmp_conf_file.ini",shell=True)
+                subprocess.run("rm -f score.txt",shell=True)
+                subprocess.run("rm -f response.txt",shell=True)
+                best_outputs_and_score.append(evaluate_continuous_static_controller(problem_index,output1,output2,output3, N_EVALS_TEST, test_seed, nlo))
+                done_test=True
+            except FileNotFoundError:
+                print("Failed with seed ", test_seed,"!")
+                print("Trying with next seed...")
+                test_seed += 1
+
         with open(result_file_path+"continuous_grid_search.csv", "a") as f:
             print(",".join([str(el) for el in best_outputs_and_score]), file=f)
 
