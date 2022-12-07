@@ -13,9 +13,14 @@ print("__name__ =", __name__)
 np.random.seed(2)
 
 def get_random_value(problem_index, dim=2):
-    rnd_x_str = ",".join([str(el) for el in np.random.random(dim)])
-    exec_res=subprocess.run(f"./main.out -evaluate-continuous-problem {problem_index} {rnd_x_str}",shell=True, capture_output=True)  
-    return float(str(exec_res.stdout).strip("'b"))
+    str_result=""
+    while str_result == "":
+        rnd_x_str = ",".join([str(el) for el in np.random.random(dim)])
+        exec_res=subprocess.run(f"./main.out -evaluate-continuous-problem {problem_index} {rnd_x_str}",shell=True, capture_output=True)  
+        str_result = str(exec_res.stdout).strip("'b")
+        if str_result=="":
+            print("str_result=''", exec_res)
+    return float()
 
 def rand_search(problem_index, n_sols):
     return max((get_random_value(problem_index) for _ in range(n_sols)))
