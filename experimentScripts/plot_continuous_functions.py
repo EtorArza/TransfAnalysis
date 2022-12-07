@@ -49,5 +49,5 @@ def generate_contour_plot(problem_index):
     plt.close()
 
 
-Parallel(n_jobs=6, verbose=12)(delayed(generate_contour_plot)(i) for i in range(0,13))
+Parallel(n_jobs=-1, verbose=12)(delayed(generate_contour_plot)(i) for i in range(0,13))
 
