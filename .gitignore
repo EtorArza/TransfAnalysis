@@ -23,8 +23,5 @@ fittest_*
 all_controllers/
 copy_files_to_*
 connet_hip.sh
-*.controller
 test_*/
-*.txt
-*.csv
 tmp_conf_file.ini
