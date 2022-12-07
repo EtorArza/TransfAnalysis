@@ -239,7 +239,7 @@ for input_txt, transfer_exp, save_fig_path in zip(txt_paths, transfer_exp_list, 
 
             new_row_df = pd.DataFrame([[score, train_name, test_name, train_type, test_type, train_seed]], 
                             columns=["score", "train_name", "test_name", "train_type", "test_type", "train_seed"])
-            data_frame = data_frame.append(new_row_df, ignore_index=True)
+            data_frame = pd.concat([data_frame, new_row_df], ignore_index=True)
 
     every_data_frame_list.append(data_frame)
 
@@ -320,7 +320,7 @@ for input_txt, transfer_exp, save_fig_path in zip(txt_paths, transfer_exp_list, 
                 new_row_df = pd.DataFrame([[score, train_name, test_name, train_type, test_type]], 
                                     columns=["score", "train_name", "test_name", "train_type", "test_type"])
 
-                BOXPLOT_data_frame = data_frame.append(new_row_df, ignore_index=True)
+                BOXPLOT_data_frame = pd.concat([BOXPLOT_data_frame, new_row_df], ignore_index=True)
         sns.set(font_scale = 1.4)
 
         # compute transferability
