@@ -26,7 +26,7 @@ def grienhawk(x_vec):
 
 
 def random_quadratic(x_vec):
-    res = subprocess.run("./neat {} {}".format(*x_vec),shell=True,capture_output=True)
+    res = subprocess.run("./main.out {} {}".format(*x_vec),shell=True,capture_output=True)
     return float(res.stdout.strip())
 
 

@@ -8,7 +8,7 @@
 #SBATCH -p short
 #SBATCH --exclude=n[001-004,017-018]
 
-SCRATCH_JOB="${SCRATCH_JOB}_${SLURM_ARRAY_TASK_ID}_compile_neat"
+SCRATCH_JOB="${SCRATCH_JOB}_${SLURM_ARRAY_TASK_ID}_compile"
 mkdir ${SCRATCH_JOB}
 
 
@@ -36,4 +36,4 @@ ls
 
 make -j ${SLURM_CPUS_PER_TASK}
 
-cp -v neat ${SRC_DIR}
+cp -v main.out ${SRC_DIR}

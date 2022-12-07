@@ -25,3 +25,4 @@ copy_files_to_*
 connet_hip.sh
 test_*/
 tmp_conf_file.ini
+main.out

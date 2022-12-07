@@ -38,7 +38,7 @@ NLO=${NLO_ARRAY[$SLURM_ARRAY_TASK_ID]}
 
 
 
-cp neat -v $SCRATCH_JOB
+cp main.out -v $SCRATCH_JOB
 #cp src/experiments/real/real_func_src/jani_ronkkonen_problem_generator/quad_function.dat -v --parents $SCRATCH_JOB/
 
 cd $SCRATCH_JOB
@@ -97,10 +97,10 @@ echo "---conf file end---"
 
 
 date
-srun neat "tmp.ini"
+srun main.out "tmp.ini"
 date
 
-rm neat
+rm main.out
 
 mkdir $TMP_RES_PATH -p
 

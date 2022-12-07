@@ -108,9 +108,9 @@ def evaluate_continuous_static_controller(PROBLEM_INDEX, output1, output2, outpu
     tmp_controller_name = f"tmp_{randint(1000000000000000000,9000000000000000000)}.controller"
     write_static_continuous_controller(output1, output2, output3, tmp_controller_name)
     write_conf_file_continuous(PROBLEM_INDEX,tmp_controller_name, n_evals, seed, nlo)
-    # subprocess.run("./neat tmp_conf_file.ini", shell=True) # print out
-    # subprocess.run("./neat tmp_conf_file.ini > /dev/shm/NEAT_code/log.txt", shell=True) # write out into log.txt
-    subprocess.run("./neat tmp_conf_file.ini > /dev/null", shell=True) # omit out
+    # subprocess.run("./main.out tmp_conf_file.ini", shell=True) # print out
+    # subprocess.run("./main.out tmp_conf_file.ini > /dev/shm/NEAT_code/log.txt", shell=True) # write out into log.txt
+    subprocess.run("./main.out tmp_conf_file.ini > /dev/null", shell=True) # omit out
     # subprocess.run("cat score.txt >> /dev/shm/NEAT_code/log.txt",shell=True)    
     # subprocess.run("cat responses.txt >> /dev/shm/NEAT_code/log.txt",shell=True)    
     with open("score.txt","r") as f:

@@ -40,7 +40,7 @@ for controller_directory in os.listdir(directory_of_controller_directories):
             print(conf_file_this_round, file=f)
         os.chdir(cwd)
         os.system("ls")
-        os.system("./neat tmp.ini")
+        os.system("./main.out tmp.ini")
         
     lines = []
     with open("score.txt", "r") as f:

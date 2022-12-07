@@ -4,13 +4,19 @@ import numpy as np
 from tqdm import tqdm as tqdm
 from matplotlib.ticker import StrMethodFormatter
 from joblib import Parallel, delayed
+from os.path import exists
+
+file_exists = exists("main.out")
+
+
 
 savefig_path = "experimentResults/transfer_16_continuous_problems/results/figures/"
 subprocess.run(f"mkdir -p {savefig_path}", shell=True) # write out into log.txt
 
 
+
 def evaluate_cont_problem(problem_index, x, y):
-    exec_res=subprocess.run(f"./neat -evaluate-continuous-problem {problem_index} {x},{y}",shell=True, capture_output=True)  
+    exec_res=subprocess.run(f"./main.out -evaluate-continuous-problem {problem_index} {x},{y}",shell=True, capture_output=True)  
     return str(exec_res.stdout).strip("'b")
 
 def eval_cont_mesh(problem_index, X, Y):

@@ -24,7 +24,7 @@ controller_directory = "experimentation_results/qap_incremental_to_10s/controlle
 
 
 
-BINARY_PATH = "neat"
+BINARY_PATH = "main.out"
 def _prep_cmd(instance_path, max_time, controller_path):
 
     cmd = "./"

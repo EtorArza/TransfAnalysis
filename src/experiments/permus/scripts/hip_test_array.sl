@@ -61,7 +61,7 @@ SRCDIR=`pwd`
 mkdir $TMP_RES_PATH -p
 cp -v --parents $PROBLEM_PATH $SCRATCH_JOB
 cp -v --parents $CONTROLLER $SCRATCH_JOB
-cp neat -v $SCRATCH_JOB
+cp main.out -v $SCRATCH_JOB
 
 
 
@@ -95,10 +95,10 @@ cat tmp.ini
 echo "---conf file end---"
 
 date
-srun neat "tmp.ini"
+srun main.out "tmp.ini"
 date
 
-rm neat
+rm main.out
 
 mkdir $TMP_RES_PATH -p
 

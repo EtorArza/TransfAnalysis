@@ -31,10 +31,10 @@ void usage()
 {
     using namespace std;
     cerr << endl;
-    cerr << "Usage: \n ./neat path_of_config_file" << endl;
-    cerr << "for example, \n ./neat \"config_files/test.ini\"" << endl;
+    cerr << "Usage: \n ./main.out path_of_config_file" << endl;
+    cerr << "for example, \n ./main.out \"config_files/test.ini\"" << endl;
     cerr << "to delete experiment folder with the same name, use: \n";
-    cerr << "\n ./neat -f \"config_files/test.ini\"" << endl;
+    cerr << "\n ./main.out -f \"config_files/test.ini\"" << endl;
     cerr << endl;
     exit(1);
 }
@@ -49,7 +49,7 @@ int main(int argc, char *argv[])
         {
             cout << "For -evaluate-continuous-problem, the following format is expected to"
             << "compute the fitness of (0.5,0.9,0.1) and (0.2,0.1,0.421) on problem 3. " << endl;
-            cout << "./neat -evaluate-continuous-problem 3 0.5,0.9,0.1 0.2,0.1,0.421" << endl;
+            cout << "./main.out -evaluate-continuous-problem 3 0.5,0.9,0.1 0.2,0.1,0.421" << endl;
         }
         
         int problem_index = atoi(argv[2]);

@@ -82,7 +82,7 @@ EOF
 
 
 date
-./neat "tmp.ini" >$ OUTPUT_FILE
+./main.out "tmp.ini" >$ OUTPUT_FILE
 date
 
 

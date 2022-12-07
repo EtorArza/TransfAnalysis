@@ -57,14 +57,14 @@ endif
 CC_FLAGS=-Wall ${DEFINES} ${MISC_FLAGS} ${PROFILE} ${INCLUDES} ${OPENMP} ${OPT} ${UBSAN} -c -g -gdwarf-3  -Wextra
 .PHONY: clean default
 
-default: ./neat
+default: ./main.out
 
 clean:
 	rm -rf obj
-	rm -f ./neat
+	rm -f ./main.out
 	rm -f src/util/std.h.gch
 
-./neat: ${OBJECTS} ${CUDA_OBJECTS} 
+./main.out: ${OBJECTS} ${CUDA_OBJECTS} 
 	g++ ${PROFILE} ${OBJECTS} ${CUDA_OBJECTS} ${UBSAN} ${PFM_LD_FLAGS} ${LIBS} -o $@
 
 src/util/std.h.gch: src/util/std.h Makefile.conf Makefile

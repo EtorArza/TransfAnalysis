@@ -52,7 +52,7 @@ echo -n "SLURM_ARRAY_TASK_ID: "
 echo $SLURM_ARRAY_TASK_ID
 
 
-cp neat -v $SCRATCH_JOB 2>&1
+cp main.out -v $SCRATCH_JOB 2>&1
 
 cd $SCRATCH_JOB
 
@@ -97,10 +97,10 @@ echo "---conf file end---"
 
 
 date
-srun neat "tmp.ini"
+srun main.out "tmp.ini"
 date
 
-rm neat
+rm main.out
 
 
 

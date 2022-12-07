@@ -78,7 +78,7 @@ done
 
 
 
-cp neat -v $SCRATCH_JOB 
+cp main.out -v $SCRATCH_JOB 
 
 cd $SCRATCH_JOB
 
@@ -123,9 +123,9 @@ echo "---conf file end---"
 
 
 date
-srun neat "tmp.ini"
+srun main.out "tmp.ini"
 date
 
-rm neat
+rm main.out
 cd ..
 rm ${SCRATCH_JOB} -r

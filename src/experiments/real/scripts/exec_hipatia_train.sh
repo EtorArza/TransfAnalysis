@@ -96,7 +96,7 @@ EOF
 
 
 date
-./neat "tmp.ini"
+./main.out "tmp.ini"
 date
 
 

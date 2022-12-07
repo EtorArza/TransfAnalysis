@@ -56,8 +56,8 @@ results = []
 def record_results(METHOD_SHORTNAME,SOLVER_POPSIZE,PROBLEM_INDEX,PROBLEM_DIM,MAX_SOLVER_FE,X_LOWER_LIM,X_UPPER_LIM,F_COMPETITION, N_REPS):
     write_conf_file(METHOD_SHORTNAME, SOLVER_POPSIZE, PROBLEM_INDEX,
                     PROBLEM_DIM, MAX_SOLVER_FE, X_LOWER_LIM, X_UPPER_LIM, F_COMPETITION, N_REPS)
-    subprocess.run("./neat tmp_conf_file.ini > /dev/null",shell=True)
-    # subprocess.run("./neat tmp_conf_file.ini",shell=True)
+    subprocess.run("./main.out tmp_conf_file.ini > /dev/null",shell=True)
+    # subprocess.run("./main.out tmp_conf_file.ini",shell=True)
     with open("score.txt","r") as f:
         res = f.readline().strip()
     res_list = eval("["+str(F_COMPETITION)+","+res+"]") # file="coparison_score.txt")

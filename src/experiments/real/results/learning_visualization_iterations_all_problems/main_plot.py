@@ -72,8 +72,8 @@ MAX_SOLVER_FE = {MAX_SOLVER_FE}
 
 def return_results(SOLVER_POPSIZE,PROBLEM_INDEX,PROBLEM_DIM,GEN_INDEX, CONTROLLER_PREFIX, NLO, SEED):
     write_conf_file(SOLVER_POPSIZE,PROBLEM_INDEX,PROBLEM_DIM,GEN_INDEX, CONTROLLER_PREFIX, NLO, SEED)
-    subprocess.run("./neat tmp_conf_file.ini > /dev/null",shell=True)
-    # subprocess.run("./neat tmp_conf_file.ini",shell=True)
+    subprocess.run("./main.out tmp_conf_file.ini > /dev/null",shell=True)
+    # subprocess.run("./main.out tmp_conf_file.ini",shell=True)
     with open("score.txt","r") as f:
         res = f.readline().strip()
     subprocess.run("rm score.txt",shell=True)
