@@ -37,7 +37,7 @@ pip install pandas
 
 ## Quick start demo
 
-We created a toy example in the demo folder, so that getting started is easy. In this demo, we train the hyperheuristic in the  QAP problem *demo/instances/tai75e01.qap* and tested it in *demo/instances/tai60a.qap*. Note that the training is terminated at 200 seconds, and this is not enough to get a good performance, but the purpse of the demo is to show how the package works.  
+We created a toy example in the demo folder, so that getting started is easy. In this demo, we train the hyperheuristic in the  QAP problem *demo/instances/tai75e01.qap* and test it in *demo/instances/tai60a.qap*. Note that the training is terminated at 200 seconds, and this is not enough to get a good performance, but the purpse of the demo is to show how the package works.  
 
 We start with training the hyperheuristic
 
