@@ -27,5 +27,4 @@ connet_hip.sh
 test_*/
 *.txt
 *.csv
-experimentResults/*
 tmp_conf_file.ini
