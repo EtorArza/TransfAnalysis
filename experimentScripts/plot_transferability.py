@@ -1,17 +1,10 @@
-from statistics import mean, variance, stdev, median
+from statistics import mean, stdev, median
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-from seaborn import clustermap
 import seaborn as sns
-import random
-import fnmatch
-import matplotlib
 import subprocess
-from sklearn.datasets import make_biclusters
-from sklearn.cluster import SpectralCoclustering
-from sklearn.metrics import consensus_score
-from scipy.cluster.hierarchy import dendrogram, linkage
+from scipy.cluster.hierarchy import linkage
 import re
 from tqdm import tqdm as tqdm
 
