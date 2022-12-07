@@ -10,70 +10,6 @@ from tqdm import tqdm as tqdm
 
 print("__name__ =", __name__)
 
-np.random.seed(2)
-
-def get_random_value(problem_index, dim=2):
-    str_result=""
-    while str_result == "":
-        rnd_x_str = ",".join([str(el) for el in np.random.random(dim)])
-        exec_res=subprocess.run(f"./main.out -evaluate-continuous-problem {problem_index} {rnd_x_str}",shell=True, capture_output=True)  
-        str_result = str(exec_res.stdout).strip("'b")
-        if str_result=="":
-            print("str_result=''", exec_res)
-    return float()
-
-def rand_search(problem_index, n_sols):
-    return max((get_random_value(problem_index) for _ in range(n_sols)))
-
-
-n = 12
-nseeds = 10
-n_sols = 20
-matrix_data = np.zeros((n, n))
-matrix_data_mean = np.zeros((n, n))
-save_fig_path = "experimentResults/"
-
-
-def get_values_to_choose_from(j, n):
-    values_to_choose_from = np.array([rand_search(j, n_sols) for _ in range(n)])
-    values_to_choose_from = np.argsort(-values_to_choose_from) / (n-1)
-    return values_to_choose_from
-
-if __name__ == "__main__":
-    print("Running main random search.")
-
-    for j in tqdm(range(n)): # for each test
-        
-        values_to_choose_from = get_values_to_choose_from(j, n)
-        values_to_choose_from_avg = np.zeros_like(values_to_choose_from)
-        for _ in range(nseeds):
-            values_to_choose_from_avg += get_values_to_choose_from(j, n)
-        values_to_choose_from_avg /= nseeds
-
-        for i in range(n): # for each train
-            train_name = i
-            test_name = j
-            only_one_value = values_to_choose_from[i]
-            mean_value = values_to_choose_from_avg[i]
-            matrix_data[i,j] = only_one_value
-            matrix_data_mean[i,j] = mean_value
-
-    for m, name in zip([matrix_data, matrix_data_mean] , ["randomsearch", "randomsearch_median_10seeds"]):
-
-        sns.set(font_scale = 1.4)
-        #sns.set_palette(sns.color_palette("viridis", as_cmap=True))
-        tick_labels = ["$A_{" + str(el) + "}$" for el in range(1,n+1)]
-        ax = sns.heatmap(m, linewidth=0.5, xticklabels=tick_labels, yticklabels=tick_labels, vmin=0, vmax=1, cmap='viridis')
-
-        ax.xaxis.tick_top() # x axis on top
-        ax.xaxis.set_label_position('top')
-
-        plt.xticks(rotation = 90)
-        ax.set_xlabel("Test instance")
-        ax.set_ylabel("Training instance")
-        plt.tight_layout()
-        plt.savefig(save_fig_path + name + "_heatmap.pdf")
-        plt.close()
 
 
 
@@ -470,3 +406,67 @@ for input_txt, transfer_exp, save_fig_path in zip(txt_paths, transfer_exp_list, 
         # print(get_row_index(data_frame, "N-t65d11xx_150.lop", "pr136.tsp"))
         # print(data_frame.iloc[478])
 
+np.random.seed(2)
+
+def get_random_value(problem_index, dim=2):
+    str_result=""
+    while str_result == "":
+        rnd_x_str = ",".join([str(el) for el in np.random.random(dim)])
+        exec_res=subprocess.run(f"./main.out -evaluate-continuous-problem {problem_index} {rnd_x_str}",shell=True, capture_output=True)  
+        str_result = str(exec_res.stdout).strip("'b")
+        if str_result=="":
+            print("str_result=''", exec_res)
+    return float()
+
+def rand_search(problem_index, n_sols):
+    return max((get_random_value(problem_index) for _ in range(n_sols)))
+
+
+n = 12
+nseeds = 10
+n_sols = 20
+matrix_data = np.zeros((n, n))
+matrix_data_mean = np.zeros((n, n))
+save_fig_path = "experimentResults/"
+
+
+def get_values_to_choose_from(j, n):
+    values_to_choose_from = np.array([rand_search(j, n_sols) for _ in range(n)])
+    values_to_choose_from = np.argsort(-values_to_choose_from) / (n-1)
+    return values_to_choose_from
+
+if __name__ == "__main__":
+    print("Running main random search.")
+
+    for j in tqdm(range(n)): # for each test
+        
+        values_to_choose_from = get_values_to_choose_from(j, n)
+        values_to_choose_from_avg = np.zeros_like(values_to_choose_from)
+        for _ in range(nseeds):
+            values_to_choose_from_avg += get_values_to_choose_from(j, n)
+        values_to_choose_from_avg /= nseeds
+
+        for i in range(n): # for each train
+            train_name = i
+            test_name = j
+            only_one_value = values_to_choose_from[i]
+            mean_value = values_to_choose_from_avg[i]
+            matrix_data[i,j] = only_one_value
+            matrix_data_mean[i,j] = mean_value
+
+    for m, name in zip([matrix_data, matrix_data_mean] , ["randomsearch", "randomsearch_median_10seeds"]):
+
+        sns.set(font_scale = 1.4)
+        #sns.set_palette(sns.color_palette("viridis", as_cmap=True))
+        tick_labels = ["$A_{" + str(el) + "}$" for el in range(1,n+1)]
+        ax = sns.heatmap(m, linewidth=0.5, xticklabels=tick_labels, yticklabels=tick_labels, vmin=0, vmax=1, cmap='viridis')
+
+        ax.xaxis.tick_top() # x axis on top
+        ax.xaxis.set_label_position('top')
+
+        plt.xticks(rotation = 90)
+        ax.set_xlabel("Test instance")
+        ax.set_ylabel("Training instance")
+        plt.tight_layout()
+        plt.savefig(save_fig_path + name + "_heatmap.pdf")
+        plt.close()
