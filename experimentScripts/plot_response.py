@@ -150,7 +150,7 @@ for idx, input_txt, transfer_exp, save_fig_path in zip(range(len(transfer_exp_li
 
             new_row_df = pd.DataFrame([[response, train_name, test_name, train_type, test_type, train_seed, resp_diff_to_average_same_train, resp_diff_to_global_average, diff_higher_to_global]], 
                             columns=["response", "train_name", "test_name", "train_type", "test_type", "train_seed", "resp_diff_to_average_same_train", "resp_diff_to_global_average", "diff_higher_to_global"])
-            data_frame = pd.concat([data_frame, new_row_df])
+            data_frame = pd.concat([data_frame, new_row_df], ignore_index=True)
 
     def sort_key(x):
         if x.isnumeric():
