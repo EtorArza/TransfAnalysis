@@ -7,7 +7,7 @@ import time
 
 # rm log.txt -f && cd ~/Dropbox/BCAM/02_NEAT_transferability/code/NEAT_code/ && make &&  cd .. && rsync -av --exclude=".*" NEAT_code /dev/shm/ && cd /dev/shm/NEAT_code && python experimentScripts/static_networks_grid_search_continuous.py
 
-result_file_path = "/home/paran/Dropbox/BCAM/02_NEAT_transferability/code/NEAT_code/experimentResults/staticNetwork/"
+result_file_path = "experimentResults/staticNetwork/"
 subprocess.run(f"mkdir -p {result_file_path}",shell=True)
 
 subprocess.run("rm -f tmp_conf_file.ini",shell=True)
