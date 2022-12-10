@@ -338,6 +338,8 @@ for input_txt, transfer_exp, save_fig_path in zip(txt_paths, transfer_exp_list, 
             m = len(train_names)
             n = len(test_names)
 
+            assert n==m
+
             matrix_data = np.zeros((m,n))
             for i in range(m):
                 for j in range(n):
@@ -349,13 +351,48 @@ for input_txt, transfer_exp, save_fig_path in zip(txt_paths, transfer_exp_list, 
                     matrix_data[i,j] = value
             #sns.set_palette(sns.color_palette("viridis", as_cmap=True))
 
+            def get_loss(matrix):
+                return sum(sum(abs(matrix[:,1:]- matrix[:,:-1]))) + sum(sum(abs(matrix[1:,:]- matrix[:-1,:])))
+
+            def get_loss_permu(matrix, permu):
+                return get_loss(matrix[np.ix_(permu, permu)])
+
+            local_optima = False
+            permu = np.array(range(n))
+            best_permu = permu[:]
+            best_loss = 1e9
+            best_loss_current = 1e9
+            import time
+            t = time.time()
+            np.random.seed(7)
+            while time.time() - t < 900.0:
+                np.random.shuffle(permu)
+                best_loss_current = 1e9
+                local_optima = False
+                while not local_optima:
+                    local_optima = True
+                    for i in range(n):
+                        for j in range(n):
+                            cand_permu = permu.copy()
+                            cand_permu[i], cand_permu[j] = cand_permu[j], cand_permu[i]
+                            loss = get_loss_permu(matrix_data, cand_permu)
+                            if loss < best_loss_current:
+                                best_loss_current = loss
+                                permu = cand_permu.copy()
+                                if loss < best_loss:
+                                    best_loss = loss
+                                    best_permu = cand_permu.copy()
+                                    print(best_loss, best_loss_current, best_permu)
+                                local_optima = False
+
+
             sns.set(font_scale={"Transfer16OnlyOne": 1.4,
                                 "transferGenerated": 1.4,
                                 "QAP": 0.7,
                                 "PERMUPROB": 0.7
                                 }[transfer_exp]
                     )
-            ax = sns.heatmap(matrix_data, linewidth=0.5, xticklabels=nice_train_names, yticklabels=nice_test_names, vmin=0, vmax=1, cmap='viridis')
+            ax = sns.heatmap(matrix_data[np.ix_(best_permu, best_permu)], linewidth=0.5, xticklabels=np.array(nice_train_names)[best_permu], yticklabels=np.array(nice_test_names)[best_permu], vmin=0, vmax=1, cmap='viridis')
 
 
             ax.xaxis.tick_top() # x axis on top
@@ -391,8 +428,8 @@ for input_txt, transfer_exp, save_fig_path in zip(txt_paths, transfer_exp_list, 
             ax.ax_heatmap.tick_params(axis="x", labelrotation = 90)
 
             ax.cax.set_visible(True)
-            ax.ax_row_dendrogram.set_visible(False)
-            ax.ax_col_dendrogram.set_visible(False)
+            # ax.ax_row_dendrogram.set_visible(False)
+            # ax.ax_col_dendrogram.set_visible(False)
             ax.ax_row_dendrogram.set_xlim([0,0])
             plt.tight_layout()
             plt.savefig(save_fig_path+transfer_exp+"_clustered_"+"_heatmap.pdf")
