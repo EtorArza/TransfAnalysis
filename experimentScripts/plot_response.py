@@ -415,7 +415,7 @@ for idx, input_txt, transfer_exp, save_fig_path in zip(range(len(transfer_exp_li
                 label = ["TSP", "LOP", "PFSP", "QAP"][color_index]
 
             elif transfer_exp == "Transfer16OnlyOne":
-                color_index = 0 if train_instance in ("_6_", "_11_", "_2_", "_1_", "_5_") else (1 if train_instance in ("_8_", "_7_", "_4_", "_3_") else (2 if train_instance in ("_9_", "_10_", "_12_") else None)) 
+                color_index = 1 if train_instance in ("_6_", "_11_", "_2_", "_1_", "_5_") else (2 if train_instance in ("_8_", "_4_", "_7_", "_3_") else (0 if train_instance in ("_9_", "_10_", "_12_") else None)) 
                 label = "Cluster " + str(color_index+1)
             else:
 
@@ -432,9 +432,12 @@ for idx, input_txt, transfer_exp, save_fig_path in zip(range(len(transfer_exp_li
 
             ax.scatter(xi,yi,marker=ma, color=ci, label=label)
 
-
-
-        ax.legend(fontsize=8, markerscale=1.0)
+        if transfer_exp == "Transfer16OnlyOne":
+            handles, labels = plt.gca().get_legend_handles_labels()
+            order = [2,0,1]
+            ax.legend([handles[idx] for idx in order],[labels[idx] for idx in order], fontsize=8, markerscale=1.0)
+        else:
+            ax.legend(fontsize=8, markerscale=1.0)
         fig.tight_layout()
         fig.savefig(file_name)
         plt.close()
