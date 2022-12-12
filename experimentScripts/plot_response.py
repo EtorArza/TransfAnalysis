@@ -415,7 +415,7 @@ for idx, input_txt, transfer_exp, save_fig_path in zip(range(len(transfer_exp_li
                 label = ["TSP", "LOP", "PFSP", "QAP"][color_index]
 
             elif transfer_exp == "Transfer16OnlyOne":
-                color_index = 0 if train_instance in ("_6_", "_11_", "_2_", "_1_", "_5_") else (1 if train_instance in ("_8_", "_7_", "_4_", "_3_") else (2 if train_instance in ("_9_", "_10_", "_12_") else None)) 
+                color_index = 1 if train_instance in ("_6_", "_11_", "_2_", "_1_", "_5_") else (2 if train_instance in ("_8_", "_4_", "_7_", "_3_") else (0 if train_instance in ("_9_", "_10_", "_12_") else None)) 
                 label = "Cluster " + str(color_index+1)
             else:
 
