@@ -214,7 +214,7 @@ for input_txt, transfer_exp, save_fig_path in zip(txt_paths, transfer_exp_list, 
                 return "$A_{"+x.strip("_") + "}$"
             elif transfer_exp == "QAP":
                 name = x.split("_")[0]
-                new_name = name[0] + str(["A","B","C"].index(name[0]) * 7 + int(name[1]))
+                new_name = ["taixxA_","taixxB_","sko_"][["A","B","C"].index(name[0])] + str(["A","B","C"].index(name[0]) * 7 + int(name[1]))
                 return new_name
             else:
                 return x.strip("_")
