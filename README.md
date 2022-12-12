@@ -69,7 +69,7 @@ The experiments in the paper can be replicated with the scripts inside experimen
 # Generate the contour plots of the continuous functions
 python experimentScripts/plot_continuous_functions.py
 
-# Generate the Transferabioity heatmaps (analyzing problem sets via the performance of the hyperheuristic)
+# Generate the Transferability matrices (analyzing problem sets via the performance of the hyperheuristic)
 python experimentScripts/plot_transferability.py
 
 # Generate the LDAs (analyzing problem sets via the behaviur of the hyperheuristic)
