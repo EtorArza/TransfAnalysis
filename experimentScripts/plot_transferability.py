@@ -352,7 +352,7 @@ for input_txt, transfer_exp, save_fig_path in zip(txt_paths, transfer_exp_list, 
             #sns.set_palette(sns.color_palette("viridis", as_cmap=True))
 
             def get_loss(matrix):
-                return sum(sum(abs(matrix[:,1:]- matrix[:,:-1]))) + sum(sum(abs(matrix[1:,:]- matrix[:-1,:])))
+                return sum(np.linalg.norm(abs(matrix[:,1:]- matrix[:,:-1]), axis=0)) + sum(np.linalg.norm(abs(matrix[1:,:]- matrix[:-1,:]), axis=1))
 
             def get_loss_permu(matrix, permu):
                 return get_loss(matrix[np.ix_(permu, permu)])
