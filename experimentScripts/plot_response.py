@@ -401,7 +401,7 @@ for idx, input_txt, transfer_exp, save_fig_path in zip(range(len(transfer_exp_li
             yi = np.array(df.iloc[idx,1])
             if transfer_exp == "QAP":
                 color_index = {"A":0, "B":1, "C":2}[train_instance[0]]
-                label = ["Taiaxx", "Taibxx", "Sko"][color_index]
+                label = ["taixxA", "taixxB", "sko"][color_index]
 
             elif transfer_exp == "PERMUPROB":
                 if ".tsp" in train_instance:

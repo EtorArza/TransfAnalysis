@@ -365,7 +365,9 @@ for input_txt, transfer_exp, save_fig_path in zip(txt_paths, transfer_exp_list, 
             import time
             t = time.time()
             np.random.seed(7)
-            while time.time() - t < 900.0:
+            search_seconds = 900.0
+            print(f"Finding best order. Will run for {search_seconds} seconds.")
+            while time.time() - t < search_seconds:
                 np.random.shuffle(permu)
                 best_loss_current = 1e9
                 local_optima = False
