@@ -24,7 +24,7 @@
 # # # #SBATCH -p short
 
 SCRATCH_JOB=${SCRATCH_JOB}_${SLURM_ARRAY_TASK_ID}
-mkdir ${SCRATCH_JOB}
+mkdir ${SCRATCH_JOB} -p
 
 
 

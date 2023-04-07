@@ -10,7 +10,7 @@
 #SBATCH -p medium
 #SBATCH --exclude=n[001-004]
 
-mkdir ${SCRATCH_JOB}
+mkdir ${SCRATCH_JOB} -p
 
 source scripts/array_to_string_functions.sh 
 

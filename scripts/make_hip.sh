@@ -9,7 +9,7 @@
 #SBATCH --exclude=n[001-004,017-018]
 
 SCRATCH_JOB="${SCRATCH_JOB}_${SLURM_ARRAY_TASK_ID}_compile"
-mkdir ${SCRATCH_JOB}
+mkdir ${SCRATCH_JOB} -p
 
 
 SRC_DIR=`pwd`

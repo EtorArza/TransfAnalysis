@@ -83,7 +83,7 @@ cat > script_2828a8741ae82e71b77975df5ec94c25.sh <<EOF
 #SBATCH -p short
 
 SCRATCH_JOB=${SCRATCH_JOB}_${SLURM_ARRAY_TASK_ID}
-mkdir ${SCRATCH_JOB}
+mkdir ${SCRATCH_JOB} -p
 
 
 
