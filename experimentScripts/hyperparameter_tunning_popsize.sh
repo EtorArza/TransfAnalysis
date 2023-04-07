@@ -51,7 +51,7 @@ for SOLVER_POPSIZE in 4 8 16 32; do
         i=$((i+1))
 
 
-        CONTROLLER_NAME_PREFIX_ARRAY+=("popsize_${SOLVER_POPSIZE}_seed${train_seed}")
+        CONTROLLER_NAME_PREFIX_ARRAY+=("continuous_popsize_${SOLVER_POPSIZE}_seed${train_seed}")
         SEED_ARRAY+=("${train_seed}")
 
         COMMA_SEPARATED_PROBLEM_INDEX_LIST_ARRAY+=("${INSTANCE_INDEX}")
@@ -90,7 +90,7 @@ for SOLVER_POPSIZE in 4 8 16 32; do
 
     for train_seed in 2 3 4 5 6 7 8 9 10 11; do
         i=$((i+1))
-        CONTROLLER_NAME_PREFIX="popsize_${SOLVER_POPSIZE}_seed${train_seed}"
+        CONTROLLER_NAME_PREFIX="continuous_popsize_${SOLVER_POPSIZE}_seed${train_seed}"
         CONTROLLER_ARRAY+=("${EXPERIMENT_CONTROLLER_FOLDER_NAME}/top_controllers/${CONTROLLER_NAME_PREFIX}_best.controller")
         SEED_ARRAY+=("2") # the same seed for testing, the seed changes only for the controller name.
         PROBLEM_INDEX_ARRAY+=("${INSTANCE_INDEX}")
@@ -110,4 +110,80 @@ echo "TEST_JOB_ID = ${TEST_JOB_ID}"
 
 # TEST_JOB_ID=":TEST_JOB_ID1:TEST_JOB_ID2:TEST_JOB_ID3"
 sbatch --dependency=afterok${TEST_JOB_ID} --export=SCORE_PATH=${SCORE_PATH},RESPONSE_PATH=${RESPONSE_PATH},COMPUTE_RESPONSE=${COMPUTE_RESPONSE},TMP_RES_PATH=${TMP_RES_PATH} scripts/cat_result_files_to_exp_folder.sh
+
+
+
+############ PERMUS #############
+
+echo "Permus."
+echo "Results saved on: $EXPERIMENT_RESULT_FOLDER_NAME"
+
+PROBLEM_TYPE="qap"
+PROBLEM_PATH="$EXPERIMENT_RESULT_FOLDER_NAME/demo/instances/tai60a.qap"
+
+
+TRAIN_JOB_ID=""
+TEST_JOB_ID=""
+
+
+
+
+for SOLVER_POPSIZE in 4 8 16 32; do
+    i=-1
+    PROBLEM_TYPE_ARRAY=()
+    PROBLEM_PATH_ARRAY=()
+    CONTROLLER_NAME_PREFIX_ARRAY=()
+    SEED_ARRAY=()
+    for train_seed in 2 3 4 5 6 7 8 9 10 11; do
+        i=$((i+1))
+        CONTROLLER_NAME_PREFIX="permus_popsize_${SOLVER_POPSIZE}_seed${train_seed}"
+        
+        PROBLEM_TYPE_ARRAY+=("${PROBLEM_TYPE}")
+        COMMA_SEPARATED_LIST_OF_INSTANCE_PATHS_ARRAY+=("${PROBLEM_PATH}")
+        CONTROLLER_NAME_PREFIX_ARRAY+=("${CONTROLLER_NAME_PREFIX}")
+        SEED_ARRAY+=("${train_seed}")
+    done
+    PROBLEM_TYPE_ARRAY=$(to_list "${PROBLEM_TYPE_ARRAY[@]}")
+    COMMA_SEPARATED_LIST_OF_INSTANCE_PATHS_ARRAY=$(to_list "${COMMA_SEPARATED_LIST_OF_INSTANCE_PATHS_ARRAY[@]}")
+    CONTROLLER_NAME_PREFIX_ARRAY=$(to_list "${CONTROLLER_NAME_PREFIX_ARRAY[@]}")
+    SEED_ARRAY=$(to_list "${SEED_ARRAY[@]}")
+    TRAIN_JOB_ID="${TRAIN_JOB_ID}:`sbatch --parsable --dependency=afterok:${COMPILE_JOB_ID} --export=PROBLEM_TYPE_ARRAY=$PROBLEM_TYPE_ARRAY,COMMA_SEPARATED_LIST_OF_INSTANCE_PATHS_ARRAY=$COMMA_SEPARATED_LIST_OF_INSTANCE_PATHS_ARRAY,SEED_ARRAY=$SEED_ARRAY,NEAT_POPSIZE=$NEAT_POPSIZE,MAX_SOLVER_FE=$MAX_SOLVER_FE,SOLVER_POPSIZE=$SOLVER_POPSIZE,MAX_TRAIN_ITERATIONS=$MAX_TRAIN_ITERATIONS,MAX_TRAIN_TIME=$MAX_TRAIN_TIME,EXPERIMENT_CONTROLLER_FOLDER_NAME=${EXPERIMENT_CONTROLLER_FOLDER_NAME},TEST_RESULT_FOLDER_NAME=${TEST_RESULT_FOLDER_NAME},LOG_DIR=${LOG_DIR},CONTROLLER_NAME_PREFIX_ARRAY=${CONTROLLER_NAME_PREFIX_ARRAY} --array=0-$i src/experiments/permus_multi/scripts/hip_train_multi_array.sl`"
+done
+
+
+
+echo "TRAIN_JOB_ID = ${TRAIN_JOB_ID}"
+
+
+############  TEST ###########
+
+COMPUTE_RESPONSE="true"
+N_REPS=1
+N_EVALS=10000
+
+TESTING_JOB_ID=""
+for SOLVER_POPSIZE in 4 8 16 32; do
+    i=-1
+    CONTROLLER_ARRAY=()
+    PROBLEM_TYPE_ARRAY=()
+    PROBLEM_PATH_ARRAY=()
+    for train_seed in 2 3 4 5 6 7 8 9 10 11; do
+        i=$((i+1))
+        PROBLEM_PATH="demo/instances/tai60a.qap"
+        CONTROLLER_NAME_PREFIX="permus_popsize_${SOLVER_POPSIZE}_seed${train_seed}"
+
+        CONTROLLER_ARRAY+=("${EXPERIMENT_CONTROLLER_FOLDER_NAME}/top_controllers/${CONTROLLER_NAME_PREFIX}_best.controller")
+        PROBLEM_TYPE_ARRAY+=("${PROBLEM_TYPE}")
+        PROBLEM_PATH_ARRAY+=("${PROBLEM_PATH}")
+    done
+    CONTROLLER_ARRAY=$(to_list "${CONTROLLER_ARRAY[@]}")
+    PROBLEM_TYPE_ARRAY=$(to_list "${PROBLEM_TYPE_ARRAY[@]}")
+    PROBLEM_PATH_ARRAY=$(to_list "${PROBLEM_PATH_ARRAY[@]}")
+    TEST_JOB_ID=$TEST_JOB_ID:`sbatch --dependency=afterok${TRAIN_JOB_ID} --parsable --export=CONTROLLER_ARRAY=${CONTROLLER_ARRAY},PROBLEM_TYPE_ARRAY=${PROBLEM_TYPE_ARRAY},PROBLEM_PATH_ARRAY=${PROBLEM_PATH_ARRAY},MAX_SOLVER_FE=${MAX_SOLVER_FE},COMPUTE_RESPONSE=${COMPUTE_RESPONSE},TMP_RES_PATH=${TMP_RES_PATH},N_REPS=${N_REPS},N_EVALS=${N_EVALS},TEST_RESULT_FOLDER_NAME=${TEST_RESULT_FOLDER_NAME},LOG_DIR=${LOG_DIR} --array=0-$i src/experiments/permus/scripts/hip_test_array.sl`
+done
+
+echo "TEST_JOB_ID = ${TEST_JOB_ID}"
+
+sbatch --dependency=afterok$TEST_JOB_ID --export=SCORE_PATH=${SCORE_PATH},RESPONSE_PATH=${RESPONSE_PATH},COMPUTE_RESPONSE=${COMPUTE_RESPONSE},TMP_RES_PATH=${TMP_RES_PATH} scripts/cat_result_files_to_exp_folder.sh
+
 
