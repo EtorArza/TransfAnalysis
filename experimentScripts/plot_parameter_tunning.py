@@ -22,5 +22,10 @@ for domain in ["continuous", "permus"]:
     df = pd.DataFrame(rows, columns=["popsize","seed","f"])
 
     fig = df.boxplot(column="f", by="popsize")
-    plt.show()
+    plt.xlabel("Population Size")
+    plt.ylabel("Objective value")
+    plt.title("")
+    plt.suptitle("")
+    plt.tight_layout()
+    plt.savefig(f"experimentResults/hyperparameter_tunning/results/figures/popsize_tunning_results_{domain}.pdf")
     plt.close()
