@@ -5,6 +5,9 @@ import numpy as np
 from tqdm import tqdm as tqdm
 import time
 
+
+# This code is a disgusting mess. I got lazy and don't want to improve it. 
+
 # rm log.txt -f && cd ~/Dropbox/BCAM/02_NEAT_transferability/code/NEAT_code/ && make &&  cd .. && rsync -av --exclude=".*" NEAT_code /dev/shm/ && cd /dev/shm/NEAT_code && python experimentScripts/static_networks_grid_search_continuous.py
 
 result_file_path = "experimentResults/staticNetwork/"
@@ -123,6 +126,42 @@ def evaluate_continuous_static_controller(PROBLEM_INDEX, output1, output2, outpu
     return score
 
 if __name__ == "__main__":
+
+    print("Testing default params.")
+    for problem_index,nlo in zip([0, 0, 0, 0, 0, 0, 0] + list(range(1,13)), [64, 32, 16, 8, 4, 2, 1] + [None for _ in range(1,13)]):
+
+        test_seed = 3
+        max_seeds = 300
+        done_test=False
+        best_outputs_and_score = []
+
+        hack_to_compatibilize = lambda x: (x + 2) / 4
+        output1,output2,output3 = hack_to_compatibilize(0.729844), hack_to_compatibilize(1.49618), hack_to_compatibilize(1.49618)
+
+
+        while not done_test and test_seed < max_seeds:
+            try:
+                subprocess.run("rm -f tmp_conf_file.ini",shell=True)
+                subprocess.run("rm -f score.txt",shell=True)
+                subprocess.run("rm -f response.txt",shell=True)
+                best_outputs_and_score.append(evaluate_continuous_static_controller(problem_index,output1,output2,output3, N_EVALS_TEST, test_seed, nlo))
+                done_test=True
+            except FileNotFoundError:
+                print("Failed with seed ", test_seed,"!")
+                print("Trying with next seed...")
+                test_seed += 1
+
+        with open(result_file_path+"continuous_literature_params.csv", "a") as f:
+            print(",".join([str(el) for el in best_outputs_and_score]), file=f)
+
+    exit(0)
+
+
+
+
+
+
+
 
     n_rep_search = 1
     upper_start = 0.98
