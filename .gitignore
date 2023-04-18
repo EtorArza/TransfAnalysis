@@ -26,3 +26,5 @@ connet_hip.sh
 test_*/
 tmp_conf_file.ini
 main.out
+tmp_*.controller
+detailed_response.txt
