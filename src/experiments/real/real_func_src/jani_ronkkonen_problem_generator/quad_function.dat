@@ -1,69 +1,12 @@
 1
 1
-2
+20
+3
+-1
 1
-2
-1
-4
-0.02
+64
 -1
 -1
 -1
-
-Example input file for generating a function of the quadratic function family.
-
-Lines:
-
-1. The function family we want to use. 1 means the quadratic family and you should 
-	not change this value here. See other example input files
-	for information about using the other function families.
-
-2. Screen output level: 
-	1: No output, except errors to stderr (cause the function to exit)
-	2: Only initialization related outputs
-	3: Full screen output (default value)
-
-3. D, Dimension of the problem (0<D<=DMAX, default 2)
-
-4. Seed for random number generator. Default: seed taken from time
-
-5. Controls the shape of the generated optima (both local and global). 
-	Value 1 allows different width for each dimension
-	value 2 means that each optimum is also randomly rotated
-	Any other value means that all optima are of equal width (circle shape) 
-
-6. Amount of Global optima, default 1
-	
-7. Amount of local optima, default 0
-
-8. The minimum euclidean distance between two global optima. The value must be
-	between MINDISTLOW and MINDISTUP (defined in quadratic.c). MINDISTLOW is 
-	the default value.
-
-9. Lower and upper limit for the optimum objective function values of local minima. 
-	Must be between DIVLOWL and DIVUPL(defined in quadratic.c), which are also the 
-	default values. A value for each local optima is randomly generated in this range. 
-	A single value means that all local optima will share the same optimum value. 
-	Note: when using large shapes and lot of optimas, high upper limit may cause problems 
-	in initialization phase, since shallow local optima are tricky to place in growded 
-	space such that they are not shadowed by some other optima.
-
-10. Lower and upper limit for the shape of the global optima. A value for each dimension 
-	is randomly generated in this range. A single value means that the optima is a 
-	round shape. The value nust be between MINSHAPE and MAXSHAPE (defined in quadratic.c), 
-	which are also the default values. 
-	Note: using too large value for upper limit with 
-	large amount of optima and/or shallow local optima may cause problems in initialization 
-	phase, because local optima may be tricky to place in crowded space such that they are not
-	shadowed by some other optima.
-
-11. Lower and upper limit for the shape of the local optima. A value for each dimension 
-	is randomly generated in this range. A single value means that the optima is a 
-	round shape.The value nust be between MINSHAPE and MAXSHAPE (defined in quadratic.c), 
-	which are also the default values.
-	Note: using too large value for upper limit with 
-	large amount of optima and/or shallow local optima may cause problems in initialization 
-	phase, because local optima may be tricky to place in crowded space such that they are not
-	shadowed by some other optima.
-
-To use default values, just type -1 for any of the lines.
+-1
+EOF

@@ -150,23 +150,21 @@ def get_hh_controller_path(index, seed):
 
 if __name__ == "__main__":
 
-    problem_index_labels = [f"A_{i}" for i in range(1,13)] + [f"nlo_{i}" for i in [1,2,4,8,16,32]]
-
-    n_rep_search = 1
+    problem_index_labels = [f"A_{i}" for i in range(1,13)] + [f"nlo_{i}" for i in [1,2,4,8,16,32,64]]
     upper_start = 0.98
     lower_start = -0.98
     all_rows = []
-    t = tqdm(total = n_slices*n_slices*n_slices*19*n_rep_search)
-    for problem_index in range(18):
-        row_to_be_written = [problem_index_labels[problem_index]]
-
+    for problem_index in range(19):
+        problem_label = problem_index_labels[problem_index]
+        row_to_be_written = [problem_label]
+        print("Working on problem",problem_label)
+        t = tqdm(total = n_slices*n_slices*n_slices)
         # Default params
         hack_to_compatibilize = lambda x: x / 2
         output1,output2,output3 = hack_to_compatibilize(0.729844), hack_to_compatibilize(1.49618), hack_to_compatibilize(1.49618)
         done_test=False
         test_seed = TEST_SEED
         while not done_test and test_seed < max_restarts_after_crash_rokkonen:
-            print("Evaluating ...")
             try:
                 subprocess.run("rm -f tmp_conf_file.ini",shell=True)
                 subprocess.run("rm -f score.txt",shell=True)
