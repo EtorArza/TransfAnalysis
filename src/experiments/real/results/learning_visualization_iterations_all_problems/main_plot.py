@@ -11,7 +11,7 @@ MAX_GEN=5000
 N_EVALS = 1000 # N of repetitions averaged
 N_REPS = 1 # N of averaged repetitions repeated
 THREADS = 1
-CONTROLLER_PATH = '/home/paran/Dropbox/BCAM/02_NEAT_transferability/code/NEAT_code/experimentResults/transfer_generated_continuous/controllers/all_controllers'
+CONTROLLER_PATH = '/home/paran/Dropbox/BCAM/02_NEAT_transferability/code/experimentResults/transfer_generated_continuous/controllers/all_controllers'
 FULL_MODEL = "false"
 
 NLO_train_list = [1,4,16,32]

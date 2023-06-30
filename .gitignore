@@ -30,3 +30,5 @@ tmp_*.controller
 detailed_response.txt
 .RData
 .Rhistory
+venv
+old

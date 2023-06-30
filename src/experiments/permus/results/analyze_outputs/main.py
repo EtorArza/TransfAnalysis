@@ -15,9 +15,9 @@ from typing import Tuple, List, Callable
 from tqdm import tqdm as tqdm
 
 #save_fig_path = "/home/paran/Dropbox/BCAM/02_NEAT_permus/paper/images/analyze_outputs/"
-save_fig_path = "/home/paran/Dropbox/BCAM/NEAT_code/src/experiments/permus/results/analyze_outputs/figures/"
+save_fig_path = "/home/paran/Dropbox/BCAM/02_NEAT_transferability/code/src/experiments/permus/results/analyze_outputs/figures/"
 
-#input_file = "/home/paran/Dropbox/BCAM/NEAT_code/src/experiments/permus/results/analyze_outputs/responses_journal.txt"
+#input_file = "/home/paran/Dropbox/BCAM/02_NEAT_transferability/code/src/experiments/permus/results/analyze_outputs/responses_journal.txt"
 
 
 DATASET_list = [
@@ -31,13 +31,13 @@ DATASET_list = [
 ]
 
 input_file_list = [
-    "/home/paran/Dropbox/BCAM/NEAT_code/src/experiments/permus/results/4by4_permu_problems/result_response_transfer_permuproblem_0_1s_2h.txt",
-    "/home/paran/Dropbox/BCAM/NEAT_code/src/experiments/permus/results/4by4_permu_problems/result_response_transfer_permuproblem_0_25s_1h.txt",
-    "/home/paran/Dropbox/BCAM/NEAT_code/src/experiments/permus/results/4by4_permu_problems/result_response_transfer_permuproblem_0_1s_12h.txt",
-    "/home/paran/Dropbox/BCAM/NEAT_code/src/experiments/permus/results/transfer_qap_with_cut_instances/result_response_transfer_qap_0_1s_2h.txt",
-    "/home/paran/Dropbox/BCAM/NEAT_code/src/experiments/permus/results/transfer_qap_with_cut_instances/result_response_transfer_qap_0_25s_1h.txt",
-    "/home/paran/Dropbox/BCAM/NEAT_code/src/experiments/permus/results/transfer_qap_with_cut_instances/result_response_transfer_qap_0_1s_12h.txt",
-    "/home/paran/Dropbox/BCAM/NEAT_code/src/experiments/permus/results/transfer_qap_with_cut_instances/result_response_transfer_qap_0_1s_12h_7instances.txt"
+    "/home/paran/Dropbox/BCAM/02_NEAT_transferability/code/src/experiments/permus/results/4by4_permu_problems/result_response_transfer_permuproblem_0_1s_2h.txt",
+    "/home/paran/Dropbox/BCAM/02_NEAT_transferability/code/src/experiments/permus/results/4by4_permu_problems/result_response_transfer_permuproblem_0_25s_1h.txt",
+    "/home/paran/Dropbox/BCAM/02_NEAT_transferability/code/src/experiments/permus/results/4by4_permu_problems/result_response_transfer_permuproblem_0_1s_12h.txt",
+    "/home/paran/Dropbox/BCAM/02_NEAT_transferability/code/src/experiments/permus/results/transfer_qap_with_cut_instances/result_response_transfer_qap_0_1s_2h.txt",
+    "/home/paran/Dropbox/BCAM/02_NEAT_transferability/code/src/experiments/permus/results/transfer_qap_with_cut_instances/result_response_transfer_qap_0_25s_1h.txt",
+    "/home/paran/Dropbox/BCAM/02_NEAT_transferability/code/src/experiments/permus/results/transfer_qap_with_cut_instances/result_response_transfer_qap_0_1s_12h.txt",
+    "/home/paran/Dropbox/BCAM/02_NEAT_transferability/code/src/experiments/permus/results/transfer_qap_with_cut_instances/result_response_transfer_qap_0_1s_12h_7instances.txt"
 ]
 
 

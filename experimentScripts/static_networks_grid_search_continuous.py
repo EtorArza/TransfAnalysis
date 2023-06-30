@@ -7,7 +7,6 @@ import time
 
 
 
-# rm log.txt -f && cd ~/Dropbox/BCAM/02_NEAT_transferability/code/NEAT_code/ && make &&  cd .. && rsync -av --exclude=".*" NEAT_code /dev/shm/ && cd /dev/shm/NEAT_code && python experimentScripts/static_networks_grid_search_continuous.py
 
 result_file_path = "experimentResults/staticNetwork/"
 subprocess.run(f"mkdir -p {result_file_path}",shell=True)
@@ -131,11 +130,7 @@ def evaluate_with_controller(problem_index, controller_path, n_evals, seed):
     # print(f"Controller: ", controller)
     
     write_conf_file_continuous(problem_index, controller_path, n_evals, seed, nlo)
-    # subprocess.run("./main.out tmp_conf_file.ini", shell=True) # print out
-    # subprocess.run("./main.out tmp_conf_file.ini > /dev/shm/NEAT_code/log.txt", shell=True) # write out into log.txt
     subprocess.run("./main.out tmp_conf_file.ini > /dev/null", shell=True) # omit out
-    # subprocess.run("cat score.txt >> /dev/shm/NEAT_code/log.txt",shell=True)    
-    # subprocess.run("cat responses.txt >> /dev/shm/NEAT_code/log.txt",shell=True)    
     with open("score.txt","r") as f:
         res = f.readline().strip()
     score = res.split("]")[0].strip("[")

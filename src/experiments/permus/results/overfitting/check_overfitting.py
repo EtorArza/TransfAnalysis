@@ -3,7 +3,7 @@ from matplotlib import pyplot as plt
 
 directory_of_controller_directories = "src/experiments/permus/results/overfitting/test_controllers/"
 instance = "src/experiments/permus/instances/qap/cut_instances/cut60_tai80b"
-cwd = "/home/paran/Dropbox/BCAM/NEAT_code"
+cwd = "/home/paran/Dropbox/BCAM/02_NEAT_transferability/code"
 exp_dir = "src/experiments/permus/results/overfitting/"
 
 CONF_FILE = """
