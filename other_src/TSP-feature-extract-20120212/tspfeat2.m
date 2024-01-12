@@ -26,14 +26,16 @@ function tspfeat2(mypath, tspname)
 
 [pathstr, name, ext] = fileparts(tspname); 
 
+
+
 % [mypath, ff1, ff2] = fileparts(which('tspfeat2'));
 seed=rand();
 
-sfile=sprintf('/tmp/%s_normal_%f', name, seed);
-gdbfile1=sprintf('/tmp/%s_gdb1_%f', name, seed);
-gdbfile2=sprintf('/tmp/%s_gdb2_%f', name, seed);
-gdbfile3=sprintf('/tmp/%s_gdb3_%f', name, seed);
-% jfile=sprintf('/tmp/%s_jfile_%f', name, seed);
+sfile=sprintf('./tmp/%s_normal_%f', name, seed);
+gdbfile1=sprintf('./tmp/%s_gdb1_%f', name, seed);
+gdbfile2=sprintf('./tmp/%s_gdb2_%f', name, seed);
+gdbfile3=sprintf('./tmp/%s_gdb3_%f', name, seed);
+% jfile=sprintf('./tmp/%s_jfile_%f', name, seed);
 mycmd=sprintf('!ruby %s/modifytspinstance.rb %s %s', mypath, tspname, sfile);
 eval(mycmd);
 
@@ -100,8 +102,18 @@ radius=mean(CentroidDistance);
 % outlierratio=outliers/100;
 % 
 
-mycmd=sprintf('!ruby %s/run_gdbscan.rb %s %s %s %s %s', mypath, mypath,sfile, gdbfile1, gdbfile2, gdbfile3);
-eval(mycmd);
+
+mycmd=sprintf('ruby %s/run_gdbscan.rb %s %s %s %s %s', mypath, mypath,sfile, gdbfile1, gdbfile2, gdbfile3);
+disp('run')
+disp(' ')
+disp(' ')
+disp(mycmd)
+disp(' ')
+disp(' ')
+disp('on MINGW64 bash terminal. Make sure you are on the folder TSP-feature-extract-20120212')
+disp(' ')
+input('Press Enter to continue once you have run the command...');
+% system(mycmd);
 
 
 linresult1=csvread(gdbfile1);

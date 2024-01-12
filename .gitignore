@@ -32,3 +32,12 @@ detailed_response.txt
 .Rhistory
 venv
 old
+other_src/TSP-feature-extract-20120212/requiredMCRProducts.txt
+other_src/TSP-feature-extract-20120212/tspfeat2.asv
+other_src/TSP-feature-extract-20120212/tspfeat2.exe
+other_src/TSP-feature-extract-20120212/unresolvedSymbols.txt
+other_src/TSP-feature-extract-20120212/mccExcludedFiles.log
+other_src/TSP-feature-extract-20120212/includedSupportPackages.txt
+other_src/TSP-feature-extract-20120212/tmp/*
+!other_src/TSP-feature-extract-20120212/tmp/.gitkeep
+other_src/TSP-feature-extract-20120212/mccExcludedFiles.log

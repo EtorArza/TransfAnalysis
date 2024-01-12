@@ -10,13 +10,17 @@ file2=ARGV[3]
 file3=ARGV[4]
 
 
-tmpfile="/tmp/tmp_#{rand()}"
-tmpfile2="/tmp/tmp_#{rand()}"
+tmpfile="./tmp/tmp_#{rand()}"
+tmpfile2="./tmp/tmp_#{rand()}"
 f1=File.new(file1, 'w')
 f2=File.new(file2, 'w')
 f3=File.new(file3, 'w')
 mycmd="sh -c '#{mypath}/gdbscan.pl -m 5 -e 40 #{infile} 1> #{tmpfile2} 2>  #{tmpfile}'"
+print mycmd
+# puts "Press Enter to continue..."
+# $stdin.gets
 system mycmd
+
 File.open(tmpfile){ |lines|
   while thisline=lines.gets
     if thisline=~/^OUTLIERS\s(.*)$/
