@@ -1,0 +1,32 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/Users/toand/git/mivp/projects/instancespace/continuous_optimization/mixmod_app/discLoss_mex.cpp
+iostream
+-
+fstream
+-
+vector
+-
+string
+-
+set
+-
+algorithm
+-
+mixmod.h
+-
+mixmod/Utilities/ExampleDataUtil.h
+-
+matrix.h
+-
+mex.h
+-
+sys/time.h
+-
+
