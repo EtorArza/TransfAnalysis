@@ -56,7 +56,7 @@ end
 fclose(fid);
 
 %            data = dlmread(s, '', [6 /0 105 2]); % reads .tsp file from corner (6,0) to (105,2) where first row is 0
-data
+
 
 x=data(:,1);
 y=data(:,2);
@@ -92,7 +92,8 @@ c_y = 0.01*sum(y);
 centroid = [0.01*sum(x),0.01*sum(y)];
 
 %D = sum((x-y).^2).^0.5 %calculates a matrix of distances between each city and centroid
-for j=1:100
+
+for j=1:min(100,size(d,1))
     CentroidDistance(j)=(((d(j,1)-centroid(1)).^2)+((d(j,2)-centroid(2)).^2)).^0.5;
 end;
 radius=mean(CentroidDistance);
