@@ -24,6 +24,11 @@
 
 function tspfeat2(mypath, tspname)
 
+% Check if the file exists
+if exist(tspname, 'file') ~= 2
+    error('Error: The specified .tsp file does not exist.');
+end
+
 [pathstr, name, ext] = fileparts(tspname); 
 
 
@@ -51,6 +56,7 @@ end
 fclose(fid);
 
 %            data = dlmread(s, '', [6 /0 105 2]); % reads .tsp file from corner (6,0) to (105,2) where first row is 0
+data
 
 x=data(:,1);
 y=data(:,2);
@@ -148,15 +154,15 @@ M =[s c_x c_y radius D1fraction D2fraction D3fraction D4fraction area sdnNNd coe
 nameM={'s' 'c_x' 'c_y' 'radius' 'D1fraction' 'D2fraction' 'D3fraction' 'D4fraction' 'area' 'sdnNNd' 'coeffvarnNNd' 'clusterratio' 'outlierratio' 'varCitiesperCluster'};
 
 for i =1:length(M)-1
-fprintf('%s, ', nameM{i});
+fprintf('%s,', nameM{i});
 end
-fprintf('%s \n', nameM{end})';
+fprintf('%s\n', nameM{end})';
 
-
+fprintf('%s%s,', name, ext);
 for i =1:length(M)-1
-fprintf('%f, ', M(i));
+fprintf('%f,', M(i));
 end
-fprintf('%f \n', M(end))';
+fprintf('%f\n', M(end))';
 
 delete(sfile);
 delete(gdbfile1);
