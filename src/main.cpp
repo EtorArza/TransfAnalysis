@@ -24,8 +24,9 @@
 #include "Parameters.h"
 #include "generator.h"
 #include "MultidimBenchmarkFF.h"
-
-
+#include "PBP.h"
+#include "Individual.h"
+#include "FitnessFunction_permu.h"
 
 void usage()
 {
@@ -84,6 +85,58 @@ int main(int argc, char *argv[])
 
     }
 
+    // local search permus
+    if (std::string(argv[1]) == "-local-search-permus")
+    {
+        
+        if (argc != 3)
+        {
+            std::cerr << "ERROR: wrong number of input arguments. Example usage: \n\n./main.out -local-search-permus src/experiments/permus/instances/transfer_tsp_instances/eil101.tsp\n" << std::flush;
+            exit(1);
+        }
+
+        size_t budget = 10000;
+
+        PERMU::PBP *problem;
+
+        std::string problemPath = std::string(argv[2]);
+        std::string problemType = problemPath.substr(problemPath.find_last_of('.') + 1);        
+        GetProblemInfo(problemType, problemPath, &problem);
+        RandomNumberGenerator *rng = new RandomNumberGenerator();
+
+        typedef PERMU::operator_t operator_type;
+        operator_type operators[3] = {PERMU::SWAP, PERMU::EXCH, PERMU::INSERT};
+        PERMU::CIndividual ind = PERMU::CIndividual(problem->GetProblemSize(), rng);
+        problem->Evaluate(&ind);
+
+        std::cout << "[";
+        for (size_t operator_idx = 0; operator_idx < 3; operator_idx++)
+        {
+            operator_type op = operators[operator_idx];
+            double f_best = -1e40;
+            ind.reset(rng);
+            problem->Evaluate(&ind);
+            for (size_t i = 0; i < budget; i++)
+            {
+                problem->local_search_iteration(&ind, op);
+                if (f_best < ind.f_value)
+                {
+                    f_best = ind.f_value;
+                }
+                
+                if (ind.is_local_optimum[op])
+                {
+                    ind.reset(rng);
+                    problem->Evaluate(&ind);
+                }
+            }
+            std::cout << f_best << ",";
+        }
+        std::cout << "]\n";
+        std::cout << std::flush;
+        exit(0);
+    }
+
     // int n = 13;
 
     // int sigma_1[n] = {5,11,2,9,4,6,0,7,8,3,10,1,12};
@@ -119,30 +172,6 @@ int main(int argc, char *argv[])
     using namespace std;
     using namespace NEAT;
 
-    /*
-    cout << "\n---------- BEGIN LICENCE DISCLAIMER----------\n";
-    cout << "The neuroevolution algorithm is based in accneat. Although some small changes \n";
-    cout << "have been made, most of the NEAT algorithm remains unchanged.\n"
-         << endl;
-    cout << "Accneat is a fork of Stanley et al.'s implementation with some \n";
-    cout << "improvements such as delete mutations and speed improvements, available at \n";
-    cout << "https://github.com/sean-dougherty/accneat (APACHE LICENCE 2.0)\n"
-         << endl
-         << endl;
-    cout << "This software also uses some other software projects or parts of them." << endl;
-    cout << "***\n";
-    cout << "Configuration file parser inih, available at https://github.com/jtilly/inih (BSD licence)" << endl;
-    cout << "Some parts of the PerMallows package by Ekhiñe Irurozki available at https://cran.r-project.org/web/packages/PerMallows/index.html (GLP licence)" << endl;
-    cout << "The incomplete gamma function (asa032.cpp and asa032.hpp), by G Bhattacharjee, originally written by John Burkardt, (GNU LGPL license).\n";
-    cout << "Continuous optimization problem generator, by Jani Rönkkönen, available at http://ronkkonen.com/generator/ (MIT licence)" << endl;
-    cout << "Random number generator by Melissa O'Neill, http://www.pcg-random.org"
-    cout << "***\n";
-
-    cout << "The original part of the source code provided here was made by Etor Arza.\n";
-    cout << "To keep the licence stuff as painless as possible, the software part writen by \n";
-    cout << "Etor Arza is distributed with APACHE LICENCE 2.0.\n\n";
-    cout << "----------END LICENCE DISCLAIMER----------\n\n\n\n\n\n";
-    */
 
 #ifndef NDEBUG
     cout << "WARNING: Debug mode. Assertions enabled." << endl;

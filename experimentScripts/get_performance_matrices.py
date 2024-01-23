@@ -1,6 +1,8 @@
 import subprocess
 import nevergrad as ng
 import numpy as np
+import glob
+import os
 
 def update_parameter_in_file(file_path, new_nlo):
     with open(file_path, 'r') as file:
@@ -57,6 +59,22 @@ def optimize(method, problem_index, budget, NLO=None):
 
 
 
+folder_path = 'src/experiments/permus/instances/transfer_tsp_instances'
+extension = '.tsp'
+file_pattern = os.path.join(folder_path, f'*{extension}')
+files = sorted(glob.glob(file_pattern))
+lines = ["Instances,algo_swap,algo_exchange,algo_insert"]
+for file_path in files:
+    print(f"Processing file: {file_path}")
+    instance = file_path.split("/")[-1]
+    res = subprocess.check_output(f"./main.out -local-search-permus {file_path}", shell=True, text=True)
+    res_list = eval(res)
+    lines.append(instance+","+",".join([str(el) for el in res_list]))
+    with open("experimentResults/problem_analisys/performanceMatrix_TSP.txt", "w") as file:
+        file.write("\n".join(lines))
+
+
+
 budget = 1000
 methods = ["RandomSearch", "DE", "PSO", "CMA"]
 lines = ["Instances,"+ ",".join(["algo_"+ el for el in methods])]
@@ -85,3 +103,5 @@ for NLO in [1,4,8,16,32,64]:
     lines.append(line)
     with open("experimentResults/problem_analisys/performanceMatrix_rokkonen.txt", "w") as file:
         file.write("\n".join(lines))
+
+
