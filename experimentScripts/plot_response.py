@@ -295,6 +295,9 @@ for idx, input_txt, transfer_exp, save_fig_path in zip(range(len(transfer_exp_li
         x_plot_lim_lower = min(x_observed) - (max(x_observed) - min(x_observed)) / 10
         x_plot_lim_upper = max(x_observed) - (max(x_observed) + min(x_observed)) / 10
 
+        x_plot_lim_lower = x_plot_lim_lower[0]
+        x_plot_lim_upper = x_plot_lim_upper[0]
+
         x_plot = np.arange(x_plot_lim_lower,x_plot_lim_upper+ 0.00000001,0.0015).reshape(-1,1)
         y_plot = np.exp(kde.score_samples(x_plot))
 
