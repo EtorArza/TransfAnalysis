@@ -13,6 +13,7 @@ from sklearn.discriminant_analysis import LinearDiscriminantAnalysis as LDA
 from scipy import stats
 from sklearn import preprocessing
 from sklearn import manifold
+from sklearn.preprocessing import StandardScaler
 
 # # Load scores from transferability.
 # import plot_transferability
@@ -34,9 +35,65 @@ txt_paths = [
 transfer_exp_list =[
 "QAP",
 "PERMUPROB",
-"Transfer16OnlyOne",
-"transferGenerated"
+"continuous12",
+"rokkonen"
 ]
+
+
+def reduce_dimensionality_to_2d(response_dict_fit, response_dict_predict, method):
+
+
+    response_array_fit = np.vstack([v for k, v in response_dict_fit.items()])
+    response_array_predict = np.vstack([v for k, v in response_dict_predict.items()])
+
+    target_class = np.asarray([el.split("|")[0] for el in response_dict_fit.keys()])
+
+    # # MDS
+    # m =  response_array_predict.shape[0]
+    # dist_matrix_dict = np.zeros((m,m))
+    # for i in range(m):
+    #     for j in range(m):
+    #         # dist_matrix_dict[i,j] = np.log(1 + hamming_dist(pop[i], pop[j])) / np.log(1+ n)
+    #         dist_matrix_dict[i,j] = L1_distance_between_responses(response_array_predict[i], response_array_predict[j])
+    # embedding = sklearn.manifold.MDS(dissimilarity="precomputed", n_components=2, n_init=3, max_iter=500, n_jobs=8)
+    # res = np.array(embedding.fit_transform(dist_matrix_dict))
+
+    # # TSNE 
+    # # https://scikit-learn.org/stable/modules/generated/sklearn.manifold.TSNE.html
+    # # https://en.wikipedia.org/wiki/T-distributed_stochastic_neighbor_embedding
+    # tsne = sklearn.manifold.TSNE(n_components=2, perplexity=5, learning_rate='auto', metric="l1")
+    # res = tsne.fit_transform(response_array_predict)
+
+    if method == "PCA":
+        pca = sklearn.decomposition.PCA(n_components=2)
+        embedding = pca.fit(response_array_fit)
+        res = embedding.transform(response_array_predict)
+
+    elif method == "LDA":
+        # https://towardsdatascience.com/dimensionality-reduction-approaches-8547c4c44334
+        lda = LDA(n_components=2)
+        embedding = lda.fit(response_array_fit, target_class)
+        res = embedding.transform(response_array_predict)
+
+
+    else:
+        raise ValueError(f"Method {method} not recognized.")
+    
+    res = pd.DataFrame(res, index=[el for el in response_dict_predict.keys()])
+    return res
+
+
+def get_2D_embedding_from_features(input_csv):
+    
+    df = pd.read_csv(input_csv, header=None, index_col=0)
+    scaler = StandardScaler()
+    df_standardized = scaler.fit_transform(df)
+
+    pca = sklearn.decomposition.PCA(n_components=2, )
+    embedding = pca.fit(df_standardized)
+    res = embedding.transform(df_standardized)
+    res = pd.DataFrame(res, index=[el for el in df.index])
+    return res
 
 def get_2D_embedding_from_response(input_txt, method):
 
@@ -74,7 +131,7 @@ def get_2D_embedding_from_response(input_txt, method):
             return element.index[0]
 
     def nicefyInstanceName(x: str):
-        if transfer_exp == "Transfer16OnlyOne":
+        if transfer_exp == "continuous12":
             return "$A_{"+x.strip("_") + "}$"
         elif transfer_exp == "QAP":
             return x.split("_")[0]
@@ -83,51 +140,6 @@ def get_2D_embedding_from_response(input_txt, method):
 
     def L1_distance_between_responses(resp1, resp2):
         return sum(abs(resp1 - resp2))
-
-    def MDS_2d(response_dict_fit, response_dict_predict, method):
-        
-        response_array_fit = np.vstack([v for k, v in response_dict_fit.items()])
-        response_array_predict = np.vstack([v for k, v in response_dict_predict.items()])
-
-        target_class = np.asarray([el.split("|")[0] for el in response_dict_fit.keys()])
-
-
-
-
-
-        # # MDS
-        # m =  response_array_predict.shape[0]
-        # dist_matrix_dict = np.zeros((m,m))
-        # for i in range(m):
-        #     for j in range(m):
-        #         # dist_matrix_dict[i,j] = np.log(1 + hamming_dist(pop[i], pop[j])) / np.log(1+ n)
-        #         dist_matrix_dict[i,j] = L1_distance_between_responses(response_array_predict[i], response_array_predict[j])
-        # embedding = sklearn.manifold.MDS(dissimilarity="precomputed", n_components=2, n_init=3, max_iter=500, n_jobs=8)
-        # res = np.array(embedding.fit_transform(dist_matrix_dict))
-
-        # # TSNE 
-        # # https://scikit-learn.org/stable/modules/generated/sklearn.manifold.TSNE.html
-        # # https://en.wikipedia.org/wiki/T-distributed_stochastic_neighbor_embedding
-        # tsne = sklearn.manifold.TSNE(n_components=2, perplexity=5, learning_rate='auto', metric="l1")
-        # res = tsne.fit_transform(response_array_predict)
-
-        if method == "PCA":
-            pca = sklearn.decomposition.PCA(n_components=2)
-            embedding = pca.fit(response_array_fit)
-            res = embedding.transform(response_array_predict)
-
-        elif method == "LDA":
-            # https://towardsdatascience.com/dimensionality-reduction-approaches-8547c4c44334
-            lda = LDA(n_components=2)
-            embedding = lda.fit(response_array_fit, target_class)
-            res = embedding.transform(response_array_predict)
-
-
-        else:
-            raise ValueError(f"Method {method} not recognized.")
-        
-        res = pd.DataFrame(res, index=[el for el in response_dict_predict.keys()])
-        return res
 
 
     responses = []
@@ -140,7 +152,7 @@ def get_2D_embedding_from_response(input_txt, method):
             train_seed = line.split("seed")[-1].split("_")[0]
             line = remove_seed_from_instance_name(line)
             # Trained only in one
-            if transfer_exp == "Transfer16OnlyOne":
+            if transfer_exp == "continuous12":
                 if not "Only" in line:
                     continue
                 line = eval(line)
@@ -148,7 +160,7 @@ def get_2D_embedding_from_response(input_txt, method):
                 test_name = "_"+str(line[1])+"_"
                 response = np.array(line[-1])
 
-            elif transfer_exp == "transferGenerated":
+            elif transfer_exp == "rokkonen":
                 line = eval(line)
                 train_name = line[0].split("NLO_")[-1].split("_best.controlle")[0]
                 test_name = str(line[-1])
@@ -304,7 +316,7 @@ def get_2D_embedding_from_response(input_txt, method):
     response_dict_fit = response_dict_averaged_per_train_instance_and_seed
     response_dict_predict = response_dict_averaged_per_train_instance
     
-    return MDS_2d(response_dict_fit, response_dict_predict, method)
+    return reduce_dimensionality_to_2d(response_dict_fit, response_dict_predict, method)
 
 
 # # # For debugging python with interactive shell. Start interactive shell.
@@ -335,7 +347,7 @@ def plot_2D_embedding(df, transfer_exp, save_fig_path):
             if len(type_name)==2:
                 type_name = type_name[0] + "_" + type_name[1]
             return type_name
-    elif transfer_exp == "LOO16" or transfer_exp == "Transfer16OnlyOne":
+    elif transfer_exp == "LOO16" or transfer_exp == "continuous12":
         PROBLEM_TYPES = ["bowl", "multiopt"]
         def get_type(instance_name):
             print("ERROR: type is wrong, and should instead be set based on experimental results in the paper.")
@@ -343,7 +355,7 @@ def plot_2D_embedding(df, transfer_exp, save_fig_path):
             problem_index = int(instance_name.split("seed")[0].strip("_"))
             type_name = PROBLEM_TYPES[(problem_index - 1) // 6]
             return type_name
-    elif transfer_exp == "transferGenerated":
+    elif transfer_exp == "rokkonen":
         def get_type(instance_name):
             return instance_name
 
@@ -376,10 +388,10 @@ def plot_2D_embedding(df, transfer_exp, save_fig_path):
                 color_index = 3
             label = ["TSP", "LOP", "PFSP", "QAP"][color_index]
 
-        elif transfer_exp == "Transfer16OnlyOne":
+        elif transfer_exp == "continuous12":
             color_index = 1 if train_instance in ("_6_", "_11_", "_2_", "_1_", "_5_") else (2 if train_instance in ("_8_", "_4_", "_7_", "_3_") else (0 if train_instance in ("_9_", "_10_", "_12_") else None)) 
             label = "Cluster " + str(color_index+1)
-        elif transfer_exp == "transferGenerated":
+        elif transfer_exp == "rokkonen":
             color_index = 0
             label = None
             ax.annotate(train_instance, (xi, yi))
@@ -398,11 +410,11 @@ def plot_2D_embedding(df, transfer_exp, save_fig_path):
     legend_location_params = {"bbox_to_anchor":(0, 1.05, 1, 0.2), "loc":"lower left", "mode":"expand", "borderaxespad":0, "ncol":4}
 
 
-    if transfer_exp == "Transfer16OnlyOne":
+    if transfer_exp == "continuous12":
         handles, labels = plt.gca().get_legend_handles_labels()
         order = [2,0,1]
         ax.legend([handles[idx] for idx in order],[labels[idx] for idx in order], fontsize=8, markerscale=1.0, **legend_location_params)
-    if transfer_exp == "transferGenerated":
+    if transfer_exp == "rokkonen":
         pass
     else:
         ax.legend(fontsize=8, markerscale=1.0, **legend_location_params)
@@ -413,12 +425,18 @@ def plot_2D_embedding(df, transfer_exp, save_fig_path):
 
 
 
+data = get_2D_embedding_from_features("experimentResults/problem_analisys/featureMatrix_continuous12_ELA.txt")
+plot_2D_embedding(data, "continuous12", "experimentResults/problem_analisys/figures/featureMatrix_continuous12_ELA_PCA.pdf")
+
+data = get_2D_embedding_from_features("experimentResults/problem_analisys/featureMatrix_rokkonen_ELA.txt")
+plot_2D_embedding(data, "rokkonen", "experimentResults/problem_analisys/figures/featureMatrix_rokkonen_ELA_PCA.pdf")
+
 
 for idx, input_txt, transfer_exp in zip(range(len(transfer_exp_list)), txt_paths, transfer_exp_list):
     data = get_2D_embedding_from_response(input_txt, "LDA")
-    plot_2D_embedding(data, transfer_exp, "experimentResults/problem_analisys/figures/responseLDA_"+transfer_exp+".pdf")
+    plot_2D_embedding(data, transfer_exp, "experimentResults/problem_analisys/figures/response_LDA_"+transfer_exp+".pdf")
     data = get_2D_embedding_from_response(input_txt, "PCA")
-    plot_2D_embedding(data, transfer_exp, "experimentResults/problem_analisys/figures/responsePCA_"+transfer_exp+".pdf")
+    plot_2D_embedding(data, transfer_exp, "experimentResults/problem_analisys/figures/response_PCA_"+transfer_exp+".pdf")
 
 
 

@@ -53,8 +53,8 @@ txt_paths = [
 transfer_exp_list =[
 "QAP",
 "PERMUPROB",
-"Transfer16OnlyOne",
-"transferGenerated"
+"continuous12",
+"rokkonen"
 ]
 every_data_frame_list = []
 for input_txt, transfer_exp, save_fig_path in zip(txt_paths, transfer_exp_list, save_fig_paths):
@@ -89,14 +89,14 @@ for input_txt, transfer_exp, save_fig_path in zip(txt_paths, transfer_exp_list, 
                 type_name = type_name[0] + "_" + type_name[1]
             return type_name
 
-    elif transfer_exp == "LOO16" or transfer_exp == "Transfer16OnlyOne":
+    elif transfer_exp == "LOO16" or transfer_exp == "continuous12":
         PROBLEM_TYPES = ["bowl", "multiopt"]
         def get_type(instance_name):
             problem_index = int(instance_name.split("seed")[0].strip("_"))
             type_name = PROBLEM_TYPES[(problem_index - 1) // 6]
             return type_name
 
-    elif transfer_exp == "transferGenerated":
+    elif transfer_exp == "rokkonen":
         def get_type(instance_name):
             return instance_name
             
@@ -121,7 +121,7 @@ for input_txt, transfer_exp, save_fig_path in zip(txt_paths, transfer_exp_list, 
             train_seed = line.split("seed")[-1].split("_")[0]
             line = remove_seed_from_instance_name(line)
             # Trained only in one
-            if transfer_exp == "Transfer16OnlyOne":
+            if transfer_exp == "continuous12":
                 if not "Only" in line:
                     continue
                 line = line.split(",")
@@ -145,7 +145,7 @@ for input_txt, transfer_exp, save_fig_path in zip(txt_paths, transfer_exp_list, 
                 if get_type(train_name) == get_type(test_name) and train_name != test_name:
                     continue
 
-            elif transfer_exp == "transferGenerated":
+            elif transfer_exp == "rokkonen":
                 line = line.split(",")
                 line = [el.strip("[]\n") for el in line]
                 train_name = line[2].split("NLO_")[-1].split("_best.controlle")[0]
@@ -210,7 +210,7 @@ for input_txt, transfer_exp, save_fig_path in zip(txt_paths, transfer_exp_list, 
 
 
         def nicefyInstanceName(x: str):
-            if transfer_exp == "Transfer16OnlyOne":
+            if transfer_exp == "continuous12":
                 return "$A_{"+x.strip("_") + "}$"
             elif transfer_exp == "QAP":
                 name = x.split("_")[0]
@@ -219,7 +219,7 @@ for input_txt, transfer_exp, save_fig_path in zip(txt_paths, transfer_exp_list, 
             else:
                 return x.strip("_")
 
-        if transfer_exp == "Transfer16OnlyOne":
+        if transfer_exp == "continuous12":
             scores_dict = dict()
             for index, row in data_frame.iterrows():
                 train_name = row["train_name"].split("seed")[0]
@@ -261,7 +261,7 @@ for input_txt, transfer_exp, save_fig_path in zip(txt_paths, transfer_exp_list, 
 
         # compute transferability
 
-        if transfer_exp == "Transfer16OnlyOne":
+        if transfer_exp == "continuous12":
             print(data_frame[data_frame["train_seed"] == "2"])
 
         all_seeds = list(data_frame["train_seed"].unique()) 
@@ -323,7 +323,7 @@ for input_txt, transfer_exp, save_fig_path in zip(txt_paths, transfer_exp_list, 
         # print(data_frame[data_frame["test_type"] == "tsp"])
 
         # Make the plots
-        if True:# transfer_exp == "LOO16" or transfer_exp == "Transfer16OnlyOne":
+        if True:# transfer_exp == "LOO16" or transfer_exp == "continuous12":
 
             train_names = sorted(data_frame["train_name"].unique(), key=sort_key)
             test_names = sorted(data_frame["test_name"].unique(), key=sort_key)
@@ -388,8 +388,8 @@ for input_txt, transfer_exp, save_fig_path in zip(txt_paths, transfer_exp_list, 
                                 local_optima = False
 
 
-            sns.set(font_scale={"Transfer16OnlyOne": 1.4,
-                                "transferGenerated": 1.4,
+            sns.set(font_scale={"continuous12": 1.4,
+                                "rokkonen": 1.4,
                                 "QAP": 0.7,
                                 "PERMUPROB": 0.7
                                 }[transfer_exp]
@@ -416,8 +416,8 @@ for input_txt, transfer_exp, save_fig_path in zip(txt_paths, transfer_exp_list, 
             print(clust_df)
             z = linkage(clust_df, method="single", metric="cityblock", optimal_ordering=True)
             # ax = sns.clustermap(clust_df,metric='cityblock', method="single")
-            sns.set(font_scale={"Transfer16OnlyOne": 2.0,
-                                "transferGenerated": 2.0,
+            sns.set(font_scale={"continuous12": 2.0,
+                                "rokkonen": 2.0,
                                 "QAP": 1.0,
                                 "PERMUPROB": 1.0
                                 }[transfer_exp]
