@@ -25,6 +25,7 @@ from sklearn.preprocessing import StandardScaler
 
 
 txt_paths = [
+"experimentResults/transfer_permus_tsp/results/response.txt",
 "experimentResults/transfer_permus_qap/results/response.txt",
 "experimentResults/transfer_permus_problems/results/response.txt",
 "experimentResults/transfer_16_continuous_problems/results/response.txt",
@@ -33,6 +34,7 @@ txt_paths = [
 
 
 transfer_exp_list =[
+"TSP",
 "QAP",
 "PERMUPROB",
 "continuous12",
@@ -168,7 +170,7 @@ def get_2D_embedding_from_response(input_txt, method):
 
 
             # PERMUS (both qap and permuproblems)
-            elif transfer_exp == "QAP_MULTI" or transfer_exp == "QAP" or transfer_exp=="PERMUPROB":
+            elif transfer_exp == "QAP_MULTI" or transfer_exp == "QAP" or transfer_exp=="PERMUPROB" or transfer_exp=="TSP":
                 line = eval(line)
                 train_name = line[0].split("/")[-1].split("_best.controlle")[-2]
                 test_name = line[1].split("/")[-1]
@@ -178,8 +180,7 @@ def get_2D_embedding_from_response(input_txt, method):
                 response = np.array(line[2])
 
             else:
-                print(f"ERROR: transfer_exp = {transfer_exp} not recognized!")
-                exit(1)
+                raise ValueError(f"transfer_exp = {transfer_exp} not recognized!")
 
 
             # print("train_type",train_type, "test_type", test_type)
@@ -358,8 +359,16 @@ def plot_2D_embedding(df, transfer_exp, save_fig_path):
     elif transfer_exp == "rokkonen":
         def get_type(instance_name):
             return instance_name
-
-
+    elif transfer_exp == "TSP":
+        def get_type(instance_name):
+            if "kro" in instance_name:
+                return "kro"
+            elif "pr" in instance_name:
+                return "pr"
+            else:
+                return "other"
+    else:
+        raise ValueError(f"Experiment {transfer_exp} not recognized.")
  
 
 
@@ -395,6 +404,10 @@ def plot_2D_embedding(df, transfer_exp, save_fig_path):
             color_index = 0
             label = None
             ax.annotate(train_instance, (xi, yi))
+        elif transfer_exp == "TSP":
+            color_index = ["kro", "pr", "other"].index(get_type(train_instance))
+            label = get_type(train_instance)
+            # ax.annotate(train_instance, (xi, yi))
         else:
             raise ValueError(f"transfer_exp = {transfer_exp} not recognized.")
         ci = colors[color_index]
@@ -431,6 +444,9 @@ plot_2D_embedding(data, "continuous12", "experimentResults/problem_analisys/figu
 data = get_2D_embedding_from_features("experimentResults/problem_analisys/featureMatrix_rokkonen_ELA.txt")
 plot_2D_embedding(data, "rokkonen", "experimentResults/problem_analisys/figures/featureMatrix_rokkonen_ELA_PCA.pdf")
 
+data = get_2D_embedding_from_features("experimentResults/problem_analisys/featureMatrix_TSP_Matilda.txt")
+plot_2D_embedding(data, "TSP", "experimentResults/problem_analisys/figures/featureMatrix_TSP_Matilda_PCA.pdf")
+
 
 for idx, input_txt, transfer_exp in zip(range(len(transfer_exp_list)), txt_paths, transfer_exp_list):
     data = get_2D_embedding_from_response(input_txt, "LDA")
@@ -438,9 +454,3 @@ for idx, input_txt, transfer_exp in zip(range(len(transfer_exp_list)), txt_paths
     data = get_2D_embedding_from_response(input_txt, "PCA")
     plot_2D_embedding(data, transfer_exp, "experimentResults/problem_analisys/figures/response_PCA_"+transfer_exp+".pdf")
 
-
-
-# plot_MDS(response_array_predict, response_array_predict, np.asarray(target_class_list), save_fig_path+"PCA_only_predict_response_"+transfer_exp+".pdf", method="PCA")
-# plot_MDS(response_array_fit, response_array_predict, np.asarray(target_class_list), save_fig_path+"PCA_fit_and_predict_response_"+transfer_exp+".pdf", method="PCA")
-# # plot_MDS(response_array_predict, response_array_predict, np.asarray(train_names), save_fig_path+"LDA_only_predict_response_"+transfer_exp+".pdf", method="LDA")
-# plot_MDS(response_array_fit, response_array_predict, np.asarray(target_class_list), save_fig_path+"LDA_fit_and_predict_response_"+transfer_exp+".pdf", method="LDA")
