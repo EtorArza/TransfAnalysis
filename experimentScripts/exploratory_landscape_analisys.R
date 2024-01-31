@@ -67,7 +67,7 @@ for (nlo in c(1,4,8,16,32,64)) {
   }
 
   print(paste("Working on generated rokonen problem with NLO=",nlo))
-  lines = c(lines,paste(paste("",nlo,",",sep="",collapse=""),paste(formatC(get_features_problem(i), format = "f", digits = 36), collapse = ",", sep=",")))
+  lines = c(lines,paste(paste("NLO_",nlo,",",sep="",collapse=""),paste(formatC(get_features_problem(i), format = "f", digits = 36), collapse = ",", sep=",")))
 }
 writeLines(lines, "experimentResults/problem_analisys/rokkonen_ELA.txt")
 

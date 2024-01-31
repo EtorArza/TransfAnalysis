@@ -40,6 +40,23 @@ void usage()
     exit(1);
 }
 
+typedef PERMU::operator_t operator_type;
+
+void reinitialize_ind_partially(PERMU::CIndividual *ind, RandomNumberGenerator *rgn, double proportion)
+{
+    size_t n_of_exchanges = (size_t) round((double) ind->n * proportion / 2.0);
+    for (size_t i = 0; i < n_of_exchanges; i++)
+    {
+        int idx_1 = (int) rgn->random_integer(ind->n);
+        int idx_2 = (int) rgn->random_integer(ind->n);
+        int tmp = ind->genome[idx_1];
+        ind->genome[idx_1] = ind->genome[idx_2];
+        ind->genome[idx_2] = tmp;
+    }
+    ind->f_value = -1e10;
+}
+
+
 int main(int argc, char *argv[])
 {
 
@@ -106,31 +123,35 @@ int main(int argc, char *argv[])
 
         typedef PERMU::operator_t operator_type;
         operator_type operators[3] = {PERMU::SWAP, PERMU::EXCH, PERMU::INSERT};
+        double reinitialize_strats[4] = {3.0, 0.5, 0.25, 0.1667};
         PERMU::CIndividual ind = PERMU::CIndividual(problem->GetProblemSize(), rng);
         problem->Evaluate(&ind);
 
         std::cout << "[";
         for (size_t operator_idx = 0; operator_idx < 3; operator_idx++)
         {
-            operator_type op = operators[operator_idx];
-            double f_best = -1e40;
-            ind.reset(rng);
-            problem->Evaluate(&ind);
-            for (size_t i = 0; i < budget; i++)
+            for (size_t reinitialize = 0; reinitialize < 4; reinitialize++)
             {
-                problem->local_search_iteration(&ind, op);
-                if (f_best < ind.f_value)
+                operator_type op = operators[operator_idx];
+                double f_best = -1e40;
+                ind.reset(rng);
+                problem->Evaluate(&ind);
+                for (size_t i = 0; i < budget; i++)
                 {
-                    f_best = ind.f_value;
+                    problem->local_search_iteration(&ind, op);
+                    if (f_best < ind.f_value)
+                    {
+                        f_best = ind.f_value;
+                    }
+                    
+                    if (ind.is_local_optimum[op])
+                    {
+                        reinitialize_ind_partially(&ind, rng, reinitialize_strats[reinitialize]);                        
+                        problem->Evaluate(&ind);
+                    }
                 }
-                
-                if (ind.is_local_optimum[op])
-                {
-                    ind.reset(rng);
-                    problem->Evaluate(&ind);
-                }
+                std::cout << f_best << ",";
             }
-            std::cout << f_best << ",";
         }
         std::cout << "]\n";
         std::cout << std::flush;

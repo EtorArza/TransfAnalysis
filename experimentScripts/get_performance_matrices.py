@@ -56,14 +56,11 @@ def optimize(method, problem_index, budget, NLO=None):
 
 
 
-
-
-
 folder_path = 'src/experiments/permus/instances/transfer_tsp_instances'
 extension = '.tsp'
 file_pattern = os.path.join(folder_path, f'*{extension}')
 files = sorted(glob.glob(file_pattern))
-lines = ["Instances,algo_swap,algo_exchange,algo_insert"]
+lines = ["Instances"+",".join([a+b for a in ["algo_swap","algo_exchange","algo_insert"] for b in ["randomrestart","halfrestart","quarterestart","sixthrestart"]])]
 for file_path in files:
     print(f"Processing file: {file_path}")
     instance = file_path.split("/")[-1]
@@ -75,33 +72,33 @@ for file_path in files:
 
 
 
-budget = 1000
-methods = ["RandomSearch", "DE", "PSO", "CMA"]
-lines = ["Instances,"+ ",".join(["algo_"+ el for el in methods])]
-for i in range(1, 13):
-    line = f"F_{i}"
-    for method in methods:
-        print(f"Working on problem {i}, method {method}")
-        f = optimize(method, i, budget, None)
-        line += f",{f}"
-    lines.append(line)
-    with open("experimentResults/problem_analisys/performanceMatrix_continuous12.txt", "w") as file:
-        file.write("\n".join(lines))
+# budget = 1000
+# methods = ["RandomSearch", "DE", "PSO", "CMA", "EDA", "TwoPointsDE", "Powell", "BFGS", "RecES", "NelderMead","OnePlusOne","OnePlusLambda"]
+# lines = ["Instances,"+ ",".join(["algo_"+ el for el in methods])]
+# for i in range(1, 13):
+#     line = f"_{i}_"
+#     for method in methods:
+#         print(f"Working on problem {i}, method {method}")
+#         f = optimize(method, i, budget, None)
+#         line += f",{f}"
+#     lines.append(line)
+#     with open("experimentResults/problem_analisys/performanceMatrix_continuous12.txt", "w") as file:
+#         file.write("\n".join(lines))
 
 
 
 
-budget = 1000
-methods = ["RandomSearch", "DE", "PSO", "CMA"]
-lines = ["Instances,"+ ",".join(["algo_"+ el for el in methods])]
-for NLO in [1,4,8,16,32,64]:
-    line = f"NLO_{NLO}"
-    for method in methods:
-        print(f"Working on problem NLO {NLO}, method {method}")
-        f = optimize(method, 0, budget, NLO)
-        line += f",{f}"
-    lines.append(line)
-    with open("experimentResults/problem_analisys/performanceMatrix_rokkonen.txt", "w") as file:
-        file.write("\n".join(lines))
+# budget = 1000
+# methods = ["RandomSearch", "DE", "PSO", "CMA", "EDA", "TwoPointsDE", "Powell", "BFGS", "RecES", "NelderMead","OnePlusOne","OnePlusLambda"]
+# lines = ["Instances,"+ ",".join(["algo_"+ el for el in methods])]
+# for NLO in [1,4,8,16,32,64]:
+#     line = f"NLO_{NLO}"
+#     for method in methods:
+#         print(f"Working on problem NLO {NLO}, method {method}")
+#         f = optimize(method, 0, budget, NLO)
+#         line += f",{f}"
+#     lines.append(line)
+#     with open("experimentResults/problem_analisys/performanceMatrix_rokkonen.txt", "w") as file:
+#         file.write("\n".join(lines))
 
 
