@@ -99,6 +99,8 @@ end
 % -------------------------------------------------------------------------
 % PROBABLY HERE SHOULD DO A SANITY CHECK, I.E., IS THERE TOO MANY NANS?
 idx = all(isnan(model.data.X),2) | all(isnan(model.data.Y),2);
+disp(model.data.X)
+disp(model.data.Y)
 if any(idx)
     warning('-> There are instances with too many missing values. They are being removed to increase speed.');
     model.data.X = model.data.X(~idx,:);
@@ -224,6 +226,7 @@ if opts.sifted.flag
     disp('=========================================================================');
     disp('-> Calling SIFTED for auto-feature selection.');
     disp('=========================================================================');
+
     [model.data.X, model.sifted] = SIFTED(model.data.X, model.data.Y, model.data.Ybin, opts.sifted);
     model.data.featlabels = model.data.featlabels(model.sifted.selvars);
     model.featsel.idx = model.featsel.idx(model.sifted.selvars);
@@ -267,25 +270,9 @@ disp('========================================================================='
 disp('-> Finding empirical bounds using CLOISTER.');
 disp('=========================================================================');
 model.cloist = CLOISTER(model.data.X, model.pilot.A, opts.cloister);
-% -------------------------------------------------------------------------
-% Algorithm selection. Fit a model that would separate the space into
-% classes of good and bad performance. 
-disp('=========================================================================');
-disp('-> Summoning PYTHIA to train the prediction models.');
-disp('=========================================================================');
-model.pythia = PYTHIA(model.pilot.Z, model.data.Yraw, model.data.Ybin, model.data.Ybest, model.data.algolabels, opts.pythia);
-% -------------------------------------------------------------------------
-% Calculating the algorithm footprints.
-disp('=========================================================================');
-disp('-> Calling TRACE to perform the footprint analysis.');
-disp('=========================================================================');
-if opts.trace.usesim
-    disp('  -> TRACE will use PYTHIA''s results to calculate the footprints.');
-    model.trace = TRACE(model.pilot.Z, model.pythia.Yhat, model.pythia.selection0, model.data.beta, model.data.algolabels, opts.trace);
-else
-    disp('  -> TRACE will use experimental data to calculate the footprints.');
-    model.trace = TRACE(model.pilot.Z, model.data.Ybin, model.data.P, model.data.beta, model.data.algolabels, opts.trace);
-end
+
+disp('  -> TRACE will use experimental data to calculate the footprints.');
+model.trace = TRACE(model.pilot.Z, model.data.Ybin, model.data.P, model.data.beta, model.data.algolabels, opts.trace);
 
 if useparallel
     disp('-------------------------------------------------------------------------');

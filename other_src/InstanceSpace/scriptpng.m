@@ -91,11 +91,6 @@ clf;
 drawPortfolioSelections(container.pilot.Z, container.data.P, container.data.algolabels, 'Best algorithm');
 print(gcf,'-dpng',[rootdir 'distribution_portfolio.png']);
 % ---------------------------------------------------------------------
-% Drawing the SVM's recommendations
-clf;
-drawPortfolioSelections(container.pilot.Z, container.pythia.selection0, container.data.algolabels, 'Predicted best algorithm');
-print(gcf,'-dpng',[rootdir 'distribution_svm_portfolio.png']);
-% ---------------------------------------------------------------------
 % Drawing the footprints as portfolio.
 clf;
 drawPortfolioFootprint(container.pilot.Z, container.trace.best, Pfoot, container.data.algolabels);
