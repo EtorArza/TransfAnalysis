@@ -128,6 +128,8 @@ def combine_files(featuresFilePath, performanceFilePath, output_path):
             instance = row1[0]
             output_writer.writerow([instance, 'none'] + row1[1:] + data2.get(instance, []))
 
+
+# Combine resutlts for matilda analysis
 combine_files("experimentResults/problem_analisys/featureMatrix_TSP_Matilda.txt",
               "experimentResults/problem_analisys/performanceMatrix_TSP.txt",
               "experimentResults/problem_analisys/Matilda_instanceSpaceData_tsp.txt")
@@ -139,3 +141,16 @@ combine_files("experimentResults/problem_analisys/featureMatrix_rokkonen_ELA.txt
 combine_files("experimentResults/problem_analisys/featureMatrix_continuous12_ELA.txt",
               "experimentResults/problem_analisys/performanceMatrix_continuous12.txt",
               "experimentResults/problem_analisys/Matilda_instanceSpaceData_continuous12.txt")
+
+# Repeat and save files in matilda InstanceSpace folder
+combine_files("experimentResults/problem_analisys/featureMatrix_TSP_Matilda.txt",
+              "experimentResults/problem_analisys/performanceMatrix_TSP.txt",
+              "other_src/InstanceSpace/trial_tsp/metadata.csv")
+
+combine_files("experimentResults/problem_analisys/featureMatrix_rokkonen_ELA.txt",
+              "experimentResults/problem_analisys/performanceMatrix_rokkonen.txt",
+              "other_src/InstanceSpace/trial_rokkonen/metadata.csv")
+
+combine_files("experimentResults/problem_analisys/featureMatrix_continuous12_ELA.txt",
+              "experimentResults/problem_analisys/performanceMatrix_continuous12.txt",
+              "other_src/InstanceSpace/trial_continuous12/metadata.csv")

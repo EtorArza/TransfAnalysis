@@ -9,3 +9,6 @@ old_versions/*.*
 old_versions
 *.json
 !trial/metadata.csv
+!trial_continuous12/metadata.csv
+!trial_rokkonen/metadata.csv
+!trial_tsp/metadata.csv
