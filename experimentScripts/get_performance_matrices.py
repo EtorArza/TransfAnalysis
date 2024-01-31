@@ -72,33 +72,70 @@ for file_path in files:
 
 
 
-# budget = 1000
-# methods = ["RandomSearch", "DE", "PSO", "CMA", "EDA", "TwoPointsDE", "Powell", "BFGS", "RecES", "NelderMead","OnePlusOne","OnePlusLambda"]
-# lines = ["Instances,"+ ",".join(["algo_"+ el for el in methods])]
-# for i in range(1, 13):
-#     line = f"_{i}_"
-#     for method in methods:
-#         print(f"Working on problem {i}, method {method}")
-#         f = optimize(method, i, budget, None)
-#         line += f",{f}"
-#     lines.append(line)
-#     with open("experimentResults/problem_analisys/performanceMatrix_continuous12.txt", "w") as file:
-#         file.write("\n".join(lines))
+budget = 1000
+methods = ["RandomSearch", "DE", "PSO", "CMA", "EDA", "TwoPointsDE", "Powell", "BFGS", "RecES", "NelderMead","OnePlusOne","OnePlusLambda"]
+lines = ["Instances,"+ ",".join(["algo_"+ el for el in methods])]
+for i in range(1, 13):
+    line = f"_{i}_"
+    for method in methods:
+        print(f"Working on problem {i}, method {method}")
+        f = optimize(method, i, budget, None)
+        line += f",{f}"
+    lines.append(line)
+    with open("experimentResults/problem_analisys/performanceMatrix_continuous12.txt", "w") as file:
+        file.write("\n".join(lines))
 
 
 
 
-# budget = 1000
-# methods = ["RandomSearch", "DE", "PSO", "CMA", "EDA", "TwoPointsDE", "Powell", "BFGS", "RecES", "NelderMead","OnePlusOne","OnePlusLambda"]
-# lines = ["Instances,"+ ",".join(["algo_"+ el for el in methods])]
-# for NLO in [1,4,8,16,32,64]:
-#     line = f"NLO_{NLO}"
-#     for method in methods:
-#         print(f"Working on problem NLO {NLO}, method {method}")
-#         f = optimize(method, 0, budget, NLO)
-#         line += f",{f}"
-#     lines.append(line)
-#     with open("experimentResults/problem_analisys/performanceMatrix_rokkonen.txt", "w") as file:
-#         file.write("\n".join(lines))
+budget = 1000
+methods = ["RandomSearch", "DE", "PSO", "CMA", "EDA", "TwoPointsDE", "Powell", "BFGS", "RecES", "NelderMead","OnePlusOne","OnePlusLambda"]
+lines = ["Instances,"+ ",".join(["algo_"+ el for el in methods])]
+for NLO in [1,4,8,16,32,64]:
+    line = f"NLO_{NLO}"
+    for method in methods:
+        print(f"Working on problem NLO {NLO}, method {method}")
+        f = optimize(method, 0, budget, NLO)
+        line += f",{f}"
+    lines.append(line)
+    with open("experimentResults/problem_analisys/performanceMatrix_rokkonen.txt", "w") as file:
+        file.write("\n".join(lines))
 
 
+import csv
+
+def combine_files(featuresFilePath, performanceFilePath, output_path):
+    # Read content from features file
+    with open(featuresFilePath, 'r') as file1:
+        file1_reader = csv.reader(file1)
+        data1 = list(file1_reader)  # Read all rows into a list
+
+    # Read content from performance file
+    with open(performanceFilePath, 'r') as file2:
+        file2_reader = csv.reader(file2)
+        header2 = next(file2_reader)
+        data2 = {row[0]: row[1:] for row in file2_reader}
+
+    # Write combined content to the output file
+    with open(output_path, 'w', newline='') as output_file:
+        output_writer = csv.writer(output_file)
+
+        # Write header
+        output_writer.writerow(['Instances', 'Source'] + ['feature_f{}'.format(i) for i in range(1, len(next(iter(data2.values()))))] + header2[1:])
+
+        # Combine data and write rows
+        for row1 in data1:  # Iterate over the list instead of the closed file
+            instance = row1[0]
+            output_writer.writerow([instance, 'none'] + row1[1:] + data2.get(instance, []))
+
+combine_files("experimentResults/problem_analisys/featureMatrix_TSP_Matilda.txt",
+              "experimentResults/problem_analisys/performanceMatrix_TSP.txt",
+              "experimentResults/problem_analisys/Matilda_instanceSpaceData_tsp.txt")
+
+combine_files("experimentResults/problem_analisys/featureMatrix_rokkonen_ELA.txt",
+              "experimentResults/problem_analisys/performanceMatrix_rokkonen.txt",
+              "experimentResults/problem_analisys/Matilda_instanceSpaceData_rokkonen.txt")
+
+combine_files("experimentResults/problem_analisys/featureMatrix_continuous12_ELA.txt",
+              "experimentResults/problem_analisys/performanceMatrix_continuous12.txt",
+              "experimentResults/problem_analisys/Matilda_instanceSpaceData_continuous12.txt")
