@@ -403,7 +403,7 @@ def plot_2D_embedding(df, transfer_exp, save_fig_path):
         elif transfer_exp == "rokkonen":
             color_index = 0
             label = None
-            ax.annotate(train_instance, (xi, yi))
+            ax.annotate(train_instance.removeprefix("NLO_"), (xi, yi))
         elif transfer_exp == "TSP":
             color_index = ["kro", "pr", "other"].index(get_type(train_instance))
             label = get_type(train_instance)
@@ -438,6 +438,18 @@ def plot_2D_embedding(df, transfer_exp, save_fig_path):
 
 
 
+# Matilda InstanceSpace
+data = pd.read_csv("other_src/InstanceSpace/trial_continuous12/coordinates.csv", index_col=0)
+plot_2D_embedding(data, "continuous12", "experimentResults/problem_analisys/figures/MatildaInstanceSpace_continuous12.pdf")
+
+data = pd.read_csv("other_src/InstanceSpace/trial_rokkonen/coordinates.csv", index_col=0)
+plot_2D_embedding(data, "rokkonen", "experimentResults/problem_analisys/figures/MatildaInstanceSpace_rokkonen.pdf")
+
+data = pd.read_csv("other_src/InstanceSpace/trial_tsp/coordinates.csv", index_col=0)
+plot_2D_embedding(data, "TSP", "experimentResults/problem_analisys/figures/MatildaInstanceSpace_tsp.pdf")
+
+
+# PCA of featureMatrix
 data = get_2D_embedding_from_features("experimentResults/problem_analisys/featureMatrix_continuous12_ELA.txt")
 plot_2D_embedding(data, "continuous12", "experimentResults/problem_analisys/figures/featureMatrix_continuous12_ELA_PCA.pdf")
 
@@ -447,10 +459,12 @@ plot_2D_embedding(data, "rokkonen", "experimentResults/problem_analisys/figures/
 data = get_2D_embedding_from_features("experimentResults/problem_analisys/featureMatrix_TSP_Matilda.txt")
 plot_2D_embedding(data, "TSP", "experimentResults/problem_analisys/figures/featureMatrix_TSP_Matilda_PCA.pdf")
 
-
+# Response of HH framework (ours)
 for idx, input_txt, transfer_exp in zip(range(len(transfer_exp_list)), txt_paths, transfer_exp_list):
     data = get_2D_embedding_from_response(input_txt, "LDA")
     plot_2D_embedding(data, transfer_exp, "experimentResults/problem_analisys/figures/response_LDA_"+transfer_exp+".pdf")
     data = get_2D_embedding_from_response(input_txt, "PCA")
     plot_2D_embedding(data, transfer_exp, "experimentResults/problem_analisys/figures/response_PCA_"+transfer_exp+".pdf")
 
+import subprocess
+subprocess.call("rsync -zarv --delete --prune-empty-dirs --include '*/' --include '*.pdf' --exclude '*' experimentResults/ ../paper/experimentResults/", shell=True)
