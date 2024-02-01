@@ -35,6 +35,7 @@ def change_distance_matrix_indices(matrix, permu):
 # save_fig_path = "/home/paran/Dropbox/BCAM/02_NEAT_permus/paper/images/permu_problems_transfer/"
 
 save_fig_paths = [
+"experimentResults/transfer_permus_tsp/results/figures/",
 "experimentResults/transfer_permus_qap/results/figures/",
 "experimentResults/transfer_permus_problems/results/figures/",
 "experimentResults/transfer_16_continuous_problems/results/figures/",
@@ -43,6 +44,7 @@ save_fig_paths = [
 
 
 txt_paths = [
+"experimentResults/transfer_permus_tsp/results/score.txt",
 "experimentResults/transfer_permus_qap/results/score.txt",
 "experimentResults/transfer_permus_problems/results/score.txt",
 "experimentResults/transfer_16_continuous_problems/results/score.txt",
@@ -51,6 +53,7 @@ txt_paths = [
 
 
 transfer_exp_list =[
+"TSP",
 "QAP",
 "PERMUPROB",
 "continuous12",
@@ -68,7 +71,16 @@ for input_txt, transfer_exp, save_fig_path in zip(txt_paths, transfer_exp_list, 
         instance_name = re.sub(r"seed\d*_", '', instance_name)
         return instance_name
 
-    if transfer_exp == "QAP":
+    if transfer_exp == "TSP":
+        def get_type(instance_name):
+            if "kro" in instance_name:
+                return "kro"
+            elif "pr" in instance_name:
+                return "pr"
+            else:
+                return "other"
+
+    elif transfer_exp == "QAP":
         def get_type(instance_name):
             return instance_name.split("_")[0][0]
 
@@ -154,7 +166,7 @@ for input_txt, transfer_exp, save_fig_path in zip(txt_paths, transfer_exp_list, 
 
 
             # PERMUS (both qap and permuproblems)
-            elif transfer_exp == "QAP_MULTI" or transfer_exp == "QAP" or transfer_exp=="PERMUPROB":
+            elif transfer_exp == "QAP_MULTI" or transfer_exp == "QAP" or transfer_exp=="PERMUPROB" or transfer_exp=="TSP":
                 line = eval(line)
                 train_name = line[2].split("/")[-1].split("_best.controlle")[-2]
                 test_name = line[1].split("/")[-1]
@@ -391,6 +403,7 @@ for input_txt, transfer_exp, save_fig_path in zip(txt_paths, transfer_exp_list, 
             sns.set(font_scale={"continuous12": 1.4,
                                 "rokkonen": 1.4,
                                 "QAP": 0.7,
+                                "TSP": 0.7,
                                 "PERMUPROB": 0.7
                                 }[transfer_exp]
                     )
@@ -419,6 +432,7 @@ for input_txt, transfer_exp, save_fig_path in zip(txt_paths, transfer_exp_list, 
             sns.set(font_scale={"continuous12": 2.0,
                                 "rokkonen": 2.0,
                                 "QAP": 1.0,
+                                "TSP": 1.0,
                                 "PERMUPROB": 1.0
                                 }[transfer_exp]
                     )        
@@ -509,3 +523,6 @@ if __name__ == "__main__":
         plt.tight_layout()
         plt.savefig(save_fig_path + name + "_heatmap.pdf")
         plt.close()
+
+import subprocess
+subprocess.call("rsync -zarv --delete --prune-empty-dirs --include '*/' --include '*.pdf' --exclude '*' experimentResults/ ../paper/experimentResults/", shell=True)
