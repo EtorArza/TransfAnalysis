@@ -332,7 +332,15 @@ def plot_2D_embedding(df, transfer_exp, save_fig_path):
     # Get the type of each instance. Not used during the generation of the embedding.
     if transfer_exp == "QAP":
         def get_type(instance_name):
-            return instance_name.split("_")[0][0]
+            if "taixxA" in instance_name:
+                return "A"
+            elif "taixxB" in instance_name:
+                return "B"
+            elif "sko" in instance_name:
+                return "sko" 
+            else:
+                raise ValueError(f"instance_name format is incorrect, instance_name={instance_name}")
+
     elif transfer_exp == "PERMUPROB":
         def get_type(instance_name):
             return instance_name.split(".")[-1]
@@ -382,8 +390,10 @@ def plot_2D_embedding(df, transfer_exp, save_fig_path):
     for idx, train_instance in enumerate(df.index):
         xi = np.array(df.iloc[idx,0])
         yi = np.array(df.iloc[idx,1])
+        train_instance = str(train_instance)
         if transfer_exp == "QAP":
-            color_index = {"A":0, "B":1, "C":2}[train_instance[0]]
+            color_index = 0 if "A" in train_instance else 1 if "B" in train_instance else 2 if "sko" in train_instance else None
+            assert color_index != None, f"train_instance = {train_instance}"  
             label = ["taixxA", "taixxB", "sko"][color_index]
 
         elif transfer_exp == "PERMUPROB":
@@ -431,12 +441,30 @@ def plot_2D_embedding(df, transfer_exp, save_fig_path):
         pass
     else:
         ax.legend(fontsize=8, markerscale=1.0, **legend_location_params)
+    if "MDS" in save_fig_path:
+        ax.set_xlim(-0.3,0.3)
+        ax.set_ylim(-0.3,0.3)
     fig.tight_layout()
     fig.savefig(save_fig_path)
     plt.close()
 
+# MDS Transferability
+data = pd.read_csv("experimentResults/problem_analisys/transferability_MDS_continuous12.txt", index_col=0, header=0)
+plot_2D_embedding(data, "continuous12", "experimentResults/problem_analisys/figures/transferability_MDS_continuous12.pdf")
 
+data = pd.read_csv("experimentResults/problem_analisys/transferability_MDS_PERMUPROB.txt", index_col=0, header=0)
+plot_2D_embedding(data, "PERMUPROB", "experimentResults/problem_analisys/figures/transferability_MDS_PERMUPROB.pdf")
 
+data = pd.read_csv("experimentResults/problem_analisys/transferability_MDS_QAP.txt", index_col=0, header=0)
+plot_2D_embedding(data, "QAP", "experimentResults/problem_analisys/figures/transferability_MDS_QAP.pdf")
+
+data = pd.read_csv("experimentResults/problem_analisys/transferability_MDS_rokkonen.txt", index_col=0, header=0)
+plot_2D_embedding(data, "rokkonen", "experimentResults/problem_analisys/figures/transferability_MDS_rokkonen.pdf")
+
+data = pd.read_csv("experimentResults/problem_analisys/transferability_MDS_TSP.txt", index_col=0, header=0)
+plot_2D_embedding(data, "TSP", "experimentResults/problem_analisys/figures/transferability_MDS_TSP.pdf")
+
+exit(0)
 
 # Matilda InstanceSpace
 data = pd.read_csv("other_src/InstanceSpace/trial_continuous12/coordinates.csv", index_col=0)

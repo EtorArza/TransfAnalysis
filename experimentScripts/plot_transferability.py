@@ -7,6 +7,7 @@ import subprocess
 from scipy.cluster.hierarchy import linkage
 import re
 from tqdm import tqdm as tqdm
+from sklearn.manifold import MDS
 
 print("__name__ =", __name__)
 
@@ -246,7 +247,7 @@ for input_txt, transfer_exp, save_fig_path in zip(txt_paths, transfer_exp_list, 
 
 
             # plot all boxplots
-            sns.set(font_scale = 1)
+            sns.set_theme(font_scale = 1)
             fig, ax_list = plt.subplots(6,2)
 
             for test_index in range(1,13):
@@ -269,7 +270,7 @@ for input_txt, transfer_exp, save_fig_path in zip(txt_paths, transfer_exp_list, 
                                     columns=["score", "train_name", "test_name", "train_type", "test_type"])
 
                 BOXPLOT_data_frame = pd.concat([BOXPLOT_data_frame, new_row_df], ignore_index=True)
-        sns.set(font_scale = 1.4)
+        sns.set_theme(font_scale = 1.4)
 
         # compute transferability
 
@@ -377,7 +378,7 @@ for input_txt, transfer_exp, save_fig_path in zip(txt_paths, transfer_exp_list, 
             import time
             t = time.time()
             np.random.seed(7)
-            search_seconds = 900.0
+            search_seconds = 10.0
             print(f"Finding best order. Will run for {search_seconds} seconds.")
             while time.time() - t < search_seconds:
                 np.random.shuffle(permu)
@@ -400,7 +401,7 @@ for input_txt, transfer_exp, save_fig_path in zip(txt_paths, transfer_exp_list, 
                                 local_optima = False
 
 
-            sns.set(font_scale={"continuous12": 1.4,
+            sns.set_theme(font_scale={"continuous12": 1.4,
                                 "rokkonen": 1.4,
                                 "QAP": 0.7,
                                 "TSP": 0.7,
@@ -408,6 +409,21 @@ for input_txt, transfer_exp, save_fig_path in zip(txt_paths, transfer_exp_list, 
                                 }[transfer_exp]
                     )
             ax = sns.heatmap(matrix_data[np.ix_(best_permu, best_permu)], linewidth=0.5, xticklabels=np.array(nice_train_names)[best_permu], yticklabels=np.array(nice_test_names)[best_permu], vmin=0, vmax=1, cmap='viridis')
+
+            print(matrix_data)
+
+            mds = MDS(n_components=2, dissimilarity='precomputed', random_state=42)
+            # import code; code.interact(local=locals()) # For debugging python with interactive shell. Start interactive shell.
+
+            distance_matrix = np.zeros_like(matrix_data)
+            for i in range(matrix_data.shape[0]):
+                for j in range(matrix_data.shape[1]):
+                    distance_matrix[i,j] = (np.mean(np.abs(matrix_data[:,i]- matrix_data[:,j])) + np.mean(np.abs(matrix_data[i,:]- matrix_data[j,:]))) / 2
+
+            mds_result = mds.fit_transform(distance_matrix)
+            result_with_names = np.column_stack((nice_test_names, mds_result[:, 0], mds_result[:, 1]))
+            output_file = f"experimentResults/problem_analisys/transferability_MDS_{transfer_exp}.txt"
+            np.savetxt(output_file, result_with_names, fmt="%s", delimiter=",", header="TestNames,MDS_1,MDS_2", comments='')
 
 
             ax.xaxis.tick_top() # x axis on top
@@ -429,7 +445,7 @@ for input_txt, transfer_exp, save_fig_path in zip(txt_paths, transfer_exp_list, 
             print(clust_df)
             z = linkage(clust_df, method="single", metric="cityblock", optimal_ordering=True)
             # ax = sns.clustermap(clust_df,metric='cityblock', method="single")
-            sns.set(font_scale={"continuous12": 2.0,
+            sns.set_theme(font_scale={"continuous12": 2.0,
                                 "rokkonen": 2.0,
                                 "QAP": 1.0,
                                 "TSP": 1.0,
@@ -452,12 +468,7 @@ for input_txt, transfer_exp, save_fig_path in zip(txt_paths, transfer_exp_list, 
             plt.close()
 
 
-        # print(get_score(data_frame, "N-t65d11xx_150.lop", "pr136.tsp"))
-        # print(get_type("pr136.tsp"))
-        # print(get_train_instances(data_frame))
-        # print(get_test_instances(data_frame))
-        # print(get_row_index(data_frame, "N-t65d11xx_150.lop", "pr136.tsp"))
-        # print(data_frame.iloc[478])
+# Random Search
 
 np.random.seed(2)
 
@@ -509,7 +520,7 @@ if __name__ == "__main__":
 
     for m, name in zip([matrix_data, matrix_data_mean] , ["randomsearch", "randomsearch_median_10seeds"]):
 
-        sns.set(font_scale = 1.4)
+        sns.set_theme(font_scale = 1.4)
         #sns.set_palette(sns.color_palette("viridis", as_cmap=True))
         tick_labels = ["$A_{" + str(el) + "}$" for el in range(1,n+1)]
         ax = sns.heatmap(m, linewidth=0.5, xticklabels=tick_labels, yticklabels=tick_labels, vmin=0, vmax=1, cmap='viridis')
