@@ -224,7 +224,7 @@ for input_txt, transfer_exp, save_fig_path in zip(txt_paths, transfer_exp_list, 
 
         def nicefyInstanceName(x: str):
             if transfer_exp == "continuous12":
-                return "$A_{"+x.strip("_") + "}$"
+                return "_"+x.strip("_") + "_"
             elif transfer_exp == "QAP":
                 name = x.split("_")[0]
                 new_name = ["taixxA_","taixxB_","sko_"][["A","B","C"].index(name[0])] + str(["A","B","C"].index(name[0]) * 7 + int(name[1]))
@@ -416,10 +416,12 @@ for input_txt, transfer_exp, save_fig_path in zip(txt_paths, transfer_exp_list, 
             # import code; code.interact(local=locals()) # For debugging python with interactive shell. Start interactive shell.
 
             distance_matrix = np.zeros_like(matrix_data)
-            for i in range(matrix_data.shape[0]):
-                for j in range(matrix_data.shape[1]):
-                    distance_matrix[i,j] = (np.mean(np.abs(matrix_data[:,i]- matrix_data[:,j])) + np.mean(np.abs(matrix_data[i,:]- matrix_data[j,:]))) / 2
-
+            assert matrix_data.shape[0] == matrix_data.shape[1]
+            k = matrix_data.shape[0]
+            for i in range(k):
+                for j in range(k):
+                    distance_matrix[i,j] = np.sum(np.abs(matrix_data[:,i]- matrix_data[:,j])) + np.sum(np.abs(matrix_data[i,:]- matrix_data[j,:]))
+                    distance_matrix[i,j] /= np.sum(np.abs(np.linspace(0,1,k) - np.linspace(1,0,k)))*2
             mds_result = mds.fit_transform(distance_matrix)
             result_with_names = np.column_stack((nice_test_names, mds_result[:, 0], mds_result[:, 1]))
             output_file = f"experimentResults/problem_analisys/transferability_MDS_{transfer_exp}.txt"

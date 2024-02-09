@@ -442,8 +442,8 @@ def plot_2D_embedding(df, transfer_exp, save_fig_path):
     else:
         ax.legend(fontsize=8, markerscale=1.0, **legend_location_params)
     if "MDS" in save_fig_path:
-        ax.set_xlim(-0.3,0.3)
-        ax.set_ylim(-0.3,0.3)
+        ax.set_xlim(-0.6,0.6)
+        ax.set_ylim(-0.6,0.6)
     fig.tight_layout()
     fig.savefig(save_fig_path)
     plt.close()
