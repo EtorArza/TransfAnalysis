@@ -464,7 +464,6 @@ plot_2D_embedding(data, "rokkonen", "experimentResults/problem_analisys/figures/
 data = pd.read_csv("experimentResults/problem_analisys/transferability_MDS_TSP.txt", index_col=0, header=0)
 plot_2D_embedding(data, "TSP", "experimentResults/problem_analisys/figures/transferability_MDS_TSP.pdf")
 
-exit(0)
 
 # Matilda InstanceSpace
 data = pd.read_csv("other_src/InstanceSpace/trial_continuous12/coordinates.csv", index_col=0)
