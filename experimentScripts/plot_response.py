@@ -368,6 +368,7 @@ def plot_2D_embedding(df, transfer_exp, save_fig_path):
         def get_type(instance_name):
             return instance_name
     elif transfer_exp == "TSP":
+        df.sort_index(axis=0, ascending=False, inplace=True, kind='quicksort', key= lambda x: pd.Index(map(lambda y: y.count("kro")*2+y.count("pr"), x)))
         def get_type(instance_name):
             if "kro" in instance_name:
                 return "kro"
@@ -409,7 +410,7 @@ def plot_2D_embedding(df, transfer_exp, save_fig_path):
 
         elif transfer_exp == "continuous12":
             color_index = 1 if train_instance in ("_6_", "_11_", "_2_", "_1_", "_5_") else (2 if train_instance in ("_8_", "_4_", "_7_", "_3_") else (0 if train_instance in ("_9_", "_10_", "_12_") else None)) 
-            label = "Cluster " + str(color_index+1)
+            label = "Type " + str(color_index+1)
         elif transfer_exp == "rokkonen":
             color_index = 0
             label = None
@@ -448,46 +449,48 @@ def plot_2D_embedding(df, transfer_exp, save_fig_path):
     fig.savefig(save_fig_path)
     plt.close()
 
-# MDS Transferability
-data = pd.read_csv("experimentResults/problem_analisys/transferability_MDS_continuous12.txt", index_col=0, header=0)
-plot_2D_embedding(data, "continuous12", "experimentResults/problem_analisys/figures/transferability_MDS_continuous12.pdf")
+# # MDS Transferability
+# data = pd.read_csv("experimentResults/problem_analisys/transferability_MDS_continuous12.txt", index_col=0, header=0)
+# plot_2D_embedding(data, "continuous12", "experimentResults/problem_analisys/figures/transferability_MDS_continuous12.pdf")
 
-data = pd.read_csv("experimentResults/problem_analisys/transferability_MDS_PERMUPROB.txt", index_col=0, header=0)
-plot_2D_embedding(data, "PERMUPROB", "experimentResults/problem_analisys/figures/transferability_MDS_PERMUPROB.pdf")
+# data = pd.read_csv("experimentResults/problem_analisys/transferability_MDS_PERMUPROB.txt", index_col=0, header=0)
+# plot_2D_embedding(data, "PERMUPROB", "experimentResults/problem_analisys/figures/transferability_MDS_PERMUPROB.pdf")
 
-data = pd.read_csv("experimentResults/problem_analisys/transferability_MDS_QAP.txt", index_col=0, header=0)
-plot_2D_embedding(data, "QAP", "experimentResults/problem_analisys/figures/transferability_MDS_QAP.pdf")
+# data = pd.read_csv("experimentResults/problem_analisys/transferability_MDS_QAP.txt", index_col=0, header=0)
+# plot_2D_embedding(data, "QAP", "experimentResults/problem_analisys/figures/transferability_MDS_QAP.pdf")
 
-data = pd.read_csv("experimentResults/problem_analisys/transferability_MDS_rokkonen.txt", index_col=0, header=0)
-plot_2D_embedding(data, "rokkonen", "experimentResults/problem_analisys/figures/transferability_MDS_rokkonen.pdf")
+# data = pd.read_csv("experimentResults/problem_analisys/transferability_MDS_rokkonen.txt", index_col=0, header=0)
+# plot_2D_embedding(data, "rokkonen", "experimentResults/problem_analisys/figures/transferability_MDS_rokkonen.pdf")
 
 data = pd.read_csv("experimentResults/problem_analisys/transferability_MDS_TSP.txt", index_col=0, header=0)
 plot_2D_embedding(data, "TSP", "experimentResults/problem_analisys/figures/transferability_MDS_TSP.pdf")
 
 
-# Matilda InstanceSpace
-data = pd.read_csv("other_src/InstanceSpace/trial_continuous12/coordinates.csv", index_col=0)
-plot_2D_embedding(data, "continuous12", "experimentResults/problem_analisys/figures/MatildaInstanceSpace_continuous12.pdf")
+# # Matilda InstanceSpace
+# data = pd.read_csv("other_src/InstanceSpace/trial_continuous12/coordinates.csv", index_col=0)
+# plot_2D_embedding(data, "continuous12", "experimentResults/problem_analisys/figures/MatildaInstanceSpace_continuous12.pdf")
 
-data = pd.read_csv("other_src/InstanceSpace/trial_rokkonen/coordinates.csv", index_col=0)
-plot_2D_embedding(data, "rokkonen", "experimentResults/problem_analisys/figures/MatildaInstanceSpace_rokkonen.pdf")
+# data = pd.read_csv("other_src/InstanceSpace/trial_rokkonen/coordinates.csv", index_col=0)
+# plot_2D_embedding(data, "rokkonen", "experimentResults/problem_analisys/figures/MatildaInstanceSpace_rokkonen.pdf")
 
 data = pd.read_csv("other_src/InstanceSpace/trial_tsp/coordinates.csv", index_col=0)
 plot_2D_embedding(data, "TSP", "experimentResults/problem_analisys/figures/MatildaInstanceSpace_tsp.pdf")
 
 
-# PCA of featureMatrix
-data = get_2D_embedding_from_features("experimentResults/problem_analisys/featureMatrix_continuous12_ELA.txt")
-plot_2D_embedding(data, "continuous12", "experimentResults/problem_analisys/figures/featureMatrix_continuous12_ELA_PCA.pdf")
+# # PCA of featureMatrix
+# data = get_2D_embedding_from_features("experimentResults/problem_analisys/featureMatrix_continuous12_ELA.txt")
+# plot_2D_embedding(data, "continuous12", "experimentResults/problem_analisys/figures/featureMatrix_continuous12_ELA_PCA.pdf")
 
-data = get_2D_embedding_from_features("experimentResults/problem_analisys/featureMatrix_rokkonen_ELA.txt")
-plot_2D_embedding(data, "rokkonen", "experimentResults/problem_analisys/figures/featureMatrix_rokkonen_ELA_PCA.pdf")
+# data = get_2D_embedding_from_features("experimentResults/problem_analisys/featureMatrix_rokkonen_ELA.txt")
+# plot_2D_embedding(data, "rokkonen", "experimentResults/problem_analisys/figures/featureMatrix_rokkonen_ELA_PCA.pdf")
 
 data = get_2D_embedding_from_features("experimentResults/problem_analisys/featureMatrix_TSP_Matilda.txt")
 plot_2D_embedding(data, "TSP", "experimentResults/problem_analisys/figures/featureMatrix_TSP_Matilda_PCA.pdf")
 
 # Response of HH framework (ours)
 for idx, input_txt, transfer_exp in zip(range(len(transfer_exp_list)), txt_paths, transfer_exp_list):
+    if transfer_exp != "TSP":
+        continue
     data = get_2D_embedding_from_response(input_txt, "LDA")
     plot_2D_embedding(data, transfer_exp, "experimentResults/problem_analisys/figures/response_LDA_"+transfer_exp+".pdf")
     data = get_2D_embedding_from_response(input_txt, "PCA")
