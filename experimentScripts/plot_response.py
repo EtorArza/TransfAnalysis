@@ -14,6 +14,7 @@ from scipy import stats
 from sklearn import preprocessing
 from sklearn import manifold
 from sklearn.preprocessing import StandardScaler
+from matplotlib.ticker import FormatStrFormatter
 
 # # Load scores from transferability.
 # import plot_transferability
@@ -433,64 +434,62 @@ def plot_2D_embedding(df, transfer_exp, save_fig_path):
 
     legend_location_params = {"bbox_to_anchor":(0, 1.05, 1, 0.2), "loc":"lower left", "mode":"expand", "borderaxespad":0, "ncol":4}
 
-
-    if transfer_exp == "continuous12":
+    if transfer_exp == "rokkonen" or "MDS" not in save_fig_path:
+        fig.set_size_inches(3.5, 2.75*0.9)
+    elif transfer_exp == "continuous12":
         handles, labels = plt.gca().get_legend_handles_labels()
         order = [2,0,1]
         ax.legend([handles[idx] for idx in order],[labels[idx] for idx in order], fontsize=8, markerscale=1.0, **legend_location_params)
-    if transfer_exp == "rokkonen":
-        pass
     else:
         ax.legend(fontsize=8, markerscale=1.0, **legend_location_params)
     if "MDS" in save_fig_path:
-        ax.set_xlim(-0.6,0.6)
-        ax.set_ylim(-0.6,0.6)
+        ax.set_xlim(-0.678,0.678)
+        ax.set_ylim(-0.678,0.678)
+    ax.yaxis.set_major_formatter(FormatStrFormatter('%.2f'))
     fig.tight_layout()
     fig.savefig(save_fig_path)
     plt.close()
 
-# # MDS Transferability
-# data = pd.read_csv("experimentResults/problem_analisys/transferability_MDS_continuous12.txt", index_col=0, header=0)
-# plot_2D_embedding(data, "continuous12", "experimentResults/problem_analisys/figures/transferability_MDS_continuous12.pdf")
+# MDS Transferability
+data = pd.read_csv("experimentResults/problem_analisys/transferability_MDS_continuous12.txt", index_col=0, header=0)
+plot_2D_embedding(data, "continuous12", "experimentResults/problem_analisys/figures/transferability_MDS_continuous12.pdf")
 
-# data = pd.read_csv("experimentResults/problem_analisys/transferability_MDS_PERMUPROB.txt", index_col=0, header=0)
-# plot_2D_embedding(data, "PERMUPROB", "experimentResults/problem_analisys/figures/transferability_MDS_PERMUPROB.pdf")
+data = pd.read_csv("experimentResults/problem_analisys/transferability_MDS_PERMUPROB.txt", index_col=0, header=0)
+plot_2D_embedding(data, "PERMUPROB", "experimentResults/problem_analisys/figures/transferability_MDS_PERMUPROB.pdf")
 
-# data = pd.read_csv("experimentResults/problem_analisys/transferability_MDS_QAP.txt", index_col=0, header=0)
-# plot_2D_embedding(data, "QAP", "experimentResults/problem_analisys/figures/transferability_MDS_QAP.pdf")
+data = pd.read_csv("experimentResults/problem_analisys/transferability_MDS_QAP.txt", index_col=0, header=0)
+plot_2D_embedding(data, "QAP", "experimentResults/problem_analisys/figures/transferability_MDS_QAP.pdf")
 
-# data = pd.read_csv("experimentResults/problem_analisys/transferability_MDS_rokkonen.txt", index_col=0, header=0)
-# plot_2D_embedding(data, "rokkonen", "experimentResults/problem_analisys/figures/transferability_MDS_rokkonen.pdf")
+data = pd.read_csv("experimentResults/problem_analisys/transferability_MDS_rokkonen.txt", index_col=0, header=0)
+plot_2D_embedding(data, "rokkonen", "experimentResults/problem_analisys/figures/transferability_MDS_rokkonen.pdf")
 
 data = pd.read_csv("experimentResults/problem_analisys/transferability_MDS_TSP.txt", index_col=0, header=0)
 plot_2D_embedding(data, "TSP", "experimentResults/problem_analisys/figures/transferability_MDS_TSP.pdf")
 
 
-# # Matilda InstanceSpace
-# data = pd.read_csv("other_src/InstanceSpace/trial_continuous12/coordinates.csv", index_col=0)
-# plot_2D_embedding(data, "continuous12", "experimentResults/problem_analisys/figures/MatildaInstanceSpace_continuous12.pdf")
+# Matilda InstanceSpace
+data = pd.read_csv("other_src/InstanceSpace/trial_continuous12/coordinates.csv", index_col=0)
+plot_2D_embedding(data, "continuous12", "experimentResults/problem_analisys/figures/MatildaInstanceSpace_continuous12.pdf")
 
-# data = pd.read_csv("other_src/InstanceSpace/trial_rokkonen/coordinates.csv", index_col=0)
-# plot_2D_embedding(data, "rokkonen", "experimentResults/problem_analisys/figures/MatildaInstanceSpace_rokkonen.pdf")
+data = pd.read_csv("other_src/InstanceSpace/trial_rokkonen/coordinates.csv", index_col=0)
+plot_2D_embedding(data, "rokkonen", "experimentResults/problem_analisys/figures/MatildaInstanceSpace_rokkonen.pdf")
 
 data = pd.read_csv("other_src/InstanceSpace/trial_tsp/coordinates.csv", index_col=0)
 plot_2D_embedding(data, "TSP", "experimentResults/problem_analisys/figures/MatildaInstanceSpace_tsp.pdf")
 
 
-# # PCA of featureMatrix
-# data = get_2D_embedding_from_features("experimentResults/problem_analisys/featureMatrix_continuous12_ELA.txt")
-# plot_2D_embedding(data, "continuous12", "experimentResults/problem_analisys/figures/featureMatrix_continuous12_ELA_PCA.pdf")
+# PCA of featureMatrix
+data = get_2D_embedding_from_features("experimentResults/problem_analisys/featureMatrix_continuous12_ELA.txt")
+plot_2D_embedding(data, "continuous12", "experimentResults/problem_analisys/figures/featureMatrix_continuous12_ELA_PCA.pdf")
 
-# data = get_2D_embedding_from_features("experimentResults/problem_analisys/featureMatrix_rokkonen_ELA.txt")
-# plot_2D_embedding(data, "rokkonen", "experimentResults/problem_analisys/figures/featureMatrix_rokkonen_ELA_PCA.pdf")
+data = get_2D_embedding_from_features("experimentResults/problem_analisys/featureMatrix_rokkonen_ELA.txt")
+plot_2D_embedding(data, "rokkonen", "experimentResults/problem_analisys/figures/featureMatrix_rokkonen_ELA_PCA.pdf")
 
 data = get_2D_embedding_from_features("experimentResults/problem_analisys/featureMatrix_TSP_Matilda.txt")
 plot_2D_embedding(data, "TSP", "experimentResults/problem_analisys/figures/featureMatrix_TSP_Matilda_PCA.pdf")
 
 # Response of HH framework (ours)
 for idx, input_txt, transfer_exp in zip(range(len(transfer_exp_list)), txt_paths, transfer_exp_list):
-    if transfer_exp != "TSP":
-        continue
     data = get_2D_embedding_from_response(input_txt, "LDA")
     plot_2D_embedding(data, transfer_exp, "experimentResults/problem_analisys/figures/response_LDA_"+transfer_exp+".pdf")
     data = get_2D_embedding_from_response(input_txt, "PCA")
