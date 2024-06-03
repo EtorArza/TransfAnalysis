@@ -63,6 +63,13 @@ clean:
 	rm -rf obj
 	rm -f ./main.out
 	rm -f src/util/std.h.gch
+	rm -rf demo/all_controllers
+	rm -rf demo/top_controllers
+	rm -f score.txt
+	rm -f responses.txt
+	rm -f demo/test_local.ini
+	rm -f demo/test.ini
+	rm -f demo/train_local.ini
 
 ./main.out: ${OBJECTS} ${CUDA_OBJECTS} 
 	g++ ${PROFILE} ${OBJECTS} ${CUDA_OBJECTS} ${UBSAN} ${PFM_LD_FLAGS} ${LIBS} -o $@
